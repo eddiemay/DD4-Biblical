@@ -1,0 +1,33 @@
+<section class="grid_12">
+  <div class="block-border">
+    <div class="block-content">
+      <h1>Utilities</h1>
+
+      <div class="block-content form">
+        <h2>Jubilee Year Calculator</h2>
+        <fieldset>
+          <div class="columns">
+            <div class="colx3-left">
+              <label>Jubilee</label>
+              <input type="number" data-ng-model="$ctrl.jubilee" data-ng-change="$ctrl.calcJubileeYear()" min="1" max="1000">
+            </div>
+            <div class="colx3-center">
+              <label>Week</label>
+              <input type="number" data-ng-model="$ctrl.week" data-ng-change="$ctrl.calcJubileeYear()" min="1" max="7">
+            </div>
+            <div class="colx3-left">
+              <label>Year</label>
+              <input type="number" data-ng-model="$ctrl.year" data-ng-change="$ctrl.calcJubileeYear()" min="0" max="7">
+            </div>
+          </div>
+          <div class="columns">
+            <button data-ng-click="$ctrl.decrementJubileeYear()">Minus</button>
+            Year: {{$ctrl.jubileeYear}} A.M.
+            <button data-ng-click="$ctrl.incrementJubileeYear()">Plus</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+  <scripture-view data-ng-if="$ctrl.reference" data-reference="$ctrl.reference"></scripture-view>
+</section>

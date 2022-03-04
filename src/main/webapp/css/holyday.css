@@ -1,0 +1,109 @@
+.calendar tbody td .holyday-title {
+  display: block;
+  float: left;
+  font-size: 1.25em;
+  line-height: 1.222em;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Sans", Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  color: #840ebf; // Deep purple
+}
+.calendar tbody td:hover .holyday-title {
+  color: white;
+  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.calendar tbody td.shabbath .day {
+  color: #840ebf; // Deep purple
+}
+.calendar tbody td.today .day {
+  color: red;
+}
+.calendar tbody td:hover .day {
+  color: white;
+  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.calendar tbody td .reference-day {
+  display: block;
+  float: left;
+  font-size: 1.1em;
+  line-height: 1.222em;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Sans", Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  color: #77A50D;
+}
+.calendar tbody td.even-reference-month .reference-day {
+  color: #3399cc;
+}
+.calendar tbody td.other-month .reference-day {
+  color: #CCCCCC;
+}
+.calendar tbody td:hover .reference-day {
+  color: white;
+  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.events li .biblical {
+  display: block;
+  font-weight: normal;
+  float: left;
+  margin-left: -3.833em;
+  }
+  .calendar .events li .biblical {
+    margin-left: -4em;
+  }
+  .calendar tbody td:hover .events li .biblical {
+    color: white;
+  }
+
+.calendar tbody td.ng-scope.passover {
+  background-image: url(../images/holyday/passover-lamb.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.passover-makeup {
+  background-image: url(../images/holyday/passover-lamb.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.unleavened-bread {
+  background-image: url(../images/holyday/unleavened-bread.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.first-fruits {
+  background-image: url(../images/holyday/first-fruits.png);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.feast-trumpets {
+  background-image: url(../images/holyday/12-tribes-Silver-plated-Rams-Horn-Shofar-from-Holy-land.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.atonement-day {
+  background-image: url(../images/holyday/day-of-atonement.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.atonement-eve {
+  background-image: url(../images/holyday/day-of-atonement.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody .ng-scope.festival-booths {
+  background-image: url(../images/holyday/our-tent.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.solemn-assembly {
+  background-image: url(../images/holyday/us-and-our-tent.jpeg);
+  background-size: 100% 100%;
+}
+.calendar tbody td.ng-scope.festival-dedication {
+  background-image: url(../images/holyday/menorah-7.jpeg);
+  background-size: 100% 100%;
+  /* background-repeat: no-repeat;
+  background-position: center; */
+}
+.calendar tbody td.ng-scope.leap-week {
+  background-image: url(../images/holyday/leap-week.jpeg);
+  background-size: 100% 100%;
+}

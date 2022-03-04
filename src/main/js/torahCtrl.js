@@ -1,0 +1,40 @@
+com.digitald4.biblical.TorahCtrl = function(globalData, commandmentService) {
+  this.commandmentService = commandmentService;
+  this.userLoggedIn = () => globalData.activeSession != undefined;
+  this.searchText = '';
+  this.newCommand = {};
+  this.pageSize = 50;
+  this.search();
+}
+
+com.digitald4.biblical.TorahCtrl.prototype.search = function(pageToken) {
+  var request = {searchText: this.searchText, pageSize: this.pageSize, pageToken: pageToken, orderBy: this.orderBy};
+  this.commandmentService.search(request, searchResult => this.searchResult = searchResult, notify);
+}
+
+com.digitald4.biblical.TorahCtrl.prototype.create = function() {
+  this.commandmentService.create(this.newCommand, newCommand => {
+    this.searchResult.items.push(newCommand);
+    this.searchResult.end++;
+    this.searchResult.totalSize++;
+    this.newCommand.summary = '';
+    this.newCommand.scriptures = '';
+  }, notify);
+}
+
+com.digitald4.biblical.TorahCtrl.prototype.edit = function(commandment) {
+  commandment.isEditing = true;
+}
+
+com.digitald4.biblical.TorahCtrl.prototype.update = function(commandment) {
+  this.commandmentService.update(commandment, ['summary', 'scriptures', 'tags'], updated => {
+    commandment.isEditing = undefined;
+    commandment.summary = updated.summary;
+    commandment.scriptures = updated.scriptures;
+    commandment.tags = updated.tags;
+  }, notify);
+}
+
+com.digitald4.biblical.TorahCtrl.prototype.showScripture = function(commandment) {
+  this.reference = commandment.scriptures;
+}

@@ -1,0 +1,16 @@
+indexes:
+  - kind: Scripture
+    properties:
+      - name: version
+      - name: book
+      - name: chapter
+      - name: verse
+  - kind: Scripture
+    properties:
+      - name: book
+      - name: chapter
+      - name: verse
+  - kind: BiblicalEvent
+    properties:
+      - name: month
+      - name: day

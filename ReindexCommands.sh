@@ -1,0 +1,1 @@
+curl --request GET --header "content-type:application/json" https://dd4-biblical.appspot.com/_api/commandments/v1/reindex

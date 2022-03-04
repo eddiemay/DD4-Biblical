@@ -1,0 +1,21 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "dd4-biblical.appspot.com"
+  },
+  "host": "dd4-biblical.appspot.com",
+  "basePath": "/_api",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+
+  }
+}

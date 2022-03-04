@@ -1,0 +1,74 @@
+<section class="grid_12">
+  <div class="block-border">
+    <div class="block-content">
+      <h1>READ THE WORD</h1>
+
+      <div class="block-content form">
+        <a href="" data-ng-click="$ctrl.showSearch()" data-ng-show="!$ctrl.searchShown">
+          <img src="images/icons/web-app/24/Search.png" alt="Search the Word">
+        </a>
+        <a href="" data-ng-click="$ctrl.hideSearch()" data-ng-show="$ctrl.searchShown">
+          <img src="images/icons/fugue/cross-circle.png" width="24" height="24" alt="Close search">
+        </a>
+        <fieldset data-ng-show="!$ctrl.searchShown">
+          <div class="columns">
+            <div class="colx3-left">
+              <label>Book</label>
+              <select data-ng-model="$ctrl.book"
+                      data-ng-options="book.name as book.name for book in $ctrl.bibleBooks"></select>
+            </div>
+            <div class="colx3-center">
+              <label>Verses</label>
+              <input type="text" data-ng-model="$ctrl.verses" class="full-width" data-on-enter="$ctrl.viewScripture()">
+            </div>
+            <div class="colx3-right">
+              <label>Version</label>
+              <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.viewScripture()"
+                      data-ng-options="version for version in $ctrl.scriptureVersions"></select>
+              <button data-ng-click="$ctrl.viewScripture()">Show</button>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset data-ng-show="$ctrl.searchShown">
+          <div class="columns">
+            <div class="colx3-left-double">
+              <label>Search Text</label>
+              <input type="text" data-ng-model="$ctrl.searchText" class="full-width" data-on-enter="$ctrl.search()">
+            </div>
+            <div class="colx3-right">
+              <button data-ng-click="$ctrl.search()">Search</button>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="block-content form">
+        <div data-ng-show="!$ctrl.searchShown">
+          <p data-ng-repeat="script in $ctrl.scriptures">
+            <span data-ng-show="script.showChapter">
+              <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
+                {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+            {{script.text}}
+          </p>
+        </div>
+        <div data-ng-show="$ctrl.searchShown && $ctrl.searchResult">
+          <h2>Search Results: {{$ctrl.searchResult.start}} to {{$ctrl.searchResult.end}} of {{$ctrl.searchResult.totalSize}}</h2>
+          <p data-ng-repeat="group in $ctrl.searchResult.grouped">
+            <a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter)">
+              {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
+            <span class="verse" data-ng-repeat="result in group.items">
+              <br>
+              (<a href="" data-ng-click="$ctrl.showScripture(result.version, result.book, result.chapter)">{{result.version}}</a>)
+              {{result.text}}
+            </span>
+          </p>
+          <fieldset>
+            <span data-ng-repeat="page in $ctrl.searchResult.pages">
+              <button data-ng-click="$ctrl.search(page)" data-ng-disabled="page == $ctrl.searchResult.pageToken">{{page}}</button>
+            </span>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </div>
+  <scripture-view data-ng-if="$ctrl.reference" data-reference="$ctrl.reference"></scripture-view>
+</section>

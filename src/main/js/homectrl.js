@@ -1,0 +1,1 @@
+com.digitald4.biblical.HomeCtrl = function() {}
