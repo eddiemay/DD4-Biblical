@@ -12,7 +12,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.util.HashMap;
@@ -24,7 +23,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
-  private static final String URL = "http://www.pseudepigrapha.com/%s/%d.htm";
+  private static final String BASE_URL = "http://www.pseudepigrapha.com/";
+  private static final String URL = BASE_URL + "%s/%d.htm";
   private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)(.+)");
   private static final Pattern VERSE_PATTERN2 = Pattern.compile("(\\d+) (\\D+)");
   private static final Pattern VERSE_PATTERN3 = Pattern.compile("(\\d+)[a-z]?\\. (\\D+\\d* \\D*)");
@@ -51,7 +51,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
 
   private ImmutableList<Scripture> fetchJubilees(String version, BibleBook book, int chapter) {
     String htmlResult = apiConnector.sendGet(String.format(URL, book.getName().toLowerCase(), chapter));
-    Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
+    Document doc = Jsoup.parse(htmlResult.trim());
     Elements wrappers = doc.getElementsByTag("ol");
     if (wrappers.size() == 0) {
       throw new DD4StorageException(
@@ -71,7 +71,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
   }
 
   private ImmutableList<Scripture> fetchJasher(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet("http://www.pseudepigrapha.com/pseudepigrapha/jasher.html");
+    String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/jasher.html");
     Document doc = Jsoup.parse(htmlResult.trim());
 
     return doc.getElementsByTag("h3").stream()
@@ -101,7 +101,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
   }
 
   private ImmutableList<Scripture> fetchEnoch(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet("http://www.pseudepigrapha.com/pseudepigrapha/enoch.htm");
+    String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/enoch.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
 
     return doc.getElementsByTag("td").stream()
@@ -143,7 +143,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
   }
 
   private ImmutableList<Scripture> fetchEnochOther(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet("http://www.pseudepigrapha.com/pseudepigrapha/enoch1b.htm");
+    String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/enoch1b.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
 
     return doc.getElementsByTag("h3").stream()

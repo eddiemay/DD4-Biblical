@@ -3,6 +3,7 @@ package com.digitald4.biblical.server;
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.server.service.Empty;
@@ -34,20 +35,25 @@ import com.google.inject.Inject;
 )
 public class ScriptureService extends EntityServiceImpl<Scripture> {
   public static final String DEFAULT_VERSION = "ISR";
+  public static final String DEFAULT_ORDER_BY = "bookNum,chapter,verse,versionNum,version";
 
   private final ScriptureStore scriptureStore;
+  private final ScriptureReferenceProcessor scriptureReferenceProcessor;
 
   @Inject
-  ScriptureService(ScriptureStore scriptureStore, SessionStore<BasicUser> sessionStore) {
+  ScriptureService(ScriptureStore scriptureStore, SessionStore<BasicUser> sessionStore,
+                   ScriptureReferenceProcessor scriptureReferenceProcessor) {
     super(scriptureStore, sessionStore, true);
     this.scriptureStore = scriptureStore;
+    this.scriptureReferenceProcessor = scriptureReferenceProcessor;
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "scriptures")
   public ImmutableList<Scripture> getScriptures(
-      @Nullable @Named("version") String version, @Named("reference") String reference) throws ServiceException {
+      @Named("reference") String reference, @Named("version") @DefaultValue(DEFAULT_VERSION) String version)
+      throws ServiceException {
     try {
-      return scriptureStore.getScriptures(version != null ? version: DEFAULT_VERSION, reference);
+      return scriptureStore.getScriptures(version, reference);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -55,22 +61,26 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "search")
   public QueryResult<Scripture> search(
-      @Named("searchText") String searchText,
-      @Named("orderBy") @DefaultValue("bookNum,chapter,verse,versionNum,version") String orderBy,
+      @Named("searchText") String searchText, @Named("version") @Nullable String version,
+      @Named("orderBy") @DefaultValue(DEFAULT_ORDER_BY) String orderBy,
       @Named("pageSize") @DefaultValue("200") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken)
       throws ServiceException {
     try {
-      return scriptureStore.search(Query.forSearch(searchText, orderBy, pageSize, pageToken));
+      return scriptureReferenceProcessor.matchesPattern(searchText)
+          ? GetOrSearchResponse.getResult(scriptureStore.getScriptures(version, searchText))
+          : GetOrSearchResponse.searchResult(
+              scriptureStore.search(Query.forSearch(searchText, orderBy, pageSize, pageToken)));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "searchAndDelete")
-  public Empty searchAndDelete(@Named("searchText") String searchText) throws ServiceException {
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "expand")
+  public StringBuilder expand(
+      @Named("html") String html, @Named("version") @DefaultValue(DEFAULT_VERSION) String version,
+      @DefaultValue("false") @Named("includeLinks") boolean includeLinks) throws ServiceException {
     try {
-      scriptureStore.searchAndDelete(searchText);
-      return Empty.getInstance();
+      return new StringBuilder(scriptureStore.expandScriptures(version, html, includeLinks));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -87,28 +97,25 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
     }
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "html")
-  public StringBuilder getScripturesHtml(
-      @Nullable @Named("version") String version,
-      @Named("reference") String reference,
-      @DefaultValue("false") @Named("includeLinks") boolean includeLinks,
-      @DefaultValue("false") @Named("spaceVerses") boolean spaceVerses) throws ServiceException {
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "searchAndReplace")
+  public ImmutableList<Scripture> searchAndReplace(
+      @Named("phase") String phase, @Named("replacement") String replacement, @Named("filter") String filter,
+      @Named("preview") @Nullable boolean preview, @Named("idToken") String idToken) throws ServiceException {
     try {
-      return new StringBuilder(
-          scriptureStore.getScripturesHtml(
-              version != null ? version: DEFAULT_VERSION, reference, includeLinks, spaceVerses));
+      resolveLogin(idToken, true);
+      return scriptureStore.searchAndReplace(phase, replacement, filter, preview);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "expand")
-  public StringBuilder expand(
-      @Nullable @Named("version") String version, @Named("html") String html,
-      @DefaultValue("false") @Named("includeLinks") boolean includeLinks) throws ServiceException {
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "searchAndDelete")
+  public Empty searchAndDelete(@Named("searchText") String searchText, @Named("idToken") String idToken)
+      throws ServiceException {
     try {
-      return new StringBuilder(
-          scriptureStore.expandScriptures(version != null ? version: DEFAULT_VERSION, html, includeLinks));
+      resolveLogin(idToken, true);
+      scriptureStore.searchAndDelete(searchText);
+      return Empty.getInstance();
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -120,6 +127,30 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
       return BibleBook.ALL_BOOKS;
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
+  public static class GetOrSearchResponse extends QueryResult<Scripture> {
+    private enum RESULT_TYPE {GET, SEARCH};
+    private final RESULT_TYPE resultType;
+
+    private GetOrSearchResponse(RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize,
+                                com.digitald4.common.storage.Query query) {
+      super(scriptures, totalSize, query);
+      this.resultType = resultType;
+    }
+
+    public RESULT_TYPE getResultType() {
+      return resultType;
+    }
+
+    private static GetOrSearchResponse getResult(ImmutableList<Scripture> scriptures) {
+      return new GetOrSearchResponse(RESULT_TYPE.GET, scriptures, scriptures.size(), null);
+    }
+
+    private static GetOrSearchResponse searchResult(QueryResult<Scripture> queryResult) {
+      return new GetOrSearchResponse(
+          RESULT_TYPE.SEARCH, queryResult.getItems(), queryResult.getTotalSize(), queryResult.query());
     }
   }
 }

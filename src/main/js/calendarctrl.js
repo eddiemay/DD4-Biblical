@@ -94,7 +94,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.refresh = function() {
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.getFirstDayOffset = function() {
-  return ((this.hebrewDate.month - 1) % 3) * 2;
+  return this.hebrewDate.getDayOfWeek() - 1;
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.getShortName = function() {

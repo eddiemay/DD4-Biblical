@@ -31,6 +31,7 @@ import javax.inject.Provider;
 
 public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   public static final String REFERENCE_ATTR = "scripture-reference";
+  private static final Query.Builder QUERY_BASE = Query.newBuilder().setOptions(QueryOptions.newBuilder().setLimit(1000));
 
   private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final ScriptureFetcher scriptureFetcher;
@@ -90,6 +91,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
 
     return com.google.appengine.api.search.Document.newBuilder()
         .setId(scripture.documentId())
+        .addField(Field.newBuilder().setName("scriptureId").setAtom(String.valueOf(scripture.getId())))
         .addField(Field.newBuilder().setName("book").setAtom(scripture.getBook()))
         .addField(Field.newBuilder().setName("bookNum").setNumber(bibleBook.getBookNum()))
         .addField(Field.newBuilder().setName("chapter").setNumber(scripture.getChapter()))
@@ -105,6 +107,9 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   @Override
   public Scripture fromDocument(com.google.appengine.api.search.Document document) {
     return new Scripture()
+        .setId(
+            document.getFieldNames().contains("scriptureId")
+                ? Long.parseLong(document.getOnlyField("scriptureId").getAtom()) : 0)
         .setVersion(document.getOnlyField("version").getAtom())
         .setBook(document.getOnlyField("book").getAtom())
         .setChapter(document.getOnlyField("chapter").getNumber().intValue())
@@ -119,11 +124,34 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   public void searchAndDelete(String searchText) {
     searchIndex.deleteAsync(
         searchIndex
-            .search(Query.newBuilder().setOptions(QueryOptions.newBuilder().setLimit(1000)).build(searchText))
+            .search(QUERY_BASE.build(searchText))
             .getResults()
             .stream()
             .map(com.google.appengine.api.search.Document::getId)
             .collect(toImmutableList()));
+  }
+
+  private ImmutableList<Scripture> getSearchAndReplaceCandidates(String phase, String replacement, String filter) {
+    return searchIndex
+        .search(QUERY_BASE.build(String.format("%s %s", phase, filter)))
+        .getResults()
+        .stream()
+        .map(this::fromDocument)
+        // The search is case insensitive, but we want to be case sensitive so need to filter the results.
+        .filter(scripture -> scripture.getText().toString().contains(phase))
+        .collect(toImmutableList());
+  }
+
+  public ImmutableList<Scripture> searchAndReplace(String phase, String replacement, String filter, boolean preview) {
+    ImmutableList<Scripture> candidates = getSearchAndReplaceCandidates(phase, replacement, filter);
+    if (preview) {
+      candidates.forEach(scripture -> scripture.setText(scripture.getText().toString().replace(phase, replacement)));
+      return candidates;
+    }
+
+    return update(
+        candidates.stream().map(Scripture::getId).collect(toImmutableList()),
+        scripture -> scripture.setText(scripture.getText().toString().replace(phase, replacement)));
   }
 
   public QueryResult<Scripture> list(

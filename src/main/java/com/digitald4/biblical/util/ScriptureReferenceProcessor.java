@@ -4,7 +4,8 @@ import com.digitald4.biblical.model.BibleBook;
 import com.google.common.collect.ImmutableList;
 
 public interface ScriptureReferenceProcessor {
-  ImmutableList<VerseRange> computeVerseRanges(String scriptureStr);
+  boolean matchesPattern(String reference);
+  ImmutableList<VerseRange> computeVerseRanges(String reference);
 
   class VerseRange {
     private final BibleBook book;

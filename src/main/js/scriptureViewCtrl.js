@@ -18,7 +18,7 @@ com.digitald4.biblical.ScriptureViewCtrl.prototype.showScripture = function(vers
   this.reference.chapter = chapter;
   this.reference.verse = verse;
 
-  var searchText = 'book=' + book + ' chapter=' + chapter + (verse ? ' verse=' + verse : ' version=' + version);
+  var searchText = 'book="' + book + '" chapter=' + chapter + (verse ? ' verse=' + verse : ' version=' + version);
   this.scriptureService.search({'searchText': searchText, 'pageSize': 200},
       searchResult => this.scriptures = searchResult.items || [],
       notifyError);

@@ -22,10 +22,15 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
   private static final Pattern SINGLE_VERSE = Pattern.compile("(\\d+)");
 
   @Override
-  public ImmutableList<VerseRange> computeVerseRanges(String scriptureStr) {
-    Matcher matcher = BASE_PATTERN.matcher(scriptureStr);
+  public boolean matchesPattern(String reference) {
+    return BASE_PATTERN.matcher(reference).find();
+  }
+
+  @Override
+  public ImmutableList<VerseRange> computeVerseRanges(String reference) {
+    Matcher matcher = BASE_PATTERN.matcher(reference);
     if (!matcher.find()) {
-      throw new DD4StorageException("Unable to match scripture pattern: " + scriptureStr, BAD_REQUEST);
+      throw new DD4StorageException("Unable to match scripture pattern: " + reference, BAD_REQUEST);
     }
 
     ImmutableList.Builder<VerseRange> verseRanges = ImmutableList.builder();
@@ -123,7 +128,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
         }
 
         throw new DD4StorageException(
-            String.format("Unable to match scripture pattern verse part: %s of: %s", part, scriptureStr), BAD_REQUEST);
+            String.format("Unable to match scripture pattern verse part: %s of: %s", part, reference), BAD_REQUEST);
       }
     } while (matcher.find());
 

@@ -12,8 +12,6 @@ var HEBREW_MONTHS = [
   {number: 10, displayText: '10th Month', days: 30, name: 'Tebeth'},
   {number: 11, displayText: '11th Month', days: 30, name: 'Shebat'},
   {number: 12, displayText: '12th Month', days: 31, name: 'Adar'}, {number: 13, displayText: 'Leap Week', days: 7}];
-var BASE_YEAR = 2000;
-var BASE_ABIB = new Date(2000, 2, 19, 4, 0);
 
 HebrewDate = function(year, month, day, date) {
   this.year = year;

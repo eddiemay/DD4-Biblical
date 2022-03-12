@@ -4,13 +4,7 @@
       <h1>READ THE WORD</h1>
 
       <div class="block-content form">
-        <a href="" data-ng-click="$ctrl.showSearch()" data-ng-show="!$ctrl.searchShown">
-          <img src="images/icons/web-app/24/Search.png" alt="Search the Word">
-        </a>
-        <a href="" data-ng-click="$ctrl.hideSearch()" data-ng-show="$ctrl.searchShown">
-          <img src="images/icons/fugue/cross-circle.png" width="24" height="24" alt="Close search">
-        </a>
-        <fieldset data-ng-show="!$ctrl.searchShown">
+        <fieldset>
           <div class="columns">
             <div class="colx3-left">
               <label>Book</label>
@@ -19,24 +13,13 @@
             </div>
             <div class="colx3-center">
               <label>Verses</label>
-              <input type="text" data-ng-model="$ctrl.verses" class="full-width" data-on-enter="$ctrl.viewScripture()">
+              <input type="text" data-ng-model="$ctrl.verses" class="full-width" data-on-enter="$ctrl.getOrSearch()">
             </div>
             <div class="colx3-right">
               <label>Version</label>
               <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.viewScripture()"
                       data-ng-options="version for version in $ctrl.scriptureVersions"></select>
-              <button data-ng-click="$ctrl.viewScripture()">Show</button>
-            </div>
-          </div>
-        </fieldset>
-        <fieldset data-ng-show="$ctrl.searchShown">
-          <div class="columns">
-            <div class="colx3-left-double">
-              <label>Search Text</label>
-              <input type="text" data-ng-model="$ctrl.searchText" class="full-width" data-on-enter="$ctrl.search()">
-            </div>
-            <div class="colx3-right">
-              <button data-ng-click="$ctrl.search()">Search</button>
+              <button data-ng-click="$ctrl.getOrSearch()">Show</button>
             </div>
           </div>
         </fieldset>
