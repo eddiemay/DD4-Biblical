@@ -3,37 +3,26 @@ var ONE_DAY = 24 * ONE_HOUR;
 var EVENT_TYPES = ['BIBLICAL', 'NOTIFICATION'];
 var SCRIPTURE_VERSIONS = ['ISR', 'RSKJ', 'NRSV', 'NWT', /*'NKJV',*/ 'KJV1611'];
 
-com.digitald4.biblical.CalendarCtrl = function($scope, $filter, globalData,
-    holyDayService, biblicalEventService, notificationService, sunRiseSetService, scriptureService) {
-  this.dateFilter = $filter('date');
+com.digitald4.biblical.CalendarCtrl = function($location, globalData, biblicalEventService, scriptureService) {
+  globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
+  this.locationProvider = $location;
   this.globalData = globalData;
-  this.globalData.scriptureVersion = 'ISR';
   this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.userLoggedIn = () => globalData.activeSession != undefined;
-  if ($scope.config) {
-    this.entityType = $scope.config.entity;
-    this.entityId = $scope.config.entityId;
-  }
-  if ($scope.onUpdate) {
-    this.onUpdate = $scope.onUpdate;
-  }
   this.months = HEBREW_MONTHS;
-  this.holyDayService = holyDayService;
   this.biblicalEventService = biblicalEventService;
-  this.notificationService = notificationService;
-  this.sunRiseSetService = sunRiseSetService;
   this.scriptureService = scriptureService;
-  var today = HebrewDate.fromDate(new Date());
-  this.hebrewDate = today.addDays(1 - today.getDay());
+
+  var year = parseInt($location.search()['year']);
+  var month = parseInt($location.search()['month']) || 1;
+  this.hebrewDate = year ? new HebrewDate(year, month, 1) : HebrewDate.fromDate(new Date());
+  this.hebrewDate = this.hebrewDate.addDays(1 - this.hebrewDate.getDay());
   this.refresh();
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.months = HEBREW_MONTHS;
 com.digitald4.biblical.CalendarCtrl.prototype.eventTypes = EVENT_TYPES;
-com.digitald4.biblical.CalendarCtrl.prototype.holydayService;
 com.digitald4.biblical.CalendarCtrl.prototype.biblicalEventService;
-com.digitald4.biblical.CalendarCtrl.prototype.notificationService;
-com.digitald4.biblical.CalendarCtrl.prototype.sunRiseSetService;
 com.digitald4.biblical.CalendarCtrl.prototype.scriptureService;
 
 com.digitald4.biblical.CalendarCtrl.prototype.setupCalendar = function() {
@@ -103,19 +92,25 @@ com.digitald4.biblical.CalendarCtrl.prototype.getShortName = function() {
 
 com.digitald4.biblical.CalendarCtrl.prototype.prevMonth = function() {
   var hebrewDate = this.hebrewDate.addDays(-1);
-  this.hebrewDate = hebrewDate.addDays(1 - hebrewDate.getDay());
-  this.refresh();
+  this.locationProvider.search('year', hebrewDate.getYear());
+  this.locationProvider.search('month', hebrewDate.getMonth());
+  // this.hebrewDate = hebrewDate.addDays(1 - hebrewDate.getDay());
+  // this.refresh();
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.setMonth = function(year, month) {
-  this.hebrewDate = new HebrewDate(year, month, 1);
-  this.refresh();
+  var hebrewDate = new HebrewDate(year, month, 1);
+  this.locationProvider.search('year', hebrewDate.getYear());
+  this.locationProvider.search('month', hebrewDate.getMonth());
+  // this.refresh();
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.nextMonth = function() {
   var hebrewDate = this.hebrewDate.addDays(31);
-  this.hebrewDate = hebrewDate.addDays(1 - hebrewDate.getDay());
-  this.refresh();
+  this.locationProvider.search('year', hebrewDate.getYear());
+  this.locationProvider.search('month', hebrewDate.getMonth());
+  // this.hebrewDate = hebrewDate.addDays(1 - hebrewDate.getDay());
+  // this.refresh();
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.showMonthSelectionDialog = function() {
@@ -188,8 +183,8 @@ com.digitald4.biblical.CalendarCtrl.prototype.createEvent = function() {
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.showEditEventDialog = function(event) {
-  this.editEvent = {id: event.id,
-      month: event.month, day: event.day, references: event.references, title: event.title, summary: event.summary};
+  this.editEvent = {id: event.id, month: event.month, day: event.day, year: event.year,
+      references: event.references, title: event.title, summary: event.summary};
 
   if (event.summary) {
     this.scriptureService.expand(event.summary, false, displayText => this.editEvent.summary = displayText, notifyError);
@@ -214,6 +209,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.saveEvent = function() {
     edits.push('day');
     dayChanged = true;
   }
+  if (this.editEvent.year != this.origEvent.year) {edits.push('year');}
   if (this.editEvent.references != this.origEvent.references) {edits.push('references');}
   if (this.editEvent.title != this.origEvent.title) {edits.push('title');}
   if (this.editEvent.summary != this.origEvent.summary) {edits.push('summary');}
@@ -240,6 +236,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.saveEvent = function() {
       this.origEvent.references = event.references;
       this.origEvent.title = event.title;
       this.origEvent.summary = event.summary;
+      this.origEvent.year = event.year;
       this.origEvent.displayText = undefined;
     }
     if (this.onUpdate) {

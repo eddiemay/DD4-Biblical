@@ -15,6 +15,7 @@ import org.jsoup.parser.Parser;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Comparator;
 import java.util.function.UnaryOperator;
 
 public class BiblicalEventStore extends GenericStore<BiblicalEvent> {
@@ -24,7 +25,10 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent> {
   }
 
   public ImmutableList<BiblicalEvent> getBiblicalEvents(int month) {
-    return list(Query.forList().setFilters(Query.Filter.of("month", month))).getItems();
+    return list(Query.forList().setFilters(Query.Filter.of("month", month))).getItems().stream()
+        // Temp sorting until we get all the years filled in.
+        .sorted(Comparator.comparing(BiblicalEvent::getDay).thenComparing(BiblicalEvent::getYear))
+        .collect(toImmutableList());
   }
 
   @Override

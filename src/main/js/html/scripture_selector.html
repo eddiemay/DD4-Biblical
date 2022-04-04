@@ -1,0 +1,39 @@
+<div id="eventModal" style="display: block;">
+  <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px;">
+    <ul class="action-tabs right">
+      <li>
+        <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+          <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+        </a>
+      </li>
+    </ul>
+    <div class="block-content form">
+      {{$ctrl.reference.toString}}
+      <div data-ng-show="$ctrl.view == 'book'">
+        <button data-ng-repeat="book in $ctrl.bibleBooks" data-ng-click="$ctrl.setBook(book)">{{book.name}}</button>
+      </div>
+      <div data-ng-show="$ctrl.view == 'chapter'">
+        <button data-ng-repeat="chapter in $ctrl.reference.book.chapters"
+                data-ng-click="$ctrl.setChapter(chapter)">{{chapter.number}}</button>
+      </div>
+      <div data-ng-show="$ctrl.view == 'startVerse' || $ctrl.view == 'endVerse'">
+        <button data-ng-repeat="v in [].constructor($ctrl.reference.chapter.verseCount) track by $index"
+                data-ng-click="$ctrl.setVerse($index + 1)">{{$index + 1}}</button>
+      </div>
+      <div class="columns">
+        <label>Version</label>
+        <select data-ng-model="$ctrl.globalData.version" data-ng-change="$ctrl.refresh()"
+                data-ng-options="version for version in $ctrl.scriptureVersions"></select>
+        <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+      </div>
+    </div>
+    <div class="modal-resize-tl"></div>
+    <div class="modal-resize-t"></div>
+    <div class="modal-resize-tr"></div>
+    <div class="modal-resize-r"></div>
+    <div class="modal-resize-br"></div>
+    <div class="modal-resize-b"></div>
+    <div class="modal-resize-bl"></div>
+    <div class="modal-resize-l"></div>
+  </div>
+</div>

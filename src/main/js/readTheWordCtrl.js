@@ -1,49 +1,28 @@
-com.digitald4.biblical.ReadTheWordCtrl = function(globalData, scriptureService) {
+com.digitald4.biblical.ReadTheWordCtrl = function($location, globalData, scriptureService) {
+  this.locationProvider = $location;
+  globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion || 'ISR';
   this.globalData = globalData;
   this.scriptureService = scriptureService;
-  this.globalData.scriptureVersion = 'ISR';
+  this.userLoggedIn = () => globalData.activeSession != undefined;
   this.scriptureVersions = SCRIPTURE_VERSIONS;
-  this.bibleBooks = [
-      {name: 'Genesis', chapters: 50}, {name: 'Exodus', chapters: 40}, {name: 'Leviticus', chapters: 27},
-      {name: 'Numbers', chapters: 36}, {name: 'Deuteronomy', chapters: 34}, {name: 'Joshua', chapters: 24}];
-  this.refreshBooks();
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.refreshBooks = function() {
-  this.scriptureService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks.items, notifyError);
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.viewScripture = function() {
-  this.book = this.book || '';
-  var reference = (this.book + ' ' + this.verses).trim();
-  this.scriptures = [{text: reference}];
-  this.scriptureService.scriptures(reference, response => this.processScriptureResult(response), notifyError);
-  this.searchShown = undefined;
+  this.reference = {value: $location.search()['reference']};
+  this.showReference();
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(version, book, chapter, verse) {
-  this.reference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.showSearch = function() {
-  this.searchShown = true;
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.hideSearch = function() {
-  this.searchShown = undefined;
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.search = function(pageToken) {
-  this.searchResult = undefined;
-  var searchText = (this.book + ' ' + this.verses).trim();
-  var request = {'searchText': searchText, 'version': this.searchVersion, 'pageSize': 50, 'pageToken': pageToken};
-  this.scriptureService.search(request, searchResult => this.processSearchResult(searchResult), notifyError);
+  this.viewReference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function() {
-  this.book = this.book || '';
-  var searchText = (this.book + ' ' + this.verses).trim();
-  var request = {'searchText': searchText, 'version': this.globalData.scriptureVersion, 'pageSize': 50, 'pageToken': 1};
+  this.locationProvider.search('reference', this.reference.value);
+  this.locationProvider.search('version', this.globalData.scriptureVersion);
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
+  if (!this.reference.value) {
+    return;
+  }
+  var request = {'searchText': this.reference.value, 'version': this.globalData.scriptureVersion, 'pageSize': 50};
   this.scriptureService.search(request, response => {
     if (response.resultType == 'GET') {
       this.processScriptureResult(response);
@@ -52,8 +31,19 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function() {
     }
   }, notifyError);
 
-  this.scriptures = [{text: searchText}];
+  this.scriptures = [{text: this.reference.value}];
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.searchAndReplace = function(preview) {
+  var request = {'phrase': this.phrase, 'replacement': this.replacement, 'filter': this.filter, 'preview': preview};
+  this.scriptureService.searchAndReplace(request, searchResult => {
+    this.processSearchResult(searchResult);
+    this.previewShown = preview ? true : undefined;
+  }, notifyError);
+
+  this.scriptures = [{text: this.phrase + ' ' + this.filter}];
   this.searchShown = undefined;
+  this.previewShown = undefined;
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = function(scriptureResult) {

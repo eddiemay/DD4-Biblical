@@ -82,9 +82,9 @@ public class ScriptureServiceTest {
             2, i.getArgumentAt(0, Query.class)));
 
     QueryResult<Scripture> result = scriptureService.search(
-        "Elohim blessed seventh", null, ScriptureService.DEFAULT_ORDER_BY, 200, 1);
+        "Elohim blessed seventh", null, ScriptureStore.DEFAULT_ORDER_BY, 200, 1);
 
-    assertThat(result.getOrderBy()).isEqualTo(ScriptureService.DEFAULT_ORDER_BY);
+    assertThat(result.getOrderBy()).isEqualTo(ScriptureStore.DEFAULT_ORDER_BY);
     assertThat(((Query.Search) result.query()).getSearchText()).isEqualTo("Elohim blessed seventh");
   }
 
@@ -99,7 +99,7 @@ public class ScriptureServiceTest {
 
     QueryResult<Scripture> result = scriptureService.search("Elohim blessed seventh", "ISR", null, 200, 1);
 
-    assertThat(result.getOrderBy()).isEqualTo(ScriptureService.DEFAULT_ORDER_BY);
+    assertThat(result.getOrderBy()).isEqualTo(ScriptureStore.DEFAULT_ORDER_BY);
     assertThat(((Query.Search) result.query()).getSearchText()).isEqualTo("Elohim blessed seventh version=ISR");
   }
 }

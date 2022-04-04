@@ -1,7 +1,9 @@
 package com.digitald4.biblical.store;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.truth.Truth.assertThat;
+import static java.util.function.Function.identity;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -16,9 +18,11 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.Query;
+import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.QueryResult;
 import com.google.appengine.api.search.Index;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -53,19 +57,13 @@ public class ScriptureStoreTest {
   }
 
   private static QueryResult<Scripture> getScriptures(Query.List query) {
-    BibleBook book = BibleBook.get(query.getFilters().get(0).getVal());
-    int chapter = query.getFilters().get(1).getVal();
-    int startVerse = query.getFilters().get(2).getVal();
-    int endVerse = (int) query.getFilters().stream()
-        .filter(filter -> filter.getColumn().equals("verse") && filter.getOperator().equals("<="))
-        .map(Query.Filter::getVal)
-        .findFirst()
-        .orElse(startVerse);
-    String version = (String) query.getFilters().stream()
-        .filter(filter -> filter.getColumn().equals("version"))
-        .map(Query.Filter::getVal)
-        .findFirst()
-        .orElse(null);
+    ImmutableMap<String, Filter> filtersByColumnOp =
+        query.getFilters().stream().collect(toImmutableMap(filter -> filter.getColumn() + filter.getOperator(), identity()));
+    BibleBook book = BibleBook.get(filtersByColumnOp.get("book=").getVal());
+    int chapter = filtersByColumnOp.get("chapter=").getVal();
+    int startVerse = filtersByColumnOp.get("verse>=").getVal();
+    int endVerse = filtersByColumnOp.getOrDefault("verse<=", Filter.of("verse<=", startVerse)).getVal();
+    String version = filtersByColumnOp.getOrDefault("version=", Filter.of("version=", null)).getVal();
     endVerse = Math.min(endVerse, 37);
 
     if (chapter != 23) {
@@ -100,7 +98,7 @@ public class ScriptureStoreTest {
     if (version == null) {
       return Stream.of(
           createScripture("ISR", book, chapter, verse, text),
-          createScripture("KJV", book, chapter, verse, text));
+          createScripture("RSKJ", book, chapter, verse, text));
     }
 
     return Stream.of(createScripture(version, book, chapter, verse, text));
@@ -162,14 +160,14 @@ public class ScriptureStoreTest {
   @Test
   public void getScriptureTextAllVersions() {
     assertThat(scriptureStore.getScripturesTextAllVersions("2 Kings 23:5"))
-        .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(KJV) 2 Kings 23:5 [Scripture Placeholder]");
+        .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]");
     assertThat(scriptureStore.getScripturesTextAllVersions("2 Kings 23:5-7"))
-        .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(KJV) 2 Kings 23:5 [Scripture Placeholder]\n" +
-            "(ISR) 2 Kings 23:6 [Scripture Placeholder]\n(KJV) 2 Kings 23:6 [Scripture Placeholder]\n" +
-            "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(KJV) 2 Kings 23:7 [Scripture Placeholder]");
+        .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]\n" +
+            "(ISR) 2 Kings 23:6 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:6 [Scripture Placeholder]\n" +
+            "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:7 [Scripture Placeholder]");
     assertThat(scriptureStore.getScripturesTextAllVersions("2 Kings 23:5,7"))
-        .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(KJV) 2 Kings 23:5 [Scripture Placeholder]\n\n" +
-            "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(KJV) 2 Kings 23:7 [Scripture Placeholder]");
+        .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]\n\n" +
+            "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:7 [Scripture Placeholder]");
   }
 
   @Test

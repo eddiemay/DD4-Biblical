@@ -26,8 +26,8 @@ public class ScriptureCacher {
     scriptureVersion.getBibleBooks().stream()
         .filter(book -> books.isEmpty() || books.contains(book.getName()))
         .forEach(book -> {
-          System.out.printf("\n%s %d =>", book.getName(), book.getChapters());
-          IntStream.range(1, book.getChapters() + 1).forEach(chapter -> {
+          System.out.printf("\n%s %d =>", book.getName(), book.getChapterCount());
+          IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
             System.out.printf(" %d", chapter);
             apiConnector.sendGet(String.format(URL, baseUrl, version, book, chapter));
           });

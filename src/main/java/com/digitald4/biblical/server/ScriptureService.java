@@ -1,6 +1,5 @@
 package com.digitald4.biblical.server;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
@@ -14,7 +13,6 @@ import com.digitald4.common.storage.SessionStore;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 @Api(
@@ -35,7 +33,6 @@ import com.google.inject.Inject;
 )
 public class ScriptureService extends EntityServiceImpl<Scripture> {
   public static final String DEFAULT_VERSION = "ISR";
-  public static final String DEFAULT_ORDER_BY = "bookNum,chapter,verse,versionNum,version";
 
   private final ScriptureStore scriptureStore;
   private final ScriptureReferenceProcessor scriptureReferenceProcessor;
@@ -50,8 +47,7 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "scriptures")
   public ImmutableList<Scripture> getScriptures(
-      @Named("reference") String reference, @Named("version") @DefaultValue(DEFAULT_VERSION) String version)
-      throws ServiceException {
+      @Named("reference") String reference, @Named("version") @Nullable String version) throws ServiceException {
     try {
       return scriptureStore.getScriptures(version, reference);
     } catch (DD4StorageException e) {
@@ -62,7 +58,7 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "search")
   public QueryResult<Scripture> search(
       @Named("searchText") String searchText, @Named("version") @Nullable String version,
-      @Named("orderBy") @DefaultValue(DEFAULT_ORDER_BY) String orderBy,
+      @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy,
       @Named("pageSize") @DefaultValue("200") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken)
       throws ServiceException {
     try {
@@ -99,18 +95,18 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "searchAndReplace")
   public ImmutableList<Scripture> searchAndReplace(
-      @Named("phase") String phase, @Named("replacement") String replacement, @Named("filter") String filter,
-      @Named("preview") @Nullable boolean preview, @Named("idToken") String idToken) throws ServiceException {
+      @Named("phrase") String phrase, @Named("replacement") String replacement, @Named("filter") String filter,
+      @Named("preview") @Nullable boolean preview, @Named("idToken") @Nullable String idToken) throws ServiceException {
     try {
       resolveLogin(idToken, true);
-      return scriptureStore.searchAndReplace(phase, replacement, filter, preview);
+      return scriptureStore.searchAndReplace(phrase, replacement, filter, preview);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "searchAndDelete")
-  public Empty searchAndDelete(@Named("searchText") String searchText, @Named("idToken") String idToken)
+  public Empty searchAndDelete(@Named("searchText") String searchText, @Named("idToken") @Nullable String idToken)
       throws ServiceException {
     try {
       resolveLogin(idToken, true);
@@ -121,21 +117,11 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
     }
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "books")
-  public ImmutableSet<BibleBook> getBibleBooks() throws ServiceException {
-    try {
-      return BibleBook.ALL_BOOKS;
-    } catch (DD4StorageException e) {
-      throw new ServiceException(e.getErrorCode(), e);
-    }
-  }
-
   public static class GetOrSearchResponse extends QueryResult<Scripture> {
     private enum RESULT_TYPE {GET, SEARCH};
     private final RESULT_TYPE resultType;
 
-    private GetOrSearchResponse(RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize,
-                                com.digitald4.common.storage.Query query) {
+    private GetOrSearchResponse(RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize, Query query) {
       super(scriptures, totalSize, query);
       this.resultType = resultType;
     }

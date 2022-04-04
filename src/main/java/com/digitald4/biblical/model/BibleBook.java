@@ -156,14 +156,14 @@ public class BibleBook {
   private final int bookNum;
   private final String name;
   private final String tags;
-  private final int chapters;
+  private final int chapterCount;
   private final ImmutableList<String> altNames;
 
-  BibleBook(int bookNum, String name, String tags, int chapters, String... altNames) {
+  BibleBook(int bookNum, String name, String tags, int chapterCount, String... altNames) {
     this.bookNum = bookNum;
     this.name = name;
     this.tags = tags;
-    this.chapters = chapters;
+    this.chapterCount = chapterCount;
     this.altNames = ImmutableList.copyOf(altNames);
   }
 
@@ -183,8 +183,8 @@ public class BibleBook {
     return tags;
   }
 
-  public int getChapters() {
-    return chapters;
+  public int getChapterCount() {
+    return chapterCount;
   }
 
   public ImmutableList<String> getAltNames() {

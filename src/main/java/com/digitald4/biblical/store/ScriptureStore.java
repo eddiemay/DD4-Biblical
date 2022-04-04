@@ -14,12 +14,13 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
-import com.digitald4.common.storage.Query.List;
 import com.digitald4.common.storage.Query.OrderBy;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SearchableStoreImpl;
-import com.google.appengine.api.search.*;
+import com.google.appengine.api.search.Field;
+import com.google.appengine.api.search.Index;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import org.jsoup.Jsoup;
@@ -31,18 +32,16 @@ import javax.inject.Provider;
 
 public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   public static final String REFERENCE_ATTR = "scripture-reference";
-  private static final Query.Builder QUERY_BASE = Query.newBuilder().setOptions(QueryOptions.newBuilder().setLimit(1000));
+  public static final String DEFAULT_ORDER_BY = "bookNum,chapter,verse,versionNum,version";
 
   private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final ScriptureFetcher scriptureFetcher;
-  private final Index searchIndex;
 
   @Inject
   public ScriptureStore(
       Provider<DAO> daoProvider, @ScriptureIndex Index searchIndex,
       ScriptureReferenceProcessor scriptureRefProcessor, ScriptureFetcher scriptureFetcher) {
     super(Scripture.class, daoProvider, searchIndex);
-    this.searchIndex = searchIndex;
     this.scriptureRefProcessor = scriptureRefProcessor;
     this.scriptureFetcher = scriptureFetcher;
   }
@@ -122,36 +121,29 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   }
 
   public void searchAndDelete(String searchText) {
-    searchIndex.deleteAsync(
-        searchIndex
-            .search(QUERY_BASE.build(searchText))
-            .getResults()
+    delete(search(Query.forSearch(searchText)).getItems().stream().map(Scripture::getId).collect(toImmutableList()));
+  }
+
+  private ImmutableList<Scripture> getSearchAndReplaceCandidates(String phrase, String replacement, String filter) {
+    return search(
+        Query.forSearch(String.format("\"%s\" %s", phrase, filter), DEFAULT_ORDER_BY, 1000, 1)).getItems()
             .stream()
-            .map(com.google.appengine.api.search.Document::getId)
-            .collect(toImmutableList()));
+            // The search is case-insensitive, but we want to be case sensitive so need to filter the results.
+            .filter(scripture -> scripture.getText().toString().contains(phrase))
+            .map(scripture -> scripture.setText(scripture.getText().toString().replace(phrase, replacement)))
+            .collect(toImmutableList());
   }
 
-  private ImmutableList<Scripture> getSearchAndReplaceCandidates(String phase, String replacement, String filter) {
-    return searchIndex
-        .search(QUERY_BASE.build(String.format("%s %s", phase, filter)))
-        .getResults()
-        .stream()
-        .map(this::fromDocument)
-        // The search is case insensitive, but we want to be case sensitive so need to filter the results.
-        .filter(scripture -> scripture.getText().toString().contains(phase))
-        .collect(toImmutableList());
-  }
+  public ImmutableList<Scripture> searchAndReplace(String phrase, String replacement, String filter, boolean preview) {
+    ImmutableList<Scripture> candidates = getSearchAndReplaceCandidates(phrase, replacement, filter);
 
-  public ImmutableList<Scripture> searchAndReplace(String phase, String replacement, String filter, boolean preview) {
-    ImmutableList<Scripture> candidates = getSearchAndReplaceCandidates(phase, replacement, filter);
-    if (preview) {
-      candidates.forEach(scripture -> scripture.setText(scripture.getText().toString().replace(phase, replacement)));
-      return candidates;
+    if (!preview) {
+      update(
+          candidates.stream().map(Scripture::getId).collect(toImmutableList()),
+          scripture -> scripture.setText(scripture.getText().toString().replace(phrase, replacement)));
     }
 
-    return update(
-        candidates.stream().map(Scripture::getId).collect(toImmutableList()),
-        scripture -> scripture.setText(scripture.getText().toString().replace(phase, replacement)));
+    return candidates;
   }
 
   public QueryResult<Scripture> list(
@@ -160,26 +152,27 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
     if (bibleBook == BibleBook.PSALMS_151 && chapter == 151) {
       chapter = 1;
     }
-    if (version != null) {
-      version = ScriptureVersion.getOrFallback(version, bibleBook).getVersion();
+
+    if (version == null) {
+      return list(bibleBook, chapter, startVerse, endVerse, reindex);
     }
 
-    List query = forList()
+    version = ScriptureVersion.getOrFallback(version, bibleBook).getVersion();
+
+    Query.List query = forList()
         .setFilters(
+            Filter.of("version", version),
             Filter.of("book", bibleBook.getName()), Filter.of("chapter", chapter),
             Filter.of("verse", ">=", startVerse), Filter.of("verse", "<=", endVerse));
-    if (version != null) {
-      query.addFilter(Filter.of("version", version));
-    }
     query.setOrderBys(OrderBy.of("verse"));
 
     QueryResult<Scripture> queryResult = list(query);
-    if (queryResult.getItems().isEmpty() && version != null) {
+    if (queryResult.getItems().isEmpty()) {
       if (startVerse > 1 &&
           !list(
               forList().setFilters(
                   Filter.of("book", bibleBook.getName()), Filter.of("chapter", chapter),
-                  Filter.of("verse",  1), Filter.of("version", version))).getItems().isEmpty()) {
+                  Filter.of("verse", ">=",  1), Filter.of("version", version))).getItems().isEmpty()) {
         throw new DD4StorageException(
             String.format("Verse %d out of bounds for: (%s) %s %d", startVerse, version, book, chapter));
       }
@@ -190,6 +183,27 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
     }
 
     return queryResult;
+  }
+
+  private QueryResult<Scripture> list(BibleBook bibleBook, int chapter, int startVerse, int endVerse, boolean reindex) {
+    Query.List query = forList()
+        .setFilters(
+            Filter.of("book", bibleBook.getName()), Filter.of("chapter", chapter),
+            Filter.of("verse", ">=", startVerse), Filter.of("verse", "<=", endVerse));
+    query.setOrderBys(OrderBy.of("verse"));
+
+    QueryResult<Scripture> queryResult = list(query);
+    if (!queryResult.getItems().isEmpty() && reindex) {
+      reindex(queryResult.getItems());
+    }
+
+    return QueryResult.of(
+        queryResult.getItems().stream()
+            .sorted(
+                comparing(Scripture::getVerse).thenComparing(s -> ScriptureVersion.get(s.getVersion()).getVersionNum()))
+            .collect(toImmutableList()),
+        queryResult.getTotalSize(),
+        queryResult.query());
   }
 
   private ImmutableList<Scripture> getScriptures(String version, VerseRange verseRange) {

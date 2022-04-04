@@ -113,7 +113,7 @@
         </li>
       </ul>
       <div class="block-content form">
-        <h2>{{$ctrl.event.title}}</h2>
+        <h2>{{$ctrl.event.title}} ({{$ctrl.event.year}} A.M.)</h2>
         <div data-ng-if="!$ctrl.event.displayText && !$ctrl.event.scriptureGroups">
           <div>{{$ctrl.event.references}}</div>
           <div data-ng-if="$ctrl.event.summary" data-ng-bind-html="$ctrl.event.summary"></div>
@@ -158,14 +158,18 @@
       </ul>
       <div class="block-content form">
         <div class="columns">
-          <div class="colx2-left">
+          <div class="colx3-left">
             <label>Month</label>
             <select data-ng-model="$ctrl.editEvent.month" data-ng-options="month.number as month.displayText for month in $ctrl.months">
             </select>
           </div>
-          <div class="colx2-right">
+          <div class="colx3-center">
             <label>Day</label>
             <input type="number" data-ng-model="$ctrl.editEvent.day" min="1" max="31">
+          </div>
+          <div class="colx3-right">
+            <label>Year</label>
+            <input type="number" data-ng-model="$ctrl.editEvent.year" min="1" max="7000">
           </div>
         </div>
         <div class="columns">

@@ -70,7 +70,7 @@ public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
 
   private static String formatBookForUrl(BibleBook book, int chapter) {
     String bookName = book.getName().replace(" ", "");
-    if (book.getChapters() == 1) {
+    if (book.getChapterCount() == 1) {
       return bookName;
     }
 

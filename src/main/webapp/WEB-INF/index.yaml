@@ -12,5 +12,15 @@ indexes:
       - name: verse
   - kind: BiblicalEvent
     properties:
+      - name: year
       - name: month
       - name: day
+  - kind: BiblicalEvent
+    properties:
+      - name: month
+      - name: day
+  - kind: BiblicalEvent
+    properties:
+      - name: month
+      - name: day
+      - name: year

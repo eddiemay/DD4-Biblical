@@ -4,22 +4,41 @@
       <h1>READ THE WORD</h1>
 
       <div class="block-content form">
-        <fieldset>
+        <a href="" data-ng-if="$ctrl.userLoggedIn()" data-ng-click="$ctrl.searchAndReplaceShown=true" data-ng-show="!$ctrl.searchAndReplaceShown">
+          <img src="images/icons/web-app/24/Search.png" alt="Search the Word">
+        </a>
+        <a href="" data-ng-if="$ctrl.userLoggedIn()"  data-ng-click="$ctrl.searchAndReplaceShown=false" data-ng-show="$ctrl.searchAndReplaceShown">
+          <img src="images/icons/fugue/cross-circle.png" width="24" height="24" alt="Close search">
+        </a>
+        <fieldset data-ng-show="!$ctrl.searchAndReplaceShown">
           <div class="columns">
-            <div class="colx3-left">
-              <label>Book</label>
-              <select data-ng-model="$ctrl.book"
-                      data-ng-options="book.name as book.name for book in $ctrl.bibleBooks"></select>
-            </div>
-            <div class="colx3-center">
-              <label>Verses</label>
-              <input type="text" data-ng-model="$ctrl.verses" class="full-width" data-on-enter="$ctrl.getOrSearch()">
+            <div class="colx3-left-double">
+              <label><button data-ng-click="$ctrl.reference.shown=true">Book</button></label>
+              <input type="text" data-ng-model="$ctrl.reference.value" class="full-width" data-on-enter="$ctrl.getOrSearch()">
             </div>
             <div class="colx3-right">
               <label>Version</label>
-              <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.viewScripture()"
+              <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.getOrSearch()"
                       data-ng-options="version for version in $ctrl.scriptureVersions"></select>
               <button data-ng-click="$ctrl.getOrSearch()">Show</button>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset data-ng-show="$ctrl.searchAndReplaceShown">
+          <div class="columns">
+            <div class="colx3-left">
+              <label>Phrase</label>
+              <input type="text" data-ng-model="$ctrl.phrase" class="full-width" data-on-enter="$ctrl.searchAndReplace(true)">
+            </div>
+            <div class="colx3-center">
+              <label>Replacement</label>
+              <input type="text" data-ng-model="$ctrl.replacement" class="full-width" data-on-enter="$ctrl.searchAndReplace(true)">
+            </div>
+            <div class="colx3-right">
+              <label>Filter</label>
+              <input type="text" data-ng-model="$ctrl.filter" class="full-width" data-on-enter="$ctrl.searchAndReplace(true)">
+              <button data-ng-click="$ctrl.searchAndReplace(true)">Preview</button>
+              <button data-ng-show="$ctrl.previewShown" data-ng-click="$ctrl.searchAndReplace(false)">Replace</button>
             </div>
           </div>
         </fieldset>
@@ -53,5 +72,6 @@
       </div>
     </div>
   </div>
-  <scripture-view data-ng-if="$ctrl.reference" data-reference="$ctrl.reference"></scripture-view>
+  <scripture-selector data-ng-if="$ctrl.reference.shown" data-reference="$ctrl.reference"></scripture-selector>
+  <scripture-view data-ng-if="$ctrl.viewReference" data-reference="$ctrl.viewReference"></scripture-view>
 </section>

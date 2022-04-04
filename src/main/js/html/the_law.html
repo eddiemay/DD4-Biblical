@@ -18,40 +18,30 @@
       </div>
       <div>
         <h2>{{$ctrl.searchResult.start}} to {{$ctrl.searchResult.end}} of {{$ctrl.searchResult.totalSize}}</h2>
-        <table>
-          <thead>
-           <tr><th colspan="2">Summary</th></tr>
-           <tr><th>Scriptures</th><th>Tags</th></tr>
-          </thead>
-          <tbody data-ng-repeat="command in $ctrl.searchResult.items">
-            <tr>
-              <td colspan="2">
-                <div data-ng-show="!command.isEditing">{{command.summary}}</div>
-                <input type="text" data-ng-if="command.isEditing" data-ng-model="command.summary" class="full-width">
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a href="" data-ng-show="!command.isEditing" data-ng-click="$ctrl.showScripture(command)">{{command.scriptures}}</a>
-                <input type="text" data-ng-if="command.isEditing" data-ng-model="command.scriptures" class="full-width">
-              </td>
-              <td>
-                <div data-ng-show="!command.isEditing">{{command.tags}}</div>
-                <input type="text" data-ng-if="command.isEditing" data-ng-model="command.tags" class="full-width">
-              </td>
-              <td>
-                <button data-ng-if="$ctrl.userLoggedIn() && !command.isEditing" data-ng-click="$ctrl.edit(command)">Edit</button>
-                <button data-ng-if="command.isEditing" data-ng-click="$ctrl.update(command)">Save</button>
-              </td>
-            </tr>
-            <tr data-ng-if="$ctrl.userLoggedIn()">
-              <td><input type="text" data-ng-model="$ctrl.newCommand.summary" class="full-width"></td>
-              <td><input type="text" data-ng-model="$ctrl.newCommand.scriptures" class="full-width"></td>
-              <td><input type="text" data-ng-model="$ctrl.newCommand.tags" class="full-width"></td>
-              <td><button data-ng-click="$ctrl.create()">Create</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <div data-ng-repeat="command in $ctrl.searchResult.items" style="padding-bottom: 8px">
+          <div>
+            <span data-ng-show="!command.isEditing">{{command.summary}}</span>
+            <a href="" data-ng-if="$ctrl.userLoggedIn() && !command.isEditing" data-ng-click="$ctrl.edit(command)">edit</a>
+            <input type="text" data-ng-if="command.isEditing" data-ng-model="command.summary" class="full-width">
+            <button data-ng-if="command.isEditing" data-ng-click="$ctrl.update(command)">Save</button>
+          </div>
+          <div style="padding-left: 16px">
+            <a href="" data-ng-show="!command.isEditing" data-ng-click="$ctrl.showScripture(command)">{{command.scriptures}}</a>
+            <input type="text" data-ng-if="command.isEditing" data-ng-model="command.scriptures" class="full-width">
+          </div>
+          <div style="padding-left: 16px">
+            <div data-ng-show="!command.isEditing">{{command.tags}}</div>
+            <input type="text" data-ng-if="command.isEditing" data-ng-model="command.tags" class="full-width">
+          </div>
+        </div>
+        <div data-ng-if="$ctrl.userLoggedIn()">
+          <input type="text" data-ng-model="$ctrl.newCommand.summary" class="full-width">
+          <button data-ng-click="$ctrl.create()">Create</button>
+          <div style="padding-left: 16px">
+            <input type="text" data-ng-model="$ctrl.newCommand.scriptures" class="full-width">
+            <input type="text" data-ng-model="$ctrl.newCommand.tags" class="full-width">
+          </div>
+        </div>
         <fieldset>
           <span data-ng-repeat="page in $ctrl.searchResult.pages">
             <button data-ng-click="$ctrl.search(page)" data-ng-disabled="page == $ctrl.searchResult.pageToken">{{page}}</button>

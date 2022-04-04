@@ -4,6 +4,7 @@ public class BiblicalEvent {
   private long id;
   private int month;
   private int day;
+  private int year = 4000;
   private String title;
   private String summary;
   private String references;
@@ -32,6 +33,15 @@ public class BiblicalEvent {
 
   public BiblicalEvent setDay(int day) {
     this.day = day;
+    return this;
+  }
+
+  public int getYear() {
+    return year;
+  }
+
+  public BiblicalEvent setYear(int year) {
+    this.year = year;
     return this;
   }
 

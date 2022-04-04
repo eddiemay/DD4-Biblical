@@ -40,7 +40,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
       String[] parts = matcher.group(3).trim().split(",");
 
       if (parts.length == 0) {
-        if (book.getChapters() == 1 && chapter > 1) {
+        if (book.getChapterCount() == 1 && chapter > 1) {
           // If the book only has 1 chapter then the chapter is really the verse (i.e. Jude 3).
           verseRanges.add(new VerseRange(book, 1, chapter, chapter));
           chapter = 1;
@@ -53,7 +53,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
         part = part.trim();
 
         if (part.isEmpty()) {
-          if (book.getChapters() == 1 && chapter > 1) {
+          if (book.getChapterCount() == 1 && chapter > 1) {
             // If the book only has 1 chapter then the chapter is really the verse (i.e. Jude 3)
             verseRanges.add(new VerseRange(book, 1, chapter, chapter));
             chapter = 1;
@@ -109,7 +109,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
         subMatcher = FULL_CHAPTERS.matcher(part);
         if (subMatcher.find()) {
           int endChapter = parseInt(subMatcher.group(1));
-          if (book.getChapters() == 1) {
+          if (book.getChapterCount() == 1) {
             // If the book only has 1 chapter then this is really a verse range.
             verseRanges.add(new VerseRange(book, 1, chapter, endChapter));
             chapter = 1;

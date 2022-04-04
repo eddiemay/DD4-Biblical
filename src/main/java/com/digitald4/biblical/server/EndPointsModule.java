@@ -53,6 +53,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 				ImmutableList.of(
 						Echo.class,
 						BiblicalEventService.class,
+						BookService.class,
 						CalendarRuleService.class,
 						CalendarValidatorService.class,
 						CommandmentService.class,
