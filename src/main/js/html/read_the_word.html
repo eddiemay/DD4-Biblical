@@ -65,7 +65,7 @@
           </p>
           <fieldset>
             <span data-ng-repeat="page in $ctrl.searchResult.pages">
-              <button data-ng-click="$ctrl.search(page)" data-ng-disabled="page == $ctrl.searchResult.pageToken">{{page}}</button>
+              <button data-ng-click="$ctrl.getOrSearch(page)" data-ng-disabled="page == $ctrl.searchResult.pageToken">{{page}}</button>
             </span>
           </fieldset>
         </div>

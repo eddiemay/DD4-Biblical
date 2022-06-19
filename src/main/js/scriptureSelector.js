@@ -4,6 +4,7 @@ com.digitald4.biblical.ScriptureSelector = function(globalData, bookService) {
   this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.bookService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks, notifyError);
   this.view = 'book';
+  this.reference.toString = undefined;
 }
 
 com.digitald4.biblical.ScriptureSelector.prototype.updateToString = function() {
@@ -64,6 +65,6 @@ com.digitald4.biblical.ScriptureSelector.prototype.setVerse = function(verse) {
 }
 
 com.digitald4.biblical.ScriptureSelector.prototype.closeDialog = function() {
-  this.reference.value = this.reference.toString;
+  this.reference.value = this.reference.toString || this.reference.value;
   this.reference.shown = undefined;
 }

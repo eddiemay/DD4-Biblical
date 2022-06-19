@@ -3,6 +3,8 @@ var ONE_DAY = 24 * ONE_HOUR;
 var EVENT_TYPES = ['BIBLICAL', 'NOTIFICATION'];
 var SCRIPTURE_VERSIONS = ['ISR', 'RSKJ', 'NRSV', 'NWT', /*'NKJV',*/ 'KJV1611'];
 
+// T. James 951-233-6912
+
 com.digitald4.biblical.CalendarCtrl = function($location, globalData, biblicalEventService, scriptureService) {
   globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.locationProvider = $location;
@@ -15,6 +17,7 @@ com.digitald4.biblical.CalendarCtrl = function($location, globalData, biblicalEv
 
   var year = parseInt($location.search()['year']);
   var month = parseInt($location.search()['month']) || 1;
+  this.disableNet = $location.search()['disableNet'];
   this.hebrewDate = year ? new HebrewDate(year, month, 1) : HebrewDate.fromDate(new Date());
   this.hebrewDate = this.hebrewDate.addDays(1 - this.hebrewDate.getDay());
   this.refresh();
@@ -69,6 +72,9 @@ com.digitald4.biblical.CalendarCtrl.prototype.setupCalendar = function() {
 com.digitald4.biblical.CalendarCtrl.prototype.refresh = function() {
 	this.biblicalEvents = [];
 	this.setupCalendar();
+	if (this.disableNet) {
+	  return;
+	}
 	this.biblicalEventService.listByMonth(this.hebrewDate.month, response => {
 	  var biblicalEvents = response.items || [];
 	  var firstDayOffset = this.getFirstDayOffset();
@@ -161,10 +167,6 @@ com.digitald4.biblical.CalendarCtrl.prototype.refreshDisplayText = function(even
 
 com.digitald4.biblical.CalendarCtrl.prototype.showCreateEventDialog = function(hebrewDate) {
   this.editEvent = {type: 'BIBLICAL', month: hebrewDate.getMonth(), day: hebrewDate.getDay()};
-  this.addScripture = {book: ''};
-  if (!this.bibleBooks) {
-    this.refreshBibleBooks();
-  }
   this.dialogShown = 'EDIT_EVENT';
 }
 
@@ -190,11 +192,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.showEditEventDialog = function(eve
     this.scriptureService.expand(event.summary, false, displayText => this.editEvent.summary = displayText, notifyError);
   }
 
-  this.addScripture = {book: ''};
   this.origEvent = event;
-  if (!this.bibleBooks) {
-    this.refreshBibleBooks();
-  }
   this.dialogShown = 'EDIT_EVENT';
 }
 
@@ -244,29 +242,6 @@ com.digitald4.biblical.CalendarCtrl.prototype.saveEvent = function() {
     }
 	  this.closeDialog();
 	}, error => this.updateError = error);
-}
-
-com.digitald4.biblical.CalendarCtrl.prototype.refreshBibleBooks = function() {
-  this.scriptureService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks.items, notifyError);
-}
-
-com.digitald4.biblical.CalendarCtrl.prototype.appendScripture = function(reference) {
-  var referenceText = (reference.book + ' ' + reference.verses).trim();
-  this.scriptureService.scriptures(referenceText, response => {
-    var scriptures = response.items;
-    var text = '';
-    var previous = {};
-    for (const script of scriptures) {
-      if (previous.book != script.book || previous.chapter != script.chapter || previous.verse + 1 != script.verse) {
-        text += '\n' + script.book + ' ' + script.chapter + ':';
-      } else {
-        text += ' ';
-      }
-      text += script.verse + ' ' + script.text;
-      previous = script;
-    }
-    this.editEvent.summary += '<div scripture-reference="' + referenceText + '">' + text + '</div>';
-  }, notifyError);
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.closeDialog = function() {

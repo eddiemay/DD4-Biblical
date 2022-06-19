@@ -51,7 +51,7 @@
                 <ul class="events">
                   <li data-ng-repeat="biblicalEvent in day.biblicalEvents">
                     <a href="" data-ng-click="$ctrl.showViewEventDialog(biblicalEvent)">
-                      <div class="biblical">{{biblicalEvent.title}}</div>
+                      <div class="biblical" data-ng-class="{'has-error': biblicalEvent.year==4001}">{{biblicalEvent.title}}</div>
                     </a>
                   </li>
                 </ul>
@@ -66,7 +66,7 @@
 
   <!-- Month selection dialog start -->
   <div data-ng-show="$ctrl.dialogShown=='SELECT_MONTH'" id="monthSelectModal" style="display: block;">
-    <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px;">
+    <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px; position: fixed;">
       <ul class="action-tabs right">
         <li><a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
           <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
@@ -101,7 +101,7 @@
 
   <!-- Event view dialog start -->
   <div data-ng-show="$ctrl.dialogShown=='VIEW_EVENT'" id="eventModal" style="display: block;">
-    <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px;">
+    <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px; position: fixed;">
       <ul class="action-tabs right">
         <li>
           <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
@@ -150,7 +150,7 @@
 
   <!-- Event edit dialog start -->
   <div data-ng-show="$ctrl.dialogShown=='EDIT_EVENT'" id="editModal" style="display: block;">
-    <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px;">
+    <div class="modal-window block-border" style="display: block; left: 5px; top: 50px; width: 380px; position: fixed;">
       <ul class="action-tabs right">
         <li><a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
           <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">

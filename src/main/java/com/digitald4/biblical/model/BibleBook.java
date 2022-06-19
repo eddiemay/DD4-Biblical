@@ -19,6 +19,7 @@ public class BibleBook {
   // Abbreviations help provided by: https://www.logos.com/bible-book-abbreviations
   // Hebrew names provided by: https://headcoverings-by-devorah.com/HebrewBibleNames.html,
   // and https://www.shalach.org/BibleSearch/booksofthebible.htm
+  // $221 3.29, 2.84, $221
   public static final ImmutableList<BibleBook> CANON = ImmutableList.of(
       Genesis = new BibleBook(1, "Genesis", "Canon,OT,Pentateuch", 50, "Gen", "Ge", "Gn", "Bereishit", "Beresheet"),
       new BibleBook(2, "Exodus", "Canon,OT,Pentateuch", 40, "Ex", "Exo", "Exod", "Shemot"),

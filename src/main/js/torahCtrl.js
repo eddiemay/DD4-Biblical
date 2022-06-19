@@ -1,15 +1,19 @@
-com.digitald4.biblical.TorahCtrl = function(globalData, commandmentService) {
+com.digitald4.biblical.TorahCtrl = function($location, globalData, commandmentService) {
+  this.locationProvider = $location;
   this.commandmentService = commandmentService;
   this.userLoggedIn = () => globalData.activeSession != undefined;
-  this.searchText = '';
+  globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion || 'ISR';
+  this.searchText = $location.search()['searchText'] || '';
+  this.pageToken = parseInt($location.search()['pageToken']) || 1;
   this.newCommand = {};
   this.pageSize = 50;
-  this.search();
+  var request = {searchText: this.searchText, pageSize: this.pageSize, pageToken: this.pageToken, orderBy: this.orderBy};
+  this.commandmentService.search(request, searchResult => this.searchResult = searchResult, notify);
 }
 
 com.digitald4.biblical.TorahCtrl.prototype.search = function(pageToken) {
-  var request = {searchText: this.searchText, pageSize: this.pageSize, pageToken: pageToken, orderBy: this.orderBy};
-  this.commandmentService.search(request, searchResult => this.searchResult = searchResult, notify);
+  this.locationProvider.search('searchText', this.searchText);
+  this.locationProvider.search('pageToken', pageToken);
 }
 
 com.digitald4.biblical.TorahCtrl.prototype.create = function() {

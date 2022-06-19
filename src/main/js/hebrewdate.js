@@ -119,18 +119,19 @@ HebrewDate.fromDate = function(date) {
 }
 
 getAbibOne = function(year) {
-  var baseYear = year - (year % 400);
-  var yearDiff = year - baseYear;
-  var weeks = yearDiff * 52;
+  var hebrewYear = year + 3971;
+  var baseYear = hebrewYear - (hebrewYear % 400);
+  var yearDiff = hebrewYear - baseYear;
 
   var baseAbib;
-  if (baseYear == 0) {
-    weeks -= 52;
+  if (baseYear < 3971) {
     baseAbib = new Date(1, 2, 18, 4, 0);
     baseAbib.setFullYear(1);
+    yearDiff = year - 1;
   } else {
-    baseAbib = new Date(baseYear, 2, 19, 4, 0);
+    baseAbib = new Date(baseYear - 3971, 2, 18, 4, 0);
   }
+  var weeks = yearDiff * 52;
   yearDiff--;
 
   weeks += Math.floor(yearDiff / 5);

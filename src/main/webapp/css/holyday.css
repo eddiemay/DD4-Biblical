@@ -107,3 +107,7 @@
   background-image: url(../images/holyday/leap-week.jpeg);
   background-size: 100% 100%;
 }
+.has-error {
+    color: red;
+    background-color: yellow;
+}

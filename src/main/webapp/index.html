@@ -65,7 +65,10 @@
 
   <body data-ng-app="biblical" data-ng-controller="DD4AppCtrl as appCtrl">
     <div data-ng-controller="BiblicalCtrl as biblicalCtrl">
-      | <a href="#/calendar">Calendar</a> | <a href="#/read_the_word">Read the Word</a> | <a href="#/the_law">The Law</a> | <a href="#/utils">Utilities</a> |
+      | <a href="#/calendar?{{appCtrl.getIdTokenParameter()}}">Calendar</a>
+      | <a href="#/read_the_word?{{appCtrl.getIdTokenParameter()}}">Read the Word</a>
+      | <a href="#/the_law?{{appCtrl.getIdTokenParameter()}}">The Law</a>
+      | <a href="#/utils?{{appCtrl.getIdTokenParameter()}}">Utilities</a> |
       <!-- Content -->
       <article class="container_12">
         <div data-ng-view></div>

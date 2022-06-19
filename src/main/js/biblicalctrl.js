@@ -1,5 +1,6 @@
-com.digitald4.biblical.BiblicalCtrl = function(apiConnector) {
+com.digitald4.biblical.BiblicalCtrl = function(apiConnector, globalData) {
   apiConnector.baseUrl = 'https://dd4-biblical.appspot.com/_api/';
+  this.globalData = globalData;
 }
 
 com.digitald4.biblical.BiblicalCtrl.prototype.showLoginDialog = function() {
