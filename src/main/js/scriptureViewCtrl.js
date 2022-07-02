@@ -1,7 +1,8 @@
-com.digitald4.biblical.ScriptureViewCtrl = function(scriptureService) {
+com.digitald4.biblical.ScriptureViewCtrl = function(scriptureService, $window) {
   this.scriptureService = scriptureService;
   this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.refresh();
+  $window.scrollTo(0, 0);
 }
 
 com.digitald4.biblical.ScriptureViewCtrl.prototype.refresh = function() {

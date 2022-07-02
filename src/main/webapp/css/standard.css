@@ -1926,9 +1926,11 @@ footer {
 	height: 100%;
 	}
 	div.modal-window {
+		display: block;
 		position: absolute;
-		left: 0;
-		top: 0;
+		left: 5px;
+		top: 50px;
+		width: 365px;
 		-moz-box-shadow: 0 1px 7px rgba(0, 0, 0, 0.75);
 		-webkit-box-shadow: 0 1px 7px rgba(0, 0, 0, 0.75);
 		box-shadow: 0 1px 7px rgba(0, 0, 0, 0.75);

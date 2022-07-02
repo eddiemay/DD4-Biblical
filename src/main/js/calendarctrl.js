@@ -5,9 +5,10 @@ var SCRIPTURE_VERSIONS = ['ISR', 'RSKJ', 'NRSV', 'NWT', /*'NKJV',*/ 'KJV1611'];
 
 // T. James 951-233-6912
 
-com.digitald4.biblical.CalendarCtrl = function($location, globalData, biblicalEventService, scriptureService) {
+com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, biblicalEventService, scriptureService) {
   globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.locationProvider = $location;
+  this.window = $window;
   this.globalData = globalData;
   this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.userLoggedIn = () => globalData.activeSession != undefined;
@@ -135,6 +136,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.showViewEventDialog = function(eve
     this.refreshDisplayText(event);
   }
   this.dialogShown = 'VIEW_EVENT';
+  this.window.scrollTo(0, 0);
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.scriptureVersionChanged = function() {
