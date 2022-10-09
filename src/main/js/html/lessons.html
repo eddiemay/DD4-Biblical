@@ -1,0 +1,51 @@
+<section class="grid_12">
+  <div class="block-border">
+    <div class="block-content">
+      <div class="block-content form" data-ng-if="$ctrl.lesson">
+        <h1>{{$ctrl.lesson.title}}</h1>
+        <p data-ng-if="$ctrl.lesson.theme.text"><i data-bind-html-compile="$ctrl.lesson.theme.text"></i></p>
+        <p data-ng-if="$ctrl.lesson.theme.scripture">
+          <i data-ng-if="!$ctrl.lesson.theme.scriptureExpanded">{{$ctrl.lesson.theme.scripture}}</i>
+          <i data-ng-if="$ctrl.lesson.theme.scriptureExpanded">{{$ctrl.lesson.theme.scriptureExpanded}}</i>
+        </p>
+        <iframe data-ng-if="$ctrl.lesson.youtubeId" width="420" height="345" ng-src="{{'https://www.youtube.com/embed/' + $ctrl.lesson.youtubeId | trusted}}">
+        </iframe>
+        <div data-bind-html-compile="$ctrl.lesson.content"></div>
+        <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.edit()">Edit</a>
+      </div>
+      <div class="block-content form" data-ng-if="$ctrl.isEditing">
+        <div class="columns">
+          <label>Title</label>
+          <input type="text" data-ng-model="$ctrl.lesson.title" class="full-width">
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <label>Theme Text</label>
+            <input type="text" data-ng-model="$ctrl.lesson.theme.text" class="full-width">
+          </div>
+          <div class="colx2-right">
+            <label>Theme Scripture</label>
+            <input type="text" data-ng-model="$ctrl.lesson.theme.scripture" class="full-width">
+          </div>
+        </div>
+        <div class="columns">
+          <label>Youtube Id</label>
+          <input type="text" data-ng-model="$ctrl.lesson.youtubeId" class="full-width">
+        </div>
+        <div class="columns">
+          <label>Content</label>
+          <textarea data-ng-model="$ctrl.lesson.content" class="full-width" style="height: 300px"></textarea>
+        </div>
+        <button data-ng-if="!$ctrl.lesson.lessonId" data-ng-click="$ctrl.saveLesson()">Create</button>
+        <button data-ng-if="$ctrl.lesson.lessonId" data-ng-click="$ctrl.saveLesson()">Save</button>
+      </div>
+      <div class="block-content form">
+        <h1>Lessons</h1>
+        <ol data-ng-repeat="lesson in $ctrl.lessons" style="padding-bottom: 8px">
+          <li><a href="" data-ng-click="$ctrl.showLesson(lesson)">{{lesson.title}}</a></li>
+        </ol>
+        <p><a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.createNew()" class="add-event">Add</a></p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -73,6 +73,10 @@
   background-image: url(../images/holyday/unleavened-bread.jpeg);
   background-size: 100% 100%;
 }
+.calendar tbody td.ng-scope.weave-offering {
+  background-image: url(../images/holyday/weave-offering.jpeg);
+  background-size: 100% 100%;
+}
 .calendar tbody td.ng-scope.first-fruits {
   background-image: url(../images/holyday/first-fruits.png);
   background-size: 100% 100%;
@@ -100,8 +104,6 @@
 .calendar tbody td.ng-scope.festival-dedication {
   background-image: url(../images/holyday/menorah-7.jpeg);
   background-size: 100% 100%;
-  /* background-repeat: no-repeat;
-  background-position: center; */
 }
 .calendar tbody td.ng-scope.leap-week {
   background-image: url(../images/holyday/leap-week.jpeg);

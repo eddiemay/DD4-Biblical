@@ -57,6 +57,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CalendarRuleService.class,
 						CalendarValidatorService.class,
 						CommandmentService.class,
+						LessonService.class,
 						ScriptureService.class,
 						BasicUserService.class));
 	}

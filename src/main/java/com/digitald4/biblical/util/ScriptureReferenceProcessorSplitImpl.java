@@ -12,13 +12,13 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceProcessor {
-  private static final Pattern BASE_PATTERN = Pattern.compile("([\\w ]+) (\\d+)([:\\d,\\-]*)");
-  private static final Pattern VERSE_RANGE_ACROSS_CHAPTERS = Pattern.compile("(\\d+):(\\d+)-(\\d+):(\\d+)");
-  private static final Pattern VERSE_RANGE_ACROSS_CHAPTERS_BASE = Pattern.compile("(\\d+)-(\\d+):(\\d+)");
-  private static final Pattern CHAPTER_CHANGE_VERSE_RANGE = Pattern.compile("(\\d+):(\\d+)-(\\d+)");
+  private static final Pattern BASE_PATTERN = Pattern.compile("([\\w ]+)\\.? (\\d+)([:\\d,;\\-–]*)");
+  private static final Pattern VERSE_RANGE_ACROSS_CHAPTERS = Pattern.compile("(\\d+):(\\d+)[-,–](\\d+):(\\d+)");
+  private static final Pattern VERSE_RANGE_ACROSS_CHAPTERS_BASE = Pattern.compile("(\\d+)[-,–](\\d+):(\\d+)");
+  private static final Pattern CHAPTER_CHANGE_VERSE_RANGE = Pattern.compile("(\\d+):(\\d+)[-,–](\\d+)");
   private static final Pattern CHAPTER_CHANGE_SINGLE_VERSE = Pattern.compile("(\\d+):(\\d+)");
-  private static final Pattern VERSE_RANGE = Pattern.compile("(\\d+)-(\\d+)");
-  private static final Pattern FULL_CHAPTERS = Pattern.compile("-(\\d+)");
+  private static final Pattern VERSE_RANGE = Pattern.compile("(\\d+)[-,–](\\d+)");
+  private static final Pattern FULL_CHAPTERS = Pattern.compile("[-,–](\\d+)");
   private static final Pattern SINGLE_VERSE = Pattern.compile("(\\d+)");
 
   @Override
@@ -37,7 +37,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
     do {
       BibleBook book = BibleBook.get(matcher.group(1).trim());
       int chapter = parseInt(matcher.group(2));
-      String[] parts = matcher.group(3).trim().split(",");
+      String[] parts = matcher.group(3).trim().split("[,;]");
 
       if (parts.length == 0) {
         if (book.getChapterCount() == 1 && chapter > 1) {

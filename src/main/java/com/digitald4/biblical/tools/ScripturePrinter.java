@@ -16,9 +16,9 @@ public class ScripturePrinter {
         new ScriptureFetcherRouter(
             new ScriptureFetcherBibleGateway(apiConnector),
             new ScriptureFetcherBibleHub(apiConnector),
-            new ScriptureFetcherBookOfEnochReferences(apiConnector),
             new ScriptureFetcherJWOrg(apiConnector),
             new ScriptureFetcherKJV1611(apiConnector),
+            new ScriptureFetcherOneOff(apiConnector),
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)));
 

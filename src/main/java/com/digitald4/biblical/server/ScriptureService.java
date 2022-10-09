@@ -15,6 +15,8 @@ import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Api(
     name = "scriptures",
     version = "v1",
@@ -31,7 +33,7 @@ import com.google.inject.Inject;
     }
     // [END_EXCLUDE]
 )
-public class ScriptureService extends EntityServiceImpl<Scripture> {
+public class ScriptureService extends EntityServiceImpl<Scripture, String> {
   public static final String DEFAULT_VERSION = "ISR";
 
   private final ScriptureStore scriptureStore;
@@ -40,7 +42,7 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
   @Inject
   ScriptureService(ScriptureStore scriptureStore, SessionStore<BasicUser> sessionStore,
                    ScriptureReferenceProcessor scriptureReferenceProcessor) {
-    super(scriptureStore, sessionStore, true);
+    super(scriptureStore, sessionStore);
     this.scriptureStore = scriptureStore;
     this.scriptureReferenceProcessor = scriptureReferenceProcessor;
   }
@@ -59,7 +61,7 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
   public QueryResult<Scripture> search(
       @Named("searchText") String searchText, @Named("version") @Nullable String version,
       @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy,
-      @Named("pageSize") @DefaultValue("200") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken)
+      @Named("pageSize") @DefaultValue("50") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken)
       throws ServiceException {
     try {
       return scriptureReferenceProcessor.matchesPattern(searchText)
@@ -106,19 +108,18 @@ public class ScriptureService extends EntityServiceImpl<Scripture> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "searchAndDelete")
-  public Empty searchAndDelete(@Named("searchText") String searchText, @Named("idToken") @Nullable String idToken)
-      throws ServiceException {
+  public AtomicInteger searchAndDelete(
+      @Named("searchText") String searchText, @Named("idToken") @Nullable String idToken) throws ServiceException {
     try {
       resolveLogin(idToken, true);
-      scriptureStore.searchAndDelete(searchText);
-      return Empty.getInstance();
+      return new AtomicInteger(scriptureStore.searchAndDelete(searchText));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
   }
 
   public static class GetOrSearchResponse extends QueryResult<Scripture> {
-    private enum RESULT_TYPE {GET, SEARCH};
+    private enum RESULT_TYPE {GET, SEARCH}
     private final RESULT_TYPE resultType;
 
     private GetOrSearchResponse(RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize, Query query) {

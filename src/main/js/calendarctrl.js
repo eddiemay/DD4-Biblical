@@ -11,7 +11,6 @@ com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, b
   this.window = $window;
   this.globalData = globalData;
   this.scriptureVersions = SCRIPTURE_VERSIONS;
-  this.userLoggedIn = () => globalData.activeSession != undefined;
   this.months = HEBREW_MONTHS;
   this.biblicalEventService = biblicalEventService;
   this.scriptureService = scriptureService;
@@ -248,9 +247,4 @@ com.digitald4.biblical.CalendarCtrl.prototype.saveEvent = function() {
 
 com.digitald4.biblical.CalendarCtrl.prototype.closeDialog = function() {
   this.dialogShown = undefined;
-}
-
-com.digitald4.biblical.CalendarCtrl.prototype.showScripture = function(version, book, chapter, verse) {
-  this.reference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
-  this.scriptureDialogShown = true;
 }

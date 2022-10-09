@@ -18,7 +18,7 @@ import javax.inject.Provider;
 import java.util.Comparator;
 import java.util.function.UnaryOperator;
 
-public class BiblicalEventStore extends GenericStore<BiblicalEvent> {
+public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
   @Inject
   public BiblicalEventStore(Provider<DAO> daoProvider) {
     super(BiblicalEvent.class, daoProvider);
@@ -42,7 +42,7 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent> {
   }
 
   @Override
-  public BiblicalEvent update(long id, UnaryOperator<BiblicalEvent> updater) {
+  public BiblicalEvent update(Long id, UnaryOperator<BiblicalEvent> updater) {
     return super.update(id, current -> clearScriptureReferences(updater.apply(current)));
   }
 

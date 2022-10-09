@@ -30,7 +30,7 @@ import org.jsoup.parser.Parser;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ScriptureStore extends SearchableStoreImpl<Scripture> {
+public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   public static final String REFERENCE_ATTR = "scripture-reference";
   public static final String DEFAULT_ORDER_BY = "bookNum,chapter,verse,versionNum,version";
 
@@ -89,8 +89,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
     BibleBook bibleBook = BibleBook.get(scripture.getBook());
 
     return com.google.appengine.api.search.Document.newBuilder()
-        .setId(scripture.documentId())
-        .addField(Field.newBuilder().setName("scriptureId").setAtom(String.valueOf(scripture.getId())))
+        .setId(scripture.getId())
         .addField(Field.newBuilder().setName("book").setAtom(scripture.getBook()))
         .addField(Field.newBuilder().setName("bookNum").setNumber(bibleBook.getBookNum()))
         .addField(Field.newBuilder().setName("chapter").setNumber(scripture.getChapter()))
@@ -108,7 +107,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
     return new Scripture()
         .setId(
             document.getFieldNames().contains("scriptureId")
-                ? Long.parseLong(document.getOnlyField("scriptureId").getAtom()) : 0)
+                ? Long.parseLong(document.getOnlyField("scriptureId").getAtom()) : null)
         .setVersion(document.getOnlyField("version").getAtom())
         .setBook(document.getOnlyField("book").getAtom())
         .setChapter(document.getOnlyField("chapter").getNumber().intValue())
@@ -117,11 +116,15 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   }
 
   public void reindex(String version, String book, int chapter) {
-    list(version, book, chapter, 1, 200, true);
+    QueryResult<Scripture> queryResult = list(version, book, chapter, 1, 200);
+    reindex(queryResult.getItems());
   }
 
-  public void searchAndDelete(String searchText) {
-    delete(search(Query.forSearch(searchText)).getItems().stream().map(Scripture::getId).collect(toImmutableList()));
+  public int searchAndDelete(String searchText) {
+    ImmutableList<Scripture> results = search(Query.forSearch(searchText, DEFAULT_ORDER_BY, 1000, 1)).getItems();
+    delete(results.stream().map(Scripture::getId).collect(toImmutableList()));
+
+    return results.size();
   }
 
   private ImmutableList<Scripture> getSearchAndReplaceCandidates(String phrase, String replacement, String filter) {
@@ -146,15 +149,14 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
     return candidates;
   }
 
-  public QueryResult<Scripture> list(
-      String version, String book, int chapter, int startVerse, int endVerse, boolean reindex) {
+  public QueryResult<Scripture> list(String version, String book, int chapter, int startVerse, int endVerse) {
     BibleBook bibleBook = BibleBook.get(book, chapter);
     if (bibleBook == BibleBook.PSALMS_151 && chapter == 151) {
       chapter = 1;
     }
 
     if (version == null) {
-      return list(bibleBook, chapter, startVerse, endVerse, reindex);
+      return list(bibleBook, chapter, startVerse, endVerse);
     }
 
     version = ScriptureVersion.getOrFallback(version, bibleBook).getVersion();
@@ -178,14 +180,12 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
       }
       ImmutableList<Scripture> fetched = fetchFromWeb(version, bibleBook, chapter, startVerse, endVerse);
       queryResult = QueryResult.of(fetched, fetched.size(), query);
-    } else if (reindex) {
-      reindex(queryResult.getItems());
     }
 
     return queryResult;
   }
 
-  private QueryResult<Scripture> list(BibleBook bibleBook, int chapter, int startVerse, int endVerse, boolean reindex) {
+  private QueryResult<Scripture> list(BibleBook bibleBook, int chapter, int startVerse, int endVerse) {
     Query.List query = forList()
         .setFilters(
             Filter.of("book", bibleBook.getName()), Filter.of("chapter", chapter),
@@ -193,9 +193,6 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
     query.setOrderBys(OrderBy.of("verse"));
 
     QueryResult<Scripture> queryResult = list(query);
-    if (!queryResult.getItems().isEmpty() && reindex) {
-      reindex(queryResult.getItems());
-    }
 
     return QueryResult.of(
         queryResult.getItems().stream()
@@ -209,7 +206,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture> {
   private ImmutableList<Scripture> getScriptures(String version, VerseRange verseRange) {
     String book = verseRange.getBook().getName();
     int chapter = verseRange.getChapter();
-    return list(version, book, chapter, verseRange.getStartVerse(), verseRange.getEndVerse(), false).getItems();
+    return list(version, book, chapter, verseRange.getStartVerse(), verseRange.getEndVerse()).getItems();
   }
 
   private String getScripturesHtml(String version, VerseRange verseRange, boolean includeLinks, boolean spaceVerses) {

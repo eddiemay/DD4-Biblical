@@ -21,12 +21,12 @@
         <div data-ng-repeat="command in $ctrl.searchResult.items" style="padding-bottom: 8px">
           <div>
             <span data-ng-show="!command.isEditing">{{command.summary}}</span>
-            <a href="" data-ng-if="$ctrl.userLoggedIn() && !command.isEditing" data-ng-click="$ctrl.edit(command)">edit</a>
+            <a href="" data-ng-if="appCtrl.isUserLoggedIn() && !command.isEditing" data-ng-click="$ctrl.edit(command)">edit</a>
             <input type="text" data-ng-if="command.isEditing" data-ng-model="command.summary" class="full-width">
             <button data-ng-if="command.isEditing" data-ng-click="$ctrl.update(command)">Save</button>
           </div>
           <div style="padding-left: 16px">
-            <a href="" data-ng-show="!command.isEditing" data-ng-click="$ctrl.showScripture(command)">{{command.scriptures}}</a>
+            <scripture data-ng-show="!command.isEditing" data-ref="{{command.scriptures}}"></scripture>
             <input type="text" data-ng-if="command.isEditing" data-ng-model="command.scriptures" class="full-width">
           </div>
           <div style="padding-left: 16px">
@@ -34,7 +34,7 @@
             <input type="text" data-ng-if="command.isEditing" data-ng-model="command.tags" class="full-width">
           </div>
         </div>
-        <div data-ng-if="$ctrl.userLoggedIn()">
+        <div data-ng-if="appCtrl.isUserLoggedIn()">
           <input type="text" data-ng-model="$ctrl.newCommand.summary" class="full-width">
           <button data-ng-click="$ctrl.create()">Create</button>
           <div style="padding-left: 16px">
@@ -51,5 +51,4 @@
     </div>
   </div>
   <!-- Edit dialog end -->
-  <scripture-view data-ng-if="$ctrl.reference" data-reference="$ctrl.reference"></scripture-view>
 </section>

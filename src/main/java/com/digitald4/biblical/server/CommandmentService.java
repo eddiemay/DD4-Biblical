@@ -21,12 +21,12 @@ import javax.inject.Inject;
         ownerName = "biblical.digitald4.com"
     )
 )
-public class CommandmentService extends EntityServiceImpl<Commandment> {
+public class CommandmentService extends EntityServiceImpl<Commandment, Long> {
   private final CommandmentStore store;
 
   @Inject
   CommandmentService(CommandmentStore store, SessionStore<BasicUser> sessionStore) {
-    super(store, sessionStore, true);
+    super(store, sessionStore);
     this.store = store;
   }
 

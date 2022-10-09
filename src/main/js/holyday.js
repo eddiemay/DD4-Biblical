@@ -16,7 +16,7 @@ var SEPARATE_DAYS = 'Enoch 75:1-2';
 
 HolyDay.HOLY_DAYS = {
   PASSOVER: new HolyDay('Passover', 'passover', date => date.getMonth() == 1 && date.getDay() == 14,
-      'Exodus 12:6,Leviticus 23:5,Numbers 28:16,Deuteronomy 16:1,Jubilees 49:10'),
+      'Exodus 12:6, Leviticus 23:5, Numbers 28:16, Deuteronomy 16:1, Jubilees 49:10'),
 
   PASSOVER_MAKEUP: new HolyDay('Passover Makeup', 'passover-makeup',
       date => date.getMonth() == 2 && date.getDay() == 14, 'Numbers 9:9-13'),
@@ -24,6 +24,8 @@ HolyDay.HOLY_DAYS = {
   FESTIVAL_UNLEAVENED_BREAD: new HolyDay('Festival of Unleavened Bread', 'unleavened-bread',
       date => date.getMonth() == 1 && date.getDay() >= 15 && date.getDay() <= 21, 'Leviticus 23:6-8'),
 
+  WEAVE_OFFERING: new HolyDay('Weave Offering', 'weave-offering', date => date.getDayOfYear() == 22,
+      'Leviticus 23:10-14'),
   FEAST_FIRST_FRUITS: new HolyDay('Feast of First Fruits', 'first-fruits', date => date.getDayOfYear() == 21 + 50,
       'Leviticus 23:15-21,Deuteronomy 16:9-12,Jubilees 6:1,17'),
 
@@ -52,7 +54,7 @@ HolyDay.HOLY_DAYS = {
   WINTER_BEGINS: new HolyDay('Winter Begins / Dedication Day 7', 'winter-begins',
       hebrewDate => hebrewDate.getDayOfYear() == 273, 'Enoch 72:25-26, 1 Maccabees 4:59, John 10:22,' + SEPARATE_DAYS),
   SPRING_BEGINS: new HolyDay('Spring Begins / Last day of year', 'spring-begins',
-      hebrewDate => hebrewDate.getDayOfYear() == 364, 'Enoch 72:31-32,Jubilees 6:31-32,' + SEPARATE_DAYS),
+      hebrewDate => hebrewDate.getDayOfYear() == 364, 'Enoch 72:31-32, Jubilees 6:31-32,' + SEPARATE_DAYS),
   LEAP_WEEK: new HolyDay('Leap Week', 'leap-week', hebrewDate => hebrewDate.getMonth() == 13, 'Enoch 74:11',
       `<p>After 5 years the calendar is 6 days (6.2125 days to be exact 365.2425 - 364 = 1.2425 x 5) behind the actual
       exact solar year. We need to do a leap week of 7 days in order to catch up. This leap is done at the end of every

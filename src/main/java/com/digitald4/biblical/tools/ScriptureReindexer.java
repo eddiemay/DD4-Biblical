@@ -9,13 +9,13 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-public class ScriptureCacher {
+public class ScriptureReindexer {
   private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
   private final static String API_VERSION = "v1";
   private final static String URL = "%s/reindex?version=%s&book=%s&chapter=%d";
   private final APIConnector apiConnector;
 
-  public ScriptureCacher(APIConnector apiConnector) {
+  public ScriptureReindexer(APIConnector apiConnector) {
     this.apiConnector = apiConnector;
   }
 
@@ -41,7 +41,7 @@ public class ScriptureCacher {
       System.exit(1);
     }
 
-    new ScriptureCacher(new APIConnector(API_URL, API_VERSION, 100))
+    new ScriptureReindexer(new APIConnector(API_URL, API_VERSION, 100))
         .cache(args[0], Arrays.stream(args).skip(1).collect(toImmutableSet()));
   }
 }

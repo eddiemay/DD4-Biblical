@@ -4,10 +4,10 @@
       <h1>READ THE WORD</h1>
 
       <div class="block-content form">
-        <a href="" data-ng-if="$ctrl.userLoggedIn()" data-ng-click="$ctrl.searchAndReplaceShown=true" data-ng-show="!$ctrl.searchAndReplaceShown">
+        <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.searchAndReplaceShown=true" data-ng-show="!$ctrl.searchAndReplaceShown">
           <img src="images/icons/web-app/24/Search.png" alt="Search the Word">
         </a>
-        <a href="" data-ng-if="$ctrl.userLoggedIn()"  data-ng-click="$ctrl.searchAndReplaceShown=false" data-ng-show="$ctrl.searchAndReplaceShown">
+        <a href="" data-ng-if="appCtrl.isUserLoggedIn()"  data-ng-click="$ctrl.searchAndReplaceShown=false" data-ng-show="$ctrl.searchAndReplaceShown">
           <img src="images/icons/fugue/cross-circle.png" width="24" height="24" alt="Close search">
         </a>
         <fieldset data-ng-show="!$ctrl.searchAndReplaceShown">
@@ -47,19 +47,19 @@
         <div data-ng-show="!$ctrl.searchShown">
           <p data-ng-repeat="script in $ctrl.scriptures">
             <span data-ng-show="script.showChapter">
-              <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
-                {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+              <a href="" data-ng-click="biblicalCtrl.showScripture(script.version, script.book, script.chapter)">
+                {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="biblicalCtrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
             {{script.text}}
           </p>
         </div>
         <div data-ng-show="$ctrl.searchShown && $ctrl.searchResult">
           <h2>Search Results: {{$ctrl.searchResult.start}} to {{$ctrl.searchResult.end}} of {{$ctrl.searchResult.totalSize}}</h2>
           <p data-ng-repeat="group in $ctrl.searchResult.grouped">
-            <a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter)">
-              {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
+            <a href="" data-ng-click="biblicalCtrl.showScripture(group.version, group.book, group.chapter)">
+              {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="biblicalCtrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
             <span class="verse" data-ng-repeat="result in group.items">
               <br>
-              (<a href="" data-ng-click="$ctrl.showScripture(result.version, result.book, result.chapter)">{{result.version}}</a>)
+              (<a href="" data-ng-click="biblicalCtrl.showScripture(result.version, result.book, result.chapter)">{{result.version}}</a>)
               {{result.text}}
             </span>
           </p>
@@ -73,5 +73,4 @@
     </div>
   </div>
   <scripture-selector data-ng-if="$ctrl.reference.shown" data-reference="$ctrl.reference"></scripture-selector>
-  <scripture-view data-ng-if="$ctrl.viewReference" data-reference="$ctrl.viewReference"></scripture-view>
 </section>

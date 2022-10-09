@@ -9,9 +9,9 @@ import javax.inject.Inject;
 public class ScriptureFetcherRouter implements ScriptureFetcher {
   private final ScriptureFetcherBibleGateway bibleGateway;
   private final ScriptureFetcherBibleHub bibleHub;
-  private final ScriptureFetcherBookOfEnochReferences bookOfEnochReferences;
   private final ScriptureFetcherJWOrg jwOrg;
   private final ScriptureFetcherKJV1611 kjv1611;
+  private final ScriptureFetcherOneOff oneOff;
   private final ScriptureFetcherPseudepigrapha pseudepigrapha;
   private final ScriptureFetcherStepBibleOrg stepBibleOrg;
 
@@ -19,14 +19,14 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
   public ScriptureFetcherRouter(
       ScriptureFetcherBibleGateway bibleGateway,
       ScriptureFetcherBibleHub bibleHub,
-      ScriptureFetcherBookOfEnochReferences bookOfEnochReferences,
       ScriptureFetcherJWOrg jwOrg,
       ScriptureFetcherKJV1611 kjv1611,
+      ScriptureFetcherOneOff oneOff,
       ScriptureFetcherPseudepigrapha pseudepigrapha,
       ScriptureFetcherStepBibleOrg stepBibleOrg) {
     this.bibleGateway = bibleGateway;
     this.bibleHub = bibleHub;
-    this.bookOfEnochReferences = bookOfEnochReferences;
+    this.oneOff = oneOff;
     this.jwOrg = jwOrg;
     this.kjv1611 = kjv1611;
     this.pseudepigrapha = pseudepigrapha;
@@ -60,7 +60,9 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
       case "KJV1611":
         return kjv1611;
       case "EnochRef":
-        return bookOfEnochReferences;
+      case "essene":
+      case "qumran":
+        return oneOff;
       case "OXFORD":
         return pseudepigrapha;
       case "RSKJ":

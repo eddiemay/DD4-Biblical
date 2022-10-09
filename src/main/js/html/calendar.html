@@ -46,7 +46,7 @@
                     <a href="#{{notification.entity}}/{{notification.entityId}}">{{notification.title}}</a>
                   </li>
                 </ul>
-                <a href="" data-ng-if="$ctrl.userLoggedIn()" data-ng-click="$ctrl.showCreateEventDialog(day.date)" class="add-event">Add</a>
+                <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.showCreateEventDialog(day.date)" class="add-event">Add</a>
                 <a href="" data-ng-if="day.holyDay" class="holyday-title" data-ng-click="$ctrl.showViewEventDialog(day.holyDay)">{{day.holyDay.title}}</a>
                 <ul class="events">
                   <li data-ng-repeat="biblicalEvent in day.biblicalEvents">
@@ -62,6 +62,9 @@
       </div>
       <ul class="message no-margin"><li>{{$ctrl.biblicalEvents.length}} Biblical events found</li></ul>
     </div>
+    <a href="https://drive.google.com/file/d/1sc4Zs6X8i_gH0c0zDZFy30hY2KyWf8h0/view" target="_blank">
+      2022 Printable Calendar
+    </a>
   </div>
 
   <!-- Month selection dialog start -->
@@ -108,7 +111,7 @@
             <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
           </a>
         </li>
-        <li data-ng-if="$ctrl.userLoggedIn()">
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
           <a href="" data-ng-click="$ctrl.showEditEventDialog($ctrl.event)" title="Edit Event">Edit</a>
         </li>
       </ul>
@@ -120,10 +123,10 @@
           <img src="images/loading-stripes.png" alt="Loading">
         </div>
         <p data-ng-repeat="group in $ctrl.event.scriptureGroups">
-          <a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter)">
-            {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
+          <a href="" data-ng-click="biblicalCtrl.showScripture(group.version, group.book, group.chapter)">
+            {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="biblicalCtrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
           <span data-ng-repeat="script in group.scriptures">
-            <a href="" data-ng-if="script.verse != group.verse" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+            <a href="" data-ng-if="script.verse != group.verse" data-ng-click="biblicalCtrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
             {{script.text}}</span>
         </p>
         <div data-ng-if="$ctrl.event.displayText" data-ng-bind-html="$ctrl.event.displayText"></div>
@@ -187,5 +190,4 @@
     </div>
   </div>
   <!-- Event edit dialog end -->
-  <scripture-view data-ng-if="$ctrl.reference" data-reference="$ctrl.reference"></scripture-view>
 </section>

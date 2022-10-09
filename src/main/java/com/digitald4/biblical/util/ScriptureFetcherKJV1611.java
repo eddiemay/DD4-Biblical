@@ -57,6 +57,10 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
+    if (book.equals(BibleBook.SIRACH.getName())) {
+      return "Ecclesiasticus";
+    }
+
     return book.replace(" ", "-");
   }
 }

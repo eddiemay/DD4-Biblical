@@ -1,20 +1,24 @@
 package com.digitald4.biblical.model;
 
 public class Scripture {
-  private long id;
+  private Long id;
   private String version;
   private String book;
   private int chapter;
   private int verse;
   private StringBuilder text;
 
-  public long getId() {
-    return id;
+  public String getId() {
+    return String.format("%s-%s-%d-%d", getVersion(), getBook().replace(" ", "_"), getChapter(), getVerse());
   }
 
-  public Scripture setId(long id) {
+  public Scripture setId(Long id) {
     this.id = id;
     return this;
+  }
+
+  public Long getLongId() {
+    return id;
   }
 
   public String getVersion() {
@@ -81,9 +85,5 @@ public class Scripture {
   @Override
   public String toString() {
     return String.format("(%s) %s %d:%d %s", getVersion(), getBook(), getChapter(), getVerse(), getText());
-  }
-
-  public String documentId() {
-    return String.format("%s-%s-%d-%d", getVersion(), getBook().replace(" ", "_"), getChapter(), getVerse());
   }
 }

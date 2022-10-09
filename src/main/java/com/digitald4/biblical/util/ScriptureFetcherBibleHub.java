@@ -127,7 +127,9 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
 
   private static String formatBookForUrl(String book) {
     if (book.equals(BibleBook.SONG_OF_SOLOMON.getName())) {
-      book = "songs";
+      return "songs";
+    } else if (book.equals(BibleBook.SIRACH.getName())) {
+      return "ecclesiasticus";
     }
 
     return book.toLowerCase().replace(" ", "_");

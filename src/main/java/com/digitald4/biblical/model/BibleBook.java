@@ -103,11 +103,12 @@ public class BibleBook {
   public static final BibleBook ESDRAS_2 = new BibleBook(68, "2 Esdras", "Apocrypha,Deuterocanon,Ethiopian", 16);
   public static final BibleBook WISDOM_OF_SOLOMON;
   public static final BibleBook MACCABES_1;
+  public static final BibleBook SIRACH;
   public static final ImmutableList<BibleBook> UNIVERSAL_DEUTEROCANON = ImmutableList.of(
       new BibleBook(69, "Tobit", "Apocrypha,Deuterocanon,Universal", 14, "Tob", "Tb"),
       new BibleBook(70, "Judith", "Apocrypha,Deuterocanon,Universal", 16, "Jth", "Jdth", "Jdt"),
       WISDOM_OF_SOLOMON = new BibleBook(71, "Wisdom of Solomon", "Apocrypha,Deuterocanon,Universal", 19, "Wisdom", "Wis", "Ws"),
-      new BibleBook(72, "Ecclesiasticus", "Apocrypha,Deuterocanon,Universal", 51, "Sirach", "Sir", "Ecclus"),
+      SIRACH = new BibleBook(72, "Sirach", "Apocrypha,Deuterocanon,Universal", 51, "Ecclesiasticus", "Sir", "Ecclus"),
       new BibleBook(73, "Baruch", "Apocrypha,Deuterocanon,Universal", 5, "Bar"),
       MACCABES_1 = new BibleBook(74, "1 Maccabees", "Apocrypha,Deuterocanon,Universal", 16, "1Mac", "1Macc", "1 Machabees"),
       new BibleBook(75, "2 Maccabees", "Apocrypha,Deuterocanon,Universal", 15, "2Mac", "2Macc", "2 Machabees"));
@@ -143,7 +144,12 @@ public class BibleBook {
           ENOCH = new BibleBook(85, "Enoch", "Apocrypha,Deuterocanon,Ethiopian", 108, "Hanok", "Eno"),
           JUBILEES = new BibleBook(86, "Jubilees", "Apocrypha,Deuterocanon,Ethiopian", 50, "Jub"));
 
-  public static final BibleBook JASHER = new BibleBook(87, "Jasher", "Apocrypha,Jewish History", 91, "Yasher", "Yahusher");
+  public static final BibleBook JASHER = new BibleBook(87, "Jasher",
+      "Apocrypha,Jewish History", 91, "Yasher", "Yahusher");
+  public static final BibleBook COMMUNITY_RULE = new BibleBook(88, "Community Rule",
+      "Apocrypha,Jewish History", 1, "cr", "Manual of Discipline", "MD");
+  public static final BibleBook WAR_SCROLL = new BibleBook(89, "War Scroll",
+      "Apocrypha,Jewish History", 19, "War");
 
   public static final ImmutableSet<BibleBook> ALL_BOOKS = ImmutableSet.<BibleBook>builder()
       .addAll(CANON)
@@ -151,7 +157,7 @@ public class BibleBook {
       .add(ADDITIONS_TO_ESTHER, PSALMS_151)
       .addAll(EASTERN_ORTHODOX_DEUTEROCANON)
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
-      .add(JASHER)
+      .add(JASHER, COMMUNITY_RULE, WAR_SCROLL)
       .build();
 
   private final int bookNum;

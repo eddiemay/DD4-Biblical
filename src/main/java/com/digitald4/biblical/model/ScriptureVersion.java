@@ -15,7 +15,6 @@ public class ScriptureVersion {
   private final ImmutableSet<BibleBook> bibleBooks;
 
   private static final ImmutableList<ScriptureVersion> ALL_VERSIONS = ImmutableList.of(
-      new ScriptureVersion("The Scriptures 2009", "TS2009", 7, BibleBook.CANON),
       new ScriptureVersion("The Scriptures (1998)", "ISR", 10, BibleBook.CANON),
       new ScriptureVersion("Restored Names King James", "RSKJ", 20, BibleBook.CANON),
       new ScriptureVersion("New Revised Standard Version", "NRSV", 30,
@@ -29,7 +28,8 @@ public class ScriptureVersion {
           ImmutableSet.of(BibleBook.ENOCH, BibleBook.JUBILEES, BibleBook.JASHER)),
       new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
-      new ScriptureVersion("New King James Version", "NKJV", 60, BibleBook.CANON),
+      new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),
+      new ScriptureVersion("Qumran", "qumran", 56, ImmutableSet.of(BibleBook.WAR_SCROLL)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()));

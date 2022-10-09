@@ -3,15 +3,10 @@ com.digitald4.biblical.ReadTheWordCtrl = function($location, globalData, scriptu
   this.globalData = globalData;
   this.globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion || 'ISR';
   this.scriptureService = scriptureService;
-  this.userLoggedIn = () => globalData.activeSession != undefined;
   this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.showReference();
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(version, book, chapter, verse) {
-  this.viewReference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {

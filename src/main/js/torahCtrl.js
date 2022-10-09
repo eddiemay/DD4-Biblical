@@ -38,7 +38,3 @@ com.digitald4.biblical.TorahCtrl.prototype.update = function(commandment) {
     commandment.tags = updated.tags;
   }, notify);
 }
-
-com.digitald4.biblical.TorahCtrl.prototype.showScripture = function(commandment) {
-  this.reference = commandment.scriptures;
-}

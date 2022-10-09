@@ -1,7 +1,6 @@
 package com.digitald4.biblical.util;
 
 import com.digitald4.biblical.model.BibleBook;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -133,5 +132,31 @@ public class ScriptureReferenceProcessorSplitImplTest {
     assertThat(scriptureStrProcessor.computeVerseRanges("Jude 23, 2 Kings 2:7")).containsExactly(
         new ScriptureReferenceProcessor.VerseRange(BibleBook.Jude, 1, 23, 23),
         new ScriptureReferenceProcessor.VerseRange(BibleBook.Kings2, 2, 7, 7));
+  }
+
+  @Test
+  public void computeVerseRange_periodAfterBook() {
+    assertThat(scriptureStrProcessor.computeVerseRanges("Gen. 2:3, Psa. 45:7")).containsExactly(
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3),
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 45, 7, 7));
+  }
+
+  @Test
+  public void computeVerseRange_semicolorSeperator() {
+    assertThat(scriptureStrProcessor.computeVerseRanges("Gen 2:3; Psa 45:7")).containsExactly(
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3),
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 45, 7, 7));
+    assertThat(scriptureStrProcessor.computeVerseRanges("Psalm 126:6;127:1-5;128:3")).containsExactly(
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 126, 6, 6),
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 127, 1, 5),
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 128, 3, 3));
+  }
+
+  @Test
+  public void computeVerseRange_dashInsteadOfMinus() {
+    assertThat(scriptureStrProcessor.computeVerseRanges("Psalm 126:6–10,127:1–5,128:3–5")).containsExactly(
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 126, 6, 10),
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 127, 1, 5),
+        new ScriptureReferenceProcessor.VerseRange(BibleBook.Psalms, 128, 3, 5));
   }
 }

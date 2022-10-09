@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Arrays;
 
-public class CommandmentStore extends SearchableStoreImpl<Commandment> {
+public class CommandmentStore extends SearchableStoreImpl<Commandment, Long> {
   private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final ScriptureStore scriptureStore;
 
@@ -39,7 +39,7 @@ public class CommandmentStore extends SearchableStoreImpl<Commandment> {
   }
 
   @Override
-  protected Iterable<Commandment> preprocess(Iterable<Commandment> commandments) {
+  protected Iterable<Commandment> preprocess(Iterable<Commandment> commandments, boolean isCreate) {
     return Streams.stream(commandments)
         // Try and parse the scriptures to make sure it is valid.
         .peek(commandment -> scriptureRefProcessor.computeVerseRanges(commandment.getScriptures()))
