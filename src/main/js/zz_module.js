@@ -77,10 +77,6 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     lessonService.latest = function(id, success, error) {
       lessonService.performRequest('GET', 'latest', {id: id, allowDraft: true}, undefined, success, error);
     }
-    lessonService.update = function(lesson, updateMask, success, error) {
-      lessonService.sendRequest(
-          {method: 'PUT', urlParams: lesson.lessonId, params: {updateMask: updateMask.join()}, data: lesson}, success, error);
-    }
     return lessonService;
   })
   .service('notificationService', function(apiConnector) {

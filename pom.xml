@@ -59,6 +59,10 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>2.4.4</version>
+                <configuration>
+                    <deploy.projectId>dd4-biblical</deploy.projectId>
+                    <deploy.version>prod</deploy.version>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

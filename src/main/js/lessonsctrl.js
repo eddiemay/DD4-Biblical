@@ -25,7 +25,7 @@ com.digitald4.biblical.LessonsCtrl.prototype.edit = function() {
 
 com.digitald4.biblical.LessonsCtrl.prototype.saveLesson = function() {
   if (this.lesson.lessonId) {
-    this.lesson.id = undefined;
+    this.lesson.id = this.lesson.lessonId;
     this.lessonService.update(
         this.lesson,
         ['title', 'theme', 'youtubeId', 'content'],
