@@ -1,7 +1,6 @@
 var ONE_HOUR = 1000 * 60 * 60;
 var ONE_DAY = 24 * ONE_HOUR;
 var EVENT_TYPES = ['BIBLICAL', 'NOTIFICATION'];
-var SCRIPTURE_VERSIONS = ['ISR', 'RSKJ', 'NRSV', 'NWT', /*'NKJV',*/ 'KJV1611'];
 
 // T. James 951-233-6912
 
@@ -10,7 +9,6 @@ com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, b
   this.locationProvider = $location;
   this.window = $window;
   this.globalData = globalData;
-  this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.months = HEBREW_MONTHS;
   this.biblicalEventService = biblicalEventService;
   this.scriptureService = scriptureService;
@@ -26,7 +24,6 @@ com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, b
 com.digitald4.biblical.CalendarCtrl.prototype.months = HEBREW_MONTHS;
 com.digitald4.biblical.CalendarCtrl.prototype.eventTypes = EVENT_TYPES;
 com.digitald4.biblical.CalendarCtrl.prototype.biblicalEventService;
-com.digitald4.biblical.CalendarCtrl.prototype.scriptureService;
 
 com.digitald4.biblical.CalendarCtrl.prototype.setupCalendar = function() {
   var hebrewDate = this.hebrewDate;
@@ -75,7 +72,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.refresh = function() {
 	if (this.disableNet) {
 	  return;
 	}
-	this.biblicalEventService.listByMonth(this.hebrewDate.month, response => {
+	this.biblicalEventService.listCalendarEvents(this.hebrewDate.month, response => {
 	  var biblicalEvents = response.items || [];
 	  var firstDayOffset = this.getFirstDayOffset();
 	  for (var e = 0; e < biblicalEvents.length; e++) {
@@ -131,39 +128,12 @@ com.digitald4.biblical.CalendarCtrl.prototype.selectMonth = function() {
 
 com.digitald4.biblical.CalendarCtrl.prototype.showViewEventDialog = function(event) {
   this.event = event;
-  if (!event.displayText) {
-    this.refreshDisplayText(event);
-  }
   this.dialogShown = 'VIEW_EVENT';
   this.window.scrollTo(0, 0);
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.scriptureVersionChanged = function() {
-  for (var e = 0; e < this.biblicalEvents.length; e++) {
-    this.biblicalEvents[e].displayText = undefined;
-  }
-  this.refreshDisplayText(this.event);
-}
-
-com.digitald4.biblical.CalendarCtrl.prototype.refreshDisplayText = function(event) {
-  if (event.references) {
-    this.scriptureService.scriptures(event.references, response => {
-      var scriptures = response.items || [];
-      event.scriptureGroups = [];
-      var group;
-      for (const script of scriptures) {
-        if (!group || group.book != script.book || group.chapter != script.chapter || group.curVer + 1 != script.verse) {
-          group = {book: script.book, chapter: script.chapter, verse: script.verse, scriptures: []};
-          event.scriptureGroups.push(group);
-        }
-        group.scriptures.push(script);
-        group.curVer = script.verse;
-      }
-    }, notifyError);
-  }
-  if (event.summary) {
-    this.scriptureService.expand(event.summary, true, displayText => event.displayText = displayText, notifyError);
-  }
+  this.event.summary = this.event.summary + ' ';
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.showCreateEventDialog = function(hebrewDate) {
@@ -186,7 +156,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.createEvent = function() {
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.showEditEventDialog = function(event) {
-  this.editEvent = {id: event.id, month: event.month, day: event.day, year: event.year,
+  this.editEvent = {id: event.id, month: event.month, day: event.day, offset: event.offset,
       references: event.references, title: event.title, summary: event.summary};
 
   if (event.summary) {
@@ -208,7 +178,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.saveEvent = function() {
     edits.push('day');
     dayChanged = true;
   }
-  if (this.editEvent.year != this.origEvent.year) {edits.push('year');}
+  if (this.editEvent.offset != this.origEvent.year) {edits.push('offset');}
   if (this.editEvent.references != this.origEvent.references) {edits.push('references');}
   if (this.editEvent.title != this.origEvent.title) {edits.push('title');}
   if (this.editEvent.summary != this.origEvent.summary) {edits.push('summary');}

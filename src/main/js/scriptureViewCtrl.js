@@ -1,6 +1,5 @@
 com.digitald4.biblical.ScriptureViewCtrl = function(scriptureService, $window, globalData) {
   this.scriptureService = scriptureService;
-  this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.globalData = globalData;
   this.refresh();
   $window.scrollTo(0, 0);

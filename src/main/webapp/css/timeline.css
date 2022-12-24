@@ -1,0 +1,508 @@
+/**
+ * Styles for the timeline block
+ */
+ 
+.timeline {
+	margin-bottom: 1.667em;
+	border: 1px solid #999999;
+	}
+	.timeline:last-child {
+		margin-bottom: 0;
+	}
+	/* IE class */
+	.timeline.last-child {
+		margin-bottom: 0;
+	}
+	.timeline.no-margin,
+	.content-columns .timeline {
+		border: none;
+	}
+	.content-columns .timeline {
+		margin-bottom: 0;
+	}
+	.timeline > li {
+		height: 2.5em;
+		line-height: 2.5em;
+		/* padding-left: 15em; */
+		background: #f2f2f2;
+		vertical-align: bottom; /* IE7 list gap fix */
+	}
+	.timeline > li:nth-child(odd) {
+		background: #e6e6e6;
+	}
+	/* IE class */
+	.timeline > li.odd {
+		background: #e6e6e6;
+	}
+	.timeline > li.timeline-header {
+		background: #a4a4a4 url(../images/old-browsers-bg/timeline-header-bg.png) repeat-x top;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -moz-linear-gradient(
+			top,
+			#cccccc,
+			#a4a4a4
+		);
+		background: -webkit-gradient(
+			linear,
+			left top, left bottom,
+			from(#cccccc),
+			to(#a4a4a4)
+		);
+		border-top: 1px solid white;
+		border-bottom: 1px solid #828282;
+		color: white;
+	}
+	.timeline > li > span,
+	.timeline > li > a {
+		display: block;
+		height: 2.5em;
+		line-height: 2.5em;
+		float: left;
+		margin-left: -15em;
+		width: 14em;
+		padding: 0 0.5em;
+		color: #333333;
+		}
+		.timeline > li > span {
+			color: #999999;
+		}
+		.timeline > li > a:hover {
+			background: #CCCCCC;
+		}
+		.timeline > li > span img,
+		.timeline > li > a img {
+			margin-bottom: -3px;
+		}
+		.timeline > li.timeline-header > span {
+			width: 13.5em;
+			padding: 0 0.75em;
+			-moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+			-webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+			color: white;
+			}
+			.timeline > li.timeline-header > span b {
+				display: block;
+				height: 2.5em;
+				margin: 0 -0.75em;
+				padding: 0 0.75em;
+				border-left: 1px solid #dddddd;
+				border-right: 1px solid #999999;
+			}
+	.timeline > li > ul {
+		position: relative;
+		height: 2.5em;
+		border-left: 1px dotted #808080;
+		background: white;
+		}
+		.timeline > li:nth-child(odd) > ul {
+			background: #f2f2f2;
+		}
+		/* IE class */
+		.timeline > li.odd > ul {
+			background: #f2f2f2;
+		}
+		.timeline > li.timeline-header > ul {
+			border-left: 1px solid white;
+			background: none;
+		}
+		.timeline > li > ul > li {
+			position: absolute;
+			top: 0.5em;
+			height: 1.5em;
+			-moz-border-radius: 0.167em;
+			-webkit-border-radius: 0.167em;
+			-webkit-background-clip: padding-box;
+			border-radius: 0.167em;
+			background: #e5e5e5 url(../images/old-browsers-bg/timeline-bar-bg.png) repeat-x top;
+			-webkit-background-size: 100% 100%;
+			-moz-background-size: 100% 100%;
+			-o-background-size: 100% 100%;
+			background-size: 100% 100%;
+			background: -moz-linear-gradient(
+				top,
+				#ffffff,
+				#eeeeee 15%,
+				#c2c2c2 73%,
+				#e5e5e5
+			);
+			background: -webkit-gradient(
+				linear,
+				left top, left bottom,
+				from(#ffffff),
+				to(#e5e5e5),
+				color-stop(0.15, #eeeeee),
+				color-stop(0.73, #c2c2c2)
+			);
+			}
+			.timeline > li.timeline-header > ul > li {
+				width: 2em;
+				top: auto;
+				height: auto;
+				text-align: center;
+				margin-left: -1em;
+				-moz-text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.25);
+				-webkit-text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.25);
+				text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.25);
+				background: none;
+			}
+			.timeline > li.timeline-header > ul > li:nth-child(even) {
+				font-size: 0.75em;
+			}
+			/* IE class */
+			.timeline > li.timeline-header > ul > li.even {
+				font-size: 0.75em;
+			}
+			.timeline > li > ul > li.lunch,
+			.timeline > li > ul > li.zebras {
+				-webkit-background-size: auto;
+				-moz-background-size: auto;
+				-o-background-size: auto;
+				background-size: auto;
+				background: #f2f2f2;
+				top: 0;
+				height: 2.5em;
+				-moz-border-radius: 0;
+				-webkit-border-radius: 0;
+				-webkit-background-clip: padding-box;
+				border-radius: 0;
+			}
+			.timeline > li:nth-child(odd) > ul > li.lunch {
+				background: #e6e6e6;
+			}
+			/* IE class */
+			.timeline > li.odd > ul > li.lunch {
+				background: #e6e6e6;
+			}
+			.timeline > li > ul > li.zebras {
+				border-left: 1px solid #ccc;
+				border-right: 1px solid #ccc;
+			}
+			.timeline > li > ul.zebras,
+			.timeline > li > ul > li.zebras {
+				background: white url(../images/zebras.png);
+			}
+			.timeline > li > ul > li.current-time {
+				background: none;
+				top: 0;
+				height: 2.5em;
+				-moz-border-radius: 0;
+				-webkit-border-radius: 0;
+				-webkit-background-clip: padding-box;
+				border-radius: 0;
+				width: 0;
+				border-left: 1px solid red;
+			}
+			.timeline > li > ul > li > a,
+			.timeline > li > ul > li > span {
+				display: block;
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				color: #666666;
+				text-indent: 0.333em;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 0.92em;
+				line-height: 1.45em;
+				border: 1px solid #666666;
+				-moz-border-radius: 0.25em;
+				-webkit-border-radius: 0.25em;
+				-webkit-background-clip: padding-box;
+				border-radius: 0.25em;
+				-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+				-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+				white-space: nowrap;
+				overflow: hidden;
+				}
+				.timeline > li > ul > li > a span,
+				.timeline > li > ul > li > span span {
+					display: block;
+					position: absolute;
+					left: 0;
+					top: 0;
+					bottom: 0;
+					width: 100%;
+					white-space: nowrap;
+					overflow: hidden;
+				}
+
+			.timeline > li > ul > li.milestone-red,
+			.timeline > li > ul > li.milestone {
+				background: #333;
+				top: 0.75em;
+				height: 0.833em;
+				width: 0.833em;
+				margin-left: -0.5em;
+				border: 0.083em solid;
+				border-color: #999 #000 #000 #999;
+				-webkit-transform: rotate(45deg);
+				-moz-transform: rotate(45deg);
+				-o-transform: rotate(45deg);
+				transform: rotate(45deg);
+			  }
+				.timeline > li > ul > li.milestone > a,
+				.timeline > li > ul > li.milestone > span {
+					border: 0;
+				}
+			.timeline > li > ul > li.milestone-red {
+			  background: #ff1100
+			}
+			
+
+.timeline > li > ul .event-blue,
+.timeline > li > ul .event-green,
+.timeline > li > ul .event-orange,
+.timeline > li > ul .event-purple,
+.timeline > li > ul > li.event-blue a,
+.timeline > li > ul > li.event-green a,
+.timeline > li > ul > li.event-orange a,
+.timeline > li > ul > li.event-purple a,
+.timeline > li > ul > li.event-blue span,
+.timeline > li > ul > li.event-green span,
+.timeline > li > ul > li.event-orange span,
+.timeline > li > ul > li.event-purple span {
+	color: white;
+	-webkit-background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+	-o-background-size: 100% 100%;
+	background-size: 100% 100%;
+	-moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	-webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.timeline > li > ul .event-blue {
+	background: #4398c9 url(../images/old-browsers-bg/timeline-bar-blue-bg.png) repeat-x top;
+	background: -moz-linear-gradient(
+		top,
+		#b0cde5,
+		#6ec3e3 15%,
+		#0e62a8 73%,
+		#4398c9
+	);
+	background: -webkit-gradient(
+		linear,
+		left top, left bottom,
+		from(#b0cde5),
+		to(#4398c9),
+		color-stop(0.15, #6ec3e3),
+		color-stop(0.73, #0e62a8)
+	);
+}
+.timeline > li > ul .event-green {
+	background: #56c943 url(../images/old-browsers-bg/timeline-bar-green-bg.png) repeat-x top;
+	background: -moz-linear-gradient(
+		top,
+		#b3e6b1,
+		#8ae46f 15%,
+		#15a80e 73%,
+		#56c943
+	);
+	background: -webkit-gradient(
+		linear,
+		left top, left bottom,
+		from(#b3e6b1),
+		to(#56c943),
+		color-stop(0.15, #8ae46f),
+		color-stop(0.73, #15a80e)
+	);
+}
+.timeline > li > ul .event-orange {
+	background: #c99c43 url(../images/old-browsers-bg/timeline-bar-orange-bg.png) repeat-x top;
+	background: -moz-linear-gradient(
+		top,
+		#e6d4b1,
+		#e4bd6f 15%,
+		#a8750e 73%,
+		#c99c43
+	);
+	background: -webkit-gradient(
+		linear,
+		left top, left bottom,
+		from(#e6d4b1),
+		to(#c99c43),
+		color-stop(0.15, #e4bd6f),
+		color-stop(0.73, #a8750e)
+	);
+}
+.timeline > li > ul .event-purple {
+	background: #b543c9 url(../images/old-browsers-bg/timeline-bar-purple-bg.png) repeat-x top;
+	background: -moz-linear-gradient(
+		top,
+		#e3b1e6,
+		#c86fe4 15%,
+		#a10ea8 73%,
+		#b543c9
+	);
+	background: -webkit-gradient(
+		linear,
+		left top, left bottom,
+		from(#e3b1e6),
+		to(#b543c9),
+		color-stop(0.15, #c86fe4),
+		color-stop(0.73, #a10ea8)
+	);
+}
+
+/*
+ * Year ranges
+ */
+.timeline .from-previous-jubilee, .timeline .at-previous-jubilee { left: 0; }
+.timeline .from-year-1 { left: 1%; }
+.timeline .from-year-2 { left: 2%; }
+.timeline .from-year-3 { left: 4%; }
+.timeline .from-year-4 { left: 6%; }
+.timeline .from-year-5 { left: 8%; }
+.timeline .from-year-6 { left: 10%; }
+.timeline .from-year-7 { left: 12%; }
+.timeline .from-year-8 { left: 14%; }
+.timeline .from-year-9 { left: 16%; }
+.timeline .from-year-10 { left: 18%; }
+.timeline .from-year-11 { left: 20%; }
+.timeline .from-year-12 { left: 22%; }
+.timeline .from-year-13 { left: 24%; }
+.timeline .from-year-14 { left: 26%; }
+.timeline .from-year-15 { left: 28%; }
+.timeline .from-year-16 { left: 30%; }
+.timeline .from-year-17 { left: 32%; }
+.timeline .from-year-18 { left: 34%; }
+.timeline .from-year-19 { left: 36%; }
+.timeline .from-year-20 { left: 38%; }
+.timeline .from-year-21 { left: 40%; }
+.timeline .from-year-22 { left: 42%; }
+.timeline .from-year-23 { left: 44%; }
+.timeline .from-year-24 { left: 46%; }
+.timeline .from-year-25 { left: 48%; }
+.timeline .from-year-26 { left: 50%; }
+.timeline .from-year-27 { left: 52%; }
+.timeline .from-year-28 { left: 54%; }
+.timeline .from-year-29 { left: 56%; }
+.timeline .from-year-30 { left: 58%; }
+.timeline .from-year-31 { left: 60%; }
+.timeline .from-year-32 { left: 62%; }
+.timeline .from-year-33 { left: 64%; }
+.timeline .from-year-34 { left: 66%; }
+.timeline .from-year-35 { left: 68%; }
+.timeline .from-year-36 { left: 70%; }
+.timeline .from-year-37 { left: 72%; }
+.timeline .from-year-38 { left: 74%; }
+.timeline .from-year-39 { left: 76%; }
+.timeline .from-year-40 { left: 78%; }
+.timeline .from-year-41 { left: 80%; }
+.timeline .from-year-42 { left: 82%; }
+.timeline .from-year-43 { left: 84%; }
+.timeline .from-year-44 { left: 86%; }
+.timeline .from-year-45 { left: 88%; }
+.timeline .from-year-46 { left: 90%; }
+.timeline .from-year-47 { left: 92%; }
+.timeline .from-year-48 { left: 94%; }
+.timeline .from-year-49 { left: 96%; }
+.timeline .from-year-50 { left: 98%; }
+
+.timeline .at-year-1 { left: 1%; }
+.timeline .at-year-2 { left: 3%; }
+.timeline .at-year-3 { left: 5%; }
+.timeline .at-year-4 { left: 7%; }
+.timeline .at-year-5 { left: 9%; }
+.timeline .at-year-6 { left: 11%; }
+.timeline .at-year-7 { left: 13%; }
+.timeline .at-year-8 { left: 15%; }
+.timeline .at-year-9 { left: 17%; }
+.timeline .at-year-10 { left: 19%; }
+.timeline .at-year-11 { left: 21%; }
+.timeline .at-year-12 { left: 23%; }
+.timeline .at-year-13 { left: 25%; }
+.timeline .at-year-14 { left: 27%; }
+.timeline .at-year-15 { left: 29%; }
+.timeline .at-year-16 { left: 31%; }
+.timeline .at-year-17 { left: 33%; }
+.timeline .at-year-18 { left: 35%; }
+.timeline .at-year-19 { left: 37%; }
+.timeline .at-year-20 { left: 39%; }
+.timeline .at-year-21 { left: 41%; }
+.timeline .at-year-22 { left: 43%; }
+.timeline .at-year-23 { left: 45%; }
+.timeline .at-year-24 { left: 47%; }
+.timeline .at-year-25 { left: 49%; }
+.timeline .at-year-26 { left: 51%; }
+.timeline .at-year-27 { left: 53%; }
+.timeline .at-year-28 { left: 55%; }
+.timeline .at-year-29 { left: 57%; }
+.timeline .at-year-30 { left: 59%; }
+.timeline .at-year-31 { left: 61%; }
+.timeline .at-year-32 { left: 63%; }
+.timeline .at-year-33 { left: 65%; }
+.timeline .at-year-34 { left: 67%; }
+.timeline .at-year-35 { left: 69%; }
+.timeline .at-year-36 { left: 71%; }
+.timeline .at-year-37 { left: 73%; }
+.timeline .at-year-38 { left: 75%; }
+.timeline .at-year-39 { left: 77%; }
+.timeline .at-year-40 { left: 79%; }
+.timeline .at-year-41 { left: 81%; }
+.timeline .at-year-42 { left: 83%; }
+.timeline .at-year-43 { left: 85%; }
+.timeline .at-year-44 { left: 87%; }
+.timeline .at-year-45 { left: 89%; }
+.timeline .at-year-46 { left: 91%; }
+.timeline .at-year-47 { left: 93%; }
+.timeline .at-year-48 { left: 95%; }
+.timeline .at-year-49 { left: 97%; }
+.timeline .at-year-50 { left: 99%; }
+
+.timeline .to-year-1 { right: 98%; }
+.timeline .to-year-2 { right: 96%; }
+.timeline .to-year-3 { right: 94%; }
+.timeline .to-year-4 { right: 92%; }
+.timeline .to-year-5 { right: 90%; }
+.timeline .to-year-6 { right: 88%; }
+.timeline .to-year-7 { right: 86%; }
+.timeline .to-year-8 { right: 84%; }
+.timeline .to-year-9 { right: 82%; }
+.timeline .to-year-10 { right: 80%; }
+.timeline .to-year-11 { right: 78%; }
+.timeline .to-year-12 { right: 76%; }
+.timeline .to-year-13 { right: 74%; }
+.timeline .to-year-14 { right: 72%; }
+.timeline .to-year-15 { right: 70%; }
+.timeline .to-year-16 { right: 68%; }
+.timeline .to-year-17 { right: 66%; }
+.timeline .to-year-18 { right: 64%; }
+.timeline .to-year-19 { right: 62%; }
+.timeline .to-year-20 { right: 60%; }
+.timeline .to-year-21 { right: 58%; }
+.timeline .to-year-22 { right: 56%; }
+.timeline .to-year-23 { right: 54%; }
+.timeline .to-year-24 { right: 52%; }
+.timeline .to-year-25 { right: 50%; }
+.timeline .to-year-26 { right: 48%; }
+.timeline .to-year-27 { right: 46%; }
+.timeline .to-year-28 { right: 44%; }
+.timeline .to-year-29 { right: 42%; }
+.timeline .to-year-30 { right: 40%; }
+.timeline .to-year-31 { right: 38%; }
+.timeline .to-year-32 { right: 36%; }
+.timeline .to-year-33 { right: 34%; }
+.timeline .to-year-34 { right: 32%; }
+.timeline .to-year-35 { right: 30%; }
+.timeline .to-year-36 { right: 28%; }
+.timeline .to-year-37 { right: 26%; }
+.timeline .to-year-38 { right: 24%; }
+.timeline .to-year-39 { right: 22%; }
+.timeline .to-year-40 { right: 20%; }
+.timeline .to-year-41 { right: 18%; }
+.timeline .to-year-42 { right: 16%; }
+.timeline .to-year-43 { right: 14%; }
+.timeline .to-year-44 { right: 12%; }
+.timeline .to-year-45 { right: 10%; }
+.timeline .to-year-46 { right: 8%; }
+.timeline .to-year-47 { right: 6%; }
+.timeline .to-year-48 { right: 4%; }
+.timeline .to-year-49 { right: 2%; }
+.timeline .to-year-50 { right: 1%; }
+.timeline .to-next-jubilee { right: 0; }

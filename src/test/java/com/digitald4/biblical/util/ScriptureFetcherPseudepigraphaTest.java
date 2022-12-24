@@ -1,5 +1,11 @@
 package com.digitald4.biblical.util;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.common.server.APIConnector;
@@ -8,15 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-public class ScriptureFetcherPseudepigraphaTest {
+public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
   @Mock
   private final APIConnector apiConnector = mock(APIConnector.class);
   private ScriptureFetcher scriptureFetcher;
@@ -218,6 +216,28 @@ public class ScriptureFetcherPseudepigraphaTest {
   }
 
   @Test
+  public void fetchBookOfAdamAndEve() throws Exception {
+    when(apiConnector.sendGet(anyString()))
+        .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/adamnev.htm"));
+
+    assertThat(scriptureFetcher.fetch("OXFORD", BibleBook.BOOK_OF_ADAM_AND_EVE, 3).stream().filter(s -> s.getChapter() == 3).collect(toImmutableList())).containsExactly(
+        new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(3).setVerse(1).setText(
+            "I And Adam arose and walked seven days over all that land, and found no victual such as they"),
+        new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(3).setVerse(2).setText(
+            "used to have in paradise. And Eve said to Adam: 'Wilt thou slay me? that I may die, and perchance God the Lord will bring thee into paradise, for on my account hast thou been driven thence.'"),
+        new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(3).setVerse(3).setText(
+            "Adam answered: 'Forbear, Eve, from such words, that peradventure God bring not some other curse upon us. How is it possible that I should stretch forth my hand against my own flesh? Nay, let us arise and look for something for us to live on, that we fail not.'"));
+
+    assertThat(scriptureFetcher.fetch("OXFORD", BibleBook.BOOK_OF_ADAM_AND_EVE, 15).stream().filter(s -> s.getChapter() == 15).collect(toImmutableList())).containsExactly(
+        new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(15).setVerse(1).setText(
+            "When the angels, who were under me, heard this, they refused to worship him. And Michael saith,"),
+        new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(15).setVerse(2).setText(
+            "'Worship the image of God, but if thou wilt not worship him, the Lord God will be wrath"),
+        new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(15).setVerse(3).setText(
+            "with thee.' And I said, 'If He be wrath with me, I will set my seat above the stars of heaven and will be like the Highest.'"));
+  }
+
+  @Test
   public void getChapterUrl() {
     assertThat(scriptureFetcher.getChapterUrl("OXFORD", new ScriptureReferenceProcessor.VerseRange(BibleBook.JUBILEES, 6, 22, 38)))
         .isEqualTo("http://www.pseudepigrapha.com/jubilees/6.htm");
@@ -231,17 +251,5 @@ public class ScriptureFetcherPseudepigraphaTest {
         .isEqualTo("http://www.pseudepigrapha.com/jubilees/6.htm");
     assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(4).setVerse(58)))
         .isEqualTo("http://www.pseudepigrapha.com/jubilees/4.htm");
-  }
-
-  private static String getContent(String filename) throws Exception {
-    BufferedReader br = new BufferedReader(new FileReader(filename));
-
-    StringBuilder content = new StringBuilder();
-    String line;
-    while ((line = br.readLine()) != null) {
-      content.append(line).append("\n");
-    }
-
-    return content.toString();
   }
 }

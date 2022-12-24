@@ -1,16 +1,16 @@
 package com.digitald4.biblical.util;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.common.server.APIConnector;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class ScriptureFetcherBibleComTest {
   @Mock private final APIConnector apiConnector = mock(APIConnector.class);

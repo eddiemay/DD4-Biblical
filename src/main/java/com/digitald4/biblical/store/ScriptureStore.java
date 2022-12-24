@@ -105,9 +105,6 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   @Override
   public Scripture fromDocument(com.google.appengine.api.search.Document document) {
     return new Scripture()
-        .setId(
-            document.getFieldNames().contains("scriptureId")
-                ? Long.parseLong(document.getOnlyField("scriptureId").getAtom()) : null)
         .setVersion(document.getOnlyField("version").getAtom())
         .setBook(document.getOnlyField("book").getAtom())
         .setChapter(document.getOnlyField("chapter").getNumber().intValue())

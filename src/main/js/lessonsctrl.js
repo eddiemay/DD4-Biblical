@@ -2,20 +2,25 @@ com.digitald4.biblical.LessonsCtrl = function($location, globalData, lessonServi
   this.locationProvider = $location;
   this.lessonService = lessonService;
   this.scriptureService = scriptureService;
-  globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion || 'RSKJ';
-  lessonService.listLessons(response => {this.lessons = response.items}, notify);
+  globalData.scriptureVersion = globalData.scriptureVersion || 'RSKJ';
+  var allowDraft = globalData.activeSession != undefined;
+  lessonService.listLessons(allowDraft, response => {this.lessons = response.items}, notify);
   this.lessonId = $location.search()['lesson'];
   if (this.lessonId) {
-    this.lessonService.latest(this.lessonId, lesson => { this.renderLesson(lesson) }, notify);
+    this.lessonService.latest(this.lessonId, allowDraft, lesson => { this.renderLesson(lesson) }, notify);
   }
 }
 
 com.digitald4.biblical.LessonsCtrl.prototype.showLesson = function(lesson) {
-  this.locationProvider.search('lesson', lesson.id);
+  if (lesson.lessonId) {
+    this.locationProvider.search('lesson', lesson.lessonId);
+  } else {
+    this.locationProvider.search('lesson', lesson.id);
+  }
 }
 
 com.digitald4.biblical.LessonsCtrl.prototype.createNew = function() {
-  this.lesson = {theme: {}};
+  this.lesson = {};
   this.isEditing = true;
 }
 
@@ -23,55 +28,21 @@ com.digitald4.biblical.LessonsCtrl.prototype.edit = function() {
   this.isEditing = true;
 }
 
-com.digitald4.biblical.LessonsCtrl.prototype.saveLesson = function() {
+com.digitald4.biblical.LessonsCtrl.prototype.saveLesson = function(published) {
+  this.lesson.published = published;
   if (this.lesson.lessonId) {
     this.lesson.id = this.lesson.lessonId;
     this.lessonService.update(
         this.lesson,
-        ['title', 'theme', 'youtubeId', 'content'],
-        lesson => { this.renderLesson(lesson) },
+        ['title', 'themeText', 'youtubeId', 'content', 'published'],
+        lesson => {this.renderLesson(lesson)},
         notify);
   } else {
-    this.lessonService.create(this.lesson, lesson => { this.renderLesson(lesson) }, notify);
+    this.lessonService.create(this.lesson, lesson => {this.showLesson(lesson)}, notify);
   }
-}
-
-com.digitald4.biblical.LessonsCtrl.prototype.showScripture = function(scripture) {
-  // $event.stopPropagation();
-  // notify(scripture);
-  this.reference = scripture;
 }
 
 com.digitald4.biblical.LessonsCtrl.prototype.renderLesson = function(lesson) {
-  if (lesson.theme.scripture) {
-    this.scriptureService.scriptures(
-        lesson.theme.scripture,
-        response => { lesson.theme.scriptureExpanded = this.expandScriptureInline(response.items) },
-        notify);
-  }
   this.lesson = lesson;
   this.isEditing = undefined;
-}
-
-com.digitald4.biblical.LessonsCtrl.prototype.expandScriptureInline = function(scriptures) {
-  var scriptureExpanded = '';
-  var book = '';
-  var chapter = -1;
-  for (var i = 0; i < scriptures.length; i++) {
-    var scripture = scriptures[i];
-    if (book != scripture.book) {
-      book = scripture.book;
-      chapter = -1;
-      scriptureExpanded += ' ' + book;
-    }
-    if (chapter != scripture.chapter) {
-      chapter = scripture.chapter;
-      scriptureExpanded += ' ' + chapter + ':' + scripture.verse;
-    } else {
-      scriptureExpanded += ' ' + scripture.verse;
-    }
-    scriptureExpanded += ' ' + scripture.text;
-  }
-
-  return scriptureExpanded.trim();
 }

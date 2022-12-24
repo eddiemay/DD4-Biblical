@@ -1,0 +1,17 @@
+<div>
+  <p data-ng-if="$ctrl.loading">{{$ctrl.ref}}</p>
+  <p data-ng-if="$ctrl.scriptures" data-ng-repeat="scripture in $ctrl.scriptures">
+    (<a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter)">{{scripture.version}}</a>)
+    <a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter)">
+      {{scripture.book}} {{scripture.chapter}}</a>:<a href="" data-ng-click="biblicalCtrl.showScripture(scripture.version, scripture.book, scripture.chapter, scripture.verse)">{{scripture.verse}}
+    </a>
+    {{scripture.text}}
+  </p>
+  <p data-ng-repeat="group in $ctrl.scriptureGroups">
+    <a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter)">
+      {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
+    <span data-ng-repeat="script in group.scriptures">
+      <a href="" data-ng-if="script.verse != group.verse" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+        {{script.text}}</span>
+  </p>
+</div>

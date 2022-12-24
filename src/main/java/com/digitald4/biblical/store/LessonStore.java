@@ -1,9 +1,11 @@
 package com.digitald4.biblical.store;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
 
 import com.digitald4.biblical.model.Lesson;
 import com.digitald4.biblical.model.Lesson.LessonVersion;
+import com.digitald4.biblical.util.ScriptureMarkupProcessor;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.GenericStore;
 import com.digitald4.common.storage.Query;
@@ -14,14 +16,13 @@ import javax.inject.Provider;
 import java.util.function.UnaryOperator;
 
 public class LessonStore extends GenericStore<Lesson, Long> {
-
   @Inject
   public LessonStore(Provider<DAO> daoProvider) {
     super(Lesson.class, daoProvider);
   }
 
   public ImmutableList<Lesson> list(boolean allowDraft) {
-    return list(Query.forList()).getItems().stream()
+    return list(Query.forList().setOrderBys(Query.OrderBy.of("creation_time"))).getItems().stream()
         .filter(lesson -> allowDraft || lesson.getLatestPublishedVersionId() > 0)
         .collect(toImmutableList());
   }
@@ -29,8 +30,7 @@ public class LessonStore extends GenericStore<Lesson, Long> {
   private LessonVersion updateLatest(LessonVersion lessonVersion) {
     update(lessonVersion.getLessonId(), lesson -> {
       if (lessonVersion.isPublished()) {
-        lesson.setTitle(lessonVersion.getTitle())
-            .setLatestPublishedVersionId(lessonVersion.getId());
+        lesson.setTitle(lessonVersion.getTitle()).setLatestPublishedVersionId(lessonVersion.getId());
       }
       return lesson.setLatestVersionId(lessonVersion.getId());
     });
@@ -40,11 +40,14 @@ public class LessonStore extends GenericStore<Lesson, Long> {
 
   public static class LessonVersionStore extends GenericStore<LessonVersion, Long> {
     private final LessonStore lessonStore;
+    private final ScriptureMarkupProcessor markupProcessor;
 
     @Inject
-    public LessonVersionStore(Provider<DAO> daoProvider, LessonStore lessonStore) {
+    public LessonVersionStore(
+        Provider<DAO> daoProvider, LessonStore lessonStore, ScriptureMarkupProcessor markupProcessor) {
       super(LessonVersion.class, daoProvider);
       this.lessonStore = lessonStore;
+      this.markupProcessor = markupProcessor;
     }
 
     public LessonVersion getLatest(long lessonId, boolean allowDraft) {
@@ -75,6 +78,15 @@ public class LessonStore extends GenericStore<Lesson, Long> {
       return latest.isPublished()
           ? create(updater.apply(latest.setId(0).setPublished(false)))
           : lessonStore.updateLatest(super.update(latest.getId(), updater));
+    }
+
+    @Override
+    protected Iterable<LessonVersion> preprocess(Iterable<LessonVersion> entities, boolean isCreate) {
+      return super.preprocess(
+          stream(entities)
+              .peek(lessonVersion -> lessonVersion.setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
+              .collect(toImmutableList()),
+          isCreate);
     }
   }
 }

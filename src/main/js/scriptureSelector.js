@@ -1,7 +1,6 @@
 com.digitald4.biblical.ScriptureSelector = function(globalData, bookService) {
   this.globalData = globalData;
   this.bookService = bookService;
-  this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.bookService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks, notifyError);
   this.view = 'book';
   this.reference.toString = undefined;

@@ -62,6 +62,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
       case "EnochRef":
       case "essene":
       case "qumran":
+      case "uchicago":
         return oneOff;
       case "OXFORD":
         return pseudepigrapha;

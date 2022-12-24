@@ -25,11 +25,12 @@ public class ScriptureVersion {
               .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,
-          ImmutableSet.of(BibleBook.ENOCH, BibleBook.JUBILEES, BibleBook.JASHER)),
+          ImmutableSet.of(BibleBook.ENOCH, BibleBook.JUBILEES, BibleBook.JASHER, BibleBook.BOOK_OF_ADAM_AND_EVE)),
       new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
       new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),
       new ScriptureVersion("Qumran", "qumran", 56, ImmutableSet.of(BibleBook.WAR_SCROLL)),
+      new ScriptureVersion("University of Chicago", "uchicago", 57, ImmutableSet.of(BibleBook.JOSEPHUS)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()));

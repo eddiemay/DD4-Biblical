@@ -30,7 +30,10 @@
     <link href="css/calendars.css" rel="stylesheet" type="text/css">
     <link href="css/wizard.css" rel="stylesheet" type="text/css">
     <link href="css/gallery.css" rel="stylesheet" type="text/css">
+
+    <!-- Digital D4 Biblical -->
     <link href="css/holyday.css" rel="stylesheet" type="text/css">
+    <link href="css/timeline.css" rel="stylesheet" type="text/css">
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
@@ -69,10 +72,12 @@
       | <a href="#/calendar?{{appCtrl.getIdTokenParameter()}}">Calendar</a>
       | <a href="#/read_the_word?{{appCtrl.getIdTokenParameter()}}">Read the Word</a>
       | <a href="#/the_law?{{appCtrl.getIdTokenParameter()}}">The Law</a>
+      | <a href="#/lessons?{{appCtrl.getIdTokenParameter()}}">Lessons</a>
+      | <a href="#/timeline?{{appCtrl.getIdTokenParameter()}}">Timeline</a>
       <span data-ng-if="appCtrl.globalData.runningLocal">
-        | <a href="#/lessons?{{appCtrl.getIdTokenParameter()}}">Lessons</a>
+        | <a href="#/utils?{{appCtrl.getIdTokenParameter()}}">Utilities</a>
       </span>
-      | <a href="#/utils?{{appCtrl.getIdTokenParameter()}}">Utilities</a> |
+      |
       <!-- Content -->
       <article class="container_12">
         <div data-ng-view></div>

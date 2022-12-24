@@ -49,9 +49,9 @@
                 <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.showCreateEventDialog(day.date)" class="add-event">Add</a>
                 <a href="" data-ng-if="day.holyDay" class="holyday-title" data-ng-click="$ctrl.showViewEventDialog(day.holyDay)">{{day.holyDay.title}}</a>
                 <ul class="events">
-                  <li data-ng-repeat="biblicalEvent in day.biblicalEvents">
-                    <a href="" data-ng-click="$ctrl.showViewEventDialog(biblicalEvent)">
-                      <div class="biblical" data-ng-class="{'has-error': biblicalEvent.year==4001}">{{biblicalEvent.title}}</div>
+                  <li data-ng-repeat="event in day.biblicalEvents">
+                    <a href="" data-ng-click="$ctrl.showViewEventDialog(event)">
+                      <div class="biblical" data-ng-class="{'has-error': event.year==4001}">{{event.title}}</div>
                     </a>
                   </li>
                 </ul>
@@ -116,25 +116,13 @@
         </li>
       </ul>
       <div class="block-content form">
-        <h2>{{$ctrl.event.title}} ({{$ctrl.event.year}} A.M.)</h2>
-        <div data-ng-if="!$ctrl.event.displayText && !$ctrl.event.scriptureGroups">
-          <div>{{$ctrl.event.references}}</div>
-          <div data-ng-if="$ctrl.event.summary" data-ng-bind-html="$ctrl.event.summary"></div>
-          <img src="images/loading-stripes.png" alt="Loading">
-        </div>
-        <p data-ng-repeat="group in $ctrl.event.scriptureGroups">
-          <a href="" data-ng-click="biblicalCtrl.showScripture(group.version, group.book, group.chapter)">
-            {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="biblicalCtrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
-          <span data-ng-repeat="script in group.scriptures">
-            <a href="" data-ng-if="script.verse != group.verse" data-ng-click="biblicalCtrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
-            {{script.text}}</span>
-        </p>
-        <div data-ng-if="$ctrl.event.displayText" data-ng-bind-html="$ctrl.event.displayText"></div>
+        <h2>{{$ctrl.event.display}}</h2>
+        <div data-bind-html-compile="$ctrl.event.summary"></div>
         <div class="columns">
           <div class="colx2-left">
             <label>Version</label>
             <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.scriptureVersionChanged()"
-                    data-ng-options="version for version in $ctrl.scriptureVersions"></select>
+                    data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
           </div>
           <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
         </div>
@@ -171,8 +159,8 @@
             <input type="number" data-ng-model="$ctrl.editEvent.day" min="1" max="31">
           </div>
           <div class="colx3-right">
-            <label>Year</label>
-            <input type="number" data-ng-model="$ctrl.editEvent.year" min="1" max="7000">
+            <label>Offset</label>
+            <input type="text" data-ng-model="$ctrl.editEvent.offset.years" class="full-width">
           </div>
         </div>
         <div class="columns">

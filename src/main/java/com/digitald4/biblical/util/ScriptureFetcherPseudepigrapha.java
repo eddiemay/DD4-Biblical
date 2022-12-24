@@ -45,6 +45,8 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
       return fetchJasher(version, book, chapter);
     } else if (book == BibleBook.ENOCH) {
       return version.equals("OXFORD") ? fetchEnoch(version, book, chapter) : fetchEnochOther(version, book, chapter);
+    } else if (book == BibleBook.BOOK_OF_ADAM_AND_EVE) {
+      return fetchBookOfAdamAndEve(version, book);
     }
     throw new DD4StorageException(String.format("Unsupported book: (%s) %s %d", version, book, chapter));
   }
@@ -164,6 +166,74 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
           }
 
           return scriptures.build().stream();
+        })
+        .collect(toImmutableList());
+  }
+
+  private ImmutableList<Scripture> fetchBookOfAdamAndEve(String version, BibleBook book) {
+    final Pattern versePattern = Pattern.compile("(\\d+) ([^<]+)");
+    String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/adamnev.htm");
+    Document doc = Jsoup.parse(htmlResult.trim());
+    AtomicInteger chapter = new AtomicInteger();
+
+    Element toReplace = doc.getElementsByTag("p").stream()
+        .filter(p -> p.text().startsWith("xv 1,2"))
+        .findFirst()
+        .orElse(null);
+    if (toReplace != null) {
+      toReplace.text("1 When the angels, who were under me, heard this, they refused to worship him. And Michael saith,");
+      toReplace.after("<p>2 'Worship the image of God, but if thou wilt not worship him, the Lord God will be wrath</p>");
+    }
+
+    toReplace = doc.getElementsByTag("p").stream()
+        .filter(p -> p.text().startsWith("2,3"))
+        .findFirst()
+        .orElse(null);
+    if (toReplace != null) {
+      toReplace.text("2 me his glory which he himself hath lost.' And at that moment, the devil vanished before him.");
+      toReplace.after("<p>3 But Adam endured in his penance, standing for forty days (on end) in the water of Jordan.</p>");
+    }
+
+    return doc.getElementsByTag("p").stream()
+        .map(Element::text)
+        .map(String::trim)
+        .filter(text -> !text.isEmpty())
+        .map(text -> {
+           if (text.startsWith("iii")) {
+             return text.replace("iii", "iii 1");
+           } else if (text.startsWith("'Worship the image of God")) {
+             return "2 " + text;
+           } else if (text.startsWith("And Michael himself")) {
+             return "3 " + text;
+           } else if (text.startsWith("And Adam answered")) {
+             return "1 " + text;
+           } else if (text.startsWith("Then Seth and his mother")) {
+             return "1 " + text;
+           } else if (text.startsWith("And all angels")) {
+             return "4 " + text;
+           }
+
+           return text;
+        })
+        .map(text -> {
+          Matcher matcher = versePattern.matcher(text);
+          if (!matcher.find()) {
+            throw new DD4StorageException("No match for: " + text);
+          }
+          return matcher;
+        })
+        .map(matcher -> {
+          int verse = Integer.parseInt(matcher.group(1));
+          if (verse == 1) {
+            chapter.incrementAndGet();
+          }
+
+          return new Scripture()
+              .setVersion(version)
+              .setBook(book.getName())
+              .setChapter(chapter.get())
+              .setVerse(verse)
+              .setText(new StringBuilder(matcher.group(2).trim()));
         })
         .collect(toImmutableList());
   }

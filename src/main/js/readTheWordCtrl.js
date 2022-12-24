@@ -1,9 +1,8 @@
 com.digitald4.biblical.ReadTheWordCtrl = function($location, globalData, scriptureService) {
   this.locationProvider = $location;
   this.globalData = globalData;
-  this.globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion || 'ISR';
+  this.globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.scriptureService = scriptureService;
-  this.scriptureVersions = SCRIPTURE_VERSIONS;
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.showReference();
@@ -13,6 +12,10 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {
   this.locationProvider.search('reference', this.reference.value);
   this.locationProvider.search('version', this.globalData.scriptureVersion);
   this.locationProvider.search('pageToken', page);
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(version, book, chapter, verse) {
+  this.globalData.reference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {

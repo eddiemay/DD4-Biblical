@@ -1,0 +1,157 @@
+<section class="grid_12">
+  <div class="block-border"><div class="block-content">
+    <h1>Biblical Timeline</h1>
+
+    <div class="block-controls">
+      <ul class="controls-buttons">
+        <li><h2>Jubilee</h2></li>
+        <li>
+          <a href="" data-ng-click="$ctrl.prevJubilee()" title="Previous Jubilee">
+            <img src="images/icons/fugue/navigation-180.png" width="16" height="16">
+          </a>
+        </li>
+        <li class="sep"></li>
+        <li class="controls-block">
+          <input type="number" min="1" max="150" data-ng-model="$ctrl.jubilee" data-on-change="$ctrl.setJubilee()" />
+        </li>
+        <li class="sep"></li>
+        <li>
+          <a href="" data-ng-click="$ctrl.nextJubilee()" title="Next Jubilee">
+            <img src="images/icons/fugue/navigation.png" width="16" height="16">
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <ul class="timeline no-margin">
+      <li class="timeline-header">
+        <ul>
+          <li data-ng-repeat="year in $ctrl.years" data-ng-class="year.class" title="{{year.year}}">
+            {{year.display}}
+          </li>
+        </ul>
+      </li>
+
+      <li data-ng-if="$ctrl.loading">
+        <ul>
+          <li class="event-orange" style="left: 25%; right: 25%;">
+            <a href="" title="Loading..." class="with-tip">Loading...</a>
+          </li>
+        </ul>
+      </li>
+      <li data-ng-repeat="event in $ctrl.biblicalEvents">
+        <ul>
+          <span data-ng-if="event.titleStyle" data-ng-style="event.titleStyle">
+            <a href="" data-ng-click="$ctrl.showEvent(event)" title="{{event.display}}" class="with-tip">{{event.display}}</a>
+          </span>
+          <li data-ng-class="event.class" data-ng-style="event.style">
+            <a href="" data-ng-click="$ctrl.showEvent(event)" title="{{event.display}}" class="with-tip">{{event.display}}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <ul class="message no-margin">
+      <li>{{$ctrl.biblicalEvents.length}} Biblical events found <button data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.updateAll()">Update All</button></li>
+    </ul>
+
+  </div></div>
+
+  <!-- Event view dialog start -->
+  <div data-ng-if="$ctrl.viewDialogShown" id="eventModal" style="display: block;">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li>
+          <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+            <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+          </a>
+        </li>
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
+          <a href="" data-ng-click="$ctrl.showEditDialog($ctrl.event)" title="Edit Event">Edit</a>
+        </li>
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
+          <a href="" data-ng-click="$ctrl.showAddDialog($ctrl.event.id)" title="Edit Event">Add Successor</a>
+        </li>
+      </ul>
+      <div class="block-content form">
+        <h2>{{$ctrl.event.display}}</h2>
+        <div data-bind-html-compile="$ctrl.event.summary"></div>
+        <div class="columns">
+          <div class="colx2-left">
+            <label>Version</label>
+            <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.scriptureVersionChanged()"
+                    data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
+          </div>
+          <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+        </div>
+      </div>
+      <div class="modal-resize-tl"></div>
+      <div class="modal-resize-t"></div>
+      <div class="modal-resize-tr"></div>
+      <div class="modal-resize-r"></div>
+      <div class="modal-resize-br"></div>
+      <div class="modal-resize-b"></div>
+      <div class="modal-resize-bl"></div>
+      <div class="modal-resize-l"></div>
+    </div>
+  </div>
+  <!-- Event view dialog end -->
+
+  <!-- Event edit dialog start -->
+  <div data-ng-if="$ctrl.editDialogShown" id="editModal" style="display: block;">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li><a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+          <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+        </a></li>
+      </ul>
+      <div class="block-content form">
+        <div class="columns">
+          <label>Dependent Event</label>
+          <select data-ng-model="$ctrl.editEvent.depEventId"
+                  data-ng-options="event.id as event.display for event in $ctrl.allEvents">
+          </select>
+        </div>
+        <div class="columns">
+          <label>Dependent Relationship</label>
+          <select data-ng-model="$ctrl.editEvent.depRelationship"
+                  data-ng-options="relationship for relationship in $ctrl.DEPENDENCY_RELATIONS">
+          </select>
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <label>Offset</label>
+            <input type="text" data-ng-model="$ctrl.editEvent.offset.value" class="full-width">
+          </div>
+          <div class="colx2-right">
+            <label>Duration</label>
+            <input type="text" data-ng-model="$ctrl.editEvent.duration.value" class="full-width">
+          </div>
+        </div>
+        <div class="columns">
+          <label>Title</label>
+          <input type="text" data-ng-model="$ctrl.editEvent.title" class="full-width">
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <label>Month</label>
+            <select data-ng-model="$ctrl.editEvent.month" data-ng-options="month.number as month.displayText for month in $ctrl.months">
+            </select>
+          </div>
+          <div class="colx2-right">
+            <label>Day</label>
+            <input type="number" data-ng-model="$ctrl.editEvent.day" min="1" max="31">
+          </div>
+        </div>
+        <div class="columns">
+          <label>Summary</label>
+          <textarea data-ng-model="$ctrl.editEvent.summary" rows="2" class="full-width"></textarea>
+        </div>
+        <button data-ng-if="$ctrl.editEvent.id" data-ng-click="$ctrl.saveEvent()">Save</button>
+        <button data-ng-if="!$ctrl.editEvent.id" data-ng-click="$ctrl.createEvent()">Create</button>
+        <button data-ng-click="$ctrl.closeDialog()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <!-- Event edit dialog end -->
+</section>

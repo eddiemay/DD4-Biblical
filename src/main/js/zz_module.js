@@ -3,9 +3,16 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .filter('trusted', ['$sce', $sce => { return url => { return $sce.trustAsResourceUrl(url); }}])
   .service('biblicalEventService', function(apiConnector) {
     var biblicalEventService = new com.digitald4.common.JSONService('biblicalEvent', apiConnector);
-    biblicalEventService.listByMonth = function(month, success, error) {
-      biblicalEventService.sendRequest({action: 'forMonth', params: {month: month}}, success, error);
-    };
+    biblicalEventService.listCalendarEvents = function(month, success, error) {
+      biblicalEventService.sendRequest({action: 'calendar_events', params: {month: month}}, success, error);
+    }
+    biblicalEventService.listTimelineEvents = function(startYear, endYear, success, error) {
+      biblicalEventService.sendRequest(
+          {action: 'timeline_events', params: {startYear: startYear, endYear: endYear}}, success, error);
+    }
+    biblicalEventService.listAll = function(success, error) {
+      biblicalEventService.sendRequest({action: 'all'}, success, error);
+    }
     // biblicalEventService = new BiblicalEventServiceInMemoryImpl();
     return biblicalEventService;
   })
@@ -26,21 +33,10 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
         bookService.bibleBooks = bibleBooks;
         success(bookService.bibleBooks);
       }
-
-      var bibleBooks = [
-        {name: 'Genesis', chapterCount: 50}, {name: 'Exodus', chapterCount: 40}, {name: 'Leviticus', chapterCount: 27},
-        {name: 'Numbers', chapterCount: 36}, {name: 'Deuteronomy', chapterCount: 34}, {name: 'Joshua', chapterCount: 24},
-        {name: 'Judges', chapterCount: 36}, {name: 'Ruth', chapterCount: 34}, {name: '1 Samuel', chapterCount: 34},
-        {name: '2 Samuel', chapterCount: 24}, {name: '1 Kings', chapterCount: 36}, {name: '2 Kings', chapterCount: 34},
-        {name: '1 Chronicles', chapterCount: 24}, {name: '2 Chronicles', chapterCount: 36}, {name: 'Ezra', chapterCount: 34},
-        {name: 'Nehemiah', chapterCount: 24}, {name: 'Esther', chapterCount: 42}];
-
-      expandChapters(bibleBooks);
-      bookService.performRequest('GET', 'books', undefined, undefined, response => expandChapters(response.items), error);
+      bookService.sendRequest({action: 'books'}, response => expandChapters(response.items), error);
     };
     bookService.getVerseCount = function(book, chapter, success, error) {
-      var request = {'book': book, 'chapter': chapter};
-      bookService.performRequest('GET', 'verseCount', request, undefined, success, error);
+      bookService.sendRequest({action: 'verseCount', params: {'book': book, 'chapter': chapter}}, success, error);
     };
 
     return bookService;
@@ -52,30 +48,12 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     return new com.digitald4.common.JSONService('holyDay', apiConnector);
   })
   .service('lessonService', function(apiConnector) {
-    var lessons = [
-      {id: 123, title: 'The Sabbath still remains', scripture: 'Hebrews 4:9',
-        content: 'The Seventh day was made holy from the beginning of time: (Gen 2:3)'},
-      {id: 124, title: 'How to observe the Sabbath', scripture: 'Exodus 20:9-10',
-        content: 'We are not to do any work nor seek our on pleasure (Isa 58:17)'},
-      {id: 125, title: 'Poetic reading of Ezekiel chapter 13',
-        themeText: 'Woe to those that have been whitewashing (Ezekiel 13:14)',
-        youtubeId: 'JmVKwppqnZQ',
-        content: '<p>There is a strong message in Ezekiel chapter 13 for those that have been whitewashing the history and killing the people of the Most High</p>'},
-      {id: 126, title: 'The Law is NOT done away with',
-        themeText: '"Do not think I came to destroy the Law..." (<a href="" data-ng-click="$ctrl.showScripture(\'Matt 5:17\')">Matt 5:17</a>)',
-        content: 'The Messiah told us to not even think he came destroy the Law, we are not even supposed to get that in our head. (<a href="" data-ng-click="$ctrl.showScripture(\'Matt 5:17\')">Matt 5:17</a>)'}]
     var lessonService = new com.digitald4.common.JSONService('lesson', apiConnector);
-    lessonService.list = function(request, success, error) {
-      success(processPagination({items: lessons}));
+    lessonService.listLessons = function(allowDraft, success, error) {
+      lessonService.sendRequest({action: 'list', params: {allowDraft: allowDraft}}, success, error);
     }
-    lessonService.get = function(id, success, error) {
-      success(lessons[id - 123]);
-    }
-    lessonService.listLessons = function(success, error) {
-      lessonService.performRequest('GET', 'list', {allowDraft: true}, undefined, success, error);
-    }
-    lessonService.latest = function(id, success, error) {
-      lessonService.performRequest('GET', 'latest', {id: id, allowDraft: true}, undefined, success, error);
+    lessonService.latest = function(id, allowDraft, success, error) {
+      lessonService.sendRequest({action: 'latest', params: {id: id, allowDraft: allowDraft}}, success, error);
     }
     return lessonService;
   })
@@ -87,18 +65,44 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     scriptureService.scriptures = function(reference, success, error) {
       var request =
           typeof(reference) == 'object' ? reference : {reference: reference, version: globalData.scriptureVersion};
-      scriptureService.performRequest(['scriptures', 'GET'], undefined, request, undefined, success, error);
+      scriptureService.sendRequest({action: 'scriptures', params: request}, success, error);
     };
     scriptureService.expand = function(html, includeLinks, success, error) {
-      scriptureService.performRequest(['expand', 'POST'], undefined, undefined,
-          {'html': html, 'includeLinks': includeLinks, 'version': globalData.scriptureVersion}, success, error);
+      var request =  {html: html, includeLinks: includeLinks, version: globalData.scriptureVersion};
+      scriptureService.sendRequest({action: 'expand', method: 'POST', params: request}, success, error);
     };
     scriptureService.searchAndReplace = function(request, success, error) {
-      scriptureService.performRequest(['searchAndReplace', 'POST'], undefined, undefined, request,
+      scriptureService.sendRequest({action: 'searchAndReplace', method: 'POST', params: request},
           response => success(processPagination(response)), error);
     };
     // scriptureService = new ScriptureServiceInMemoryImpl();
     return scriptureService;
+  })
+  .service('timelineService', function(apiConnector) {
+    var timelineService = new com.digitald4.common.JSONService('timeline', apiConnector);
+    var events = {items: [
+      {title: 'Life of Adam', year: 1, duration: 930, endYear: 931, month: 1, day: 6, scripture: 'Gen 1:26,31,5:5'},
+      {title: 'Eve is born', year: 1, endYear: 1, month: 1, day: 13, scripture: 'Jub 3:1,4-6,8'},
+      {title: 'Adam & Eve kicked out the garden', year: 8, endYear: 8, month: 2, day: 17, scripture: 'Jub 3:17-21'},
+      {title: 'Life of Seth', offset: 130, year: 131, duration: 912, endYear: 1043, scripture: 'Gen 5:3,8'},
+      {title: 'Life of Enosh', offset: 105, year: 236, duration: 905, endYear: 1141, scripture: 'Gen 5:6,11'},
+      {title: 'Life of Kenan', offset: 90, year: 326, duration: 910, endYear: 1236, scripture: 'Gen 5:9,14'},
+      {title: 'Life of Mahalalel', offset: 70, year: 396, duration: 895, endYear: 1291, scripture: 'Gen 5:12,17'},
+      {title: 'Life of Jared', offset: 65, year: 461, duration: 962, endYear: 1423, scripture: 'Gen 5:15,20'},
+      {title: 'Days of Enoch', offset: 162, year: 633, duration: 350, endYear: 983, scripture: 'Gen 5:18,23-24'},
+      {title: 'Life of Methuʹselah', offset: 65, year: 698, duration: 969, endYear: 1667, scripture: 'Gen 5:21,27'},
+      {title: 'Life of Laʹmech', offset: 187, year: 885, duration: 777, endYear: 1662, scripture: 'Gen 5:25,31'},
+      {title: 'Life of Noah', offset: 182, year: 1067, duration: 950, endYear: 2017, scripture: 'Gen 5:28,9:29'},
+      {title: 'Life of Shem', offset: 500, year: 1567, duration: 600, endYear: 2167, scripture: 'Gen 5:32,11:10-11'},
+      {title: 'Start of Flood', offset: 600, year: 1667, endYear: 1667, scripture: 'Gen 7:6'},
+    ]};
+    timelineService.listEvents = function(year, endYear, success, error) {
+      success(events);
+    }
+    timelineService.listAll = function(success, error) {
+      success(events);
+    }
+    return timelineService;
   })
   .service('sunRiseSetService', function(apiConnector) {
     return new com.digitald4.common.JSONService('sunRiseSet', apiConnector)
@@ -115,14 +119,25 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
       templateUrl: 'js/html/calendar.html'
     };
   }])
+  .component('inlineScripture', {
+    controller: com.digitald4.biblical.InlineScriptureCtrl,
+    bindings: {
+      ref: '@',
+      version: '@',
+    },
+    templateUrl: 'js/html/inline_scripture.html',
+  })
   .component('scripture', {
     controller: function(globalData) {
-      this.show = () => {globalData.reference = {reference: this.ref}}
+      this.label = this.label || this.ref;
+      this.show = () => {globalData.reference = {reference: this.ref, version: this.version}}
     },
     bindings: {
       ref: '@',
+      label: '@',
+      version: '@',
     },
-    template: '<a href="" data-ng-click="$ctrl.show()">{{$ctrl.ref}}</a>',
+    template: '<a href="" data-ng-click="$ctrl.show()">{{$ctrl.label}}</a>',
   })
   .component('scriptureSelector', {
     controller: com.digitald4.biblical.ScriptureSelector,

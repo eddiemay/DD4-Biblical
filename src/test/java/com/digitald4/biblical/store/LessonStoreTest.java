@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Lesson;
 import com.digitald4.biblical.model.Lesson.LessonVersion;
+import com.digitald4.biblical.util.ScriptureMarkupProcessor;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,18 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class LessonStoreTest {
   private static final String TITLE = "Lesson Title";
+  private static final String PREPROCESSED_CONTENT = "The seventh day was blessed (Gen 2:3)." +
+      " It is a rest for man (<scripture ref=\"Hebrew 10:4\"/>)." +
+      " Moses told us (as part of the ten commandments) to keep it holy (Exo 20:8)." +
+      " Even the Messiah spoke about the Sabbath (Mark 10:12, Matt 4:19-21)." +
+      " To not keep it is sin [1 John 2:3,3:4].";
+  private static final String POSTPROCESSED_CONTENT = "The seventh day was blessed (<scripture ref=\"Gen 2:3\"/>)." +
+      " It is a rest for man (<scripture ref=\"Hebrew 10:4\"/>)." +
+      " Moses told us (as part of the ten commandments) to keep it holy (<scripture ref=\"Exo 20:8\"/>)." +
+      " Even the Messiah spoke about the Sabbath (<scripture ref=\"Mark 10:12, Matt 4:19-21\"/>)." +
+      " To not keep it is sin (<inline-scripture ref=\"1 John 2:3,3:4\"/>).";
+
+  private final static ScriptureMarkupProcessor SCRIPTURE_MARKUP_PROCESSOR = new ScriptureMarkupProcessor();
   @Mock private final Clock clock = mock(Clock.class);
   private DAOTestingImpl dao;
   private LessonStore lessonStore;
@@ -26,7 +39,7 @@ public class LessonStoreTest {
     AtomicLong TIME = new AtomicLong(60000L);
     dao = new DAOTestingImpl(clock);
     lessonStore = new LessonStore(() -> dao);
-    versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore);
+    versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore, SCRIPTURE_MARKUP_PROCESSOR);
     when(clock.millis()).thenAnswer(i -> TIME.incrementAndGet());
   }
 
@@ -172,5 +185,20 @@ public class LessonStoreTest {
 
     lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo("New Title");
+  }
+
+  @Test
+  public void create_replacesScriptures() {
+    LessonVersion version = versionStore.create(new LessonVersion().setTitle(TITLE).setContent(PREPROCESSED_CONTENT));
+
+    assertThat(version.getContent().toString()).isEqualTo(POSTPROCESSED_CONTENT);
+  }
+
+  @Test
+  public void update_replacesScriptures() {
+    LessonVersion version = versionStore.create(new LessonVersion().setTitle(TITLE).setContent(""));
+    version = versionStore.update(version.getLessonId(), current -> current.setContent(PREPROCESSED_CONTENT));
+
+    assertThat(version.getContent().toString()).isEqualTo(POSTPROCESSED_CONTENT);
   }
 }

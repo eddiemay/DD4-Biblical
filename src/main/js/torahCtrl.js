@@ -2,7 +2,7 @@ com.digitald4.biblical.TorahCtrl = function($location, globalData, commandmentSe
   this.locationProvider = $location;
   this.commandmentService = commandmentService;
   this.userLoggedIn = () => globalData.activeSession != undefined;
-  globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion || 'ISR';
+  globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.searchText = $location.search()['searchText'] || '';
   this.pageToken = parseInt($location.search()['pageToken']) || 1;
   this.newCommand = {};

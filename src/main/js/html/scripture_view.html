@@ -19,7 +19,7 @@
         <div class="colx2-left" data-ng-show="!$ctrl.reference.verse">
           <label>Version</label>
           <select data-ng-model="$ctrl.reference.version" data-ng-change="$ctrl.refresh()"
-                  data-ng-options="version for version in $ctrl.scriptureVersions"></select>
+                  data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
         </div>
         <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
       </div>

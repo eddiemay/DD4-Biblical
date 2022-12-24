@@ -91,6 +91,7 @@ public class Lesson implements HasModificationTimes {
     private long id;
     private long lessonId;
     private String title = "";
+    private String themeText;
     private Theme theme;
     private String youtubeId = "";
     private StringBuilder content;
@@ -126,10 +127,26 @@ public class Lesson implements HasModificationTimes {
       return this;
     }
 
+    public String getThemeText() {
+      if (themeText == null && theme != null) {
+        return theme.getScripture() == null
+            ? theme.getText() : String.format("<inline-scripture ref=\"%s\" />", theme.getScripture());
+      }
+
+      return themeText;
+    }
+
+    public LessonVersion setThemeText(String themeText) {
+      this.themeText = themeText;
+      return this;
+    }
+
+    @Deprecated
     public Theme getTheme() {
       return theme;
     }
 
+    @Deprecated
     public LessonVersion setTheme(Theme theme) {
       this.theme = theme;
       return this;

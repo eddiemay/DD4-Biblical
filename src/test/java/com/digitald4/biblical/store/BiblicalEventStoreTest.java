@@ -7,56 +7,76 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.BiblicalEvent;
+import com.digitald4.biblical.model.BiblicalEvent.Dependency.Relationship;
+import com.digitald4.biblical.model.BiblicalEvent.Duration;
+import com.digitald4.biblical.util.ScriptureMarkupProcessor;
 import com.digitald4.common.storage.DAO;
-import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.UnaryOperator;
-
 public class BiblicalEventStoreTest {
-  private static final long GEN_1_1_ID = 11;
-  private static final String GEN_1_1_FULL =
-      "In the beginning <div scripture-reference=\"Genesis 1:1\">Genesis 1:1 In the beginning Elohim created...</div>";
-  private static final String GEN_1_1_STORAGE =
-      "In the beginning <div scripture-reference=\"Genesis 1:1\"><p>Genesis 1:1</p></div>";
-  private static final String GEN_2_3_FULL =
-      "<div scripture-reference=\"Genesis 2:3\">Genesis 2:3 And Elohim blessed the 7th day and set it apart...</div>";
-  private static final String GEN_2_3_STORAGE = "<div scripture-reference=\"Genesis 2:3\"><p>Genesis 2:3</p></div>";
-
-  private DAO dao = mock(DAO.class);
+  private static final ScriptureMarkupProcessor SCRIPTURE_MARKUP_PROCESSOR = new ScriptureMarkupProcessor();
+  private final DAO dao = mock(DAO.class);
   private BiblicalEventStore biblicalEventStore;
 
   @Before
   public void setup() {
-    biblicalEventStore = new BiblicalEventStore(() -> dao);
+    biblicalEventStore = new BiblicalEventStore(() -> dao, SCRIPTURE_MARKUP_PROCESSOR);
     when(dao.create(any(BiblicalEvent.class))).thenAnswer(i -> i.getArgumentAt(0, BiblicalEvent.class));
-    when(dao.create(any(ImmutableList.class))).thenAnswer(i -> i.getArgumentAt(0, ImmutableList.class));
+    // when(dao.create(any(ImmutableList.class))).thenAnswer(i -> i.getArgumentAt(0, ImmutableList.class));
   }
 
   @Test
-  public void create_clearsScriptureReference() {
-    BiblicalEvent biblicalEvent = biblicalEventStore.create(new BiblicalEvent().setSummary(GEN_1_1_FULL));
+  public void create_setsYears() {
+    BiblicalEvent event = biblicalEventStore.create(
+        new BiblicalEvent()
+            .setTitle("Offset Fixed")
+            .setOffset(new BiblicalEvent.Duration().setYears(10))
+            .setDuration(new BiblicalEvent.Duration().setYears(2)));
 
-    assertThat(biblicalEvent.getSummary()).isEqualTo(GEN_1_1_STORAGE);
+    assertThat(event.getTitle()).isEqualTo("Offset Fixed");
+    assertThat(event.getYear()).isEqualTo(10);
+    assertThat(event.getEndYear()).isEqualTo(12);
   }
 
   @Test
-  public void multiCreate_clearsScriptureReference() {
-    ImmutableList<BiblicalEvent> biblicalEvents = biblicalEventStore.create(
-        ImmutableList.of(new BiblicalEvent().setSummary(GEN_1_1_FULL), new BiblicalEvent().setSummary(GEN_2_3_FULL)));
+  public void setYearsCorrectly() {
+    BiblicalEvent pred = new BiblicalEvent().setId(100L).setYear(100).setDuration(new Duration().setYears(50));
+    when(dao.get(eq(BiblicalEvent.class), eq(100L))).thenReturn(pred);
 
-    assertThat(biblicalEvents.get(0).getSummary()).isEqualTo(GEN_1_1_STORAGE);
-    assertThat(biblicalEvents.get(1).getSummary()).isEqualTo(GEN_2_3_STORAGE);
-  }
+    long depEventId = 100L;
+    BiblicalEvent event = new BiblicalEvent();
 
-  @Test
-  public void update_clearsScriptureReference() {
-    when(dao.update(eq(BiblicalEvent.class), eq(GEN_1_1_ID), any(UnaryOperator.class)))
-        .then(i -> i.getArgumentAt(2, UnaryOperator.class).apply(new BiblicalEvent().setSummary(GEN_1_1_STORAGE)));
+    // No offset no, duration should result in 0,0
+    biblicalEventStore.preprocess(event);
+    assertThat(event.getYear()).isEqualTo(0);
+    assertThat(event.getEndYear()).isEqualTo(0);
 
-    BiblicalEvent biblicalEvent = biblicalEventStore.update(GEN_1_1_ID, current -> current.setSummary(GEN_1_1_FULL));
+    // With offset should result in 0 + offset for both
+    biblicalEventStore.preprocess(event.setOffset(new Duration().setYears(5)));
+    assertThat(event.getYear()).isEqualTo(5);
+    assertThat(event.getEndYear()).isEqualTo(5);
 
-    assertThat(biblicalEvent.getSummary()).isEqualTo(GEN_1_1_STORAGE);
+    // Duration should add to start for finish.
+    biblicalEventStore.preprocess(event.setDuration(new Duration().setYears(30)));
+    assertThat(event.getYear()).isEqualTo(5);
+    assertThat(event.getEndYear()).isEqualTo(35);
+
+    // A start to start dependency should move the start to offset passed the dependency start
+    biblicalEventStore.preprocess(event.setDepEventId(depEventId).setDepRelationship(Relationship.START_TO_START));
+    assertThat(event.getYear()).isEqualTo(105);
+    assertThat(event.getEndYear()).isEqualTo(135);
+
+    biblicalEventStore.preprocess(event.setDepRelationship(Relationship.FINISH_TO_START));
+    assertThat(event.getYear()).isEqualTo(155);
+    assertThat(event.getEndYear()).isEqualTo(185);
+
+    biblicalEventStore.preprocess(event.setDepRelationship(Relationship.FINISH_TO_FINISH));
+    assertThat(event.getYear()).isEqualTo(125);
+    assertThat(event.getEndYear()).isEqualTo(155);
+
+    biblicalEventStore.preprocess(event.setDepRelationship(Relationship.START_TO_FINISH));
+    assertThat(event.getYear()).isEqualTo(75);
+    assertThat(event.getEndYear()).isEqualTo(105);
   }
 }

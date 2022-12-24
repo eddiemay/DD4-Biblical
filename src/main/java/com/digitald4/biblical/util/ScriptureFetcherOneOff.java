@@ -40,6 +40,8 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetchCommunityRule(version, book);
     } else if (book == BibleBook.WAR_SCROLL) {
       return fetchWarScroll(version, book);
+    } else if (book == BibleBook.JOSEPHUS) {
+      return fetchJosephus(version, book, chapter);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -124,6 +126,36 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                   .setVerse(verse)
                   .setText(new StringBuilder(matcher.group(2)));
             })
+        .collect(toImmutableList());
+  }
+
+  public synchronized ImmutableList<Scripture> fetchJosephus(String version, BibleBook book, int chapter) {
+    String urlTemplate = "http://penelope.uchicago.edu/josephus/ant-%d.html";
+    final Pattern isNumber = Pattern.compile("(\\d+)");
+
+    String htmlResult = apiConnector.sendGet(String.format(urlTemplate, chapter));
+    Document doc = Jsoup.parse(htmlResult.trim());
+    Elements paragraphs = doc.getElementsByTag("p");
+    if (paragraphs.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+
+    AtomicInteger verse = new AtomicInteger();
+    return paragraphs.stream()
+        .filter(p -> p.hasClass("indent") || p.hasClass("noindent"))
+        .peek(
+            p -> p.getElementsByTag("a").stream()
+                .filter(a -> isNumber.matcher(a.text()).find())
+                .forEach(Element::remove))
+        .map(Element::text)
+        .map(ScriptureFetcher::trim)
+        .map(
+            text -> new Scripture()
+                  .setVersion(version)
+                  .setBook(book.getName())
+                  .setChapter(chapter)
+                  .setVerse(verse.incrementAndGet())
+                  .setText(new StringBuilder(text)))
         .collect(toImmutableList());
   }
 

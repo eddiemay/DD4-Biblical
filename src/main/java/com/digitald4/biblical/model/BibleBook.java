@@ -31,12 +31,12 @@ public class BibleBook {
           "Josh", "Jos", "Jsh", "Yehoshua", "Yahosha", "Yahoshai", "Yahoshi", "Yahusha", "Yahushai", "Yahushi"),
       new BibleBook(7, "Judges", "Canon,OT,Historical",21, "Judg", "Jdg", "Jg", "Jdgs", "Shoftim"),
       new BibleBook(8, "Ruth", "Canon,OT,Historical", 4, "Ru", "Rth", "Rut"),
-      new BibleBook(9, "1 Samuel", "Canon,OT,Historical", 31, "1Sam", "1Sa", "1Sm", "1 Shamuel", "1 Shmuel"),
-      new BibleBook(10, "2 Samuel", "Canon,OT,Historical", 24,"2Sam", "2Sa", "2Sm", "2 Shemuel", "2 Shamuel"),
-      new BibleBook(11, "1 Kings", "Canon,OT,Historical", 22,"1Ki", "1 Kgs", "1 Malachim"),
-      Kings2 = new BibleBook(12, "2 Kings", "Canon,OT,Historical", 25,"2Ki", "2 Kgs", "2 Malachim"),
-      new BibleBook(13, "1 Chronicles", "Canon,OT,Historical", 29, "1Ch", "1Chr", "1 Divrei HaYamim"),
-      new BibleBook(14, "2 Chronicles", "Canon,OT,Historical", 36, "2Ch", "2Chr", "2 Divrei HaYamim"),
+      new BibleBook(9, "1 Samuel", "Canon,OT,Historical,Samuel,Sam", 31, "1Sam", "1Sa", "1Sm", "1 Shamuel", "1 Shmuel"),
+      new BibleBook(10, "2 Samuel", "Canon,OT,Historical,Samuel,Sam", 24,"2Sam", "2Sa", "2Sm", "2 Shemuel", "2 Shamuel"),
+      new BibleBook(11, "1 Kings", "Canon,OT,Historical,Kings", 22,"1Ki", "1 Kgs", "1 Malachim"),
+      Kings2 = new BibleBook(12, "2 Kings", "Canon,OT,Historical,Kings", 25,"2Ki", "2 Kgs", "2 Malachim"),
+      new BibleBook(13, "1 Chronicles", "Canon,OT,Historical,Chronicles,Chr", 29, "1Ch", "1Chr", "1 Divrei HaYamim"),
+      new BibleBook(14, "2 Chronicles", "Canon,OT,Historical,Chronicles,Chr", 36, "2Ch", "2Chr", "2 Divrei HaYamim"),
       new BibleBook(15, "Ezra", "Canon,OT,Historical", 10, "Ezr", "Ez"),
       new BibleBook(16, "Nehemiah", "Canon,OT,Historical", 13, "Neh", "Ne", "Nechemya"),
       ESTHER = new BibleBook(17, "Esther", "Canon,OT,Historical", 16, "Est", "Esth", "Es", "Hadassah"),
@@ -75,32 +75,32 @@ public class BibleBook {
       new BibleBook(44, "Acts", "Canon,NT,Apostles", 28, "Act", "Ac", "Pyilut Hashaliachim"),
       
       new BibleBook(45, "Romans", "Canon,NT,Letters", 16, "Rom", "Ro", "Rm"),
-      new BibleBook(46, "1 Corinthians", "Canon,NT,Letters", 16, "1Co", "1Cor"),
-      new BibleBook(47, "2 Corinthians", "Canon,NT,Letters", 13, "2Co", "2Cor"),
+      new BibleBook(46, "1 Corinthians", "Canon,NT,Letters,Corinthians,Cor", 16, "1Co", "1Cor"),
+      new BibleBook(47, "2 Corinthians", "Canon,NT,Letters,Corinthians,Cor", 13, "2Co", "2Cor"),
       new BibleBook(48, "Galatians", "Canon,NT,Letters", 6, "Ga", "Gal"),
       new BibleBook(49, "Ephesians", "Canon,NT,Letters", 6, "Eph", "Ep", "Ephes"),
       new BibleBook(50, "Philippians", "Canon,NT,Letters", 4, "Phil", "Php", "Pp"),
       new BibleBook(51, "Colossians", "Canon,NT,Letters", 4, "Col", "Co"),
-      new BibleBook(52, "1 Thessalonians", "Canon,NT,Letters", 5, "1Th", "1Thes"),
-      new BibleBook(53, "2 Thessalonians", "Canon,NT,Letters", 3, "2Th", "2Thes"),
-      new BibleBook(54, "1 Timothy", "Canon,NT,Letters", 6, "1Ti", "1Tim"),
-      new BibleBook(55, "2 Timothy", "Canon,NT,Letters", 4, "2Ti", "2Tim"),
+      new BibleBook(52, "1 Thessalonians", "Canon,NT,Letters,Thessalonians,Thes", 5, "1Th", "1Thes"),
+      new BibleBook(53, "2 Thessalonians", "Canon,NT,Letters,Thessalonians,Thes", 3, "2Th", "2Thes"),
+      new BibleBook(54, "1 Timothy", "Canon,NT,Letters,Timothy,Tim", 6, "1Ti", "1Tim"),
+      new BibleBook(55, "2 Timothy", "Canon,NT,Letters,Timothy,Tim", 4, "2Ti", "2Tim"),
       new BibleBook(56, "Titus", "Canon,NT,Letters", 3, "Tit", "Ti"),
       new BibleBook(57, "Philemon", "Canon,NT,Letters", 1, "Phm", "Ph"),
 
       new BibleBook(58, "Hebrews", "Canon,NT,Letters", 13, "Heb", "He", "Yehudim", "Mashiakim Yehudim\t"),
       new BibleBook(59, "James", "Canon,NT,Letters", 5, "Jas", "Jm", "Ya'akov"),
-      new BibleBook(60, "1 Peter", "Canon,NT,Letters", 5, "1Pe", "1Pet", "1 Kefa"),
-      new BibleBook(61, "2 Peter", "Canon,NT,Letters", 3, "2Pe", "2Pet", "2 Kefa"),
-      new BibleBook(62, "1 John", "Canon,NT,Letters", 5, "1Jo", "1Jn", "1 Yochanan"),
-      new BibleBook(63, "2 John", "Canon,NT,Letters", 1, "2Jo", "2Jn", "2 Yochanan"),
-      new BibleBook(64, "3 John", "Canon,NT,Letters", 1, "3Jo", "3Jn", "3 Yochanan"),
+      new BibleBook(60, "1 Peter", "Canon,NT,Letters,Peter", 5, "1Pe", "1Pet", "1 Kefa"),
+      new BibleBook(61, "2 Peter", "Canon,NT,Letters,Peter", 3, "2Pe", "2Pet", "2 Kefa"),
+      new BibleBook(62, "1 John", "Canon,NT,Letters.John", 5, "1Jo", "1Jn", "1 Yochanan"),
+      new BibleBook(63, "2 John", "Canon,NT,Letters,John", 1, "2Jo", "2Jn", "2 Yochanan"),
+      new BibleBook(64, "3 John", "Canon,NT,Letters,John", 1, "3Jo", "3Jn", "3 Yochanan"),
       Jude = new BibleBook(65, "Jude", "Canon,NT,Letters", 1, "Jud", "Jd", "Yahudah"),
 
       new BibleBook(66, "Revelation", "Canon,NT,Prophecy", 22, "Rev", "Re", "Revelations", "Hagilu Natan Elohim\t"));
 
-  public static final BibleBook ESDRAS_1 = new BibleBook(67, "1 Esdras", "Apocrypha,Deuterocanon,Eastern", 9);
-  public static final BibleBook ESDRAS_2 = new BibleBook(68, "2 Esdras", "Apocrypha,Deuterocanon,Ethiopian", 16);
+  public static final BibleBook ESDRAS_1 = new BibleBook(67, "1 Esdras", "Apocrypha,Deuterocanon,Eastern,Esdras,Ezra", 9);
+  public static final BibleBook ESDRAS_2 = new BibleBook(68, "2 Esdras", "Apocrypha,Deuterocanon,Ethiopian,Esdras,Ezra", 16);
   public static final BibleBook WISDOM_OF_SOLOMON;
   public static final BibleBook MACCABES_1;
   public static final BibleBook SIRACH;
@@ -110,8 +110,8 @@ public class BibleBook {
       WISDOM_OF_SOLOMON = new BibleBook(71, "Wisdom of Solomon", "Apocrypha,Deuterocanon,Universal", 19, "Wisdom", "Wis", "Ws"),
       SIRACH = new BibleBook(72, "Sirach", "Apocrypha,Deuterocanon,Universal", 51, "Ecclesiasticus", "Sir", "Ecclus"),
       new BibleBook(73, "Baruch", "Apocrypha,Deuterocanon,Universal", 5, "Bar"),
-      MACCABES_1 = new BibleBook(74, "1 Maccabees", "Apocrypha,Deuterocanon,Universal", 16, "1Mac", "1Macc", "1 Machabees"),
-      new BibleBook(75, "2 Maccabees", "Apocrypha,Deuterocanon,Universal", 15, "2Mac", "2Macc", "2 Machabees"));
+      MACCABES_1 = new BibleBook(74, "1 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 16, "1Mac", "1Macc", "1 Machabees"),
+      new BibleBook(75, "2 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 15, "2Mac", "2Macc", "2 Machabees"));
 
   public static final BibleBook PRAYER_OF_MANASSEH;
   public static final ImmutableList<BibleBook> APOCRYPHA = ImmutableList.<BibleBook>builder()
@@ -127,13 +127,13 @@ public class BibleBook {
       .build();
 
   public static final BibleBook ADDITIONS_TO_ESTHER =
-      new BibleBook(81, "Additions to Esther", "Apocrypha", 16, "Add Esther", "Add Est", "Add Esth", "Add Es");
-  public static final BibleBook PSALMS_151 = new BibleBook(82, "Psalms 151", "Apocrypha", 1, "Add Ps", "Add Psa");
+      new BibleBook(81, "Additions to Esther", "Apocrypha,Esther", 16, "Add Esther", "Add Est", "Add Esth", "Add Es");
+  public static final BibleBook PSALMS_151 = new BibleBook(82, "Psalms 151", "Apocrypha,Psalms,Psa", 1, "Add Ps", "Add Psa");
 
   public static final ImmutableList<BibleBook> EASTERN_ORTHODOX_DEUTEROCANON = ImmutableList.of(
       ESDRAS_1,
-      new BibleBook(83, "3 Maccabees", "Apocrypha,Deuterocanon,Eastern", 7, "3Mac", "3Macc", "3 Machabees"),
-      new BibleBook(84, "4 Maccabees", "Apocrypha,Deuterocanon,Eastern", 18, "4Mac", "4Macc", "4 Machabees"),
+      new BibleBook(83, "3 Maccabees", "Apocrypha,Deuterocanon,Eastern,Machabeesm,Mac,Macc", 7, "3Mac", "3Macc", "3 Machabees"),
+      new BibleBook(84, "4 Maccabees", "Apocrypha,Deuterocanon,Eastern,Machabees,Mac,Macc", 18, "4Mac", "4Macc", "4 Machabees"),
       PRAYER_OF_MANASSEH);
 
   public static final BibleBook ENOCH;
@@ -150,6 +150,10 @@ public class BibleBook {
       "Apocrypha,Jewish History", 1, "cr", "Manual of Discipline", "MD");
   public static final BibleBook WAR_SCROLL = new BibleBook(89, "War Scroll",
       "Apocrypha,Jewish History", 19, "War");
+  public static final BibleBook JOSEPHUS = new BibleBook(90, "Josephus",
+      "Apocrypha,Jewish History", 20);
+  public static final BibleBook BOOK_OF_ADAM_AND_EVE = new BibleBook(91, "Book of Adam and Eve",
+      "Apocrypha,Jewish History", 51);
 
   public static final ImmutableSet<BibleBook> ALL_BOOKS = ImmutableSet.<BibleBook>builder()
       .addAll(CANON)
@@ -157,7 +161,7 @@ public class BibleBook {
       .add(ADDITIONS_TO_ESTHER, PSALMS_151)
       .addAll(EASTERN_ORTHODOX_DEUTEROCANON)
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
-      .add(JASHER, COMMUNITY_RULE, WAR_SCROLL)
+      .add(JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS, BOOK_OF_ADAM_AND_EVE)
       .build();
 
   private final int bookNum;

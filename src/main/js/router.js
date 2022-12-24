@@ -20,6 +20,10 @@ com.digitald4.biblical.router = function($routeProvider) {
 			controller: com.digitald4.biblical.LessonsCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/lessons.html'
+		}).when('/timeline', {
+			controller: com.digitald4.biblical.TimelineCtrl,
+			controllerAs: '$ctrl',
+			templateUrl: 'js/html/timeline.html'
 		}).when('/utils', {
 			controller: com.digitald4.biblical.UtilsCtrl,
 			controllerAs: '$ctrl',

@@ -41,7 +41,8 @@ public class ScriptureReindexer {
       System.exit(1);
     }
 
-    new ScriptureReindexer(new APIConnector(API_URL, API_VERSION, 100))
-        .cache(args[0], Arrays.stream(args).skip(1).collect(toImmutableSet()));
+    new ScriptureReindexer(new APIConnector(API_URL, API_VERSION, 100)).cache(
+        args[0],
+        Arrays.stream(args).skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));
   }
 }

@@ -1,7 +1,6 @@
 package com.digitald4.biblical.model;
 
 public class Scripture {
-  private Long id;
   private String version;
   private String book;
   private int chapter;
@@ -10,15 +9,6 @@ public class Scripture {
 
   public String getId() {
     return String.format("%s-%s-%d-%d", getVersion(), getBook().replace(" ", "_"), getChapter(), getVerse());
-  }
-
-  public Scripture setId(Long id) {
-    this.id = id;
-    return this;
-  }
-
-  public Long getLongId() {
-    return id;
   }
 
   public String getVersion() {
