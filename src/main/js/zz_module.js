@@ -50,7 +50,7 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .service('lessonService', function(apiConnector) {
     var lessonService = new com.digitald4.common.JSONService('lesson', apiConnector);
     lessonService.listLessons = function(allowDraft, success, error) {
-      lessonService.sendRequest({action: 'list', params: {allowDraft: allowDraft}}, success, error);
+      lessonService.sendRequest({action: 'lessons', params: {allowDraft: allowDraft}}, success, error);
     }
     lessonService.latest = function(id, allowDraft, success, error) {
       lessonService.sendRequest({action: 'latest', params: {id: id, allowDraft: allowDraft}}, success, error);
@@ -66,10 +66,6 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
       var request =
           typeof(reference) == 'object' ? reference : {reference: reference, version: globalData.scriptureVersion};
       scriptureService.sendRequest({action: 'scriptures', params: request}, success, error);
-    };
-    scriptureService.expand = function(html, includeLinks, success, error) {
-      var request =  {html: html, includeLinks: includeLinks, version: globalData.scriptureVersion};
-      scriptureService.sendRequest({action: 'expand', method: 'POST', params: request}, success, error);
     };
     scriptureService.searchAndReplace = function(request, success, error) {
       scriptureService.sendRequest({action: 'searchAndReplace', method: 'POST', params: request},
