@@ -13,8 +13,7 @@ public class BiblicalEvent implements ModelObject<Long> {
 
   private Long id;
   private String title;
-  private String summary;
-  private String references;
+  private StringBuilder summary;
   private int month;
   private int day;
   private Long depEventId;
@@ -70,27 +69,17 @@ public class BiblicalEvent implements ModelObject<Long> {
     return this;
   }
 
-  public String getSummary() {
-    if (summary == null && references != null) {
-      return String.format("<inline-scripture ref=\"%s\" />", references);
-    }
-
+  public StringBuilder getSummary() {
     return summary;
   }
 
-  public BiblicalEvent setSummary(String summary) {
+  public BiblicalEvent setSummary(StringBuilder summary) {
     this.summary = summary;
     return this;
   }
 
-  @Deprecated
-  public String getReferences() {
-    return references;
-  }
-
-  @Deprecated
-  public BiblicalEvent setReferences(String references) {
-    this.references = references;
+  public BiblicalEvent setSummary(String summary) {
+    this.summary = new StringBuilder(summary);
     return this;
   }
 
@@ -163,6 +152,48 @@ public class BiblicalEvent implements ModelObject<Long> {
 
     return String.format("%s %d-%dAM (%s-%s)%s",
         getTitle(), startYear, endYear, getModernEra(startYear, showStartEra), getModernEra(endYear), duration);
+  }
+
+  @ApiResourceProperty
+  public String displayAmOnly() {
+    int startYear = getYear();
+    int endYear = getEndYear();
+    int month = getMonth();
+    int day = getDay();
+    String duration = getDuration() == null || getDuration().toString().isEmpty() ? "" : " (" + getDuration() + ")";
+
+    if (startYear == endYear && month > 0 && day > 0) {
+      return String.format("%s %d/%d/%dAM%s", getTitle(), month, day, startYear, duration);
+    }
+
+    if (startYear == endYear) {
+      return String.format("%s %dAM%s", getTitle(), startYear, duration);
+    }
+
+    return String.format("%s %d-%dAM%s", getTitle(), startYear, endYear, duration);
+  }
+
+  @ApiResourceProperty
+  public String displayEraOnly() {
+    int startYear = getYear();
+    int endYear = getEndYear();
+    int month = getMonth();
+    int day = getDay();
+    String duration = getDuration() == null || getDuration().toString().isEmpty() ? "" : " (" + getDuration() + ")";
+
+    if (startYear == endYear && month > 0 && day > 0) {
+      return String.format(
+          "%s %d/%d/%s%s", getTitle(), month, day, getModernEra(startYear), duration);
+    }
+
+    if (startYear == endYear) {
+      return String.format("%s %s%s", getTitle(), getModernEra(startYear), duration);
+    }
+
+    boolean showStartEra = startYear <= ONE_BCE && endYear > ONE_BCE;
+
+    return String.format(
+        "%s %s-%s%s", getTitle(), getModernEra(startYear, showStartEra), getModernEra(endYear), duration);
   }
 
   private static String getModernEra(int year) {

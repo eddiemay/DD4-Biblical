@@ -32,11 +32,10 @@ com.digitald4.biblical.LessonsCtrl.prototype.saveLesson = function(published) {
   this.lesson.published = published;
   if (this.lesson.lessonId) {
     this.lesson.id = this.lesson.lessonId;
-    this.lessonService.update(
-        this.lesson,
-        ['title', 'themeText', 'youtubeId', 'content', 'published'],
-        lesson => {this.renderLesson(lesson)},
-        notify);
+    var props = ['title', 'content', 'published'];
+    if (this.lesson.themeText) { props.push('themeText'); }
+    if (this.lesson.youtubeId) { props.push('youtubeId'); }
+    this.lessonService.update(this.lesson, props, lesson => {this.renderLesson(lesson)}, notify);
   } else {
     this.lessonService.create(this.lesson, lesson => {this.showLesson(lesson)}, notify);
   }

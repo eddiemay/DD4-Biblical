@@ -49,7 +49,7 @@ public class BookService {
                                      @Named("version") @Nullable String version) throws ServiceException {
     try {
       return new AtomicInteger(
-          scriptureStore.getScriptures(version, book + " " + chapter).stream()
+          scriptureStore.getScriptures(version, book + " " + chapter).getItems().stream()
               .mapToInt(Scripture::getVerse).max().orElse(0));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);

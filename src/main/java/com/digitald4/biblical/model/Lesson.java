@@ -90,10 +90,9 @@ public class Lesson implements HasModificationTimes {
   public static class LessonVersion implements HasModificationTimes {
     private long id;
     private long lessonId;
-    private String title = "";
+    private String title;
     private String themeText;
-    private Theme theme;
-    private String youtubeId = "";
+    private String youtubeId;
     private StringBuilder content;
     private boolean published;
     private DateTime creationTime;
@@ -128,11 +127,6 @@ public class Lesson implements HasModificationTimes {
     }
 
     public String getThemeText() {
-      if (themeText == null && theme != null) {
-        return theme.getScripture() == null
-            ? theme.getText() : String.format("<inline-scripture ref=\"%s\" />", theme.getScripture());
-      }
-
       return themeText;
     }
 
@@ -141,23 +135,12 @@ public class Lesson implements HasModificationTimes {
       return this;
     }
 
-    @Deprecated
-    public Theme getTheme() {
-      return theme;
-    }
-
-    @Deprecated
-    public LessonVersion setTheme(Theme theme) {
-      this.theme = theme;
-      return this;
-    }
-
     public String getYoutubeId() {
       return youtubeId;
     }
 
     public LessonVersion setYoutubeId(String youtubeId) {
-      this.youtubeId = youtubeId;
+      this.youtubeId = "".equals(youtubeId) ? null : youtubeId;
       return this;
     }
 
@@ -214,35 +197,6 @@ public class Lesson implements HasModificationTimes {
     public LessonVersion setDeletionTime(DateTime deletionTime) {
       this.deletionTime = deletionTime;
       return this;
-    }
-
-    public static class Theme {
-      private String scripture;
-      private String text;
-
-      public String getScripture() {
-        return scripture;
-      }
-
-      public Theme setScripture(String scripture) {
-        this.scripture = scripture;
-        if (scripture != null) {
-          text = null;
-        }
-        return this;
-      }
-
-      public String getText() {
-        return text;
-      }
-
-      public Theme setText(String text) {
-        this.text = text;
-        if (text != null) {
-          scripture = null;
-        }
-        return this;
-      }
     }
   }
 }

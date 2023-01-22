@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class LessonStoreTest {
   private static final String TITLE = "Lesson Title";
+  private static final String THEME_TEXT = "[Job 1:1]";
+  private static final String THEME_TEXT_EXPANDED = "<inline-scripture ref=\"Job 1:1\"/>";
   private static final String PREPROCESSED_CONTENT = "The seventh day was blessed (Gen 2:3)." +
       " It is a rest for man (<scripture ref=\"Hebrew 10:4\"/>)." +
       " Moses told us (as part of the ten commandments) to keep it holy (Exo 20:8)." +
@@ -26,7 +28,7 @@ public class LessonStoreTest {
       " It is a rest for man (<scripture ref=\"Hebrew 10:4\"/>)." +
       " Moses told us (as part of the ten commandments) to keep it holy (<scripture ref=\"Exo 20:8\"/>)." +
       " Even the Messiah spoke about the Sabbath (<scripture ref=\"Mark 10:12, Matt 4:19-21\"/>)." +
-      " To not keep it is sin (<inline-scripture ref=\"1 John 2:3,3:4\"/>).";
+      " To not keep it is sin <inline-scripture ref=\"1 John 2:3,3:4\"/>.";
 
   private final static ScriptureMarkupProcessor SCRIPTURE_MARKUP_PROCESSOR = new ScriptureMarkupProcessor();
   @Mock private final Clock clock = mock(Clock.class);
@@ -189,8 +191,11 @@ public class LessonStoreTest {
 
   @Test
   public void create_replacesScriptures() {
-    LessonVersion version = versionStore.create(new LessonVersion().setTitle(TITLE).setContent(PREPROCESSED_CONTENT));
+    LessonVersion version = versionStore.create(
+        new LessonVersion().setTitle(TITLE).setThemeText(THEME_TEXT).setContent(PREPROCESSED_CONTENT));
 
+    assertThat(version.getTitle()).isEqualTo(TITLE);
+    assertThat(version.getThemeText()).isEqualTo(THEME_TEXT_EXPANDED);
     assertThat(version.getContent().toString()).isEqualTo(POSTPROCESSED_CONTENT);
   }
 

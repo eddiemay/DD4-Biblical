@@ -40,7 +40,7 @@ public class LessonService extends EntityServiceImpl<LessonVersion, Long> {
     this.lessonVersionStore = lessonVersionStore;
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "list")
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "lessons")
   public ImmutableList<Lesson> listLessons(@Named("allowDraft") boolean allowDraft) throws ServiceException {
     try {
       return lessonStore.list(allowDraft);

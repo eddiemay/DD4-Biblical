@@ -28,5 +28,5 @@ com.digitald4.biblical.router = function($routeProvider) {
 			controller: com.digitald4.biblical.UtilsCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/utils.html'
-		}).otherwise({ redirectTo: '/calendar'});
+		}).otherwise({ redirectTo: '/home'});
 }

@@ -14,6 +14,12 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {
   this.locationProvider.search('pageToken', page);
 }
 
+com.digitald4.biblical.ReadTheWordCtrl.prototype.setReference = function(reference) {
+  this.locationProvider.search('reference', reference);
+  this.locationProvider.search('version', this.globalData.scriptureVersion);
+  this.locationProvider.search('pageToken', undefined);
+}
+
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(version, book, chapter, verse) {
   this.globalData.reference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
 }
@@ -47,7 +53,9 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.searchAndReplace = function(pre
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = function(scriptureResult) {
+  this.prevChapter = scriptureResult.prevChapter;
   this.scriptures = scriptureResult.items || [];
+  this.nextChapter = scriptureResult.nextChapter;
   var previous;
   for (const script of this.scriptures) {
     if (!previous || previous.chapter != script.chapter || previous.verse + 1 != script.verse || previous.book != script.book) {

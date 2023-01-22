@@ -44,6 +44,14 @@
         </fieldset>
       </div>
       <div class="block-content form">
+        <a data-ng-show="$ctrl.prevChapter" href="" title="Previous Chapter" style="float: left; top: 50%;"
+           data-ng-click="$ctrl.setReference($ctrl.prevChapter)">
+          <img src="images/chevron-left.png" width="18" height="26">
+        </a>
+        <a data-ng-show="$ctrl.nextChapter"  href="" title="Next Chapter" style="float: right; top: 50%;"
+           data-ng-click="$ctrl.setReference($ctrl.nextChapter)">
+          <img src="images/chevron.png" width="18" height="26">
+        </a>
         <div data-ng-show="!$ctrl.searchShown">
           <p data-ng-repeat="script in $ctrl.scriptures">
             <span data-ng-show="script.showChapter">

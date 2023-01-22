@@ -4,6 +4,10 @@ var EVENT_TYPES = ['BIBLICAL', 'NOTIFICATION'];
 
 // T. James 951-233-6912
 
+// 365.25 146100 20871.428571428571429
+// 365.2425 146097 20871 (20800 + 80 - 8)
+// 365.24219 146096.876 20870.982285714285714
+
 com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, biblicalEventService, scriptureService) {
   globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.locationProvider = $location;
@@ -158,10 +162,6 @@ com.digitald4.biblical.CalendarCtrl.prototype.createEvent = function() {
 com.digitald4.biblical.CalendarCtrl.prototype.showEditEventDialog = function(event) {
   this.editEvent = {id: event.id, month: event.month, day: event.day, offset: event.offset,
       references: event.references, title: event.title, summary: event.summary};
-
-  if (event.summary) {
-    this.scriptureService.expand(event.summary, false, displayText => this.editEvent.summary = displayText, notifyError);
-  }
 
   this.origEvent = event;
   this.dialogShown = 'EDIT_EVENT';

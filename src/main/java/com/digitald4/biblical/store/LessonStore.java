@@ -84,7 +84,10 @@ public class LessonStore extends GenericStore<Lesson, Long> {
     protected Iterable<LessonVersion> preprocess(Iterable<LessonVersion> entities, boolean isCreate) {
       return super.preprocess(
           stream(entities)
-              .peek(lessonVersion -> lessonVersion.setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
+              .peek(
+                  lessonVersion ->
+                      lessonVersion.setThemeText(markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
+                          .setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
               .collect(toImmutableList()),
           isCreate);
     }
