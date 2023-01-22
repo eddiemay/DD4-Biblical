@@ -94,20 +94,4 @@ public class ScriptureFetcherKJV1611Test {
         new Scripture().setVersion("KJV1611").setBook("1 Maccabees").setChapter(4).setVerse(5).setText(
             "In the meane season came Gorgias by night into the campe of Iudas: and when hee found no man there, hee sought them in the mountaines: for said hee, these fellowes flee from vs."));
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("KJV1611", new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3)))
-        .isEqualTo("https://www.kingjamesbibleonline.org/1611_Genesis-Chapter-2/");
-    assertThat(scriptureFetcher.getChapterUrl("KJV1611", new ScriptureReferenceProcessor.VerseRange(BibleBook.MACCABES_1, 4, 58, 58)))
-        .isEqualTo("https://www.kingjamesbibleonline.org/1611_1-Maccabees-Chapter-4/");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("KJV1611").setBook("Genesis").setChapter(2).setVerse(3)))
-        .isEqualTo("https://www.kingjamesbibleonline.org/1611_Genesis-Chapter-2/#3");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("KJV1611").setBook("1 Maccabees").setChapter(4).setVerse(58)))
-        .isEqualTo("https://www.kingjamesbibleonline.org/1611_1-Maccabees-Chapter-4/#58");
-  }
 }

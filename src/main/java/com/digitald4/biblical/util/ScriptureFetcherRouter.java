@@ -38,16 +38,6 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
     return getFetcher(version).fetch(version, book, chapter);
   }
 
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return getFetcher(version).getChapterUrl(version, verseRange);
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    return getFetcher(scripture.getVersion()).getVerseUrl(scripture);
-  }
-
   private ScriptureFetcher getFetcher(String version) {
     switch (version) {
       case "NKJV":
@@ -63,6 +53,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
       case "essene":
       case "qumran":
       case "uchicago":
+      case "mrjames":
         return oneOff;
       case "OXFORD":
         return pseudepigrapha;

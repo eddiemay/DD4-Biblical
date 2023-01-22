@@ -1,5 +1,6 @@
 package com.digitald4.biblical.model;
 
+// Dave Nelson, Coonley,
 public class Scripture {
   private String version;
   private String book;
@@ -65,7 +66,6 @@ public class Scripture {
     if (!(obj instanceof Scripture)) {
       return false;
     }
-
     Scripture other = (Scripture) obj;
 
     return version.equals(other.version) && book.equals(other.book) && chapter == other.chapter && verse == other.verse

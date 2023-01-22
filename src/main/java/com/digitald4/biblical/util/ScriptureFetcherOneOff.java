@@ -42,12 +42,14 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetchWarScroll(version, book);
     } else if (book == BibleBook.JOSEPHUS) {
       return fetchJosephus(version, book, chapter);
+    } else if (book == BibleBook.TESTAMENT_OF_JOB) {
+      return fetchTestamentOfJob(version, book);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
   }
 
-  public synchronized ImmutableList<Scripture> fetchCommunityRule(String version, BibleBook book) {
+  private synchronized ImmutableList<Scripture> fetchCommunityRule(String version, BibleBook book) {
     String htmlResult = apiConnector.sendGet(COMMUNITY_RULE_URL);
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements paragraphs = doc.getElementsByTag("p");
@@ -74,7 +76,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  public synchronized ImmutableList<Scripture> fetchEnoch(String version, BibleBook book, int chapter) {
+  private synchronized ImmutableList<Scripture> fetchEnoch(String version, BibleBook book, int chapter) {
     final Pattern versePattern = Pattern.compile("(\\d+). ([^<]+)");
     int rangeStart = getRangeStart(chapter);
     String htmlResult = apiConnector.sendGet(String.format(ENOCH_URL, rangeStart, rangeStart + 9, chapter));
@@ -98,7 +100,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  public synchronized ImmutableList<Scripture> fetchWarScroll(String version, BibleBook book) {
+  private synchronized ImmutableList<Scripture> fetchWarScroll(String version, BibleBook book) {
     final Pattern versePattern = Pattern.compile("\\((\\d+)\\) ([^<]+)");
     String htmlResult = apiConnector.sendGet(WAR_SCROLL_URL);
     Document doc = Jsoup.parse(htmlResult.trim());
@@ -129,7 +131,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  public synchronized ImmutableList<Scripture> fetchJosephus(String version, BibleBook book, int chapter) {
+  private synchronized ImmutableList<Scripture> fetchJosephus(String version, BibleBook book, int chapter) {
     String urlTemplate = "http://penelope.uchicago.edu/josephus/ant-%d.html";
     final Pattern isNumber = Pattern.compile("(\\d+)");
 
@@ -159,16 +161,35 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    int rangeStart = getRangeStart(verseRange.getChapter());
-    return String.format(ENOCH_URL, rangeStart, rangeStart + 9, verseRange.getChapter());
-  }
+  private synchronized ImmutableList<Scripture> fetchTestamentOfJob(String version, BibleBook book) {
+    String urlTemplate = "http://dd4-biblical.appspot.com/books/testament_of_job.html";
+    final Pattern versePattern = Pattern.compile("(\\d+)\\.? (.+)");
+    AtomicInteger chapter = new AtomicInteger();
 
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    int rangeStart = getRangeStart(scripture.getChapter());
-    return String.format(ENOCH_URL, rangeStart, rangeStart + 9, scripture.getChapter());
+    String htmlResult = apiConnector.sendGet(urlTemplate);
+    Document doc = Jsoup.parse(htmlResult.trim());
+    Elements paragraphs = doc.getElementsByTag("p");
+    if (paragraphs.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+
+    return paragraphs.stream()
+        .map(Element::text)
+        .map(versePattern::matcher)
+        .filter(Matcher::matches)
+        .map(matcher -> {
+          int verse = Integer.parseInt(matcher.group(1));
+          if (verse == 1) {
+            chapter.incrementAndGet();
+          }
+          return new Scripture()
+              .setVersion(version)
+              .setBook(book.getName())
+              .setChapter(chapter.get())
+              .setVerse(verse)
+              .setText(new StringBuilder(matcher.group(2)));
+        })
+        .collect(toImmutableList());
   }
 
   private static int getRangeStart(int chapter) {

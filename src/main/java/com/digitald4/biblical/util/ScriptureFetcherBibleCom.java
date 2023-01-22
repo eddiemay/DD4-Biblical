@@ -16,7 +16,6 @@ import javax.inject.Inject;
 
 public class ScriptureFetcherBibleCom  implements ScriptureFetcher {
   public static final String URL = "https://www.bible.com/bible/316/%s.%d.%s";
-  public static final String VERSE_URL = "https://www.bible.com/bible/316/%s.%d.%d.%s";
 
   private final APIConnector apiConnector;
 
@@ -43,17 +42,6 @@ public class ScriptureFetcherBibleCom  implements ScriptureFetcher {
                 .setVerse(Integer.parseInt(verse.getElementsByClass("label").get(0).ownText()))
                 .setText(new StringBuilder(ScriptureFetcher.trim(verse.getElementsByClass("content").get(0).text()))))
         .collect(toImmutableList());
-  }
-
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(URL, formatBookForUrl(verseRange.getBook().getName()), verseRange.getChapter(), version);
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    return String.format(VERSE_URL,
-        formatBookForUrl(scripture.getBook()), scripture.getChapter(), scripture.getVerse(), scripture.getVersion());
   }
 
   private static String formatBookForUrl(String book) {

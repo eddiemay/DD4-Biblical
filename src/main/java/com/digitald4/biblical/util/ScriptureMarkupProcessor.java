@@ -7,7 +7,7 @@ public class ScriptureMarkupProcessor {
   private static final Pattern SCRIPTURE_PATTERN = Pattern.compile("\\(([\\w ]+\\.? \\d+[:\\w,; \\-–]*)\\)");
   private static final String SCRIPTURE_TEMPLATE = "(<scripture ref=\"%s\"/>)";
   private static final Pattern INLINE_SCRIPTURE_PATTERN = Pattern.compile("\\[([\\w ]+\\.? \\d+[:\\w,; \\-–]*)]");
-  private static final String INLINE_SCRIPTURE_TEMPLATE = "(<inline-scripture ref=\"%s\"/>)";
+  private static final String INLINE_SCRIPTURE_TEMPLATE = "<inline-scripture ref=\"%s\"/>";
 
   public String replaceScriptures(String content) {
     if (content == null) {

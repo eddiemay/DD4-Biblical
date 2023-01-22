@@ -132,7 +132,7 @@ public class BibleBook {
 
   public static final ImmutableList<BibleBook> EASTERN_ORTHODOX_DEUTEROCANON = ImmutableList.of(
       ESDRAS_1,
-      new BibleBook(83, "3 Maccabees", "Apocrypha,Deuterocanon,Eastern,Machabeesm,Mac,Macc", 7, "3Mac", "3Macc", "3 Machabees"),
+      new BibleBook(83, "3 Maccabees", "Apocrypha,Deuterocanon,Eastern,Machabees,Mac,Macc", 7, "3Mac", "3Macc", "3 Machabees"),
       new BibleBook(84, "4 Maccabees", "Apocrypha,Deuterocanon,Eastern,Machabees,Mac,Macc", 18, "4Mac", "4Macc", "4 Machabees"),
       PRAYER_OF_MANASSEH);
 
@@ -150,10 +150,10 @@ public class BibleBook {
       "Apocrypha,Jewish History", 1, "cr", "Manual of Discipline", "MD");
   public static final BibleBook WAR_SCROLL = new BibleBook(89, "War Scroll",
       "Apocrypha,Jewish History", 19, "War");
-  public static final BibleBook JOSEPHUS = new BibleBook(90, "Josephus",
-      "Apocrypha,Jewish History", 20);
+  public static final BibleBook JOSEPHUS = new BibleBook(90, "Josephus", "Apocrypha,Jewish History", 20);
   public static final BibleBook BOOK_OF_ADAM_AND_EVE = new BibleBook(91, "Book of Adam and Eve",
       "Apocrypha,Jewish History", 51);
+  public static final BibleBook TESTAMENT_OF_JOB = new BibleBook(92, "Testament of Job", "Apocrypha,Jewish History", 12);
 
   public static final ImmutableSet<BibleBook> ALL_BOOKS = ImmutableSet.<BibleBook>builder()
       .addAll(CANON)
@@ -161,7 +161,7 @@ public class BibleBook {
       .add(ADDITIONS_TO_ESTHER, PSALMS_151)
       .addAll(EASTERN_ORTHODOX_DEUTEROCANON)
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
-      .add(JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS, BOOK_OF_ADAM_AND_EVE)
+      .add(JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS, BOOK_OF_ADAM_AND_EVE, TESTAMENT_OF_JOB)
       .build();
 
   private final int bookNum;

@@ -237,14 +237,4 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
         })
         .collect(toImmutableList());
   }
-
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(URL, verseRange.getBook().getName().toLowerCase(), verseRange.getChapter());
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    return String.format(URL, scripture.getBook().toLowerCase(), scripture.getChapter());
-  }
 }

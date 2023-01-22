@@ -114,17 +114,6 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(
-        CHAPTER_URL, version.toLowerCase(), formatBookForUrl(verseRange.getBook().getName()), verseRange.getChapter());
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    return String.format(VERSE_URL, formatBookForUrl(scripture.getBook()), scripture.getChapter(), scripture.getVerse());
-  }
-
   private static String formatBookForUrl(String book) {
     if (book.equals(BibleBook.SONG_OF_SOLOMON.getName())) {
       return "songs";

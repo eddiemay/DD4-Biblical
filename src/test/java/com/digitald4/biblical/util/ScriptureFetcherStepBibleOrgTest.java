@@ -110,28 +110,4 @@ public class ScriptureFetcherStepBibleOrgTest {
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(2).setText(
             "For his merciful kindness is great toward us: and the truth of יהוה endureth for ever. Praise ye יהוה."));
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("RSKJ", new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3)))
-        .isEqualTo("https://www.stepbible.org/?q=reference=Genesis.2|version=RSKJ&options=VNHUG");
-    assertThat(scriptureFetcher.getChapterUrl("RSKJ", new ScriptureReferenceProcessor.VerseRange(BibleBook.Kings2, 4, 58, 58)))
-        .isEqualTo("https://www.stepbible.org/?q=reference=2Kings.4|version=RSKJ&options=VNHUG");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("RSKJ").setBook("Genesis").setChapter(2).setVerse(3)))
-        .isEqualTo("https://www.stepbible.org/?q=reference=Genesis.2.3|version=RSKJ&options=VNHUG");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("RSKJ").setBook("2 Kings").setChapter(4).setVerse(36)))
-        .isEqualTo("https://www.stepbible.org/?q=reference=2Kings.4.36|version=RSKJ&options=VNHUG");
-  }
-
-  @Test
-  public void getUrls_singleChapterBook() {
-    assertThat(scriptureFetcher.getChapterUrl("RSKJ", new ScriptureReferenceProcessor.VerseRange(BibleBook.Jude, 1, 3, 3)))
-        .isEqualTo("https://www.stepbible.org/?q=reference=Jude|version=RSKJ&options=VNHUG");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("RSKJ").setBook("Jude").setChapter(1).setVerse(3)))
-        .isEqualTo("https://www.stepbible.org/?q=reference=Jude.3|version=RSKJ&options=VNHUG");
-  }
 }

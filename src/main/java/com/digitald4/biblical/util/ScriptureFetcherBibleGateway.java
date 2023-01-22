@@ -91,17 +91,6 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(URL, version, formatBookForUrl(verseRange.getBook().getName()), verseRange.getChapter());
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    return String.format(URL + ":%d",
-        scripture.getVersion(), formatBookForUrl(scripture.getBook()), scripture.getChapter(), scripture.getVerse());
-  }
-
   private static String formatBookForUrl(String book) {
     if (book.equals(BibleBook.WISDOM_OF_SOLOMON.getName())) {
       book = "Wisdom";

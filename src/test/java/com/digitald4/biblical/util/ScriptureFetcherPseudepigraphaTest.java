@@ -236,20 +236,4 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
         new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(15).setVerse(3).setText(
             "with thee.' And I said, 'If He be wrath with me, I will set my seat above the stars of heaven and will be like the Highest.'"));
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("OXFORD", new ScriptureReferenceProcessor.VerseRange(BibleBook.JUBILEES, 6, 22, 38)))
-        .isEqualTo("http://www.pseudepigrapha.com/jubilees/6.htm");
-    assertThat(scriptureFetcher.getChapterUrl("OXFORD", new ScriptureReferenceProcessor.VerseRange(BibleBook.JUBILEES, 4, 58, 58)))
-        .isEqualTo("http://www.pseudepigrapha.com/jubilees/4.htm");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(6).setVerse(36)))
-        .isEqualTo("http://www.pseudepigrapha.com/jubilees/6.htm");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(4).setVerse(58)))
-        .isEqualTo("http://www.pseudepigrapha.com/jubilees/4.htm");
-  }
 }

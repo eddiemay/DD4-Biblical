@@ -38,20 +38,4 @@ public class ScriptureFetcherBibleComTest {
         new Scripture().setVersion("TS2009").setBook("Psalms").setChapter(117).setVerse(2).setText(
             "For His loving-commitment is mighty over us, And the truth of יהוה is everlasting. Praise Yah!"));
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("TS2009", new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3)))
-        .isEqualTo("https://www.bible.com/bible/316/GEN.2.TS2009");
-    assertThat(scriptureFetcher.getChapterUrl("TS2009", new ScriptureReferenceProcessor.VerseRange(BibleBook.Kings2, 4, 58, 58)))
-        .isEqualTo("https://www.bible.com/bible/316/2KI.4.TS2009");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("TS2009").setBook("Genesis").setChapter(2).setVerse(3)))
-        .isEqualTo("https://www.bible.com/bible/316/GEN.2.3.TS2009");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("TS2009").setBook("2 Kings").setChapter(4).setVerse(58)))
-        .isEqualTo("https://www.bible.com/bible/316/2KI.4.58.TS2009");
-  }
 }

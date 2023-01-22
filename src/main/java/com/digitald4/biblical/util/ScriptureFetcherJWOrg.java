@@ -53,19 +53,6 @@ public class ScriptureFetcherJWOrg implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(URL, formatBookForUrl(verseRange.getBook().getName()), verseRange.getChapter());
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    BibleBook bibleBook = BibleBook.get(scripture.getBook());
-    String bookName = formatBookForUrl(scripture.getBook());
-    return String.format(URL + "#v%d%03d%03d",
-        bookName, scripture.getChapter(), bibleBook.getBookNum(), scripture.getChapter(), scripture.getVerse());
-  }
-
   private static String formatBookForUrl(String book) {
     return book.toLowerCase().replace(" ", "-");
   }

@@ -148,26 +148,4 @@ public class ScriptureFetcherBibleGatewayTest {
         new Scripture().setVersion("NRSV").setBook("1 Esdras").setChapter(1).setVerse(6).setText(
             "and kill the passover lamb and prepare the sacrifices for your kindred, and keep the passover according to the commandment of the Lord that was given to Moses.”"));
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("WYC", new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=WYC&search=Genesis+2");
-    assertThat(scriptureFetcher.getChapterUrl("NRSV", new ScriptureReferenceProcessor.VerseRange(BibleBook.Kings2, 4, 58, 58)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=NRSV&search=2+Kings+4");
-    assertThat(scriptureFetcher.getChapterUrl("NRSV", new ScriptureReferenceProcessor.VerseRange(BibleBook.PSALMS_151, 1, 3, 3)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=NRSV&search=Psalms+151+1");
-    assertThat(scriptureFetcher.getChapterUrl("NRSV", new ScriptureReferenceProcessor.VerseRange(BibleBook.WISDOM_OF_SOLOMON, 1, 3, 3)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=NRSV&search=Wisdom+1");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("WYC").setBook("Genesis").setChapter(2).setVerse(3)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=WYC&search=Genesis+2:3");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("NRSV").setBook("2 Kings").setChapter(4).setVerse(58)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=NRSV&search=2+Kings+4:58");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("NRSV").setBook("Wisdom of Solomon").setChapter(4).setVerse(58)))
-        .isEqualTo("https://www.biblegateway.com/passage/?version=NRSV&search=Wisdom+4:58");
-  }
 }

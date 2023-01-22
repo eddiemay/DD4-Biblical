@@ -26,6 +26,6 @@ public class ScripturePrinter {
       version = args[1];
     }
 
-    scriptureStore.getScriptures(version, args[0]).forEach(System.out::println);
+    scriptureStore.getScriptures(version, args[0]).getItems().forEach(System.out::println);
   }
 }

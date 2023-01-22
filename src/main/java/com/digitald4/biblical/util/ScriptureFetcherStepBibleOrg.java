@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
 
 public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
   public static final String URL = "https://us.api.stepbible.org/rest/search/masterSearch/reference=%s|version=%s/VNHUG//////en?lang=en-US";
-  private static final String CHAPTER_URL = "https://www.stepbible.org/?q=reference=%s|version=%s&options=VNHUG";
-  private static final String VERSE_URL = "https://www.stepbible.org/?q=reference=%s.%d|version=%s&options=VNHUG";
   private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)(.+)");
 
   private final APIConnector apiConnector;
@@ -45,18 +43,6 @@ public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
                 .setVerse(Integer.parseInt(verse.getElementsByClass("verseNumber").get(0).text()))
                 .setText(getText(verse.text())))
         .collect(toImmutableList());
-  }
-
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(CHAPTER_URL, formatBookForUrl(verseRange.getBook(), verseRange.getChapter()), version);
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    BibleBook bibleBook = BibleBook.get(scripture.getBook());
-    return String.format(
-        VERSE_URL, formatBookForUrl(bibleBook, scripture.getChapter()), scripture.getVerse(), scripture.getVersion());
   }
 
   private static StringBuilder getText(String text) {

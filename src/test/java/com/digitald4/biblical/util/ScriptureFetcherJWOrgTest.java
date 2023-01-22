@@ -39,20 +39,4 @@ public class ScriptureFetcherJWOrgTest {
         new Scripture().setVersion("NWT").setBook("Psalms").setChapter(117).setVerse(2)
             .setText("For his loyal love toward us is great; The faithfulness of Jehovah endures forever. Praise Jah!"));
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("NWT", new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3)))
-        .isEqualTo("https://www.jw.org/en/library/bible/study-bible/books/genesis/2/");
-    assertThat(scriptureFetcher.getChapterUrl("NWT", new ScriptureReferenceProcessor.VerseRange(BibleBook.Kings2, 4, 58, 58)))
-        .isEqualTo("https://www.jw.org/en/library/bible/study-bible/books/2-kings/4/");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("NWT").setBook("Genesis").setChapter(2).setVerse(3)))
-        .isEqualTo("https://www.jw.org/en/library/bible/study-bible/books/genesis/2/#v1002003");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("NWT").setBook("2 Kings").setChapter(4).setVerse(36)))
-        .isEqualTo("https://www.jw.org/en/library/bible/study-bible/books/2-kings/4/#v12004036");
-  }
 }

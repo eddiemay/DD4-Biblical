@@ -111,20 +111,4 @@ public class ScriptureFetcherBibleHubTest {
     assertThat(fetched.get(4).getText().toString()).isEqualTo(
         "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day.");
   }
-
-  @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("ISR", new ScriptureReferenceProcessor.VerseRange(BibleBook.Genesis, 2, 3, 3)))
-        .isEqualTo("https://biblehub.com/isr/genesis/2.htm");
-    assertThat(scriptureFetcher.getChapterUrl("ISR", new ScriptureReferenceProcessor.VerseRange(BibleBook.Kings2, 4, 58, 58)))
-        .isEqualTo("https://biblehub.com/isr/2_kings/4.htm");
-  }
-
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)))
-        .isEqualTo("https://biblehub.com/genesis/2-3.htm");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("ISR").setBook("2 Kings").setChapter(4).setVerse(58)))
-        .isEqualTo("https://biblehub.com/2_kings/4-58.htm");
-  }
 }

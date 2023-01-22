@@ -33,9 +33,11 @@ public class ScriptureServiceTest {
   @Test
   public void getOrSearch_scriptureSingle() throws Exception {
     when(scriptureStore.getScriptures("ISR", "Genesis 2:3")).thenReturn(
-        ImmutableList.of(
-            new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
-                .setText("Elohim blessed the seventh day.")));
+        ScriptureStore.GetOrSearchResponse.getResult(
+            ImmutableList.of(
+                new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
+                    .setText("Elohim blessed the seventh day.")),
+            null, null));
 
     QueryResult<Scripture> result = scriptureService.search("Genesis 2:3", "ISR", null, 200, 1);
 
@@ -45,11 +47,13 @@ public class ScriptureServiceTest {
   @Test
   public void getOrSearch_scriptureRange() throws Exception {
     when(scriptureStore.getScriptures("ISR", "Genesis 2:2-3")).thenReturn(
-        ImmutableList.of(
-            new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(2)
-                .setText("And on the 7th day he rested"),
-            new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
-                .setText("Elohim blessed the seventh day.")));
+        ScriptureStore.GetOrSearchResponse.getResult(
+            ImmutableList.of(
+                new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(2)
+                    .setText("And on the 7th day he rested"),
+                new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
+                    .setText("Elohim blessed the seventh day.")),
+            null, null));
 
     QueryResult<Scripture> result = scriptureService.search("Genesis 2:2-3", "ISR", null, 200, 1);
 
@@ -59,11 +63,13 @@ public class ScriptureServiceTest {
   @Test
   public void getOrSearch_scriptureMultiBooks() throws Exception {
     when(scriptureStore.getScriptures("ISR", "Genesis 2:3, Exodus 20:8")).thenReturn(
-        ImmutableList.of(
-            new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
-                .setText("Elohim blessed the seventh day."),
-            new Scripture().setVersion("ISR").setBook("Exodus").setChapter(20).setVerse(8)
-                .setText("Remember the sabbath day, keep it holy.")));
+        ScriptureStore.GetOrSearchResponse.getResult(
+            ImmutableList.of(
+                new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
+                    .setText("Elohim blessed the seventh day."),
+                new Scripture().setVersion("ISR").setBook("Exodus").setChapter(20).setVerse(8)
+                    .setText("Remember the sabbath day, keep it holy.")),
+            null, null));
 
     QueryResult<Scripture> result = scriptureService.search("Genesis 2:3, Exodus 20:8", "ISR", null, 200, 1);
 

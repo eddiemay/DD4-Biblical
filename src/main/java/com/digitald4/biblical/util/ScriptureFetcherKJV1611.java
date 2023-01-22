@@ -45,17 +45,6 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  @Override
-  public String getChapterUrl(String version, ScriptureReferenceProcessor.VerseRange verseRange) {
-    return String.format(URL, formatBookForUrl(verseRange.getBook().getName()), verseRange.getChapter());
-  }
-
-  @Override
-  public String getVerseUrl(Scripture scripture) {
-    return String.format(
-        URL + "#%d", formatBookForUrl(scripture.getBook()), scripture.getChapter(), scripture.getVerse());
-  }
-
   private static String formatBookForUrl(String book) {
     if (book.equals(BibleBook.SIRACH.getName())) {
       return "Ecclesiasticus";

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.common.server.APIConnector;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -251,22 +252,27 @@ public class ScriptureFetcherOneOffTest extends ReadFileTest {
             "The copies of these epistles remain at this day, and are preserved not only in our books, but among the Tyrians also: insomuch that if any one would know the certainty about them, he may desire of the keepers of the publick records of Tyre to shew him them, and he will find what is there set down to agree with what we have said. I have said so much out of a desire that my readers may know, that we speak nothing but the truth; and do not compose an history out of some plausible relations, which deceive men and please them at the same time; nor attempt to avoid examination; nor desire men to believe us immediately. Nor are we at liberty to depart from speaking truth, which is the proper commendation of an historian, and yet be blameless. But we insist upon no admission of what we say, unless we be able to manifest its truth by demonstration, and the strongest vouchers."),
         new Scripture().setVersion("uchicago").setBook("Josephus").setChapter(8).setVerse(16).setText(
             "Now King Solomon, as soon as this epistle of the King of Tyre was brought him, commended the readiness and good will he declared therein: and repayed him in what he desired, and sent him yearly twenty thousand cori of wheat: and as many baths of oil. Now the bath is able to contain seventy two sextaries. He also sent him the same measure of wine. So the friendship between Hiram and Solomon hereby increased more and more: and they swore to continue it for ever. And the King appointed a tribute to be laid on all the people, of thirty thousand labourers; whose work he rendred easy to them by prudently dividing it among them. For he made ten thousand cut timber in mount Lebanon, for one month: and then to come home, and rest two months; until the time when the other twenty thousand had finished their task at the appointed time. And so afterward it came to pass, that the first ten thousand returned to their work every fourth month. And it was Adoram who was over this tribute. There were also of the strangers who were left by David, who were to carry the stones, and other materials, seventy thousand: and of those that cut the stones, eighty thousand. Of these three thousand and three hundred were rulers over the rest. He also enjoined them to cut out large stones for the foundations of the temple, and that they should fit them and unite them together in the mountain, and so bring them to the city. This was done not only by our own countrey workmen, but by those workmen whom Hiram sent also."));
-
   }
 
   @Test
-  public void getChapterUrl() {
-    assertThat(scriptureFetcher.getChapterUrl("OXFORD", new ScriptureReferenceProcessor.VerseRange(BibleBook.ENOCH, 72, 3, 3)))
-        .isEqualTo("https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-71-to-80/chapter-72/");
-    assertThat(scriptureFetcher.getChapterUrl("OXFORD", new ScriptureReferenceProcessor.VerseRange(BibleBook.ENOCH, 4, 58, 58)))
-        .isEqualTo("https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-1-to-10/chapter-4/");
-  }
+  public void fetchTestamentOfJob() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(getContent("src/main/webapp/books/testament_of_job.html"));
 
-  @Test
-  public void getVerseUrl() {
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(72).setVerse(3)))
-        .isEqualTo("https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-71-to-80/chapter-72/");
-    assertThat(scriptureFetcher.getVerseUrl(new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(4).setVerse(58)))
-        .isEqualTo("https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-1-to-10/chapter-4/");
+    ImmutableList<Scripture> result = scriptureFetcher.fetch("mrjames", BibleBook.TESTAMENT_OF_JOB, 0);
+    assertThat(result.subList(0, 3)).containsExactly(
+        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(1).setVerse(1).setText(
+            "On the day he became sick and (he) knew that he would have to leave his bodily abode, he called his seven sons and his three daughters together and spoke to them as follows:"),
+        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(1).setVerse(2).setText(
+            "“Form a circle around me, children, and hear, and I shall relate to you what the Lord did for me and all that happened to me."),
+        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(1).setVerse(3).setText(
+            "For I am Job your father."));
+
+    assertThat(result.subList(result.size() - 3, result.size())).containsExactly(
+        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(12).setVerse(17).setText(
+            "The name of Job was formerly Jobab, and he was called Job by the Lord."),
+        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(12).setVerse(18).setText(
+            "He had lived before his plague eighty five years, and after the plague he took the double share of all; for this reason also his year’s he doubled, which is 170 years. In this way he lived altogether 255 years."),
+        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(12).setVerse(19).setText(
+            "And, he saw sons of his sons to the fourth generation. It is written that he will rise up with those whom the Lord will reawaken. To our Lord by glory. Amen."));
   }
 }

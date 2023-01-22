@@ -31,6 +31,7 @@ public class ScriptureVersion {
       new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),
       new ScriptureVersion("Qumran", "qumran", 56, ImmutableSet.of(BibleBook.WAR_SCROLL)),
       new ScriptureVersion("University of Chicago", "uchicago", 57, ImmutableSet.of(BibleBook.JOSEPHUS)),
+      new ScriptureVersion("M R James", "mrjames", 58, ImmutableSet.of(BibleBook.TESTAMENT_OF_JOB)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()));
