@@ -8,7 +8,7 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta charset="utf-8">
 
-    <title>Mackabees Ministries</title>
+    <title>Mackabees Ministry</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -69,6 +69,7 @@
 
   <body data-ng-app="biblical" data-ng-controller="DD4AppCtrl as appCtrl">
     <div data-ng-controller="biblicalCtrl as biblicalCtrl">
+      <h2><a href="#/home?{{appCtrl.getIdTokenParameter()}}">Mackabees Ministry</a></h2>
       | <a href="#/calendar?{{appCtrl.getIdTokenParameter()}}">Calendar</a>
       | <a href="#/read_the_word?{{appCtrl.getIdTokenParameter()}}">Read the Word</a>
       | <a href="#/the_law?{{appCtrl.getIdTokenParameter()}}">The Law</a>
