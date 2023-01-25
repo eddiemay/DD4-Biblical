@@ -37,7 +37,7 @@ public class ScriptureFetcherJWOrg implements ScriptureFetcher {
 
     return verses.stream()
         .peek(verse -> {
-          verse.getElementsByClass("newblock").forEach(element -> element.replaceWith(new TextNode(" ", "")));
+          verse.getElementsByClass("newblock").forEach(element -> element.replaceWith(new TextNode(" ")));
           verse.getElementsByClass("xrefLink").forEach(Element::remove);
           verse.getElementsByClass("chapterNum").forEach(Element::remove);
           verse.getElementsByClass("verseNum").forEach(Element::remove);
