@@ -86,7 +86,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.refresh = function() {
 	      this.biblicalEvents.push(biblicalEvent);
 	    }
 	  }
-	}, notify);
+	}, notifyError);
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.getFirstDayOffset = function() {

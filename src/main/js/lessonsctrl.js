@@ -4,10 +4,10 @@ com.digitald4.biblical.LessonsCtrl = function($location, globalData, lessonServi
   this.scriptureService = scriptureService;
   globalData.scriptureVersion = globalData.scriptureVersion || 'RSKJ';
   var allowDraft = globalData.activeSession != undefined;
-  lessonService.listLessons(allowDraft, response => {this.lessons = response.items}, notify);
+  lessonService.listLessons(allowDraft, response => {this.lessons = response.items}, notifyError);
   this.lessonId = $location.search()['lesson'];
   if (this.lessonId) {
-    this.lessonService.latest(this.lessonId, allowDraft, lesson => { this.renderLesson(lesson) }, notify);
+    this.lessonService.latest(this.lessonId, allowDraft, lesson => { this.renderLesson(lesson) }, notifyError);
   }
 }
 
@@ -35,9 +35,9 @@ com.digitald4.biblical.LessonsCtrl.prototype.saveLesson = function(published) {
     var props = ['title', 'content', 'published'];
     if (this.lesson.themeText) { props.push('themeText'); }
     if (this.lesson.youtubeId) { props.push('youtubeId'); }
-    this.lessonService.update(this.lesson, props, lesson => {this.renderLesson(lesson)}, notify);
+    this.lessonService.update(this.lesson, props, lesson => {this.renderLesson(lesson)}, notifyError);
   } else {
-    this.lessonService.create(this.lesson, lesson => {this.showLesson(lesson)}, notify);
+    this.lessonService.create(this.lesson, lesson => {this.showLesson(lesson)}, notifyError);
   }
 }
 

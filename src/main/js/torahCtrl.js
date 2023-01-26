@@ -8,7 +8,7 @@ com.digitald4.biblical.TorahCtrl = function($location, globalData, commandmentSe
   this.newCommand = {};
   this.pageSize = 50;
   var request = {searchText: this.searchText, pageSize: this.pageSize, pageToken: this.pageToken, orderBy: this.orderBy};
-  this.commandmentService.search(request, searchResult => this.searchResult = searchResult, notify);
+  this.commandmentService.search(request, searchResult => this.searchResult = searchResult, notifyError);
 }
 
 com.digitald4.biblical.TorahCtrl.prototype.search = function(pageToken) {
@@ -23,7 +23,7 @@ com.digitald4.biblical.TorahCtrl.prototype.create = function() {
     this.searchResult.totalSize++;
     this.newCommand.summary = '';
     this.newCommand.scriptures = '';
-  }, notify);
+  }, notifyError);
 }
 
 com.digitald4.biblical.TorahCtrl.prototype.edit = function(commandment) {
@@ -36,5 +36,5 @@ com.digitald4.biblical.TorahCtrl.prototype.update = function(commandment) {
     commandment.summary = updated.summary;
     commandment.scriptures = updated.scriptures;
     commandment.tags = updated.tags;
-  }, notify);
+  }, notifyError);
 }

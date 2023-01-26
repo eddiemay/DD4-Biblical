@@ -28,7 +28,7 @@ com.digitald4.biblical.TimelineCtrl.prototype.refresh = function() {
 	    }
 	  }
 	  this.loading = undefined;
-	}, notify);
+	}, notifyError);
 
 	this.years = [];
 	for (var y = 0; y < 49;) {
@@ -174,7 +174,7 @@ com.digitald4.biblical.TimelineCtrl.prototype.updateAll = function() {
   updateNext();
 	/* this.biblicalEventService.batchUpdate(this.biblicalEvents, ['title'], updated => {
 	  this.refresh();
-	}, notify); */
+	}, notifyError); */
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.scriptureVersionChanged = function() {
