@@ -201,8 +201,10 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
         queryResult.query());
   }
 
-  private ImmutableList<Scripture> fetchFromWeb(String version, BibleBook book, int chapter, int startVerse, int endVerse) {
+  private ImmutableList<Scripture> fetchFromWeb(
+      String version, BibleBook book, int chapter, int startVerse, int endVerse) {
     return create(scriptureFetcher.fetch(version, book, chapter)).stream()
+        .filter(scripture -> scripture.getChapter() == chapter)
         .filter(scripture -> scripture.getVerse() >= startVerse && scripture.getVerse() <= endVerse)
         .sorted(comparing(Scripture::getVerse))
         .collect(toImmutableList());
@@ -215,8 +217,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     private final String nextChapter;
 
     private GetOrSearchResponse(
-        RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize, Query query, String prevChapter,
-        String nextChapter) {
+        RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize, Query query,
+        String prevChapter, String nextChapter) {
       super(scriptures, totalSize, query);
       this.resultType = resultType;
       this.prevChapter = prevChapter;
@@ -243,7 +245,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
 
     public static GetOrSearchResponse searchResult(QueryResult<Scripture> queryResult) {
       return new GetOrSearchResponse(
-          RESULT_TYPE.SEARCH, queryResult.getItems(), queryResult.getTotalSize(), queryResult.query(), null, null);
+          RESULT_TYPE.SEARCH, queryResult.getItems(), queryResult.getTotalSize(),
+          queryResult.query(), null, null);
     }
   }
 }

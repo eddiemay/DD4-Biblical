@@ -25,7 +25,7 @@ public class ScriptureVersion {
               .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,
-          ImmutableSet.of(BibleBook.ENOCH, BibleBook.JUBILEES, BibleBook.JASHER, BibleBook.BOOK_OF_ADAM_AND_EVE)),
+          ImmutableSet.of(BibleBook.ENOCH, BibleBook.ENOCH_2, BibleBook.JUBILEES, BibleBook.JASHER, BibleBook.BOOK_OF_ADAM_AND_EVE)),
       new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
       new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),

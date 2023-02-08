@@ -123,6 +123,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.nextMonth = function() {
 com.digitald4.biblical.CalendarCtrl.prototype.showMonthSelectionDialog = function() {
   this.monthSelection = {year: this.hebrewDate.getYear(), month: this.hebrewDate.getMonth()};
   this.dialogShown = 'SELECT_MONTH';
+  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.selectMonth = function() {
@@ -133,7 +134,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.selectMonth = function() {
 com.digitald4.biblical.CalendarCtrl.prototype.showViewEventDialog = function(event) {
   this.event = event;
   this.dialogShown = 'VIEW_EVENT';
-  this.window.scrollTo(0, 0);
+  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.scriptureVersionChanged = function() {
@@ -143,6 +144,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.scriptureVersionChanged = function
 com.digitald4.biblical.CalendarCtrl.prototype.showCreateEventDialog = function(hebrewDate) {
   this.editEvent = {type: 'BIBLICAL', month: hebrewDate.getMonth(), day: hebrewDate.getDay()};
   this.dialogShown = 'EDIT_EVENT';
+  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.createEvent = function() {
@@ -165,6 +167,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.showEditEventDialog = function(eve
 
   this.origEvent = event;
   this.dialogShown = 'EDIT_EVENT';
+  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.saveEvent = function() {

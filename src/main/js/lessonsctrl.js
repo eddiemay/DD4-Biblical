@@ -2,12 +2,25 @@ com.digitald4.biblical.LessonsCtrl = function($location, globalData, lessonServi
   this.locationProvider = $location;
   this.lessonService = lessonService;
   this.scriptureService = scriptureService;
+  this.lessonId = $location.search()['lesson'];
   globalData.scriptureVersion = globalData.scriptureVersion || 'RSKJ';
   var allowDraft = globalData.activeSession != undefined;
-  lessonService.listLessons(allowDraft, response => {this.lessons = response.items}, notifyError);
-  this.lessonId = $location.search()['lesson'];
+  this.refresh(allowDraft);
+}
+
+com.digitald4.biblical.LessonsCtrl.prototype.refresh = function(allowDraft) {
+  this.lessonService.listLessons(allowDraft, response => {
+    this.lessons = response.items;
+    if (allowDraft) {
+      for (var l = 0; l < this.lessons.length; l++) {
+        this.lessons[l].published = this.lessons[l].latestPublishedVersionId != undefined;
+      }
+    }
+  }, notifyError);
+
   if (this.lessonId) {
-    this.lessonService.latest(this.lessonId, allowDraft, lesson => { this.renderLesson(lesson) }, notifyError);
+    this.lessonService.latest(
+        this.lessonId, allowDraft, lesson => {this.renderLesson(lesson)}, notifyError);
   }
 }
 

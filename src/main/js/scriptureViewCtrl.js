@@ -1,8 +1,8 @@
-com.digitald4.biblical.ScriptureViewCtrl = function(scriptureService, $window, globalData) {
-  this.scriptureService = scriptureService;
+com.digitald4.biblical.ScriptureViewCtrl = function($window, globalData, scriptureService) {
+  this.style = {top: $window.visualViewport.pageTop - 20};
   this.globalData = globalData;
+  this.scriptureService = scriptureService;
   this.refresh();
-  $window.scrollTo(0, 0);
 }
 
 com.digitald4.biblical.ScriptureViewCtrl.prototype.refresh = function() {

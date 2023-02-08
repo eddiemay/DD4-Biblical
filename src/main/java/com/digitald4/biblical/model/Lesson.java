@@ -6,8 +6,8 @@ import org.joda.time.DateTime;
 public class Lesson implements HasModificationTimes {
   private long id;
   private String title;
-  private long latestVersionId;
-  private long latestPublishedVersionId;
+  private Long latestVersionId;
+  private Long latestPublishedVersionId;
   private DateTime creationTime;
   private DateTime lastModifiedTime;
   private DateTime deletionTime;
@@ -36,21 +36,21 @@ public class Lesson implements HasModificationTimes {
     return this;
   }
 
-  public long getLatestVersionId() {
+  public Long getLatestVersionId() {
     return latestVersionId;
   }
 
-  public Lesson setLatestVersionId(long latestDraftVersionId) {
+  public Lesson setLatestVersionId(Long latestDraftVersionId) {
     this.latestVersionId = latestDraftVersionId;
     return this;
   }
 
-  public long getLatestPublishedVersionId() {
+  public Long getLatestPublishedVersionId() {
     return latestPublishedVersionId;
   }
 
-  public Lesson setLatestPublishedVersionId(long latestPublishedVersionId) {
-    this.latestPublishedVersionId = latestPublishedVersionId;
+  public Lesson setLatestPublishedVersionId(Long latestPublishedVersionId) {
+    this.latestPublishedVersionId = latestPublishedVersionId == 0 ? null : latestPublishedVersionId;
     return this;
   }
 

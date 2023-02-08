@@ -103,7 +103,9 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/jasher.html"));
 
-    assertThat(scriptureFetcher.fetch("OXFORD", BibleBook.JASHER, 69)).containsExactly(
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("OXFORD", BibleBook.JASHER, 69);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 69).collect(toImmutableList())).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(69).setVerse(1).setText(
             "And the king of Edom died in those days, in the eighteenth year of his reign, and was buried in his temple which he had built for himself as his royal residence in the land of Edom."),
         new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(69).setVerse(2).setText(
@@ -129,7 +131,9 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch.htm"));
 
-    assertThat(scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH, 2)).containsExactly(
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH, 2);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 2).collect(toImmutableList())).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(2).setVerse(1).setText(
             "Observe ye everything that takes place in the heaven, how they do not change their orbits, and the luminaries which are in the heaven, how they all rise and set in order each in its season, and transgress not against their appointed order."),
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(2).setVerse(2).setText(
@@ -143,7 +147,9 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch.htm"));
 
-    assertThat(scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH, 3)).containsExactly(
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH, 3);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 3).collect(toImmutableList())).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(3).setVerse(1).setText(
             "Observe and see how (in the winter) all the trees seem as though they had withered and shed all their leaves, except fourteen trees, which do not lose their foliage but retain the old foliage from two to three years till the new comes."));
   }
@@ -153,7 +159,9 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch.htm"));
 
-    assertThat(scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH, 5)).containsAtLeast(
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH, 5);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 5).collect(toImmutableList())).containsAtLeast(
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(5).setVerse(1).setText(
             "Observe ye how the trees cover themselves with green leaves and bear fruit: wherefore give ye heed and know with regard to all His works, and recognize how He that liveth for ever hath made them so."),
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(5).setVerse(2).setText(
@@ -181,7 +189,9 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch1b.htm"));
 
-    assertThat(scriptureFetcher.fetch("Other", BibleBook.ENOCH, 2)).containsExactly(
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("Other", BibleBook.ENOCH, 2);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 2).collect(toImmutableList())).containsExactly(
         new Scripture().setVersion("Other").setBook("Enoch").setChapter(2).setVerse(1).setText(
             "Observe ye everything that takes place in the heaven, how they do not change their orbits, and the luminaries which are in the heaven, how they all rise and set in order each in its season, and"),
         new Scripture().setVersion("Other").setBook("Enoch").setChapter(2).setVerse(2).setText(
@@ -195,7 +205,9 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch1b.htm"));
 
-    assertThat(scriptureFetcher.fetch("Other", BibleBook.ENOCH, 3)).containsExactly(
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("Other", BibleBook.ENOCH, 3);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 3).collect(toImmutableList())).containsExactly(
         new Scripture().setVersion("Other").setBook("Enoch").setChapter(3).setVerse(1).setText(
             "Observe and see how (in the winter) all the trees seem as though they had withered and shed all their leaves, except fourteen trees, which do not lose their foliage but retain the old foliage from two to three years till the new comes."));
   }
@@ -213,6 +225,22 @@ public class ScriptureFetcherPseudepigraphaTest extends ReadFileTest {
             "Let not your spirit be troubled on account of the times; For the Holy and Great One has appointed days for all things."),
         new Scripture().setVersion("Other").setBook("Enoch").setChapter(92).setVerse(5).setText(
             "And sin shall perish in darkness for ever, And shall no more be seen from that day for evermore."));
+  }
+
+  @Test
+  public void fetch2Enoch() throws Exception {
+    when(apiConnector.sendGet(anyString()))
+        .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enochs2.htm"));
+
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("OXFORD", BibleBook.ENOCH_2, 7);
+
+    assertThat(results.stream().filter(s -> s.getChapter() == 7).collect(toImmutableList())).containsExactly(
+        new Scripture().setVersion("OXFORD").setBook("2 Enoch").setChapter(7).setVerse(1).setText(
+            "And those men took me and led me up on to the second heaven, and showed me darkness, greater than earthly darkness, and there I saw prisoners hanging, watched, awaiting the great and boundless judgment, and these angels (spirits) were dark-looking, more than earthly darkness, and incessantly making weeping through all hours."),
+        new Scripture().setVersion("OXFORD").setBook("2 Enoch").setChapter(7).setVerse(2).setText(
+            "And I said to the men who were with me: Wherefore are these incessantly tortured? They answered me: These are God�s apostates, who obeyed not God�s commands, but took counsel with their own will, and turned away with their prince, who also (is) fastened on the fifth heaven."),
+        new Scripture().setVersion("OXFORD").setBook("2 Enoch").setChapter(7).setVerse(3).setText(
+            "And I felt great pity for them, and they saluted me, and said to me: Man of God, pray for us to the Lord; and I answered to them: Who am I, a mortal man, that I should pray for angels (spirits)? Who knows whither I go, or what will befall me? Or who will pray for me?"));
   }
 
   @Test

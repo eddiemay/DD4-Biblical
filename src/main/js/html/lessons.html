@@ -34,7 +34,9 @@
         <h1>Lessons</h1>
         <ol>
           <li data-ng-repeat="lesson in $ctrl.lessons" style="padding-bottom: 8px">
-            <a href="" data-ng-click="$ctrl.showLesson(lesson)">{{lesson.title}}</a>
+            <a href="" data-ng-click="$ctrl.showLesson(lesson)">
+              {{lesson.title}}<img data-ng-if="lesson.published" src="images/icons/fugue/status.png">
+            </a>
           </li>
         </ol>
         <p><a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.createNew()" class="add-event">Add</a></p>

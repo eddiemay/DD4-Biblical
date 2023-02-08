@@ -57,7 +57,7 @@ public class BibleBook {
       new BibleBook(28, "Hosea", "Canon,OT,Prophets", 14, "Hos", "Ho", "Hoshea"),
       new BibleBook(29, "Joel", "Canon,OT,Prophets", 3, "Joe", "Jl", "Yoel"),
       new BibleBook(30, "Amos", "Canon,OT,Prophets", 9, "Am"),
-      new BibleBook(31, "Obadiah", "Canon,OT,Prophets", 1, "Obad", "Ob", "Ovadya"),
+      new BibleBook(31, "Obadiah", "Canon,OT,Prophets", 1, "Obad", "Ob", "Oba", "Ovadya"),
       new BibleBook(32, "Jonah", "Canon,OT,Prophets", 4, "Jon", "Jo", "Yonah"),
       new BibleBook(33, "Micah", "Canon,OT,Prophets", 7, "Mic", "Mc", "Micha"),
       new BibleBook(34, "Nahum", "Canon,OT,Prophets", 3, "Nah", "Nachum"),
@@ -136,24 +136,22 @@ public class BibleBook {
       new BibleBook(84, "4 Maccabees", "Apocrypha,Deuterocanon,Eastern,Machabees,Mac,Macc", 18, "4Mac", "4Macc", "4 Machabees"),
       PRAYER_OF_MANASSEH);
 
-  public static final BibleBook ENOCH;
-  public static final BibleBook JUBILEES;
+  public static final BibleBook ENOCH = new BibleBook(85, "Enoch", "Apocrypha,Deuterocanon,Ethiopian", 108, "Hanok", "Eno");
+  public static final BibleBook ENOCH_2 = new BibleBook(86, "2 Enoch", "Apocrypha,Deuterocanon,Ethiopian,Enoch", 68, "2 Hanok", "2 Eno");
+  public static final BibleBook JUBILEES = new BibleBook(89, "Jubilees", "Apocrypha,Deuterocanon,Ethiopian", 50, "Jub");
   public static final ImmutableList<BibleBook> ETHIOPIAN_ORTHODOX_DEUTEROCANON =
-      ImmutableList.of(
-          ESDRAS_2,
-          ENOCH = new BibleBook(85, "Enoch", "Apocrypha,Deuterocanon,Ethiopian", 108, "Hanok", "Eno"),
-          JUBILEES = new BibleBook(86, "Jubilees", "Apocrypha,Deuterocanon,Ethiopian", 50, "Jub"));
+      ImmutableList.of(ESDRAS_2, ENOCH, JUBILEES);
 
-  public static final BibleBook JASHER = new BibleBook(87, "Jasher",
+  public static final BibleBook JASHER = new BibleBook(90, "Jasher",
       "Apocrypha,Jewish History", 91, "Yasher", "Yahusher");
-  public static final BibleBook COMMUNITY_RULE = new BibleBook(88, "Community Rule",
+  public static final BibleBook COMMUNITY_RULE = new BibleBook(91, "Community Rule",
       "Apocrypha,Jewish History", 1, "cr", "Manual of Discipline", "MD");
-  public static final BibleBook WAR_SCROLL = new BibleBook(89, "War Scroll",
+  public static final BibleBook WAR_SCROLL = new BibleBook(92, "War Scroll",
       "Apocrypha,Jewish History", 19, "War");
-  public static final BibleBook JOSEPHUS = new BibleBook(90, "Josephus", "Apocrypha,Jewish History", 20);
-  public static final BibleBook BOOK_OF_ADAM_AND_EVE = new BibleBook(91, "Book of Adam and Eve",
+  public static final BibleBook JOSEPHUS = new BibleBook(93, "Josephus", "Apocrypha,Jewish History", 20);
+  public static final BibleBook BOOK_OF_ADAM_AND_EVE = new BibleBook(94, "Book of Adam and Eve",
       "Apocrypha,Jewish History", 51);
-  public static final BibleBook TESTAMENT_OF_JOB = new BibleBook(92, "Testament of Job", "Apocrypha,Jewish History", 12);
+  public static final BibleBook TESTAMENT_OF_JOB = new BibleBook(95, "Testament of Job", "Apocrypha,Jewish History", 12);
 
   public static final ImmutableSet<BibleBook> ALL_BOOKS = ImmutableSet.<BibleBook>builder()
       .addAll(CANON)
@@ -161,7 +159,8 @@ public class BibleBook {
       .add(ADDITIONS_TO_ESTHER, PSALMS_151)
       .addAll(EASTERN_ORTHODOX_DEUTEROCANON)
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
-      .add(JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS, BOOK_OF_ADAM_AND_EVE, TESTAMENT_OF_JOB)
+      .add(ENOCH_2, JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS, BOOK_OF_ADAM_AND_EVE,
+          TESTAMENT_OF_JOB)
       .build();
 
   private final int bookNum;

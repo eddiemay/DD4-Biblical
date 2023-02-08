@@ -1,12 +1,16 @@
 package com.digitald4.biblical.server;
 
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Comparator.comparing;
+
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.common.exception.DD4StorageException;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,9 +40,11 @@ public class BookService {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "books")
-  public ImmutableSet<BibleBook> getBibleBooks() throws ServiceException {
+  public ImmutableList<BibleBook> getBibleBooks() throws ServiceException {
     try {
-      return BibleBook.ALL_BOOKS;
+      return BibleBook.ALL_BOOKS.stream()
+          .sorted(comparing(BibleBook::getBookNum))
+          .collect(toImmutableList());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

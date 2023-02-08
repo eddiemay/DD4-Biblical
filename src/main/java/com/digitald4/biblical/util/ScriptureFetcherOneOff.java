@@ -20,11 +20,6 @@ import java.util.regex.Pattern;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 public class ScriptureFetcherOneOff implements ScriptureFetcher {
-  private static final String COMMUNITY_RULE_URL = "https://www.essene.com/History&Essenes/md.htm";
-  private static final String ENOCH_URL =
-      "https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-%d-to-%d/chapter-%d/";
-  private static final String WAR_SCROLL_URL = "https://www.qumran.org/js/qumran/hss/1qm";
-
   private final APIConnector apiConnector;
 
   @Inject
@@ -50,7 +45,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
   }
 
   private synchronized ImmutableList<Scripture> fetchCommunityRule(String version, BibleBook book) {
-    String htmlResult = apiConnector.sendGet(COMMUNITY_RULE_URL);
+    String htmlResult = apiConnector.sendGet("https://www.essene.com/History&Essenes/md.htm");
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements paragraphs = doc.getElementsByTag("p");
     if (paragraphs.size() == 0) {
@@ -79,7 +74,10 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
   private synchronized ImmutableList<Scripture> fetchEnoch(String version, BibleBook book, int chapter) {
     final Pattern versePattern = Pattern.compile("(\\d+). ([^<]+)");
     int rangeStart = getRangeStart(chapter);
-    String htmlResult = apiConnector.sendGet(String.format(ENOCH_URL, rangeStart, rangeStart + 9, chapter));
+    String htmlResult = apiConnector.sendGet(
+        String.format(
+            "https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-%d-to-%d/chapter-%d/",
+            rangeStart, rangeStart + 9, chapter));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements wrappers = doc.getElementsByClass("entry-content");
     if (wrappers.size() == 0) {
@@ -102,7 +100,68 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
   private synchronized ImmutableList<Scripture> fetchWarScroll(String version, BibleBook book) {
     final Pattern versePattern = Pattern.compile("\\((\\d+)\\) ([^<]+)");
-    String htmlResult = apiConnector.sendGet(WAR_SCROLL_URL);
+    String htmlResult = apiConnector.sendGet("https://www.qumran.org/js/qumran/hss/1qm");
+    Document doc = Jsoup.parse(htmlResult.trim());
+    Elements rows = doc.getElementsByTag("tr");
+    if (rows.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+
+    AtomicInteger chapter = new AtomicInteger();
+    return rows.stream()
+        .map(Element::text)
+        .map(versePattern::matcher)
+        .filter(Matcher::matches)
+        .map(
+            matcher -> {
+              int verse = Integer.parseInt(matcher.group(1));
+              if (verse == 1) {
+                chapter.incrementAndGet();
+              }
+
+              return new Scripture()
+                  .setVersion(version)
+                  .setBook(book.getName())
+                  .setChapter(chapter.get())
+                  .setVerse(verse)
+                  .setText(new StringBuilder(matcher.group(2)));
+            })
+        .collect(toImmutableList());
+  }
+
+  private synchronized ImmutableList<Scripture> fetch3Enoch(String version, BibleBook book) {
+    final Pattern versePattern = Pattern.compile("\\((\\d+)\\) ([^<]+)");
+    String htmlResult = apiConnector.sendGet("http://ldysinger.stjohnsem.edu/@themes/judaism/kabbalah/02_3rd_enoch.htm");
+    Document doc = Jsoup.parse(htmlResult.trim());
+    Elements rows = doc.getElementsByTag("tr");
+    if (rows.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+
+    AtomicInteger chapter = new AtomicInteger();
+    return rows.stream()
+        .map(Element::text)
+        .map(versePattern::matcher)
+        .filter(Matcher::matches)
+        .map(
+            matcher -> {
+              int verse = Integer.parseInt(matcher.group(1));
+              if (verse == 1) {
+                chapter.incrementAndGet();
+              }
+
+              return new Scripture()
+                  .setVersion(version)
+                  .setBook(book.getName())
+                  .setChapter(chapter.get())
+                  .setVerse(verse)
+                  .setText(new StringBuilder(matcher.group(2)));
+            })
+        .collect(toImmutableList());
+  }
+  private synchronized ImmutableList<Scripture> fetchGiants(String version, BibleBook book) {
+    final Pattern versePattern = Pattern.compile("(\\d+) ([^<]+)");
+    String htmlResult = apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements rows = doc.getElementsByTag("tr");
     if (rows.size() == 0) {

@@ -22,8 +22,9 @@ public class LessonStore extends GenericStore<Lesson, Long> {
   }
 
   public ImmutableList<Lesson> list(boolean allowDraft) {
-    return list(Query.forList().setOrderBys(Query.OrderBy.of("creation_time"))).getItems().stream()
-        .filter(lesson -> allowDraft || lesson.getLatestPublishedVersionId() > 0)
+    return list(Query.forList().setOrderBys(Query.OrderBy.of("creation_time"))).getItems()
+        .stream()
+        .filter(lesson -> allowDraft || lesson.getLatestPublishedVersionId() != null)
         .collect(toImmutableList());
   }
 

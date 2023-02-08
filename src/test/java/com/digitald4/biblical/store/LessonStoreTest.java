@@ -53,8 +53,8 @@ public class LessonStoreTest {
     assertThat(lesson.getId()).isEqualTo(5001L);
     assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
     assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60001L);
-    assertThat(lesson.getLatestVersionId()).isEqualTo(0L);
-    assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(0L);
+    assertThat(lesson.getLatestVersionId()).isNull();
+    assertThat(lesson.getLatestPublishedVersionId()).isNull();
   }
 
   @Test
@@ -73,7 +73,7 @@ public class LessonStoreTest {
     assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
     assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60003L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
-    assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(0L);
+    assertThat(lesson.getLatestPublishedVersionId()).isNull();
   }
 
   @Test
@@ -94,7 +94,7 @@ public class LessonStoreTest {
     assertThat(lesson.getId()).isEqualTo(5001L);
     assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
-    assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(0L);
+    assertThat(lesson.getLatestPublishedVersionId()).isNull();
     assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60003L);
   }
 
@@ -115,7 +115,7 @@ public class LessonStoreTest {
     assertThat(lesson.getId()).isEqualTo(5001L);
     assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
-    assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(0L);
+    assertThat(lesson.getLatestPublishedVersionId()).isNull();
     assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60005L);
   }
 
@@ -180,7 +180,7 @@ public class LessonStoreTest {
     assertThat(lesson.getId()).isEqualTo(5001L);
     assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
-    assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(0L);
+    assertThat(lesson.getLatestPublishedVersionId()).isNull();
     assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60005L);
 
     versionStore.update(version.getLessonId(), v -> v.setPublished(true));
