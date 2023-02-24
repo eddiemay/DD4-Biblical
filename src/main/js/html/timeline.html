@@ -52,9 +52,14 @@
     </ul>
 
     <ul class="message no-margin">
-      <li>{{$ctrl.biblicalEvents.length}} Biblical events found <button data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.updateAll()">Update All</button></li>
+      <li>
+        {{$ctrl.biblicalEvents.length}} Biblical events found.
+        View:
+        <select data-ng-model="$ctrl.view" data-ng-change="$ctrl.setView()"
+                data-ng-options="view for view in $ctrl.viewOptions"></select>
+        <button data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.updateAll()">Update All</button>
+      </li>
     </ul>
-
   </div></div>
 
   <!-- Event view dialog start -->

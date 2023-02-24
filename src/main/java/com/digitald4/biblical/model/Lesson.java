@@ -92,7 +92,6 @@ public class Lesson implements HasModificationTimes {
     private long lessonId;
     private String title;
     private String themeText;
-    private String youtubeId;
     private StringBuilder content;
     private boolean published;
     private DateTime creationTime;
@@ -135,12 +134,13 @@ public class Lesson implements HasModificationTimes {
       return this;
     }
 
+    @Deprecated
     public String getYoutubeId() {
-      return youtubeId;
+      return null;
     }
 
+    @Deprecated
     public LessonVersion setYoutubeId(String youtubeId) {
-      this.youtubeId = "".equals(youtubeId) ? null : youtubeId;
       return this;
     }
 

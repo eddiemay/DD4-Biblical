@@ -1,9 +1,11 @@
 package com.digitald4.biblical.model;
 
-public class Commandment {
+import com.digitald4.common.model.Searchable;
+
+public class Commandment implements Searchable {
   private long id;
-  private String summary;
   private String scriptures;
+  private String summary;
   private String tags;
 
   public long getId() {

@@ -12,15 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class ScriptureFetcherStepBibleOrgTest {
-  @Mock private final APIConnector apiConnector = mock(APIConnector.class);
-  private ScriptureFetcher scriptureFetcher;
-
-  @Before
-  public void setup() {
-    scriptureFetcher = new ScriptureFetcherStepBibleOrg(apiConnector);
-  }
-
+public class ScriptureFetcherStepBibleOrgTest extends ScriptureFetcherTest {
   @Test
   public void fetch() {
     when(apiConnector.sendGet(anyString())).thenReturn(
@@ -104,7 +96,7 @@ public class ScriptureFetcherStepBibleOrgTest {
             "    ]\n" +
             "}");
 
-    assertThat(scriptureFetcher.fetch("RSKJ", BibleBook.Psalms, 117)).containsExactly(
+    assertThat(scriptureStore.getScriptures("RSKJ", "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "O praise יהוה, all ye nations: praise him, all ye people."),
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(2).setText(

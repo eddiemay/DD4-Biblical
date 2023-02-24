@@ -16,7 +16,7 @@ com.digitald4.biblical.router = function($routeProvider) {
 			controller: com.digitald4.biblical.TorahCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/the_law.html'
-		}).when('/lessons', {
+		}).when('/lessons/:id?/:title?', {
 			controller: com.digitald4.biblical.LessonsCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/lessons.html'

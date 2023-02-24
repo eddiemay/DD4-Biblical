@@ -42,9 +42,11 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
     if (book == BibleBook.JUBILEES) {
       return fetchJubilees(version, book, chapter);
     } else if (book == BibleBook.JASHER) {
-      return fetchJasher(version, book, chapter);
+      return fetchJasher(version, book);
     } else if (book == BibleBook.ENOCH) {
-      return version.equals("OXFORD") ? fetchEnoch(version, book, chapter) : fetchEnochOther(version, book, chapter);
+      return version.equals("OXFORD") ? fetchEnoch(version, book) : fetchEnochOther(version, book);
+    } else if (book == BibleBook.ENOCH_2) {
+      return fetch2Enoch(version, book);
     } else if (book == BibleBook.BOOK_OF_ADAM_AND_EVE) {
       return fetchBookOfAdamAndEve(version, book);
     }
@@ -72,12 +74,15 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  private ImmutableList<Scripture> fetchJasher(String version, BibleBook book, int chapter) {
+  private ImmutableList<Scripture> fetchJasher(String version, BibleBook book) {
     String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/jasher.html");
     Document doc = Jsoup.parse(htmlResult.trim());
 
+    AtomicInteger chapter = new AtomicInteger();
+
     return doc.getElementsByTag("h3").stream()
-        .filter(h3 -> h3.text().startsWith("CHAPTER") && Integer.parseInt(h3.text().substring(8)) == chapter)
+        .filter(h3 -> h3.text().startsWith("CHAPTER"))
+        .peek(h3 -> chapter.set(Integer.parseInt(h3.text().substring(8))))
         .flatMap(h3 -> {
           ImmutableList.Builder<TextNode> textNodes = ImmutableList.builder();
           Node nextNode = h3.nextSibling();
@@ -96,23 +101,23 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
             matcher -> new Scripture()
                 .setVersion(version)
                 .setBook(book.getName())
-                .setChapter(chapter)
+                .setChapter(chapter.get())
                 .setVerse(Integer.parseInt(matcher.group(1)))
                 .setText(new StringBuilder(matcher.group(2).trim())))
         .collect(toImmutableList());
   }
 
-  private ImmutableList<Scripture> fetchEnoch(String version, BibleBook book, int chapter) {
+  private ImmutableList<Scripture> fetchEnoch(String version, BibleBook book) {
     String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/enoch.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
 
     return doc.getElementsByTag("td").stream()
-        .filter(td -> {
-          Matcher matcher = CHAPTER_PATTERN.matcher(td.text());
-          return matcher.find() && Integer.parseInt(matcher.group(1)) == chapter;
-        })
-        // .peek(td -> td.getElementsByTag("BR").remove())
         .flatMap(td -> {
+          Matcher chapMatcher = CHAPTER_PATTERN.matcher(td.text());
+          if (!chapMatcher.find()) {
+            return ImmutableList.<Scripture>of().stream();
+          }
+          int chapter = Integer.parseInt(chapMatcher.group(1));
           Map<Integer, Scripture> scriptures = new HashMap<>();
           Matcher matcher = VERSE_PATTERN3.matcher(td.text());
           if (!matcher.find()) {
@@ -144,12 +149,51 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  private ImmutableList<Scripture> fetchEnochOther(String version, BibleBook book, int chapter) {
+  private ImmutableList<Scripture> fetch2Enoch(String version, BibleBook book) {
+    String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/enochs2.htm");
+    Document doc = Jsoup.parse(htmlResult.trim());
+
+    AtomicInteger chapter = new AtomicInteger();
+
+    return doc.getElementsByTag("td").stream()
+        .filter(td -> {
+          int ch = td.getElementsByTag("a").stream()
+              .map(Element::text)
+              .map(CHAPTER_PATTERN::matcher)
+              .filter(Matcher::find)
+              .map(matcher -> matcher.group(1))
+              .map(Integer::parseInt)
+              .findFirst().orElse(0);
+          if (ch == 0) {
+            return false;
+          }
+
+          chapter.set(ch);
+          return true;
+        })
+        .flatMap(td -> td.getElementsByTag("p").stream())
+        .map(Element::text)
+        .map(VERSE_PATTERN::matcher)
+        .filter(Matcher::matches)
+        .map(
+            matcher -> new Scripture()
+                .setVersion(version)
+                .setBook(book.getName())
+                .setChapter(chapter.get())
+                .setVerse(Integer.parseInt(matcher.group(1)))
+                .setText(new StringBuilder(matcher.group(2).trim())))
+        .collect(toImmutableList());
+  }
+
+  private ImmutableList<Scripture> fetchEnochOther(String version, BibleBook book) {
     String htmlResult = apiConnector.sendGet(BASE_URL + "pseudepigrapha/enoch1b.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
 
+    AtomicInteger chapter = new AtomicInteger();
+
     return doc.getElementsByTag("h3").stream()
-        .filter(h3 -> h3.text().startsWith("Chapter") && Integer.parseInt(h3.text().substring(8)) == chapter)
+        .filter(h3 -> h3.text().startsWith("Chapter"))
+        .peek(h3 -> chapter.set(Integer.parseInt(h3.text().substring(8))))
         .map(Element::nextElementSibling)
         .map(Element::text)
         .flatMap(text -> {
@@ -160,7 +204,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
                 new Scripture()
                     .setVersion(version)
                     .setBook(book.getName())
-                    .setChapter(chapter)
+                    .setChapter(chapter.get())
                     .setVerse(Integer.parseInt(matcher.group(1)))
                     .setText(new StringBuilder(matcher.group(2).trim())));
           }

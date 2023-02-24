@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 import com.digitald4.common.exception.DD4StorageException;
+import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -29,9 +30,11 @@ public class ScriptureVersion {
       new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
       new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),
-      new ScriptureVersion("Qumran", "qumran", 56, ImmutableSet.of(BibleBook.WAR_SCROLL)),
+      new ScriptureVersion("Qumran", "qumran", 56,
+          ImmutableSet.of(BibleBook.WAR_SCROLL, BibleBook.GIANTS)),
       new ScriptureVersion("University of Chicago", "uchicago", 57, ImmutableSet.of(BibleBook.JOSEPHUS)),
-      new ScriptureVersion("M R James", "mrjames", 58, ImmutableSet.of(BibleBook.TESTAMENT_OF_JOB)),
+      new ScriptureVersion("M. R. James", "M. R. James", 58, ImmutableSet.of(BibleBook.TESTAMENT_OF_JOB)),
+      new ScriptureVersion("Rabbi Ishmael Ben Elisha", "R. Ishmael", 59, ImmutableSet.of(BibleBook.ENOCH_3)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()));
@@ -69,6 +72,9 @@ public class ScriptureVersion {
 
   public static ScriptureVersion getOrFallback(String version, BibleBook book) {
     ScriptureVersion scriptureVersion = get(version);
+    if (scriptureVersion == null) {
+      throw new DD4StorageException("Unknown scritpure version: " + version, ErrorCode.BAD_REQUEST);
+    }
     if (scriptureVersion.getBibleBooks().contains(book)) {
       return scriptureVersion;
     }

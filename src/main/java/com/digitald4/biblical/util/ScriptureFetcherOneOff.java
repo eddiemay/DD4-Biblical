@@ -39,6 +39,10 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetchJosephus(version, book, chapter);
     } else if (book == BibleBook.TESTAMENT_OF_JOB) {
       return fetchTestamentOfJob(version, book);
+    } else if (book == BibleBook.ENOCH_3) {
+      return fetch3Enoch(version, book);
+    } else if (book == BibleBook.GIANTS) {
+      return fetchGiants(version, book);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -130,35 +134,50 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
   }
 
   private synchronized ImmutableList<Scripture> fetch3Enoch(String version, BibleBook book) {
-    final Pattern versePattern = Pattern.compile("\\((\\d+)\\) ([^<]+)");
-    String htmlResult = apiConnector.sendGet("http://ldysinger.stjohnsem.edu/@themes/judaism/kabbalah/02_3rd_enoch.htm");
+    final Pattern versePattern = Pattern.compile("\\((\\d+)\\) ([^(]+)");
+    final Pattern chapterPattern = Pattern.compile("(.*) (Chapter|CHAPTER) ([IVXL]+) (.*)");
+    String htmlResult =
+        apiConnector.sendGet("https://rejectedscriptures.weebly.com/the-third-book-of-enoch.html");
     Document doc = Jsoup.parse(htmlResult.trim());
-    Elements rows = doc.getElementsByTag("tr");
-    if (rows.size() == 0) {
+    Elements divs = doc.getElementsByTag("div");
+    if (divs.size() == 0) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
     AtomicInteger chapter = new AtomicInteger();
-    return rows.stream()
+    return divs.stream()
+        .filter(div -> div.hasClass("paragraph"))
         .map(Element::text)
         .map(versePattern::matcher)
-        .filter(Matcher::matches)
-        .map(
+        .flatMap(
             matcher -> {
-              int verse = Integer.parseInt(matcher.group(1));
-              if (verse == 1) {
-                chapter.incrementAndGet();
+              ImmutableList.Builder<Scripture> builder = ImmutableList.builder();
+              while (matcher.find()) {
+                int verse = Integer.parseInt(matcher.group(1));
+                if (verse == 1) {
+                  chapter.incrementAndGet();
+                }
+
+                String text = matcher.group(2).trim();
+                Matcher chapterMatcher = chapterPattern.matcher(text);
+                if (chapterMatcher.matches()) {
+                  text = chapterMatcher.group(1).trim();
+                }
+
+                builder.add(
+                    new Scripture()
+                        .setVersion(version)
+                        .setBook(book.getName())
+                        .setChapter(chapter.get())
+                        .setVerse(verse)
+                        .setText(new StringBuilder(text)));
               }
 
-              return new Scripture()
-                  .setVersion(version)
-                  .setBook(book.getName())
-                  .setChapter(chapter.get())
-                  .setVerse(verse)
-                  .setText(new StringBuilder(matcher.group(2)));
+              return builder.build().stream();
             })
         .collect(toImmutableList());
   }
+
   private synchronized ImmutableList<Scripture> fetchGiants(String version, BibleBook book) {
     final Pattern versePattern = Pattern.compile("(\\d+) ([^<]+)");
     String htmlResult = apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");

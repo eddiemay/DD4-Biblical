@@ -11,10 +11,6 @@
           <input type="text" data-ng-model="$ctrl.lesson.themeText" class="full-width">
         </div>
         <div class="columns">
-          <label>Youtube Id</label>
-          <input type="text" data-ng-model="$ctrl.lesson.youtubeId" class="full-width">
-        </div>
-        <div class="columns">
           <label>Content</label>
           <textarea data-ng-model="$ctrl.lesson.content" class="full-width" style="height: 300px"></textarea>
         </div>
@@ -34,7 +30,7 @@
         <h1>Lessons</h1>
         <ol>
           <li data-ng-repeat="lesson in $ctrl.lessons" style="padding-bottom: 8px">
-            <a href="" data-ng-click="$ctrl.showLesson(lesson)">
+            <a href="{{lesson.url}}">
               {{lesson.title}}<img data-ng-if="lesson.published" src="images/icons/fugue/status.png">
             </a>
           </li>

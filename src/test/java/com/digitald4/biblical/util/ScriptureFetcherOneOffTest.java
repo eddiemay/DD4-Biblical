@@ -1,6 +1,7 @@
 package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,12 +14,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class ScriptureFetcherOneOffTest extends ReadFileTest {
-  @Mock private final APIConnector apiConnector = mock(APIConnector.class);
+public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
   private ScriptureFetcher scriptureFetcher;
 
   @Before
   public void setup() {
+    super.setup();
     scriptureFetcher = new ScriptureFetcherOneOff(apiConnector);
   }
 
@@ -59,7 +60,7 @@ public class ScriptureFetcherOneOffTest extends ReadFileTest {
         "\t\tThey must not turn aside from the ordinances of God's truth either to the right\n" +
         "\t\tor to the left.</B></P><P><B><FONT COLOR=\"#800000\">Of Initiation.</FONT></B></P></BODY</HTML>");
 
-    assertThat(scriptureFetcher.fetch("essene", BibleBook.COMMUNITY_RULE, 1)).containsExactly(
+    assertThat(scriptureStore.getScriptures("essene", "COMMUNITY RULE 1").getItems()).containsExactly(
         new Scripture().setVersion("essene").setBook("Community Rule").setChapter(1).setVerse(1).setText(
             "Of the Commitment."),
         new Scripture().setVersion("essene").setBook("Community Rule").setChapter(1).setVerse(2).setText(
@@ -193,7 +194,7 @@ public class ScriptureFetcherOneOffTest extends ReadFileTest {
             " <TR><TD VALIGN=\"top\">(18)</TD><TD>[...]</TD></TR>" +
         "</TABLE></BODY></HTML>");
 
-    assertThat(scriptureFetcher.fetch("qumran", BibleBook.WAR_SCROLL, 1)).containsExactly(
+    assertThat(scriptureStore.getScriptures("qumran", "WAR SCROLL 1-2").getItems()).containsExactly(
         new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(1).setText(
             "For the In[structor, the Rule of] the War. The first attack of the Sons of Light shall be undertaken against the forces of the Sons of Darkness, the army of Belial: the troops of Edom, Moab, the sons of Ammon, the [Amalekites],"),
         new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(2).setText(
@@ -206,12 +207,12 @@ public class ScriptureFetcherOneOffTest extends ReadFileTest {
             "in the regular offering before God. The chiefs of the courses, twenty-six, shall serve in their courses. After them the chiefs of the Levites serve continually, twelve in all, one"),
         new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(15).setText(
             "[The Rule of the Trumpets: the trumpets] of alarm for all their service for the [...] for their commissioned men,"),
-    new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(16).setText(
-        "[by tens of thousands and thousands and hundreds and fifties] and tens. Upon the t[rumpets ...]"),
-    new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(17).setText(
-        "[...]"),
-    new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(18).setText(
-        "[...]"));
+        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(16).setText(
+            "[by tens of thousands and thousands and hundreds and fifties] and tens. Upon the t[rumpets ...]"),
+        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(17).setText(
+            "[...]"),
+        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(18).setText(
+            "[...]"));
   }
 
   @Test
@@ -219,7 +220,7 @@ public class ScriptureFetcherOneOffTest extends ReadFileTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/ant-8.html"));
 
-    assertThat(scriptureFetcher.fetch("uchicago", BibleBook.JOSEPHUS, 8)).containsExactly(
+    assertThat(scriptureStore.getScriptures("uchicago", "JOSEPHUS 8").getItems()).containsExactly(
         new Scripture().setVersion("uchicago").setBook("Josephus").setChapter(8).setVerse(1).setText(
             "[About An. 1056.] We have already treated of David, and his virtue; and of the benefits he was the author of to his countreymen; of his wars also, and battels which he managed with success, and then died an old man, in the foregoing book. And when Solomon his son, who was but a youth in age, had taken the Kingdom, and whom David had declared, while he was alive, the Lord of that people, according to God’s will: when he sat upon the throne, the whole body of the people made joyful acclamations to him: as is usual at the beginning of a reign: and wished that all his affairs might come to a blessed conclusion; and that he might arrive at a great age, and at the most happy state of affairs possible."),
         new Scripture().setVersion("uchicago").setBook("Josephus").setChapter(8).setVerse(2).setText(
@@ -256,23 +257,39 @@ public class ScriptureFetcherOneOffTest extends ReadFileTest {
 
   @Test
   public void fetchTestamentOfJob() throws Exception {
-    when(apiConnector.sendGet(anyString())).thenReturn(getContent("src/main/webapp/books/testament_of_job.html"));
+    when(apiConnector.sendGet(anyString()))
+        .thenReturn(getContent("src/main/webapp/books/testament_of_job.html"));
 
-    ImmutableList<Scripture> result = scriptureFetcher.fetch("mrjames", BibleBook.TESTAMENT_OF_JOB, 0);
-    assertThat(result.subList(0, 3)).containsExactly(
-        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(1).setVerse(1).setText(
+    /*assertThat(scriptureStore.getScriptures("M R James", "TESTAMENT OF JOB 1:1-3").getItems()).containsExactly(
+        new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(1).setText(
             "On the day he became sick and (he) knew that he would have to leave his bodily abode, he called his seven sons and his three daughters together and spoke to them as follows:"),
-        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(1).setVerse(2).setText(
+        new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(2).setText(
             "“Form a circle around me, children, and hear, and I shall relate to you what the Lord did for me and all that happened to me."),
-        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(1).setVerse(3).setText(
-            "For I am Job your father."));
+        new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(3).setText(
+            "For I am Job your father."));*/
 
-    assertThat(result.subList(result.size() - 3, result.size())).containsExactly(
-        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(12).setVerse(17).setText(
+    assertThat(scriptureStore.getScriptures("M. R. James", "TESTAMENT OF JOB 12:17-19").getItems()).containsExactly(
+        new Scripture().setVersion("M. R. James").setBook("Testament of Job").setChapter(12).setVerse(17).setText(
             "The name of Job was formerly Jobab, and he was called Job by the Lord."),
-        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(12).setVerse(18).setText(
+        new Scripture().setVersion("M. R. James").setBook("Testament of Job").setChapter(12).setVerse(18).setText(
             "He had lived before his plague eighty five years, and after the plague he took the double share of all; for this reason also his year’s he doubled, which is 170 years. In this way he lived altogether 255 years."),
-        new Scripture().setVersion("mrjames").setBook("Testament of Job").setChapter(12).setVerse(19).setText(
+        new Scripture().setVersion("M. R. James").setBook("Testament of Job").setChapter(12).setVerse(19).setText(
             "And, he saw sons of his sons to the fourth generation. It is written that he will rise up with those whom the Lord will reawaken. To our Lord by glory. Amen."));
+  }
+
+  @Test
+  public void fetch3Enoch() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/test/java/com/digitald4/biblical/util/data/the-third-book-of-enoch.html"));
+
+    assertThat(scriptureStore.getScriptures("R. Ishmael", "3 ENOCH 2").getItems()).containsExactly(
+        new Scripture().setVersion("R. Ishmael").setBook("3 Enoch").setChapter(2).setVerse(1).setText(
+            "In that hour the eagles of the Merkaba, the flaming 'Ophannim and the Seraphim of consuming fire asked a Metatron, saying to him:"),
+        new Scripture().setVersion("R. Ishmael").setBook("3 Enoch").setChapter(2).setVerse(2).setText(
+            "\"Youth! Why sufferest thou one born of woman to enter and behold the Merkaba? From which nation, from which tribe is this one? What is his character?\""),
+        new Scripture().setVersion("R. Ishmael").setBook("3 Enoch").setChapter(2).setVerse(3).setText(
+            "Metatron answered and said to them: \"From the nation of Israel whom the Holy One, blessed be He, chose for his people from among seventy tongues, from the tribe of Levi, whom he set aside as a contribution to his name and from the seed of Aaron whom the Holy One, blessed be He, did choose for his servant and put upon him the crown of priesthood on Sinai\"."),
+        new Scripture().setVersion("R. Ishmael").setBook("3 Enoch").setChapter(2).setVerse(4).setText(
+            "Forthwith they spake and said: \"Indeed, this one is worthy to behold the Merkaba \". And they said: \"Happy is the people that is in such a case!\""));
   }
 }

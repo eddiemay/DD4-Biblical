@@ -25,7 +25,7 @@ com.digitald4.biblical.InlineScriptureCtrl.prototype.refresh = function() {
       }
     }
     this.loading = undefined;
-  }, notifyError);
+  });
 }
 
 com.digitald4.biblical.InlineScriptureCtrl.prototype.showScripture = function(version, book, chapter, verse) {

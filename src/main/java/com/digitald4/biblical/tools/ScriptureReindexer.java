@@ -19,12 +19,14 @@ public class ScriptureReindexer {
     this.apiConnector = apiConnector;
   }
 
-  public void cache(String version, ImmutableSet<String> books) {
+  public void reindex(String version, ImmutableSet<String> books) {
     String baseUrl = apiConnector.formatUrl("scriptures");
 
     ScriptureVersion scriptureVersion = ScriptureVersion.get(version);
     scriptureVersion.getBibleBooks().stream()
-        .filter(book -> books.isEmpty() || books.contains(book.getName()) || book.getAltNames().stream().anyMatch(books::contains))
+        .filter(
+            book -> books.isEmpty() || books.contains(book.getName())
+                || book.getAltNames().stream().anyMatch(books::contains))
         .forEach(book -> {
           System.out.printf("\n%s %d =>", book.getName(), book.getChapterCount());
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
@@ -41,8 +43,9 @@ public class ScriptureReindexer {
       System.exit(1);
     }
 
-    new ScriptureReindexer(new APIConnector(API_URL, API_VERSION, 100)).cache(
+    new ScriptureReindexer(new APIConnector(API_URL, API_VERSION, 100)).reindex(
         args[0],
-        Arrays.stream(args).skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));
+        Arrays.stream(args)
+            .skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));
   }
 }

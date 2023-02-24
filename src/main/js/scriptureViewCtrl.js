@@ -10,7 +10,7 @@ com.digitald4.biblical.ScriptureViewCtrl.prototype.refresh = function() {
     this.showScripture(this.reference.version, this.reference.book, this.reference.chapter, this.reference.verse);
   } else {
     this.reference.version = this.reference.version || this.globalData.scriptureVersion;
-    this.scriptureService.scriptures(this.reference, response => this.scriptures = response.items, notifyError);
+    this.scriptureService.scriptures(this.reference, response => this.scriptures = response.items);
   }
 }
 
@@ -21,7 +21,7 @@ com.digitald4.biblical.ScriptureViewCtrl.prototype.showScripture = function(vers
   this.reference.verse = verse;
 
   var request = {reference: book + ' ' + chapter + (verse ? ':' + verse : ''), version: verse ? undefined : version};
-  this.scriptureService.scriptures(request, response => this.scriptures = response.items, notifyError);
+  this.scriptureService.scriptures(request, response => this.scriptures = response.items);
 }
 
 com.digitald4.biblical.ScriptureViewCtrl.prototype.closeDialog = function() {

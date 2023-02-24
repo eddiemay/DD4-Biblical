@@ -7,6 +7,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.server.service.Empty;
+import com.digitald4.common.server.service.EntityServiceBulkImpl;
 import com.digitald4.common.server.service.EntityServiceImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.SessionStore;
@@ -33,9 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
     }
     // [END_EXCLUDE]
 )
-public class ScriptureService extends EntityServiceImpl<Scripture, String> {
-  public static final String DEFAULT_VERSION = "ISR";
-
+public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   private final ScriptureStore scriptureStore;
   private final ScriptureReferenceProcessor scriptureReferenceProcessor;
 
@@ -48,8 +47,8 @@ public class ScriptureService extends EntityServiceImpl<Scripture, String> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "scriptures")
-  public GetOrSearchResponse getScriptures(
-      @Named("reference") String reference, @Named("version") @Nullable String version) throws ServiceException {
+  public GetOrSearchResponse getScriptures(@Named("reference") String reference,
+      @Named("version") @Nullable String version) throws ServiceException {
     try {
       return scriptureStore.getScriptures(version, reference);
     } catch (DD4StorageException e) {
@@ -61,7 +60,8 @@ public class ScriptureService extends EntityServiceImpl<Scripture, String> {
   public GetOrSearchResponse search(
       @Named("searchText") String searchText, @Named("version") @Nullable String version,
       @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy,
-      @Named("pageSize") @DefaultValue("50") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken)
+      @Named("pageSize") @DefaultValue("50") int pageSize,
+      @Named("pageToken") @DefaultValue("1") int pageToken)
       throws ServiceException {
     try {
       return scriptureReferenceProcessor.matchesPattern(searchText)
@@ -74,8 +74,8 @@ public class ScriptureService extends EntityServiceImpl<Scripture, String> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
-  public Empty reindex(@Named("version") String version, @Named("book") String book, @Named("chapter") int chapter)
-      throws ServiceException {
+  public Empty reindex(@Named("version") String version, @Named("book") String book,
+      @Named("chapter") int chapter) throws ServiceException {
     try {
       scriptureStore.reindex(version, book, chapter);
       return Empty.getInstance();
@@ -85,9 +85,10 @@ public class ScriptureService extends EntityServiceImpl<Scripture, String> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "searchAndReplace")
-  public ImmutableList<Scripture> searchAndReplace(
-      @Named("phrase") String phrase, @Named("replacement") String replacement, @Named("filter") String filter,
-      @Named("preview") @Nullable boolean preview, @Named("idToken") @Nullable String idToken) throws ServiceException {
+  public ImmutableList<Scripture> searchAndReplace(@Named("phrase") String phrase,
+      @Named("replacement") String replacement, @Named("filter") String filter,
+      @Named("preview") @Nullable boolean preview, @Named("idToken") @Nullable String idToken)
+      throws ServiceException {
     try {
       resolveLogin(idToken, true);
       return scriptureStore.searchAndReplace(phrase, replacement, filter, preview);
@@ -97,8 +98,8 @@ public class ScriptureService extends EntityServiceImpl<Scripture, String> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "searchAndDelete")
-  public AtomicInteger searchAndDelete(
-      @Named("searchText") String searchText, @Named("idToken") @Nullable String idToken) throws ServiceException {
+  public AtomicInteger searchAndDelete(@Named("searchText") String searchText,
+      @Named("idToken") @Nullable String idToken) throws ServiceException {
     try {
       resolveLogin(idToken, true);
       return new AtomicInteger(scriptureStore.searchAndDelete(searchText));

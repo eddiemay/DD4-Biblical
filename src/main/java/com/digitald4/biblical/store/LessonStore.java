@@ -22,7 +22,7 @@ public class LessonStore extends GenericStore<Lesson, Long> {
   }
 
   public ImmutableList<Lesson> list(boolean allowDraft) {
-    return list(Query.forList().setOrderBys(Query.OrderBy.of("creation_time"))).getItems()
+    return list(Query.forList().setOrderBys(Query.OrderBy.of("creationTime"))).getItems()
         .stream()
         .filter(lesson -> allowDraft || lesson.getLatestPublishedVersionId() != null)
         .collect(toImmutableList());
@@ -31,7 +31,8 @@ public class LessonStore extends GenericStore<Lesson, Long> {
   private LessonVersion updateLatest(LessonVersion lessonVersion) {
     update(lessonVersion.getLessonId(), lesson -> {
       if (lessonVersion.isPublished()) {
-        lesson.setTitle(lessonVersion.getTitle()).setLatestPublishedVersionId(lessonVersion.getId());
+        lesson.setTitle(lessonVersion.getTitle())
+            .setLatestPublishedVersionId(lessonVersion.getId());
       }
       return lesson.setLatestVersionId(lessonVersion.getId());
     });
@@ -44,8 +45,8 @@ public class LessonStore extends GenericStore<Lesson, Long> {
     private final ScriptureMarkupProcessor markupProcessor;
 
     @Inject
-    public LessonVersionStore(
-        Provider<DAO> daoProvider, LessonStore lessonStore, ScriptureMarkupProcessor markupProcessor) {
+    public LessonVersionStore(Provider<DAO> daoProvider,
+        LessonStore lessonStore, ScriptureMarkupProcessor markupProcessor) {
       super(LessonVersion.class, daoProvider);
       this.lessonStore = lessonStore;
       this.markupProcessor = markupProcessor;
@@ -53,12 +54,12 @@ public class LessonStore extends GenericStore<Lesson, Long> {
 
     public LessonVersion getLatest(long lessonId, boolean allowDraft) {
       Lesson lesson = lessonStore.get(lessonId);
-      long latestId = allowDraft ? lesson.getLatestVersionId() : lesson.getLatestPublishedVersionId();
-      if (latestId == 0) {
+      long latest = allowDraft ? lesson.getLatestVersionId() : lesson.getLatestPublishedVersionId();
+      if (latest == 0) {
         return null;
       }
 
-      return get(latestId);
+      return get(latest);
     }
 
     @Override
@@ -67,6 +68,12 @@ public class LessonStore extends GenericStore<Lesson, Long> {
         lessonVersion.setLessonId(lessonStore.create(Lesson.create(lessonVersion)).getId());
       }
       return lessonStore.updateLatest(super.create(lessonVersion));
+    }
+
+    @Override
+    public ImmutableList<LessonVersion> create(Iterable<LessonVersion> entities) {
+      lessonStore.create(lessonStore.list(Query.forList()).getItems());
+      return super.create(entities);
     }
 
     @Override
@@ -82,13 +89,16 @@ public class LessonStore extends GenericStore<Lesson, Long> {
     }
 
     @Override
-    protected Iterable<LessonVersion> preprocess(Iterable<LessonVersion> entities, boolean isCreate) {
+    protected Iterable<LessonVersion> preprocess(Iterable<LessonVersion> items, boolean isCreate) {
       return super.preprocess(
-          stream(entities)
+          stream(items)
               .peek(
                   lessonVersion ->
-                      lessonVersion.setThemeText(markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
-                          .setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
+                      lessonVersion
+                          .setThemeText(
+                              markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
+                          .setContent(
+                              markupProcessor.replaceScriptures(lessonVersion.getContent())))
               .collect(toImmutableList()),
           isCreate);
     }

@@ -19,7 +19,7 @@ import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.QueryResult;
-import com.google.appengine.api.search.Index;
+import com.digitald4.common.storage.SearchIndexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -33,7 +33,7 @@ public class ScriptureStoreTest {
   private static final String VERSION = "ISR";
 
   @Mock private final DAO dao = mock(DAO.class);
-  @Mock private final Index searchIndex = mock(Index.class);
+  @Mock private final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   @Mock private final ScriptureFetcher scriptureFetcher = mock(ScriptureFetcher.class);
 
   private final ScriptureReferenceProcessor scriptureRefProcessor = new ScriptureReferenceProcessorSplitImpl();
@@ -41,7 +41,8 @@ public class ScriptureStoreTest {
 
   @Before
   public void setup() {
-    scriptureStore = new ScriptureStore(() -> dao, searchIndex, scriptureRefProcessor, scriptureFetcher);
+    scriptureStore =
+        new ScriptureStore(() -> dao, searchIndexer, scriptureRefProcessor, scriptureFetcher);
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).then(
         i -> getScriptures(i.getArgumentAt(1, Query.List.class)));

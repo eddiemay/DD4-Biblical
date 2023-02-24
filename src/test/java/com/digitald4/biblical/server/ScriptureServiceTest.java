@@ -20,14 +20,15 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 public class ScriptureServiceTest {
-  private static final ScriptureReferenceProcessor scriptureReferenceProcessor = new ScriptureReferenceProcessorSplitImpl();
+  private static final ScriptureReferenceProcessor scriptureRefProcessor =
+      new ScriptureReferenceProcessorSplitImpl();
   @Mock private final SessionStore<BasicUser> sessionStore = mock(SessionStore.class);
   @Mock private final ScriptureStore scriptureStore = mock(ScriptureStore.class);
   private ScriptureService scriptureService;
 
   @Before
   public void setup() {
-    scriptureService = new ScriptureService(scriptureStore, sessionStore, scriptureReferenceProcessor);
+    scriptureService = new ScriptureService(scriptureStore, sessionStore, scriptureRefProcessor);
   }
 
   @Test
@@ -71,7 +72,8 @@ public class ScriptureServiceTest {
                     .setText("Remember the sabbath day, keep it holy.")),
             null, null));
 
-    QueryResult<Scripture> result = scriptureService.search("Genesis 2:3, Exodus 20:8", "ISR", null, 200, 1);
+    QueryResult<Scripture> result =
+        scriptureService.search("Genesis 2:3, Exodus 20:8", "ISR", null, 200, 1);
 
     assertThat(result.getTotalSize()).isEqualTo(2);
   }
@@ -103,9 +105,11 @@ public class ScriptureServiceTest {
                     .setText("Elohim blessed the seventh day.")),
             1, i.getArgumentAt(0, Query.class)));
 
-    QueryResult<Scripture> result = scriptureService.search("Elohim blessed seventh", "ISR", null, 200, 1);
+    QueryResult<Scripture> result =
+        scriptureService.search("Elohim blessed seventh", "ISR", null, 200, 1);
 
     assertThat(result.getOrderBy()).isEqualTo(ScriptureStore.DEFAULT_ORDER_BY);
-    assertThat(((Query.Search) result.query()).getSearchText()).isEqualTo("Elohim blessed seventh version=ISR");
+    assertThat(((Query.Search) result.query()).getSearchText()).isEqualTo(
+        "Elohim blessed seventh version=ISR");
   }
 }

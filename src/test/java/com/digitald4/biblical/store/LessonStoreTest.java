@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import com.digitald4.biblical.model.Lesson;
 import com.digitald4.biblical.model.Lesson.LessonVersion;
 import com.digitald4.biblical.util.ScriptureMarkupProcessor;
+import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.DAOHelper;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,14 +34,14 @@ public class LessonStoreTest {
 
   private final static ScriptureMarkupProcessor SCRIPTURE_MARKUP_PROCESSOR = new ScriptureMarkupProcessor();
   @Mock private final Clock clock = mock(Clock.class);
-  private DAOTestingImpl dao;
+  private DAO dao;
   private LessonStore lessonStore;
   private LessonStore.LessonVersionStore versionStore;
 
   @Before
   public void setup() {
     AtomicLong TIME = new AtomicLong(60000L);
-    dao = new DAOTestingImpl(clock);
+    dao = new DAOHelper(new DAOTestingImpl(), clock, null);
     lessonStore = new LessonStore(() -> dao);
     versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore, SCRIPTURE_MARKUP_PROCESSOR);
     when(clock.millis()).thenAnswer(i -> TIME.incrementAndGet());
@@ -79,15 +81,15 @@ public class LessonStoreTest {
   @Test
   public void testCreateVersionAfterLesson() {
     Lesson lesson = lessonStore.create(new Lesson().setTitle(TITLE));
-    LessonVersion version =
-        versionStore.create(new LessonVersion().setLessonId(lesson.getId()).setTitle(TITLE).setYoutubeId("youtube123"));
+    LessonVersion version = versionStore.create(
+        new LessonVersion().setLessonId(lesson.getId()).setTitle(TITLE).setContent("words 123"));
 
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
     assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
     assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getYoutubeId()).isEqualTo("youtube123");
+    assertThat(version.getContent().toString()).isEqualTo("words 123");
 
     lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
@@ -101,14 +103,14 @@ public class LessonStoreTest {
   @Test
   public void testCanUpdateDraftVersion() {
     LessonVersion version = versionStore.create(new LessonVersion().setTitle(TITLE));
-    version = versionStore.update(version.getLessonId(), v -> v.setYoutubeId("youtube123"));
+    version = versionStore.update(version.getLessonId(), v -> v.setContent("words 123"));
 
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
     assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
     assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
-    assertThat(version.getYoutubeId()).isEqualTo("youtube123");
+    assertThat(version.getContent().toString()).isEqualTo("words 123");
 
     Lesson lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
@@ -122,14 +124,15 @@ public class LessonStoreTest {
   @Test
   public void testCanPublishVersion() {
     LessonVersion version = versionStore.create(new LessonVersion().setTitle(TITLE));
-    version = versionStore.update(version.getLessonId(), v -> v.setYoutubeId("youtube123").setPublished(true));
+    version = versionStore.update(
+        version.getLessonId(), v -> v.setContent("words 123").setPublished(true));
 
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
     assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
     assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
-    assertThat(version.getYoutubeId()).isEqualTo("youtube123");
+    assertThat(version.getContent().toString()).isEqualTo("words 123");
     assertThat(version.isPublished()).isTrue();
 
     Lesson lesson = lessonStore.get(version.getLessonId());
@@ -144,14 +147,14 @@ public class LessonStoreTest {
   @Test
   public void testUpdatePublishVersionCreatesNew() {
     LessonVersion version = versionStore.create(new LessonVersion().setTitle(TITLE).setPublished(true));
-    version = versionStore.update(version.getLessonId(), v -> v.setYoutubeId("youtube123"));
+    version = versionStore.update(version.getLessonId(), v -> v.setContent("words 123"));
 
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5003L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
     assertThat(version.getCreationTime().getMillis()).isEqualTo(60004L);
     assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
-    assertThat(version.getYoutubeId()).isEqualTo("youtube123");
+    assertThat(version.getContent().toString()).isEqualTo("words 123");
     assertThat(version.isPublished()).isFalse();
 
     Lesson lesson = lessonStore.get(version.getLessonId());

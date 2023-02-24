@@ -1,16 +1,26 @@
+var ONE_BCE = 3960;
+var VIEW_OPTIONS = {
+  AFTER_MAN_AND_COMMON_ERA: 'After Man + Common Era',
+  AFTER_MAN_ONLY: 'After Man Only',
+  COMMON_ERA_ONLY: 'Common Era Only'
+}
+
 com.digitald4.biblical.TimelineCtrl = function($location, $window, globalData, biblicalEventService) {
   this.locationProvider = $location;
   this.window = $window;
   this.globalData = globalData;
-  globalData.scriptureVersion = globalData.scriptureVersion || 'NWT';
+  this.globalData.scriptureVersion = globalData.scriptureVersion || 'NWT';
   this.months = HEBREW_MONTHS;
-  this.DEPENDENCY_RELATIONS = ['START_TO_START', 'FINISH_TO_START', 'START_TO_FINISH', 'FINISH_TO_FINISH'];
+  this.DEPENDENCY_RELATIONS =
+      ['START_TO_START', 'FINISH_TO_START', 'START_TO_FINISH', 'FINISH_TO_FINISH'];
+  this.viewOptions = VIEW_OPTIONS;
   this.biblicalEventService = biblicalEventService;
 
   this.jubilee = parseInt($location.search()['jubilee']) || 1;
   if (this.jubilee < 1) {
     this.jubilee = 1;
   }
+  this.view = $location.search()['view'] || VIEW_OPTIONS.AFTER_MAN_AND_COMMON_ERA;
   this.startYear = (this.jubilee - 1) * 50 + 1;
   this.endYear = this.jubilee * 50;
   this.refresh();
@@ -24,23 +34,48 @@ com.digitald4.biblical.TimelineCtrl.prototype.refresh = function() {
 	  for (var e = 0; e < events.length; e++) {
 	    var event = events[e];
 	    if (event.year <= this.endYear && event.endYear >= this.startYear) {
+	      if (this.view == VIEW_OPTIONS.AFTER_MAN_ONLY) {
+	        event.display = event.displayAmOnly;
+	      } else if (this.view == VIEW_OPTIONS.COMMON_ERA_ONLY) {
+	        event.display = event.displayEraOnly;
+	      }
 	      this.biblicalEvents.push(this.setMetadata(event));
 	    }
 	  }
 	  this.loading = undefined;
-	}, notifyError);
+	});
 
-	this.years = [];
+	var years = [];
 	for (var y = 0; y < 49;) {
-	  this.years.push({year: (this.startYear + y), display: '[', class: 'at-year-' + (++y)});
-	  this.years.push({year: (this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  this.years.push({year: (this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  this.years.push({year: (this.startYear + y), display: (this.startYear + y), class: 'at-year-' + (++y)});
-	  this.years.push({year: (this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  this.years.push({year: (this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  this.years.push({year: (this.startYear + y), display: ']', class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: '[', class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: this.getDisplayYear(this.startYear + y), class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
+	  years.push({year: this.getHoverText(this.startYear + y), display: ']', class: 'at-year-' + (++y)});
 	}
-	this.years.push({year: this.endYear, display: '🎉', class: 'at-year-50'});
+	years.push({year: this.getHoverText(this.endYear), display: '🎉', class: 'at-year-50'});
+	this.years = years;
+}
+
+com.digitald4.biblical.TimelineCtrl.prototype.getHoverText = function(year) {
+  var am = year + 'AM';
+  if (this.view == VIEW_OPTIONS.AFTER_MAN_ONLY) {
+    return am;
+  }
+
+  var era = (year <= ONE_BCE) ? (ONE_BCE + 1 - year) + 'BCE' : (year - ONE_BCE) + 'CE';
+  if (this.view == VIEW_OPTIONS.COMMON_ERA_ONLY) {
+    return era;
+  }
+
+  return am + ' (' + era + ')';
+}
+
+com.digitald4.biblical.TimelineCtrl.prototype.getDisplayYear = function(year) {
+  var era = (year <= ONE_BCE) ? (ONE_BCE + 1 - year) + 'BCE' : (year - ONE_BCE) + 'CE';
+  return this.view == VIEW_OPTIONS.COMMON_ERA_ONLY ? era : year + 'AM';
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.setMetadata = function(event) {
@@ -101,6 +136,10 @@ com.digitald4.biblical.TimelineCtrl.prototype.nextJubilee = function() {
   this.setJubilee();
 }
 
+com.digitald4.biblical.TimelineCtrl.prototype.setView = function() {
+  this.locationProvider.search('view', this.view);
+}
+
 com.digitald4.biblical.TimelineCtrl.prototype.showEvent = function(event) {
   this.event = event;
   this.viewDialogShown = true;
@@ -127,14 +166,14 @@ com.digitald4.biblical.TimelineCtrl.prototype.showEditDialog = function(event) {
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.readAll = function() {
-  this.biblicalEventService.listAll(response => Array.prototype.push.apply(this.allEvents, response.items), notifyError);
+  this.biblicalEventService.listAll(response => Array.prototype.push.apply(this.allEvents, response.items));
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.createEvent = function() {
 	this.biblicalEventService.create(this.editEvent, created => {
 	  this.refresh();
 	  this.closeDialog();
-	}, notifyError);
+	});
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.saveEvent = function() {
@@ -154,7 +193,7 @@ com.digitald4.biblical.TimelineCtrl.prototype.saveEvent = function() {
 	this.biblicalEventService.update(this.editEvent, edits, updated => {
 	  this.refresh();
 	  this.closeDialog();
-	}, notifyError);
+	});
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.updateAll = function() {
@@ -174,7 +213,7 @@ com.digitald4.biblical.TimelineCtrl.prototype.updateAll = function() {
   updateNext();
 	/* this.biblicalEventService.batchUpdate(this.biblicalEvents, ['title'], updated => {
 	  this.refresh();
-	}, notifyError); */
+	}); */
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.scriptureVersionChanged = function() {

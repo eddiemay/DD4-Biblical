@@ -1,7 +1,7 @@
 com.digitald4.biblical.ScriptureSelector = function(globalData, bookService) {
   this.globalData = globalData;
   this.bookService = bookService;
-  this.bookService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks, notifyError);
+  this.bookService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks);
   this.view = 'book';
   this.reference.toString = undefined;
 }
@@ -45,7 +45,7 @@ com.digitald4.biblical.ScriptureSelector.prototype.setChapter = function(chapter
   this.view = 'startVerse';
   if (!chapter.verses) {
     this.bookService.getVerseCount(
-        this.reference.book.name, chapter.number, verseCount => chapter.verseCount = verseCount, notifyError);
+        this.reference.book.name, chapter.number, verseCount => chapter.verseCount = verseCount);
   }
   this.updateToString();
 }

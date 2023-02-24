@@ -51,9 +51,10 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
         return kjv1611;
       case "EnochRef":
       case "essene":
+      case "M. R. James":
       case "qumran":
+      case "R. Ishmael":
       case "uchicago":
-      case "mrjames":
         return oneOff;
       case "OXFORD":
         return pseudepigrapha;

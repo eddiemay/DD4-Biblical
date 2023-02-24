@@ -1,8 +1,9 @@
-com.digitald4.biblical.LessonsCtrl = function($location, globalData, lessonService, scriptureService) {
-  this.locationProvider = $location;
+com.digitald4.biblical.LessonsCtrl =
+    function($location, $routeParams, $window, globalData, lessonService, scriptureService) {
+  this.window = $window;
   this.lessonService = lessonService;
   this.scriptureService = scriptureService;
-  this.lessonId = $location.search()['lesson'];
+  this.lessonId = $routeParams.id || $location.search()['lesson'];
   globalData.scriptureVersion = globalData.scriptureVersion || 'RSKJ';
   var allowDraft = globalData.activeSession != undefined;
   this.refresh(allowDraft);
@@ -11,24 +12,18 @@ com.digitald4.biblical.LessonsCtrl = function($location, globalData, lessonServi
 com.digitald4.biblical.LessonsCtrl.prototype.refresh = function(allowDraft) {
   this.lessonService.listLessons(allowDraft, response => {
     this.lessons = response.items;
-    if (allowDraft) {
-      for (var l = 0; l < this.lessons.length; l++) {
-        this.lessons[l].published = this.lessons[l].latestPublishedVersionId != undefined;
+    for (var l = 0; l < this.lessons.length; l++) {
+      var lesson = this.lessons[l];
+      lesson.url = '#lessons/' + lesson.id + '/' + lesson.title.replaceAll(' ', '_').replace('?', '');
+      if (allowDraft) {
+        lesson.published = lesson.latestPublishedVersionId != undefined;
       }
     }
-  }, notifyError);
+  });
 
   if (this.lessonId) {
     this.lessonService.latest(
-        this.lessonId, allowDraft, lesson => {this.renderLesson(lesson)}, notifyError);
-  }
-}
-
-com.digitald4.biblical.LessonsCtrl.prototype.showLesson = function(lesson) {
-  if (lesson.lessonId) {
-    this.locationProvider.search('lesson', lesson.lessonId);
-  } else {
-    this.locationProvider.search('lesson', lesson.id);
+        this.lessonId, allowDraft, lesson => {this.renderLesson(lesson)});
   }
 }
 
@@ -47,10 +42,11 @@ com.digitald4.biblical.LessonsCtrl.prototype.saveLesson = function(published) {
     this.lesson.id = this.lesson.lessonId;
     var props = ['title', 'content', 'published'];
     if (this.lesson.themeText) { props.push('themeText'); }
-    if (this.lesson.youtubeId) { props.push('youtubeId'); }
-    this.lessonService.update(this.lesson, props, lesson => {this.renderLesson(lesson)}, notifyError);
+    this.lessonService.update(this.lesson, props, lesson => {this.renderLesson(lesson)});
   } else {
-    this.lessonService.create(this.lesson, lesson => {this.showLesson(lesson)}, notifyError);
+    this.lessonService.create(this.lesson, lesson => {
+      this.window.location.href = '#lessons/' + lesson.id;
+    });
   }
 }
 

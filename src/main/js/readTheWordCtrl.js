@@ -35,7 +35,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
     } else {
       this.processSearchResult(response);
     }
-  }, notifyError);
+  });
 
   this.scriptures = [{text: this.reference.value}];
 }
@@ -45,7 +45,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.searchAndReplace = function(pre
   this.scriptureService.searchAndReplace(request, searchResult => {
     this.processSearchResult(searchResult);
     this.previewShown = preview ? true : undefined;
-  }, notifyError);
+  });
 
   this.scriptures = [{text: this.phrase + ' ' + this.filter}];
   this.searchShown = undefined;

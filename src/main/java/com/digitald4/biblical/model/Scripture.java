@@ -1,7 +1,10 @@
 package com.digitald4.biblical.model;
 
+import com.digitald4.common.model.ModelObject;
+import com.digitald4.common.model.Searchable;
+
 // Dave Nelson, Coonley,
-public class Scripture {
+public class Scripture implements ModelObject<String>, Searchable {
   private String version;
   private String book;
   private int chapter;
@@ -9,7 +12,12 @@ public class Scripture {
   private StringBuilder text;
 
   public String getId() {
-    return String.format("%s-%s-%d-%d", getVersion(), getBook().replace(" ", "_"), getChapter(), getVerse());
+    return String.format("%s-%s-%d-%d", getVersion(), getBook(), getChapter(), getVerse())
+        .replace(" ", "_");
+  }
+
+  public Scripture setId(String id) {
+    return this;
   }
 
   public String getVersion() {

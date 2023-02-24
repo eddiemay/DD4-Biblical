@@ -2,24 +2,12 @@ package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
-import com.digitald4.common.server.APIConnector;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
-public class ScriptureFetcherKJV1611Test {
-  @Mock private final APIConnector apiConnector = mock(APIConnector.class);
-  private ScriptureFetcher scriptureFetcher;
-
-  @Before
-  public void setup() {
-    scriptureFetcher = new ScriptureFetcherKJV1611(apiConnector);
-  }
+public class ScriptureFetcherKJV1611Test extends ScriptureFetcherTest {
 
   @Test
   public void fetch() {
@@ -82,7 +70,7 @@ public class ScriptureFetcherKJV1611Test {
             "</div>" +
             "</body></html>");
 
-    assertThat(scriptureFetcher.fetch("KJV1611", BibleBook.MACCABES_1, 4)).containsExactly(
+    assertThat(scriptureStore.getScriptures("KJV1611", "1 MACCABEES 4").getItems()).containsExactly(
         new Scripture().setVersion("KJV1611").setBook("1 Maccabees").setChapter(4).setVerse(1).setText(
             "Then tooke Gorgias fiue thousand footmen, and a thousand of the best horsemen, and remooued out of the campe by night:"),
         new Scripture().setVersion("KJV1611").setBook("1 Maccabees").setChapter(4).setVerse(2).setText(

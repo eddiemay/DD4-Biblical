@@ -2,26 +2,12 @@ package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
-import com.digitald4.common.server.APIConnector;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
-public class ScriptureFetcherJWOrgTest {
-  @Mock
-  private final APIConnector apiConnector = mock(APIConnector.class);
-  private ScriptureFetcher scriptureFetcher;
-
-  @Before
-  public void setup() {
-    scriptureFetcher = new ScriptureFetcherJWOrg(apiConnector);
-  }
-
+public class ScriptureFetcherJWOrgTest extends ScriptureFetcherTest {
   @Test
   public void fetch() {
     when(apiConnector.sendGet(anyString())).thenReturn(
@@ -33,7 +19,7 @@ public class ScriptureFetcherJWOrgTest {
             "\n" +
             "</div></body></html>");
 
-    assertThat(scriptureFetcher.fetch("NWT", BibleBook.Psalms, 117)).containsExactly(
+    assertThat(scriptureStore.getScriptures("NWT", "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("NWT").setBook("Psalms").setChapter(117).setVerse(1)
             .setText("Praise Jehovah, all you nations; Glorify him, all you peoples."),
         new Scripture().setVersion("NWT").setBook("Psalms").setChapter(117).setVerse(2)
