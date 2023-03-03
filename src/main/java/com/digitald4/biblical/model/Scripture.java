@@ -4,7 +4,7 @@ import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;
 
 // Dave Nelson, Coonley,
-public class Scripture implements ModelObject<String>, Searchable {
+public class Scripture extends ModelObject<String> implements Searchable {
   private String version;
   private String book;
   private int chapter;

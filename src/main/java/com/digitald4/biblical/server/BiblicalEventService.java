@@ -3,9 +3,8 @@ package com.digitald4.biblical.server;
 import com.digitald4.biblical.model.BiblicalEvent;
 import com.digitald4.biblical.store.BiblicalEventStore;
 import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.server.service.EntityServiceBulkImpl;
-import com.digitald4.common.storage.SessionStore;
+import com.digitald4.common.storage.LoginResolver;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
@@ -33,8 +32,8 @@ public class BiblicalEventService extends EntityServiceBulkImpl<Long, BiblicalEv
   private final BiblicalEventStore store;
 
   @Inject
-  BiblicalEventService(BiblicalEventStore store, SessionStore<BasicUser> sessionStore) {
-    super(store, sessionStore);
+  BiblicalEventService(BiblicalEventStore store, LoginResolver loginResolver) {
+    super(store, loginResolver);
     this.store = store;
   }
 

@@ -5,12 +5,10 @@ import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.ScriptureStore.GetOrSearchResponse;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.server.service.Empty;
 import com.digitald4.common.server.service.EntityServiceBulkImpl;
-import com.digitald4.common.server.service.EntityServiceImpl;
+import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.Query;
-import com.digitald4.common.storage.SessionStore;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
@@ -39,9 +37,9 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   private final ScriptureReferenceProcessor scriptureReferenceProcessor;
 
   @Inject
-  ScriptureService(ScriptureStore scriptureStore, SessionStore<BasicUser> sessionStore,
+  ScriptureService(ScriptureStore scriptureStore, LoginResolver loginResolver,
                    ScriptureReferenceProcessor scriptureReferenceProcessor) {
-    super(scriptureStore, sessionStore);
+    super(scriptureStore, loginResolver);
     this.scriptureStore = scriptureStore;
     this.scriptureReferenceProcessor = scriptureReferenceProcessor;
   }

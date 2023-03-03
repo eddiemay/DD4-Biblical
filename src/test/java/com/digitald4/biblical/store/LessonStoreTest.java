@@ -41,7 +41,7 @@ public class LessonStoreTest {
   @Before
   public void setup() {
     AtomicLong TIME = new AtomicLong(60000L);
-    dao = new DAOHelper(new DAOTestingImpl(), clock, null);
+    dao = new DAOHelper(new DAOTestingImpl(), clock, null, null, null);
     lessonStore = new LessonStore(() -> dao);
     versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore, SCRIPTURE_MARKUP_PROCESSOR);
     when(clock.millis()).thenAnswer(i -> TIME.incrementAndGet());
@@ -152,7 +152,7 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5003L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60004L);
+    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
     assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
     assertThat(version.getContent().toString()).isEqualTo("words 123");
     assertThat(version.isPublished()).isFalse();

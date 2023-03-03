@@ -7,11 +7,10 @@ import com.google.api.server.spi.config.ApiResourceProperty;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BiblicalEvent implements ModelObject<Long> {
+public class BiblicalEvent extends ModelObject<Long> {
   private static final Pattern DURATION_PATTERN = Pattern.compile("(-?\\d+)([ymd])");
   private static final int ONE_BCE = 3960;
 
-  private Long id;
   private String title;
   private StringBuilder summary;
   private int month;
@@ -23,13 +22,8 @@ public class BiblicalEvent implements ModelObject<Long> {
   private Duration duration;
   private Integer endYear;
 
-  @Override
-  public Long getId() {
-    return id;
-  }
-
   public BiblicalEvent setId(Long id) {
-    this.id = id;
+    super.setId(id);
     return this;
   }
 

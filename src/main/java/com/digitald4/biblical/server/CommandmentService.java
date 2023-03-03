@@ -3,11 +3,10 @@ package com.digitald4.biblical.server;
 import com.digitald4.biblical.model.Commandment;
 import com.digitald4.biblical.store.CommandmentStore;
 import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.server.service.EntityServiceImpl;
+import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.QueryResult;
-import com.digitald4.common.storage.SessionStore;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 
@@ -25,8 +24,8 @@ public class CommandmentService extends EntityServiceImpl<Commandment, Long> {
   private final CommandmentStore store;
 
   @Inject
-  CommandmentService(CommandmentStore store, SessionStore<BasicUser> sessionStore) {
-    super(store, sessionStore);
+  CommandmentService(CommandmentStore store, LoginResolver loginResolver) {
+    super(store, loginResolver);
     this.store = store;
   }
 

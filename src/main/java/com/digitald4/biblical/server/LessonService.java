@@ -5,9 +5,8 @@ import com.digitald4.biblical.model.Lesson.LessonVersion;
 import com.digitald4.biblical.store.LessonStore;
 import com.digitald4.biblical.store.LessonStore.LessonVersionStore;
 import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.server.service.EntityServiceImpl;
-import com.digitald4.common.storage.SessionStore;
+import com.digitald4.common.storage.LoginResolver;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
@@ -34,8 +33,9 @@ public class LessonService extends EntityServiceImpl<LessonVersion, Long> {
   private final LessonVersionStore lessonVersionStore;
 
   @Inject
-  LessonService(LessonStore lessonStore, LessonVersionStore lessonVersionStore, SessionStore<BasicUser> sessionStore) {
-    super(lessonVersionStore, sessionStore);
+  LessonService(
+      LessonStore lessonStore, LessonVersionStore lessonVersionStore, LoginResolver loginResolver) {
+    super(lessonVersionStore, loginResolver);
     this.lessonStore = lessonStore;
     this.lessonVersionStore = lessonVersionStore;
   }
