@@ -10,6 +10,7 @@ com.digitald4.biblical.LessonsCtrl =
 }
 
 com.digitald4.biblical.LessonsCtrl.prototype.refresh = function(allowDraft) {
+  this.loading = true;
   this.lessonService.listLessons(allowDraft, response => {
     this.lessons = response.items;
     for (var l = 0; l < this.lessons.length; l++) {
@@ -18,6 +19,7 @@ com.digitald4.biblical.LessonsCtrl.prototype.refresh = function(allowDraft) {
       if (allowDraft) {
         lesson.published = lesson.latestPublishedVersionId != undefined;
       }
+      this.loading = undefined;
     }
   });
 

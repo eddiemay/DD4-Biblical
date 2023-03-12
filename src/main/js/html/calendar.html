@@ -168,8 +168,8 @@
           <input type="text" data-ng-model="$ctrl.editEvent.title" class="full-width">
         </div>
         <div class="columns">
-          <label>Scripture References</label>
-          <textarea data-ng-model="$ctrl.editEvent.references" rows="2" class="full-width"></textarea>
+          <label>Summary</label>
+          <textarea data-ng-model="$ctrl.editEvent.summary" rows="2" class="full-width"></textarea>
         </div>
         <button data-ng-if="$ctrl.editEvent.id" data-ng-click="$ctrl.saveEvent()">Save</button>
         <button data-ng-if="!$ctrl.editEvent.id" data-ng-click="$ctrl.createEvent()">Create</button>

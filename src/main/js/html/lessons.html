@@ -28,6 +28,7 @@
       </div>
       <div class="block-content form">
         <h1>Lessons</h1>
+        <p data-ng-if="$ctrl.loading">Loading...</p>
         <ol>
           <li data-ng-repeat="lesson in $ctrl.lessons" style="padding-bottom: 8px">
             <a href="{{lesson.url}}">

@@ -1,9 +1,9 @@
 HolyDay = function(title, cssClass, matcher, references, summary) {
-  this.title = title;
+  this.title = this.display = title;
   this.cssClass = cssClass;
   this.matches = matcher;
   this.references = references;
-  this.summary = summary;
+  this.summary = summary || '<inline-scripture ref="' + references + '"/>';
 }
 
 HolyDay.prototype.title;
