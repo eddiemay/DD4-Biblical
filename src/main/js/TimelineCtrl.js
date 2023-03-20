@@ -220,7 +220,6 @@ com.digitald4.biblical.TimelineCtrl.prototype.scriptureVersionChanged = function
   this.event.summary = this.event.summary + ' ';
 }
 
-
 com.digitald4.biblical.TimelineCtrl.prototype.closeDialog = function() {
   this.viewDialogShown = undefined;
   this.editDialogShown = undefined;

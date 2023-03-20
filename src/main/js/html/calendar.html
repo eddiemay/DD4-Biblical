@@ -60,7 +60,17 @@
           </tbody>
         </table>
       </div>
-      <ul class="message no-margin"><li>{{$ctrl.biblicalEvents.length}} Biblical events found</li></ul>
+      <ul class="message no-margin">
+        <li>{{$ctrl.biblicalEvents.length}} Biblical events found</li>
+        <li> Show:
+          <input type="checkbox" data-ng-model="$ctrl.showBiblicalEvents"
+                 data-ng-change="$ctrl.setView('showBiblicalEvents')">Biblical Events
+          <input type="checkbox" data-ng-model="$ctrl.showImages"
+                 data-ng-change="$ctrl.setView('showImages')">Images
+          <input type="checkbox" data-ng-model="$ctrl.showFeastDays"
+                 data-ng-change="$ctrl.setView('showFeastDays')">Feast Days
+        </li>
+      </ul>
     </div>
     <a href="https://drive.google.com/file/d/1sc4Zs6X8i_gH0c0zDZFy30hY2KyWf8h0/view" target="_blank">
       2022 Printable Calendar

@@ -19,7 +19,9 @@ com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, b
 
   var year = parseInt($location.search()['year']);
   var month = parseInt($location.search()['month']) || 1;
-  this.disableNet = $location.search()['disableNet'];
+  this.showBiblicalEvents = $location.search()['showBiblicalEvents'] != false;
+  this.showImages = $location.search()['showImages'] != false;
+  this.showFeastDays = $location.search()['showFeastDays'] != false;
   this.hebrewDate = year ? new HebrewDate(year, month, 1) : HebrewDate.fromDate(new Date());
   this.hebrewDate = this.hebrewDate.addDays(1 - this.hebrewDate.getDay());
   this.refresh();
@@ -46,7 +48,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.setupCalendar = function() {
       var day = {
         date: currDay,
         day: (currDay.getDay() != 31 && currDay.getMonth() != 13) ? currDay.getDay() : undefined,
-        holyDay: holyDay,
+        holyDay: this.showFeastDays ? holyDay : undefined,
         classes: {
           'even-reference-month': currDay.getDate().getMonth() % 2 == 0,
           'other-month': currDay.getMonth() != hebrewDate.getMonth(),
@@ -56,7 +58,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.setupCalendar = function() {
         biblicalEvents: [],
         notifications: []
       };
-      if (holyDay) {
+      if (holyDay && this.showImages) {
         day.classes[holyDay.cssClass] = true;
       }
       weekdays.push(day);
@@ -73,9 +75,11 @@ com.digitald4.biblical.CalendarCtrl.prototype.setupCalendar = function() {
 com.digitald4.biblical.CalendarCtrl.prototype.refresh = function() {
 	this.biblicalEvents = [];
 	this.setupCalendar();
-	if (this.disableNet) {
+
+	if (!this.showBiblicalEvents) {
 	  return;
 	}
+
 	this.biblicalEventService.listCalendarEvents(this.hebrewDate.month, response => {
 	  var biblicalEvents = response.items || [];
 	  var firstDayOffset = this.getFirstDayOffset();
@@ -124,6 +128,10 @@ com.digitald4.biblical.CalendarCtrl.prototype.showMonthSelectionDialog = functio
   this.monthSelection = {year: this.hebrewDate.getYear(), month: this.hebrewDate.getMonth()};
   this.dialogShown = 'SELECT_MONTH';
   this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
+}
+
+com.digitald4.biblical.CalendarCtrl.prototype.setView = function(prop) {
+  this.locationProvider.search(prop, this[prop] ? undefined : false);
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.selectMonth = function() {
