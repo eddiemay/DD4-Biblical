@@ -3,12 +3,13 @@ package com.digitald4.biblical.tools;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.util.*;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 
 public class ScripturePrinter {
   public static void main(String[] args) {
     String version = "ISR";
-    DAOTestingImpl dao = new DAOTestingImpl();
+    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, null, null));
     APIConnector apiConnector = new APIConnector(null, null, 100);
     ScriptureStore scriptureStore = new ScriptureStore(
         () -> dao, null,

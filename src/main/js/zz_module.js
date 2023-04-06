@@ -108,10 +108,6 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     return {
       controller: com.digitald4.biblical.CalendarCtrl,
       restrict: 'AE',
-      scope: {
-        config: '=',
-        onUpdate: '&'
-      },
       templateUrl: 'js/html/calendar.html'
     };
   }])

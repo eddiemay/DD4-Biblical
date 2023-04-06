@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 import com.digitald4.biblical.model.Lesson;
 import com.digitald4.biblical.model.Lesson.LessonVersion;
 import com.digitald4.biblical.util.ScriptureMarkupProcessor;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAO;
-import com.digitald4.common.storage.DAOHelper;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class LessonStoreTest {
   @Before
   public void setup() {
     AtomicLong TIME = new AtomicLong(60000L);
-    dao = new DAOHelper(new DAOTestingImpl(), clock, null, null, null);
+    dao = new DAOTestingImpl(new ChangeTracker(() -> dao, null, null, clock));
     lessonStore = new LessonStore(() -> dao);
     versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore, SCRIPTURE_MARKUP_PROCESSOR);
     when(clock.millis()).thenAnswer(i -> TIME.incrementAndGet());

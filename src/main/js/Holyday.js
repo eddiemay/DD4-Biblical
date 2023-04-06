@@ -6,26 +6,20 @@ HolyDay = function(title, cssClass, matcher, references, summary) {
   this.summary = summary || '<inline-scripture ref="' + references + '"/>';
 }
 
-HolyDay.prototype.title;
-HolyDay.prototype.cssClass;
-HolyDay.prototype.matches;
-HolyDay.prototype.references;
-HolyDay.prototype.summary;
-
 var SEPARATE_DAYS = 'Enoch 75:1-2';
 
 HolyDay.HOLY_DAYS = {
   PASSOVER: new HolyDay('Passover', 'passover', date => date.getMonth() == 1 && date.getDay() == 14,
       'Exodus 12:6, Leviticus 23:5, Numbers 28:16, Deuteronomy 16:1, Jubilees 49:10'),
 
+  FESTIVAL_UNLEAVENED_BREAD: new HolyDay('Festival of Unleavened Bread', 'unleavened-bread',
+      date => date.getMonth() == 1 && date.getDay() >= 15 && date.getDay() <= 21, 'Leviticus 23:6-8'),
+  WEAVE_OFFERING: new HolyDay('Weave Offering', 'weave-offering', date => date.getDayOfYear() == 22,
+      'Leviticus 23:10-14'),
+
   PASSOVER_MAKEUP: new HolyDay('Passover Makeup', 'passover-makeup',
       date => date.getMonth() == 2 && date.getDay() == 14, 'Numbers 9:9-13'),
 
-  FESTIVAL_UNLEAVENED_BREAD: new HolyDay('Festival of Unleavened Bread', 'unleavened-bread',
-      date => date.getMonth() == 1 && date.getDay() >= 15 && date.getDay() <= 21, 'Leviticus 23:6-8'),
-
-  WEAVE_OFFERING: new HolyDay('Weave Offering', 'weave-offering', date => date.getDayOfYear() == 22,
-      'Leviticus 23:10-14'),
   FEAST_FIRST_FRUITS: new HolyDay('Feast of First Fruits', 'first-fruits', date => date.getDayOfYear() == 21 + 50,
       'Leviticus 23:15-21,Deuteronomy 16:9-12,Jubilees 6:1,17'),
 

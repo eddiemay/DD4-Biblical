@@ -4,6 +4,8 @@ import static org.mockito.Mockito.mock;
 
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
+import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,11 +14,12 @@ import org.mockito.Mock;
 
 public class ScriptureFetcherTest {
   @Mock protected final APIConnector apiConnector = mock(APIConnector.class);
+  @Mock final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   protected ScriptureStore scriptureStore;
 
   @Before
   public void setup() {
-    DAOTestingImpl dao = new DAOTestingImpl();
+    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, searchIndexer, null));
     scriptureStore = new ScriptureStore(
         () -> dao, null,
         new ScriptureReferenceProcessorSplitImpl(),
