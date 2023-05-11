@@ -4,6 +4,11 @@ var VIEW_OPTIONS = {
   AFTER_MAN_ONLY: 'After Man Only',
   COMMON_ERA_ONLY: 'Common Era Only'
 }
+var YEAR_BOUND = {
+  JUBILEE: {name: 'Jubilee', years: 50, abb: 'j'},
+  CENTURY: {name: 'Century', years: 100, abb: 'c'},
+  MILLENNIUM: {name: 'Millennium', years: 1000, abb: 'm'}
+}
 
 com.digitald4.biblical.TimelineCtrl = function($location, $window, globalData, biblicalEventService) {
   this.locationProvider = $location;
@@ -14,15 +19,27 @@ com.digitald4.biblical.TimelineCtrl = function($location, $window, globalData, b
   this.DEPENDENCY_RELATIONS =
       ['START_TO_START', 'FINISH_TO_START', 'START_TO_FINISH', 'FINISH_TO_FINISH'];
   this.viewOptions = VIEW_OPTIONS;
+  this.yearBound = YEAR_BOUND;
   this.biblicalEventService = biblicalEventService;
 
-  this.jubilee = parseInt($location.search()['jubilee']) || 1;
-  if (this.jubilee < 1) {
-    this.jubilee = 1;
+  this.offset = $location.search()['offset'] || '1j';
+
+  var jubilee = parseInt($location.search()['jubilee']);
+  if (jubilee > 1) {
+    this.offset = jubilee + 'j';
   }
+  var abb = this.offset.substring(this.offset.length - 1);
+  for (var prop in YEAR_BOUND) {
+    var yearBound = YEAR_BOUND[prop];
+    if (yearBound.abb == abb) {
+      this.offsetUnit = yearBound;
+      break;
+    }
+  }
+  this.offsetValue = parseInt(this.offset.substring(0, this.offset.length - 1));
   this.view = $location.search()['view'] || VIEW_OPTIONS.AFTER_MAN_AND_COMMON_ERA;
-  this.startYear = (this.jubilee - 1) * 50 + 1;
-  this.endYear = this.jubilee * 50;
+  this.startYear = (this.offsetValue - 1) * this.offsetUnit.years + 1;
+  this.endYear = this.offsetValue * this.offsetUnit.years;
   this.refresh();
 }
 
@@ -46,16 +63,22 @@ com.digitald4.biblical.TimelineCtrl.prototype.refresh = function() {
 	});
 
 	var years = [];
-	for (var y = 0; y < 49;) {
-	  years.push({year: this.getHoverText(this.startYear + y), display: '[', class: 'at-year-' + (++y)});
-	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  years.push({year: this.getHoverText(this.startYear + y), display: this.getDisplayYear(this.startYear + y), class: 'at-year-' + (++y)});
-	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  years.push({year: this.getHoverText(this.startYear + y), display: '|', class: 'at-year-' + (++y)});
-	  years.push({year: this.getHoverText(this.startYear + y), display: ']', class: 'at-year-' + (++y)});
-	}
-	years.push({year: this.getHoverText(this.endYear), display: '🎉', class: 'at-year-50'});
+	var displayYears = this.offsetUnit.years;
+	for (var y = 0; y < displayYears; y++) {
+	  var year = this.startYear + y;
+	  var percentLeft = y * 100 / displayYears;
+	  var style = {left: percentLeft + '%'};
+	  var hoverText = this.getHoverText(year);
+	  if (year % 50 == 0) {
+	    years.push({year: hoverText, display: '🎉', style: style});
+	  /* } else if (percentLeft % 7 == 0) {
+	    years.push(
+	        {year: hoverText, display: this.getDisplayYear(year), style: style}); */
+	  } else {
+	    years.push({year: hoverText, display: '|', style: style});
+	  }
+  }
+	//
 	this.years = years;
 }
 
@@ -99,9 +122,9 @@ com.digitald4.biblical.TimelineCtrl.prototype.getLeftPercent = function(event) {
     return 0;
   }
 
-  var indexYear = ((event.year - 1) % 50) + 1;
+  var indexYear = ((event.year - 1) % this.offsetUnit.years) + 1;
   indexYear += event.month / 12.0 + event.day / 364.0;
-  return (indexYear - 1) * 2;
+  return (indexYear - 1) * 100 / this.offsetUnit.years;
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.getRightPercent = function(event) {
@@ -109,31 +132,37 @@ com.digitald4.biblical.TimelineCtrl.prototype.getRightPercent = function(event) 
     return undefined;
   }
 
-  if (event.endYear > this.endYear) {
+  if (event.endYear >= this.endYear) {
     return 0;
   }
 
-  var right = event.endYear == this.endYear ? 50 : event.endYear % 50;
-  return 100 - (right - 1) * 2;
+  var right = event.endYear % this.offsetUnit.years;
+  return 100 - (right - 1) * 100 / this.offsetUnit.years;
 }
 
-com.digitald4.biblical.TimelineCtrl.prototype.prevJubilee = function() {
-  this.jubilee = this.jubilee - 1;
-  this.setJubilee();
+com.digitald4.biblical.TimelineCtrl.prototype.prevValue = function() {
+  this.offsetValue = this.offsetValue - 1;
+  this.setValue();
 }
 
-com.digitald4.biblical.TimelineCtrl.prototype.setJubilee = function() {
-  if (this.jubilee < 1) {
-    this.jubilee = 1;
-  } else if (this.jubilee > 150) {
-    this.jubilee = 150;
+com.digitald4.biblical.TimelineCtrl.prototype.setValue = function() {
+  if (this.offsetValue < 1) {
+    this.offsetValue = 1;
+  } else if (this.offsetValue * this.offsetUnit.years > 6000) {
+    this.offsetValue = 6000 / this.offsetUnit.years;
   }
-  this.locationProvider.search('jubilee', this.jubilee);
+  this.locationProvider.search(
+      'offset', this.offsetValue + this.offsetUnit.abb);
 }
 
-com.digitald4.biblical.TimelineCtrl.prototype.nextJubilee = function() {
-  this.jubilee = this.jubilee + 1;
-  this.setJubilee();
+com.digitald4.biblical.TimelineCtrl.prototype.nextValue = function() {
+  this.offsetValue = this.offsetValue + 1;
+  this.setValue();
+}
+
+com.digitald4.biblical.TimelineCtrl.prototype.setUnit = function() {
+  this.offsetValue = parseInt(this.startYear / this.offsetUnit.years) + 1;
+  this.setValue();
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.setView = function() {
@@ -166,7 +195,8 @@ com.digitald4.biblical.TimelineCtrl.prototype.showEditDialog = function(event) {
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.readAll = function() {
-  this.biblicalEventService.listAll(response => Array.prototype.push.apply(this.allEvents, response.items));
+  this.biblicalEventService.listAll(
+      response => Array.prototype.push.apply(this.allEvents, response.items));
 }
 
 com.digitald4.biblical.TimelineCtrl.prototype.createEvent = function() {

@@ -1,5 +1,5 @@
-com.digitald4.biblical.LessonsCtrl =
-    function($location, $routeParams, $window, globalData, lessonService, scriptureService) {
+com.digitald4.biblical.LessonsCtrl = function($location, $routeParams, $window,
+    globalData, lessonService, scriptureService) {
   this.window = $window;
   this.lessonService = lessonService;
   this.scriptureService = scriptureService;

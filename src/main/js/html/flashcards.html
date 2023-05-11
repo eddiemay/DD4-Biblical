@@ -1,0 +1,36 @@
+<section class="grid_8 block-content">
+  <h1>Hebrew Flash Cards</h1>
+  <div id="tab-global" class="tabs-content">
+    <ul class="tabs js-tabs same-height">
+      <li data-ng-repeat="tab in $ctrl.tabs" data-ng-class="{current: $ctrl.selectedTab == tab}">
+        <a href="" data-ng-click="$ctrl.setSelectedTab(tab)" title="{{tab}}">{{tab}}</a>
+      </li>
+    </ul>
+    <div class="tabs-content">
+      <div data-ng-if="$ctrl.selectedTab == 'Review'">
+        <h3>Name</h3>
+        <p style="font-size: x-large">{{$ctrl.card.name}}</p>
+        <h3>Modern</h3>
+        <p style="font-size: x-large">{{$ctrl.card.modern}}</p>
+        <h3>Paleo</h3>
+        <p style="font-size: x-large">{{$ctrl.card.paleo}}</p>
+        <h3>Ancient:</h3>
+        <p style="font-size: x-large">{{$ctrl.card.ancient}}</p>
+        <h3>English</h3>
+        <p style="font-size: x-large">{{$ctrl.card.english}}</p>
+        <h3>Meaning</h3>
+        <p style="font-size: x-large">{{$ctrl.card.meaning}}</p>
+        <div class="columns">
+          <div class="colx2-left">
+            <button data-ng-click="$ctrl.prevCard()">Prev</button>
+          </div>
+          <div class="colx2-right">
+            <button data-ng-click="$ctrl.nextCard()">Next</button>
+          </div>
+        </div>
+      </div>
+      <div data-ng-if="$ctrl.selectedTab == 'Test'">
+      </div>
+    </div>
+  </div>
+</section>

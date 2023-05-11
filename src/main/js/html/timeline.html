@@ -4,19 +4,21 @@
 
     <div class="block-controls">
       <ul class="controls-buttons">
-        <li><h2>Jubilee</h2></li>
+        <li><select data-ng-model="$ctrl.offsetUnit" data-ng-change="$ctrl.setUnit()"
+                    data-ng-options="unit.name for unit in $ctrl.yearBound"></select></li>
         <li>
-          <a href="" data-ng-click="$ctrl.prevJubilee()" title="Previous Jubilee">
+          <a href="" data-ng-click="$ctrl.prevValue()" title="Previous Value">
             <img src="images/icons/fugue/navigation-180.png" width="16" height="16">
           </a>
         </li>
         <li class="sep"></li>
         <li class="controls-block">
-          <input type="number" min="1" max="150" data-ng-model="$ctrl.jubilee" data-on-change="$ctrl.setJubilee()" />
+          <input type="number" min="1" max="150" data-ng-model="$ctrl.offsetValue"
+                 data-on-change="$ctrl.setValue()" />
         </li>
         <li class="sep"></li>
         <li>
-          <a href="" data-ng-click="$ctrl.nextJubilee()" title="Next Jubilee">
+          <a href="" data-ng-click="$ctrl.nextValue()" title="Next Value">
             <img src="images/icons/fugue/navigation.png" width="16" height="16">
           </a>
         </li>
@@ -26,7 +28,7 @@
     <ul class="timeline no-margin">
       <li class="timeline-header">
         <ul>
-          <li data-ng-repeat="year in $ctrl.years" data-ng-class="year.class" title="{{year.year}}">
+          <li data-ng-repeat="year in $ctrl.years" data-ng-style="year.style" title="{{year.year}}">
             {{year.display}}
           </li>
         </ul>

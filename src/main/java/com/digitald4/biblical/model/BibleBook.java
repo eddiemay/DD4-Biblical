@@ -96,7 +96,6 @@ public class BibleBook {
       new BibleBook(63, "2 John", "Canon,NT,Letters,John", 1, "2Jo", "2Jn", "2 Yochanan"),
       new BibleBook(64, "3 John", "Canon,NT,Letters,John", 1, "3Jo", "3Jn", "3 Yochanan"),
       Jude = new BibleBook(65, "Jude", "Canon,NT,Letters", 1, "Jud", "Jd", "Yahudah"),
-
       new BibleBook(66, "Revelation", "Canon,NT,Prophecy", 22, "Rev", "Re", "Revelations", "Hagilu Natan Elohim\t"));
 
   public static final BibleBook ESDRAS_1 = new BibleBook(67, "1 Esdras", "Apocrypha,Deuterocanon,Eastern,Esdras,Ezra", 9);
@@ -149,7 +148,8 @@ public class BibleBook {
       new BibleBook(87, "3 Enoch", "Apocrypha,Enoch", 48, "3 Hanok", "3 Eno");
   public static final BibleBook GIANTS =
       new BibleBook(88, "Book of Giants", "Apocrypha,Enoch", 48, "Giants");
-  public static final BibleBook JUBILEES = new BibleBook(89, "Jubilees", "Apocrypha,Deuterocanon,Ethiopian", 50, "Jub");
+  public static final BibleBook JUBILEES =
+      new BibleBook(89, "Jubilees", "Apocrypha,Deuterocanon,Ethiopian", 50, "Jub");
   public static final ImmutableList<BibleBook> ETHIOPIAN_ORTHODOX_DEUTEROCANON =
       ImmutableList.of(ESDRAS_2, ENOCH, JUBILEES);
 
