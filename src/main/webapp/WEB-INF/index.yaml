@@ -24,3 +24,11 @@ indexes:
       - name: month
       - name: day
       - name: year
+  - kind: HighScore
+    properties:
+    - name: game
+    - name: config
+    - name: score
+      direction: desc
+    - name: elapsedTime
+    - name: startTime

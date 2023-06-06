@@ -51,8 +51,9 @@ public class BookService {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "verseCount")
-  public AtomicInteger getVerseCount(@Named("book") String book, @Named("chapter") int chapter,
-                                     @Named("version") @Nullable String version) throws ServiceException {
+  public AtomicInteger getVerseCount(
+      @Named("book") String book, @Named("chapter") int chapter,
+      @Named("version") @Nullable String version) throws ServiceException {
     try {
       return new AtomicInteger(
           scriptureStore.getScriptures(version, book + " " + chapter).getItems().stream()

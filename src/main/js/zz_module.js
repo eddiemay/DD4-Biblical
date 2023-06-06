@@ -44,6 +44,16 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .service('commandmentService', function(apiConnector) {
     return new com.digitald4.common.JSONService('commandment', apiConnector)
   })
+  .service('highScoreService', function(apiConnector) {
+    var highScoreService =
+        new com.digitald4.common.JSONService('highscore', apiConnector);
+    highScoreService.list = function(game, config, pageSize, pageToken, success, error) {
+      highScoreService.sendRequest(
+        {action: 'list', params: {game: game, config: config, pageSize: 20}},
+        success, error);
+    };
+    return highScoreService;
+  })
   .service('holyDayService', function(apiConnector) {
     return new com.digitald4.common.JSONService('holyDay', apiConnector);
   })

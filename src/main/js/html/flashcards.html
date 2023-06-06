@@ -1,4 +1,4 @@
-<section class="grid_8 block-content">
+<section class="grid_12 block-content">
   <h1>Hebrew Flash Cards</h1>
   <div id="tab-global" class="tabs-content">
     <ul class="tabs js-tabs same-height">
@@ -9,17 +9,23 @@
     <div class="tabs-content">
       <div data-ng-if="$ctrl.selectedTab == 'Review'">
         <h3>Name</h3>
-        <p style="font-size: x-large">{{$ctrl.card.name}}</p>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.name}}</p>
         <h3>Modern</h3>
-        <p style="font-size: x-large">{{$ctrl.card.modern}}</p>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.modern}}</p>
         <h3>Paleo</h3>
-        <p style="font-size: x-large">{{$ctrl.card.paleo}}</p>
-        <h3>Ancient:</h3>
-        <p style="font-size: x-large">{{$ctrl.card.ancient}}</p>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.paleo}}</p>
+        <h3>Ancient</h3>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.ancient}}</p>
         <h3>English</h3>
-        <p style="font-size: x-large">{{$ctrl.card.english}}</p>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.english}}</p>
+        <h3>Samaritan</h3>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.samaritan}}</p>
+        <h3>Arabic</h3>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.arabic}}</p>
+        <h3>Value</h3>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.value}}</p>
         <h3>Meaning</h3>
-        <p style="font-size: x-large">{{$ctrl.card.meaning}}</p>
+        <p style="font-size: x-large;margin-bottom: .5em;">{{$ctrl.card.meaning}}</p>
         <div class="columns">
           <div class="colx2-left">
             <button data-ng-click="$ctrl.prevCard()">Prev</button>
@@ -30,6 +36,114 @@
         </div>
       </div>
       <div data-ng-if="$ctrl.selectedTab == 'Test'">
+        <div data-ng-if="$ctrl.test.state == $ctrl.testStates.NOT_STARTED">
+          <h3>Your name</h3>
+          <input type="text" data-ng-model="$ctrl.test.name" />
+          <h3>Question Set</h3>
+          <select data-ng-model="$ctrl.test.questionSet"
+                  data-ng-options="option for option in $ctrl.testOptions"
+                  data-ng-change="$ctrl.refreshHighScoreList()">
+          </select>
+          <h3>Answer Set</h3>
+          <select data-ng-model="$ctrl.test.answerSet"
+                  data-ng-options="option for option in $ctrl.testOptions"
+                  data-ng-change="$ctrl.refreshHighScoreList()">
+          </select>
+          <h3>Difficulty</h3>
+          <select data-ng-model="$ctrl.test.difficulty"
+                  data-ng-options="option for option in $ctrl.difficulty"
+                  data-ng-change="$ctrl.refreshHighScoreList()">
+          </select>
+          <h3>Question Order</h3>
+          <select data-ng-model="$ctrl.test.order"
+                  data-ng-options="option for option in $ctrl.order"
+                  data-ng-change="$ctrl.refreshHighScoreList()">
+          </select>
+          <p style="font-size: x-large"></p>
+          <button data-ng-click="$ctrl.startTest()">Start</button>
+          <div data-ng-show="$ctrl.test.highScores">
+            <table style="width:100%">
+              <thead>
+              <tr>
+                <th>Name</th>
+                <th>Percent Correct</th>
+                <th>Time</th>
+                <th>Submitted</th>
+              </tr>
+              </thead>
+              <tr data-ng-repeat="highscore in $ctrl.test.highScores" style="text-align:center;">
+                <td>{{highscore.name}}</td>
+                <td>{{highscore.score}}</td>
+                <td>{{highscore.elapsedTime | date:'mm:ss'}}</td>
+                <td>{{highscore.startTime.epochSecond * 1000 | date:'MM/dd/yyyy hh:mm a'}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div data-ng-if="$ctrl.test.state == $ctrl.testStates.IN_PROGRESS">
+          <p style="font-size: x-large">{{$ctrl.test.question.text}}</p>
+          <h2>Options</h2>
+          <div data-ng-repeat="option in $ctrl.test.question.options">
+            <input type="radio" name="answer" value="{{option}}"
+                   data-ng-model="$ctrl.test.question.selectedAnswer">
+            <label style="font-size: x-large">{{option}}</label><br>
+          </div>
+          <p style="font-size: x-large"></p>
+          <div class="columns">
+            <div class="colx2-left">
+              <button data-ng-click="$ctrl.prevQuestion()">Prev</button>
+            </div>
+            <div class="colx2-right">
+              <button data-ng-show="$ctrl.test.questionIndex < $ctrl.test.questions.length - 1"
+                      data-ng-click="$ctrl.nextQuestion()">Next</button>
+              <button data-ng-show="$ctrl.test.questionIndex == $ctrl.test.questions.length - 1"
+                      data-ng-click="$ctrl.calcTestResults()">Submit</button>
+            </div>
+          </div>
+        </div>
+        <div data-ng-if="$ctrl.test.state == $ctrl.testStates.FINISHED">
+          <h2>Test Results</h2>
+          <h3>{{$ctrl.test.correct}} out of {{$ctrl.test.questions.length}} correct ({{$ctrl.test.percentCorrect}}%)</h3>
+          <h3>Finished in {{$ctrl.test.elapsedTime | date:'mm:ss'}}</h3>
+          <button data-ng-click="$ctrl.resetTest()">Test again</button>
+          <h3>Answer Key</h3>
+          <table style="width:100%">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tr data-ng-repeat="question in $ctrl.test.questions" style="text-align:center;">
+              <td>{{question.text}}</td>
+              <td>{{question.selectedAnswer}}</td>
+              <td>{{question.answer}}</td>
+              <td>{{question.result}}</td>
+            </tr>
+          </table>
+          <p style="font-size: x-large"></p>
+          <h3 data-ng-show="$ctrl.test.rank">You are rank {{$ctrl.test.rank}}</h3>
+          <div data-ng-show="$ctrl.test.highScores">
+            <table style="width:100%">
+              <thead>
+              <tr>
+                <th>Name</th>
+                <th>Percent Correct</th>
+                <th>Time</th>
+                <th>Submitted</th>
+              </tr>
+              </thead>
+              <tr data-ng-repeat="highscore in $ctrl.test.highScores" style="text-align:center;">
+                <td>{{highscore.name}}</td>
+                <td>{{highscore.score}}</td>
+                <td>{{highscore.elapsedTime | date:'mm:ss'}}</td>
+                <td>{{highscore.startTime.epochSecond * 1000 | date:'MM/dd/yyyy hh:mm a'}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -1,5 +1,6 @@
 package com.digitald4.biblical.server;
 
+import com.digitald4.biblical.model.HighScore;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.util.*;
 import com.digitald4.common.model.BasicUser;
@@ -10,10 +11,12 @@ import com.digitald4.common.server.service.Echo;
 import com.digitald4.common.server.service.UserService;
 import com.digitald4.common.storage.Annotations;
 import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.GenericStore;
 import com.digitald4.common.storage.GenericUserStore;
 import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.SessionStore;
+import com.digitald4.common.storage.Store;
 import com.digitald4.common.storage.UserStore;
 import com.digitald4.common.util.ProviderThreadLocalImpl;
 import com.google.common.collect.ImmutableList;
@@ -41,6 +44,8 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		bind(new TypeLiteral<ProviderThreadLocalImpl<BasicUser>>(){}).toInstance(userProvider);
 		bind(new TypeLiteral<UserStore<BasicUser>>(){})
 				.toInstance(new GenericUserStore<>(BasicUser.class, getProvider(DAO.class)));
+		bind(new TypeLiteral<Store<HighScore, Long>>(){})
+				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
 		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){});
 
 		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
@@ -62,6 +67,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CalendarRuleService.class,
 						CalendarValidatorService.class,
 						CommandmentService.class,
+						HighScoreService.class,
 						LessonService.class,
 						ScriptureService.class));
 	}
