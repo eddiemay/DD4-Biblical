@@ -6,6 +6,7 @@ import com.digitald4.common.model.Searchable;
 // Dave Nelson, Coonley,
 public class Scripture extends ModelObject<String> implements Searchable {
   private String version;
+  private String locale = BibleBook.EN;
   private String book;
   private int chapter;
   private int verse;
@@ -26,6 +27,15 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
   public Scripture setVersion(String version) {
     this.version = version;
+    return this;
+  }
+
+  public String getLocale() {
+    return locale;
+  }
+
+  public Scripture setLocale(String locale) {
+    this.locale = locale;
     return this;
   }
 
@@ -76,12 +86,13 @@ public class Scripture extends ModelObject<String> implements Searchable {
     }
     Scripture other = (Scripture) obj;
 
-    return version.equals(other.version) && book.equals(other.book) && chapter == other.chapter && verse == other.verse
-        && text.toString().equals(other.text.toString());
+    return version.equals(other.version) && locale.equals(other.locale) && book.equals(other.book)
+        && chapter == other.chapter && verse == other.verse && text.toString().contentEquals(other.text);
   }
 
   @Override
   public String toString() {
-    return String.format("(%s) %s %d:%d %s", getVersion(), getBook(), getChapter(), getVerse(), getText());
+    return String.format(
+        "(%s) %s %d:%d %s", getVersion(), getBook(), getChapter(), getVerse(), getText());
   }
 }

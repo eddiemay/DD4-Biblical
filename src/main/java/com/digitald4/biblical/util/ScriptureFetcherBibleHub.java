@@ -11,6 +11,7 @@ import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.util.Pair;
 import com.google.common.collect.ImmutableList;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,7 +26,6 @@ import java.util.regex.Pattern;
 
 public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   private static final String CHAPTER_URL = "https://biblehub.com/%s/%s/%d.htm";
-  private static final String VERSE_URL = "https://biblehub.com/%s/%d-%d.htm";
   private static final String REF_TEXT = "reftext";
   private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)(.+)");
   private static final Pattern VERSE_CLS_PATTERN = Pattern.compile("([\\d\\w]+)-(\\d+)-(\\d+)");
@@ -36,15 +36,23 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   public ScriptureFetcherBibleHub(APIConnector apiConnector) {
     this.apiConnector = apiConnector;
   }
-
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet(
-        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.getName()), chapter));
+    if (version.equals("WLCO")) {
+      return fetchWLCO(version, book, chapter);
+    }
+
+    return fetchOther(version, book, chapter);
+  }
+
+  public synchronized ImmutableList<Scripture> fetchOther(String version, BibleBook book, int chapter) {
+    String url =
+        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.getName()), chapter);
+    String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements chaps = doc.getElementsByClass("chap");
     if (chaps.size() == 0) {
-      throw new DD4StorageException("Unable to find scripture content");
+      throw new DD4StorageException("Unable to find scripture content for " + url);
     }
     Element chap = chaps.get(0);
 
@@ -56,7 +64,8 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
               .setVersion(version)
               .setBook(book.getName())
               .setChapter(chapter)
-              .setVerse(Integer.parseInt(sc.getElementsByClass(REF_TEXT).get(0).getElementsByTag("b").text()))
+              .setVerse(
+                  Integer.parseInt(sc.getElementsByClass(REF_TEXT).get(0).getElementsByTag("b").text()))
               .setText(getText(sc.text())))
           .collect(toImmutableList());
     }
@@ -69,6 +78,30 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
                 .setChapter(chapter)
                 .setVerse(Integer.parseInt(reftext.getElementsByTag("b").text()))
                 .setText(getText(reftext)))
+        .collect(toImmutableList());
+  }
+
+  public synchronized ImmutableList<Scripture> fetchWLCO(String version, BibleBook book, int chapter) {
+    String url =
+        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.getName()), chapter);
+    String htmlResult = apiConnector.sendGet(url);
+    Document doc = Jsoup.parse(htmlResult.trim());
+    Elements scs = doc.getElementsByClass("spcl");
+    if (scs.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content for " + url);
+    }
+
+    AtomicInteger verse = new AtomicInteger();
+
+    return scs.stream()
+        .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
+        .map(sc -> new Scripture()
+            .setVersion(version)
+            .setLocale("he")
+            .setBook(book.getName())
+            .setChapter(chapter)
+            .setVerse(verse.incrementAndGet())
+            .setText(getText(sc.text())))
         .collect(toImmutableList());
   }
 

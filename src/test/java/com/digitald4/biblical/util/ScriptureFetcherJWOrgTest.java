@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class ScriptureFetcherJWOrgTest extends ScriptureFetcherTest {
             "\n" +
             "</div></body></html>");
 
-    assertThat(scriptureStore.getScriptures("NWT", "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("NWT", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("NWT").setBook("Psalms").setChapter(117).setVerse(1)
             .setText("Praise Jehovah, all you nations; Glorify him, all you peoples."),
         new Scripture().setVersion("NWT").setBook("Psalms").setChapter(117).setVerse(2)

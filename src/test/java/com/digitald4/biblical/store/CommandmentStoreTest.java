@@ -28,7 +28,7 @@ public class CommandmentStoreTest {
     commandmentStore =
         new CommandmentStore(() -> dao, searchIndexer, scriptureRefProcessor, scriptureStore);
 
-    when(dao.create(any(Commandment.class))).thenAnswer(i -> i.getArgumentAt(0, Commandment.class));
+    when(dao.create(any(Commandment.class))).thenAnswer(i -> i.getArgument(0));
   }
 
   @Test

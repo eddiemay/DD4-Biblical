@@ -1,5 +1,6 @@
 package com.digitald4.biblical.util;
 
+import static com.digitald4.biblical.model.BibleBook.EN;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -35,7 +36,7 @@ public class ScriptureFetcherBibleGatewayTest extends ScriptureFetcherTest {
             "</div>\n</div>\n</div>" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("NRSV", "Genesis 2").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("NRSV", EN, "Genesis 2").getItems()).containsExactly(
         new Scripture().setVersion("NRSV").setBook("Genesis").setChapter(2).setVerse(1).setText(
             "Thus the heavens and the earth were finished, and all their multitude."),
         new Scripture().setVersion("NRSV").setBook("Genesis").setChapter(2).setVerse(2).setText(
@@ -87,7 +88,7 @@ public class ScriptureFetcherBibleGatewayTest extends ScriptureFetcherTest {
             "</div>\n</div>\n</div>\n</div>\n</div>" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("NRSV", "Psalms 151").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("NRSV", EN, "Psalms 151").getItems()).containsExactly(
         new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(1).setText(
             "I was small among my brothers, and the youngest in my father’s house; I tended my father’s sheep."),
         new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(2).setText(
@@ -122,7 +123,7 @@ public class ScriptureFetcherBibleGatewayTest extends ScriptureFetcherTest {
             "</div></div></div>" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("NRSV", "1 ESDRAS 1").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("NRSV", EN, "1 ESDRAS 1").getItems()).containsExactly(
         new Scripture().setVersion("NRSV").setBook("1 Esdras").setChapter(1).setVerse(1).setText(
             "Josiah kept the passover to his Lord in Jerusalem; he killed the passover lamb on the fourteenth day of the first month,"),
         new Scripture().setVersion("NRSV").setBook("1 Esdras").setChapter(1).setVerse(2).setText(

@@ -8,7 +8,7 @@
       </li>
     </ul>
     <div class="block-content form">
-      <p data-ng-repeat="scripture in $ctrl.scriptures">
+      <p data-ng-repeat="scripture in $ctrl.scriptures" dir="{{scripture.dir}}">
         (<a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter)">{{scripture.version}}</a>)
         <a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter)">
           {{scripture.book}} {{scripture.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter, scripture.verse)">{{scripture.verse}}

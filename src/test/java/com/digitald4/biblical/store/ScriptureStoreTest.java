@@ -1,5 +1,6 @@
 package com.digitald4.biblical.store;
 
+import static com.digitald4.biblical.model.BibleBook.EN;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.truth.Truth.assertThat;
@@ -45,11 +46,10 @@ public class ScriptureStoreTest {
         new ScriptureStore(() -> dao, searchIndexer, scriptureRefProcessor, scriptureFetcher);
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).then(
-        i -> getScriptures(i.getArgumentAt(1, Query.List.class)));
-    when(dao.create(anyCollectionOf(Scripture.class))).then(i -> i.getArgumentAt(0, ImmutableList.class));
-    when(scriptureFetcher.fetch(anyString(), any(BibleBook.class), anyInt())).then(i ->
-        fetchFromWeb(
-            i.getArgumentAt(0, String.class), i.getArgumentAt(1, BibleBook.class), i.getArgumentAt(2, int.class)));
+        i -> getScriptures(i.getArgument(1)));
+    when(dao.create(anyCollectionOf(Scripture.class))).then(i -> i.getArgument(0));
+    when(scriptureFetcher.fetch(anyString(), anyString(), any(BibleBook.class), anyInt())).then(i ->
+        fetchFromWeb(i.getArgument(0), i.getArgument(2), i.getArgument(3)));
   }
 
   private static QueryResult<Scripture> getScriptures(Query.List query) {
@@ -96,33 +96,33 @@ public class ScriptureStoreTest {
 
   @Test
   public void getScriptures() {
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:5").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN, "2 Kings 23:5").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:5-7").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:5-7").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(6).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(7).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:5,7").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:5,7").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(7).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:5-7,9").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:5-7,9").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(6).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(7).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(9).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:5,9-11").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:5,9-11").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(9).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(10).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(11).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:5-7,9-11").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:5-7,9-11").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(6).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(7).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(9).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(10).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(11).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23:35-24:3").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:35-24:3").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(35).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(36).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(37).setText("[Scripture Placeholder]"),
@@ -130,18 +130,18 @@ public class ScriptureStoreTest {
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(2).setText("[Fetched From Web]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(3).setText("[Fetched From Web]"));
 
-    assertThat(scriptureStore.getScriptures(VERSION, "2 Kings 23").getItems()).hasSize(37);
+    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23").getItems()).hasSize(37);
   }
 
   @Test
   public void getScriptureTextAllVersions() {
-    assertThat(scriptureStore.getScripturesTextAllVersions("2 Kings 23:5"))
+    assertThat(scriptureStore.getScripturesTextAllVersions(EN, "2 Kings 23:5"))
         .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]");
-    assertThat(scriptureStore.getScripturesTextAllVersions("2 Kings 23:5-7"))
+    assertThat(scriptureStore.getScripturesTextAllVersions(EN, "2 Kings 23:5-7"))
         .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]\n" +
             "(ISR) 2 Kings 23:6 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:6 [Scripture Placeholder]\n" +
             "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:7 [Scripture Placeholder]");
-    assertThat(scriptureStore.getScripturesTextAllVersions("2 Kings 23:5,7"))
+    assertThat(scriptureStore.getScripturesTextAllVersions(EN, "2 Kings 23:5,7"))
         .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]\n\n" +
             "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:7 [Scripture Placeholder]");
   }
@@ -149,7 +149,7 @@ public class ScriptureStoreTest {
   @Test
   public void getScriptures_verseOutOfBounds() {
     try {
-      scriptureStore.getScriptures(VERSION, "2 Kings 23:42-46");
+      scriptureStore.getScriptures(VERSION, EN, "2 Kings 23:42-46");
       fail("Should not have got here");
     } catch (DD4StorageException e) {
       assertThat(e).hasMessageThat().contains("Verse 42 out of bounds for: (ISR) 2 Kings 23");

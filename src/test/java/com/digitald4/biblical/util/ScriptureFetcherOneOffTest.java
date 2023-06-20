@@ -1,18 +1,14 @@
 package com.digitald4.biblical.util;
 
+import static com.digitald4.biblical.model.BibleBook.EN;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
-import com.digitald4.common.server.APIConnector;
-import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
 public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
   private ScriptureFetcher scriptureFetcher;
@@ -60,7 +56,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
         "\t\tThey must not turn aside from the ordinances of God's truth either to the right\n" +
         "\t\tor to the left.</B></P><P><B><FONT COLOR=\"#800000\">Of Initiation.</FONT></B></P></BODY</HTML>");
 
-    assertThat(scriptureStore.getScriptures("essene", "COMMUNITY RULE 1").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("essene", EN, "COMMUNITY RULE 1").getItems()).containsExactly(
         new Scripture().setVersion("essene").setBook("Community Rule").setChapter(1).setVerse(1).setText(
             "Of the Commitment."),
         new Scripture().setVersion("essene").setBook("Community Rule").setChapter(1).setVerse(2).setText(
@@ -194,7 +190,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
             " <TR><TD VALIGN=\"top\">(18)</TD><TD>[...]</TD></TR>" +
         "</TABLE></BODY></HTML>");
 
-    assertThat(scriptureStore.getScriptures("qumran", "WAR SCROLL 1-2").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("qumran", EN, "WAR SCROLL 1-2").getItems()).containsExactly(
         new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(1).setText(
             "For the In[structor, the Rule of] the War. The first attack of the Sons of Light shall be undertaken against the forces of the Sons of Darkness, the army of Belial: the troops of Edom, Moab, the sons of Ammon, the [Amalekites],"),
         new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(2).setText(
@@ -220,7 +216,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/ant-8.html"));
 
-    assertThat(scriptureStore.getScriptures("uchicago", "JOSEPHUS 8").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("uchicago", EN, "JOSEPHUS 8").getItems()).containsExactly(
         new Scripture().setVersion("uchicago").setBook("Josephus").setChapter(8).setVerse(1).setText(
             "[About An. 1056.] We have already treated of David, and his virtue; and of the benefits he was the author of to his countreymen; of his wars also, and battels which he managed with success, and then died an old man, in the foregoing book. And when Solomon his son, who was but a youth in age, had taken the Kingdom, and whom David had declared, while he was alive, the Lord of that people, according to God’s will: when he sat upon the throne, the whole body of the people made joyful acclamations to him: as is usual at the beginning of a reign: and wished that all his affairs might come to a blessed conclusion; and that he might arrive at a great age, and at the most happy state of affairs possible."),
         new Scripture().setVersion("uchicago").setBook("Josephus").setChapter(8).setVerse(2).setText(
@@ -268,7 +264,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
         new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(3).setText(
             "For I am Job your father."));*/
 
-    assertThat(scriptureStore.getScriptures("M. R. James", "TESTAMENT OF JOB 12:17-19").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("M. R. James", EN, "TESTAMENT OF JOB 12:17-19").getItems()).containsExactly(
         new Scripture().setVersion("M. R. James").setBook("Testament of Job").setChapter(12).setVerse(17).setText(
             "The name of Job was formerly Jobab, and he was called Job by the Lord."),
         new Scripture().setVersion("M. R. James").setBook("Testament of Job").setChapter(12).setVerse(18).setText(
@@ -282,7 +278,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/test/java/com/digitald4/biblical/util/data/the-third-book-of-enoch.html"));
 
-    assertThat(scriptureStore.getScriptures("R. Ishmael", "3 ENOCH 2").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("R. Ishmael", EN, "3 ENOCH 2").getItems()).containsExactly(
         new Scripture().setVersion("R. Ishmael").setBook("3 Enoch").setChapter(2).setVerse(1).setText(
             "In that hour the eagles of the Merkaba, the flaming 'Ophannim and the Seraphim of consuming fire asked a Metatron, saying to him:"),
         new Scripture().setVersion("R. Ishmael").setBook("3 Enoch").setChapter(2).setVerse(2).setText(

@@ -28,6 +28,11 @@ public class ScriptureFetcherJWOrg implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+    return fetch(version, "en", book, chapter);
+  }
+
+  public synchronized ImmutableList<Scripture> fetch(
+      String version, String locale, BibleBook book, int chapter) {
     String htmlResult = apiConnector.sendGet(String.format(URL, formatBookForUrl(book.getName()), chapter));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements verses = doc.getElementsByClass("verse");

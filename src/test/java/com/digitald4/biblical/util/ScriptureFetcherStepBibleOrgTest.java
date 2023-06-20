@@ -96,7 +96,7 @@ public class ScriptureFetcherStepBibleOrgTest extends ScriptureFetcherTest {
             "    ]\n" +
             "}");
 
-    assertThat(scriptureStore.getScriptures("RSKJ", "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("RSKJ", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "O praise יהוה, all ye nations: praise him, all ye people."),
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(2).setText(

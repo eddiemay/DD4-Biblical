@@ -33,7 +33,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             "For His kindness is mighty over us, And the truth of יהוה is everlasting. Praise Yah!</p>" +
             "</div></body></html>");
 
-    assertThat(scriptureStore.getScriptures("ISR", "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("ISR", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("ISR").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "Praise יהוה, all you nations! Extol Him, all you peoples!"),
         new Scripture().setVersion("ISR").setBook("Psalms").setChapter(117).setVerse(2).setText(
@@ -53,7 +53,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             "<a name=\"footnotes\"></a><div class=\"footnotes\"><h4>Footnotes:</h4><ol><li id=\"fen-NKJV-15869a\"><span class=\"fnref\" title=\"Go to Psalm 117:1\">Psalm 117:1</span> <span class=\"footnote-text\"><i>Praise</i></span></li></ol></div> <!--end of footnotes--></div>" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("NKJV", "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("NKJV", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("NKJV").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "Praise the Lord, all you Gentiles! Laud Him, all you peoples!"),
         new Scripture().setVersion("NKJV").setBook("Psalms").setChapter(117).setVerse(2).setText(
@@ -107,5 +107,17 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
         "And God saw the light, that it was good: and God divided the light from the darkness.");
     assertThat(fetched.get(4).getText().toString()).isEqualTo(
         "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day.");
+  }
+
+  @Test
+  public void fetchWLCO() throws Exception {
+    when(apiConnector.sendGet(anyString()))
+        .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/wlco.html"));
+
+    assertThat(scriptureStore.getScriptures("WLCO", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
+        new Scripture().setVersion("WLCO").setLocale("he").setBook("Psalms").setChapter(117).setVerse(1)
+            .setText("הללו את־יהוה כל־גוים בחוהו כל־האמים׃"),
+        new Scripture().setVersion("WLCO").setLocale("he").setBook("Psalms").setChapter(117).setVerse(2)
+            .setText("כי גבר עלינו ׀ חסדו ואמת־יהוה לעולם הללו־יה׃"));
   }
 }

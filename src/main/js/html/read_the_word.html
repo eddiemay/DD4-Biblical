@@ -52,7 +52,7 @@
           <img src="images/chevron.png" width="18" height="26">
         </a -->
         <div data-ng-show="!$ctrl.searchShown">
-          <p data-ng-repeat="script in $ctrl.scriptures">
+          <p data-ng-repeat="script in $ctrl.scriptures" dir="{{script.dir}}">
             <span data-ng-show="script.showChapter">
               <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
                 {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>

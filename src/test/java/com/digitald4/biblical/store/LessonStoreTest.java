@@ -53,8 +53,8 @@ public class LessonStoreTest {
 
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60001L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isNull();
     assertThat(lesson.getLatestPublishedVersionId()).isNull();
   }
@@ -66,14 +66,14 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60002L);
+    assertThat(version.getCreationTime().toEpochMilli()).isEqualTo(60002L);
+    assertThat(version.getLastModifiedTime().toEpochMilli()).isEqualTo(60002L);
 
     Lesson lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60003L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60003L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
     assertThat(lesson.getLatestPublishedVersionId()).isNull();
   }
@@ -87,17 +87,17 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60002L);
+    assertThat(version.getCreationTime().toEpochMilli()).isEqualTo(60002L);
+    assertThat(version.getLastModifiedTime().toEpochMilli()).isEqualTo(60002L);
     assertThat(version.getContent().toString()).isEqualTo("words 123");
 
     lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
     assertThat(lesson.getLatestPublishedVersionId()).isNull();
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60003L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60003L);
   }
 
   @Test
@@ -108,17 +108,17 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
+    assertThat(version.getCreationTime().toEpochMilli()).isEqualTo(60002L);
+    assertThat(version.getLastModifiedTime().toEpochMilli()).isEqualTo(60004L);
     assertThat(version.getContent().toString()).isEqualTo("words 123");
 
     Lesson lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
     assertThat(lesson.getLatestPublishedVersionId()).isNull();
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60005L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60005L);
   }
 
   @Test
@@ -130,18 +130,18 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
+    assertThat(version.getCreationTime().toEpochMilli()).isEqualTo(60002L);
+    assertThat(version.getLastModifiedTime().toEpochMilli()).isEqualTo(60004L);
     assertThat(version.getContent().toString()).isEqualTo("words 123");
     assertThat(version.isPublished()).isTrue();
 
     Lesson lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
     assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(5002L);
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60005L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60005L);
   }
 
   @Test
@@ -152,18 +152,18 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo(TITLE);
     assertThat(version.getId()).isEqualTo(5003L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
+    assertThat(version.getCreationTime().toEpochMilli()).isEqualTo(60002L);
+    assertThat(version.getLastModifiedTime().toEpochMilli()).isEqualTo(60004L);
     assertThat(version.getContent().toString()).isEqualTo("words 123");
     assertThat(version.isPublished()).isFalse();
 
     Lesson lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5003L);
     assertThat(lesson.getLatestPublishedVersionId()).isEqualTo(5002L);
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60005L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60005L);
   }
 
   @Test
@@ -174,17 +174,17 @@ public class LessonStoreTest {
     assertThat(version.getTitle()).isEqualTo("New Title");
     assertThat(version.getId()).isEqualTo(5002L);
     assertThat(version.getLessonId()).isEqualTo(5001L);
-    assertThat(version.getCreationTime().getMillis()).isEqualTo(60002L);
-    assertThat(version.getLastModifiedTime().getMillis()).isEqualTo(60004L);
+    assertThat(version.getCreationTime().toEpochMilli()).isEqualTo(60002L);
+    assertThat(version.getLastModifiedTime().toEpochMilli()).isEqualTo(60004L);
     assertThat(version.isPublished()).isFalse();
 
     Lesson lesson = lessonStore.get(version.getLessonId());
     assertThat(lesson.getTitle()).isEqualTo(TITLE);
     assertThat(lesson.getId()).isEqualTo(5001L);
-    assertThat(lesson.getCreationTime().getMillis()).isEqualTo(60001L);
+    assertThat(lesson.getCreationTime().toEpochMilli()).isEqualTo(60001L);
     assertThat(lesson.getLatestVersionId()).isEqualTo(5002L);
     assertThat(lesson.getLatestPublishedVersionId()).isNull();
-    assertThat(lesson.getLastModifiedTime().getMillis()).isEqualTo(60005L);
+    assertThat(lesson.getLastModifiedTime().toEpochMilli()).isEqualTo(60005L);
 
     versionStore.update(version.getLessonId(), v -> v.setPublished(true));
 

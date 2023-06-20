@@ -5,12 +5,21 @@ com.digitald4.biblical.ScriptureViewCtrl = function($window, globalData, scriptu
   this.refresh();
 }
 
+var processScriptures = function(scriptures) {
+  for (const script of scriptures) {
+    script.dir = script.locale == 'he' ? 'rtl' : 'ltr';
+  }
+  return scriptures;
+}
+
 com.digitald4.biblical.ScriptureViewCtrl.prototype.refresh = function() {
   if (this.reference.book != undefined) {
-    this.showScripture(this.reference.version, this.reference.book, this.reference.chapter, this.reference.verse);
+    this.showScripture(
+        this.reference.version, this.reference.book, this.reference.chapter, this.reference.verse);
   } else {
     this.reference.version = this.reference.version || this.globalData.scriptureVersion;
-    this.scriptureService.scriptures(this.reference, response => this.scriptures = response.items);
+    this.scriptureService.scriptures(
+        this.reference, response => this.scriptures = processScriptures(response.items));
   }
 }
 
@@ -21,7 +30,8 @@ com.digitald4.biblical.ScriptureViewCtrl.prototype.showScripture = function(vers
   this.reference.verse = verse;
 
   var request = {reference: book + ' ' + chapter + (verse ? ':' + verse : ''), version: verse ? undefined : version};
-  this.scriptureService.scriptures(request, response => this.scriptures = response.items);
+  this.scriptureService.scriptures(
+      request, response => this.scriptures = processScriptures(response.items));
 }
 
 com.digitald4.biblical.ScriptureViewCtrl.prototype.closeDialog = function() {

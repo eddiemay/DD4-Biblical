@@ -1,5 +1,6 @@
 package com.digitald4.biblical.util;
 
+import static com.digitald4.biblical.model.BibleBook.EN;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -70,7 +71,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
             "Scanned and Edited by Joshua Williams, Northwest Nazarene College</b>\n" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "JUBILEES 6").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "JUBILEES 6").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(6).setVerse(1).setText(
             "And on the new moon of the third month he went forth from the ark, and built an altar on that mountain."),
         new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(6).setVerse(2).setText(
@@ -88,7 +89,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/Jubilees 19.html"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "Jubilees 19:17").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "Jubilees 19:17").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(19).setVerse(17).setText(
             "And he said unto her: My daughter, watch over my son Jacob, For he shall be in my stead on the earth, And for a blessing in the midst of the children of men, And for the glory of the whole seed of Shem."));
   }
@@ -98,7 +99,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/jasher.html"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "Jasher 69").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "Jasher 69").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(69).setVerse(1).setText(
             "And the king of Edom died in those days, in the eighteenth year of his reign, and was buried in his temple which he had built for himself as his royal residence in the land of Edom."),
         new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(69).setVerse(2).setText(
@@ -124,7 +125,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch.htm"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "Enoch 2").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "Enoch 2").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(2).setVerse(1).setText(
             "Observe ye everything that takes place in the heaven, how they do not change their orbits, and the luminaries which are in the heaven, how they all rise and set in order each in its season, and transgress not against their appointed order."),
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(2).setVerse(2).setText(
@@ -138,7 +139,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch.htm"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "Enoch 3").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "Enoch 3").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(3).setVerse(1).setText(
             "Observe and see how (in the winter) all the trees seem as though they had withered and shed all their leaves, except fourteen trees, which do not lose their foliage but retain the old foliage from two to three years till the new comes."));
   }
@@ -148,7 +149,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch.htm"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "Enoch 5").getItems()).containsAtLeast(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "Enoch 5").getItems()).containsAtLeast(
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(5).setVerse(1).setText(
             "Observe ye how the trees cover themselves with green leaves and bear fruit: wherefore give ye heed and know with regard to all His works, and recognize how He that liveth for ever hath made them so."),
         new Scripture().setVersion("OXFORD").setBook("Enoch").setChapter(5).setVerse(2).setText(
@@ -220,7 +221,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enochs2.htm"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "2 Enoch 7").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "2 Enoch 7").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("2 Enoch").setChapter(7).setVerse(1).setText(
             "And those men took me and led me up on to the second heaven, and showed me darkness, greater than earthly darkness, and there I saw prisoners hanging, watched, awaiting the great and boundless judgment, and these angels (spirits) were dark-looking, more than earthly darkness, and incessantly making weeping through all hours."),
         new Scripture().setVersion("OXFORD").setBook("2 Enoch").setChapter(7).setVerse(2).setText(
@@ -234,7 +235,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/adamnev.htm"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "BOOK OF ADAM AND EVE 3").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "BOOK OF ADAM AND EVE 3").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(3).setVerse(1).setText(
             "I And Adam arose and walked seven days over all that land, and found no victual such as they"),
         new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(3).setVerse(2).setText(
@@ -242,7 +243,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
         new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(3).setVerse(3).setText(
             "Adam answered: 'Forbear, Eve, from such words, that peradventure God bring not some other curse upon us. How is it possible that I should stretch forth my hand against my own flesh? Nay, let us arise and look for something for us to live on, that we fail not.'"));
 
-    assertThat(scriptureStore.getScriptures("OXFORD", "BOOK OF ADAM AND EVE 15").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "BOOK OF ADAM AND EVE 15").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(15).setVerse(1).setText(
             "When the angels, who were under me, heard this, they refused to worship him. And Michael saith,"),
         new Scripture().setVersion("OXFORD").setBook("Book of Adam and Eve").setChapter(15).setVerse(2).setText(

@@ -61,6 +61,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = functi
     if (!previous || previous.chapter != script.chapter || previous.verse + 1 != script.verse || previous.book != script.book) {
       script.showChapter = true;
     }
+    script.dir = script.locale == 'he' ? 'rtl' : 'ltr';
     previous = script;
   }
 }

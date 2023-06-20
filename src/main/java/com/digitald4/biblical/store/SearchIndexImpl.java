@@ -54,6 +54,7 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
         .addField(Field.newBuilder().setName("chapter").setNumber(scripture.getChapter()))
         .addField(Field.newBuilder().setName("verse").setNumber(scripture.getVerse()))
         .addField(Field.newBuilder().setName("version").setAtom(scripture.getVersion()))
+        .addField(Field.newBuilder().setName("locale").setAtom(scripture.getLocale()))
         .addField(
             Field.newBuilder().setName("versionNum").setNumber(scriptureVersion.getVersionNum()))
         .addField(Field.newBuilder().setName("text").setHTML(scripture.getText().toString()))
@@ -78,7 +79,8 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
         .addField(Field.newBuilder().setName("chapter").setNumber(firstDeclared.getChapter()))
         .addField(Field.newBuilder().setName("verse").setNumber(firstDeclared.getStartVerse()))
         .addField(Field.newBuilder().setName("scriptureText").setText(
-            scriptureStore.get().getScripturesTextAllVersions(commandment.getScriptures())))
+            scriptureStore.get()
+                .getScripturesTextAllVersions(BibleBook.EN, commandment.getScriptures())))
         .addField(Field.newBuilder().setName("bookTags").setText(
             bibleBooks.stream()
                 .flatMap(bibleBook -> stream(bibleBook.getTags().split(",")))

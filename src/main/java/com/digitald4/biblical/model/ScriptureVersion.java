@@ -37,7 +37,8 @@ public class ScriptureVersion {
       new ScriptureVersion("Rabbi Ishmael Ben Elisha", "R. Ishmael", 59, ImmutableSet.of(BibleBook.ENOCH_3)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder()
-              .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()));
+              .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),
+      new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80, BibleBook.CANON.subList(0, 39)));
 
   private static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
       ALL_VERSIONS.stream().collect(toImmutableMap(ScriptureVersion::getVersion, identity()));
@@ -70,11 +71,16 @@ public class ScriptureVersion {
     return BY_VERSION.get(version); // OrDefault(version, new ScriptureVersion(version, version, BibleBook.CANON));
   }
 
-  public static ScriptureVersion getOrFallback(String version, BibleBook book) {
+  public static ScriptureVersion getOrFallback(String version, String locale, BibleBook book) {
+    if (version.equals("WLCA")) {
+      version = "WLCO";
+    }
+
     ScriptureVersion scriptureVersion = get(version);
     if (scriptureVersion == null) {
-      throw new DD4StorageException("Unknown scritpure version: " + version, ErrorCode.BAD_REQUEST);
+      throw new DD4StorageException("Unknown scripture version: " + version, ErrorCode.BAD_REQUEST);
     }
+
     if (scriptureVersion.getBibleBooks().contains(book)) {
       return scriptureVersion;
     }

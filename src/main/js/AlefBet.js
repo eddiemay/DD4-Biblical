@@ -69,14 +69,14 @@ AlefBet = {
     name: 'Zayin',
     modern: 'ז',
     paleo: '𐤆',
-    ancient: '𓏭',
+    ancient: '𓌻',
     samaritan: 'ࠆ',
     arabic: 'ز',
     value: 7,
     english: 'Z',
     meaning: 'weapon'
   },
-  Khes: {
+  Chet: {
     name: 'Chet',
     modern: 'ח',
     paleo: '𐤇',
@@ -91,7 +91,7 @@ AlefBet = {
     name: 'Tet',
     modern: 'ט',
     paleo: '𐤈',
-    ancient: '',
+    ancient: '𐤈',
     samaritan: 'ࠈ',
     arabic: 'ط',
     value: 9,
@@ -124,7 +124,7 @@ AlefBet = {
     name: 'Lamed',
     modern: 'ל',
     paleo: '𐤋',
-    ancient: '𓌅',
+    ancient: '𓏱',
     samaritan: 'ࠋ',
     arabic: 'ل',
     value: 30,
@@ -153,7 +153,7 @@ AlefBet = {
     english: 'N',
     meaning: 'fish'
   },
-  Samech: {
+  Samekh: {
     name: 'Samekh',
     modern: 'ס',
     paleo: '𐤎',
@@ -197,16 +197,16 @@ AlefBet = {
     english: 'Tz',
     meaning: ''
   },
-  Qoph: {
+  Qof: {
     name: 'Qof',
     modern: 'ק',
     paleo: '𐤒',
-    ancient: '',
+    ancient: '𐤒',
     samaritan: 'ࠒ',
     arabic: 'ق',
     value: 100,
     english: 'Q',
-    meaning: ''
+    meaning: 'eye of needle'
   },
   Resh: {
     name: 'Resh',
@@ -244,5 +244,8 @@ AlefBet = {
 }
 
 // References
+// https://www.hebrew4christians.com/Grammar/Unit_One/Pictograms/pictograms.html
 // https://en.wikipedia.org/wiki/Hebrew_alphabet
 // https://en.wikipedia.org/wiki/Arabic_alphabet
+// https://en.wikipedia.org/wiki/Paleo-Hebrew_alphabet
+// https://en.wikipedia.org/wiki/Template:Unicode_chart_Egyptian_Hieroglyphs

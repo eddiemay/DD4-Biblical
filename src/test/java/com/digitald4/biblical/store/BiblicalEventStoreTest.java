@@ -22,7 +22,7 @@ public class BiblicalEventStoreTest {
   @Before
   public void setup() {
     biblicalEventStore = new BiblicalEventStore(() -> dao, SCRIPTURE_MARKUP_PROCESSOR);
-    when(dao.create(any(BiblicalEvent.class))).thenAnswer(i -> i.getArgumentAt(0, BiblicalEvent.class));
+    when(dao.create(any(BiblicalEvent.class))).thenAnswer(i -> i.getArgument(0));
     // when(dao.create(any(ImmutableList.class))).thenAnswer(i -> i.getArgumentAt(0, ImmutableList.class));
   }
 

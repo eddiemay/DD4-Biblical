@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class BibleBook {
+  public static final String EN = "en";
   public static final BibleBook Genesis;
   public static final BibleBook Kings2;
   public static final BibleBook ESTHER;

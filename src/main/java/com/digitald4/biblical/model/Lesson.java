@@ -1,16 +1,16 @@
 package com.digitald4.biblical.model;
 
 import com.digitald4.common.model.HasModificationTimes;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 public class Lesson implements HasModificationTimes {
   private long id;
   private String title;
   private Long latestVersionId;
   private Long latestPublishedVersionId;
-  private DateTime creationTime;
-  private DateTime lastModifiedTime;
-  private DateTime deletionTime;
+  private Instant creationTime;
+  private Instant lastModifiedTime;
+  private Instant deletionTime;
 
   public static Lesson create(LessonVersion lessonVersion) {
     return new Lesson()
@@ -55,35 +55,35 @@ public class Lesson implements HasModificationTimes {
   }
 
   @Override
-  public DateTime getCreationTime() {
+  public Instant getCreationTime() {
     return creationTime;
   }
 
   @Override
-  public Lesson setCreationTime(DateTime createdAt) {
-    this.creationTime = createdAt;
+  public Lesson setCreationTime(long millis) {
+    this.creationTime = Instant.ofEpochMilli(millis);
     return this;
   }
 
   @Override
-  public DateTime getLastModifiedTime() {
+  public Instant getLastModifiedTime() {
     return lastModifiedTime;
   }
 
   @Override
-  public Lesson setLastModifiedTime(DateTime modifiedAt) {
-    this.lastModifiedTime = modifiedAt;
+  public Lesson setLastModifiedTime(long millis) {
+    this.lastModifiedTime = Instant.ofEpochMilli(millis);
     return this;
   }
 
   @Override
-  public DateTime getDeletionTime() {
+  public Instant getDeletionTime() {
     return deletionTime;
   }
 
   @Override
-  public Lesson setDeletionTime(DateTime deletionTime) {
-    this.deletionTime = deletionTime;
+  public Lesson setDeletionTime(long millis) {
+    this.deletionTime = Instant.ofEpochMilli(millis);
     return this;
   }
 
@@ -94,9 +94,9 @@ public class Lesson implements HasModificationTimes {
     private String themeText;
     private StringBuilder content;
     private boolean published;
-    private DateTime creationTime;
-    private DateTime lastModifiedTime;
-    private DateTime deletionTime;
+    private Instant creationTime;
+    private Instant lastModifiedTime;
+    private Instant deletionTime;
 
     public long getId() {
       return id;
@@ -167,35 +167,35 @@ public class Lesson implements HasModificationTimes {
     }
 
     @Override
-    public DateTime getCreationTime() {
+    public Instant getCreationTime() {
       return creationTime;
     }
 
     @Override
-    public LessonVersion setCreationTime(DateTime creationTime) {
-      this.creationTime = creationTime;
+    public LessonVersion setCreationTime(long millis) {
+      this.creationTime = Instant.ofEpochMilli(millis);
       return this;
     }
 
     @Override
-    public DateTime getLastModifiedTime() {
+    public Instant getLastModifiedTime() {
       return lastModifiedTime;
     }
 
     @Override
-    public LessonVersion setLastModifiedTime(DateTime lastModifiedTime) {
-      this.lastModifiedTime = lastModifiedTime;
+    public LessonVersion setLastModifiedTime(long millis) {
+      this.lastModifiedTime = Instant.ofEpochMilli(millis);
       return this;
     }
 
     @Override
-    public DateTime getDeletionTime() {
+    public Instant getDeletionTime() {
       return deletionTime;
     }
 
     @Override
-    public LessonVersion setDeletionTime(DateTime deletionTime) {
-      this.deletionTime = deletionTime;
+    public LessonVersion setDeletionTime(long millis) {
+      this.deletionTime = Instant.ofEpochMilli(millis);
       return this;
     }
   }
