@@ -34,7 +34,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -94,7 +94,9 @@
                     <aggregations>
                         <aggregation>
                             <insertNewLine>true</insertNewLine>
-                            <output>${basedir}/target/${project.artifactId}-${project.version}/js/${project.artifactId}.js</output>
+                            <output>
+                                ${basedir}/target/${project.artifactId}-${project.version}/js/${project.artifactId}.js
+                            </output>
                             <inputDir>${basedir}/src/main/js</inputDir>
                             <includes>
                                 <include>**/*.js</include>
@@ -129,7 +131,8 @@
                         <phase>process-resources</phase>
                         <configuration>
                             <tasks>
-                                <copy todir="${basedir}/target/${project.artifactId}-${project.version}/js/html" flatten="true">
+                                <copy todir="${basedir}/target/${project.artifactId}-${project.version}/js/html"
+                                      flatten="true">
                                     <fileset dir="../common/src/main/js/html">
                                         <include name="*.html"/>
                                     </fileset>
