@@ -30,6 +30,7 @@ public class ScriptureFetcherTest {
             new ScriptureFetcherKJV1611(apiConnector),
             new ScriptureFetcherOneOff(apiConnector),
             new ScriptureFetcherPseudepigrapha(apiConnector),
+            new ScriptureFetcherSefariaOrg(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)));
   }
 

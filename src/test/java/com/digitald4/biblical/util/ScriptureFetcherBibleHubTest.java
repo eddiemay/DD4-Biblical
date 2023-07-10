@@ -114,7 +114,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/wlco.html"));
 
-    assertThat(scriptureStore.getScriptures("WLCO", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("WLCO", BibleBook.HEBREW, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("WLCO").setLocale("he").setBook("Psalms").setChapter(117).setVerse(1)
             .setText("הללו את־יהוה כל־גוים בחוהו כל־האמים׃"),
         new Scripture().setVersion("WLCO").setLocale("he").setBook("Psalms").setChapter(117).setVerse(2)

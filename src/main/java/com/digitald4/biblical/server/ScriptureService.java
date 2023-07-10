@@ -1,7 +1,5 @@
 package com.digitald4.biblical.server;
 
-import static com.digitald4.biblical.model.BibleBook.EN;
-
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.ScriptureStore.GetOrSearchResponse;
@@ -49,9 +47,9 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "scriptures")
   public GetOrSearchResponse getScriptures(
       @Named("reference") String reference, @Named("version") @Nullable String version,
-      @Named("locale") @DefaultValue(EN) String locale) throws ServiceException {
+      @Named("lang") @Nullable String lang) throws ServiceException {
     try {
-      return scriptureStore.getScriptures(version, locale, reference);
+      return scriptureStore.getScriptures(version, lang, reference);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -60,14 +58,14 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "search")
   public GetOrSearchResponse search(
       @Named("searchText") String searchText, @Named("version") @Nullable String version,
-      @Named("locale") @DefaultValue(EN) String locale,
+      @Named("lang") @Nullable String lang,
       @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy,
       @Named("pageSize") @DefaultValue("50") int pageSize,
       @Named("pageToken") @DefaultValue("1") int pageToken)
       throws ServiceException {
     try {
       return scriptureReferenceProcessor.matchesPattern(searchText)
-          ? scriptureStore.getScriptures(version, locale, searchText)
+          ? scriptureStore.getScriptures(version, lang, searchText)
           : GetOrSearchResponse.searchResult(
               scriptureStore.search(Query.forSearch(searchText, orderBy, pageSize, pageToken)));
     } catch (DD4StorageException e) {
@@ -76,12 +74,21 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
-  public Empty reindex(@Named("version") String version,
-      @Named("locale") @DefaultValue(EN) String locale,
+  public Empty reindex(@Named("version") String version, @Named("lang") @Nullable String lang,
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
-      scriptureStore.reindex(version, locale, book, chapter);
+      scriptureStore.reindex(version, lang, book, chapter);
       return Empty.getInstance();
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrateScriptures")
+  public AtomicInteger migrateScriptures(@Named("version") String version, @Named("lang") @Nullable String lang,
+      @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
+    try {
+      return new AtomicInteger(scriptureStore.migrate(version, lang, book, chapter));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

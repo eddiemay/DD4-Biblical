@@ -49,17 +49,19 @@ public class ScriptureStoreTest {
         i -> getScriptures(i.getArgument(1)));
     when(dao.create(anyCollectionOf(Scripture.class))).then(i -> i.getArgument(0));
     when(scriptureFetcher.fetch(anyString(), anyString(), any(BibleBook.class), anyInt())).then(i ->
-        fetchFromWeb(i.getArgument(0), i.getArgument(2), i.getArgument(3)));
+        fetchFromWeb(i.getArgument(0), i.getArgument(1), i.getArgument(2), i.getArgument(3)));
   }
 
   private static QueryResult<Scripture> getScriptures(Query.List query) {
-    ImmutableMap<String, Filter> filtersByColumnOp =
-        query.getFilters().stream().collect(toImmutableMap(filter -> filter.getColumn() + filter.getOperator(), identity()));
-    BibleBook book = BibleBook.get(filtersByColumnOp.get("book=").getVal());
-    int chapter = filtersByColumnOp.get("chapter=").getVal();
-    int startVerse = filtersByColumnOp.get("verse>=").getVal();
-    int endVerse = filtersByColumnOp.getOrDefault("verse<=", Filter.of("verse<=", startVerse)).getVal();
-    String version = filtersByColumnOp.getOrDefault("version=", Filter.of("version=", null)).getVal();
+    ImmutableMap<String, Object> filterValueByColumnOp =
+        query.getFilters().stream().collect(
+            toImmutableMap(filter -> filter.getColumn() + filter.getOperator(), Filter::getVal));
+    BibleBook book = BibleBook.get((String) filterValueByColumnOp.get("book="));
+    int chapter = (Integer) filterValueByColumnOp.get("chapter=");
+    int startVerse = (Integer) filterValueByColumnOp.get("verse>=");
+    int endVerse = (Integer) filterValueByColumnOp.getOrDefault("verse<=", startVerse);
+    String version = (String) filterValueByColumnOp.getOrDefault("version=", null);
+    String locale = (String) filterValueByColumnOp.getOrDefault("locale=", "en");
     endVerse = Math.min(endVerse, 37);
 
     if (chapter != 23) {
@@ -69,36 +71,38 @@ public class ScriptureStoreTest {
     return QueryResult.of(
         IntStream.range(startVerse, endVerse + 1)
             .boxed()
-            .flatMap(verse -> createScriptures(version, book.getName(), chapter, verse, "[Scripture Placeholder]"))
+            .flatMap(verse -> createScriptures(version, locale, book.getName(), chapter, verse, "[Scripture Placeholder]"))
             .collect(toImmutableList()),
         endVerse + 1 - startVerse, query);
   }
 
-  private static ImmutableList<Scripture> fetchFromWeb(String version, BibleBook book, int chapter) {
+  private static ImmutableList<Scripture> fetchFromWeb(
+      String version, String locale, BibleBook book, int chapter) {
     return IntStream.range(1, 38)
-        .mapToObj(verse -> createScripture(version, book.getName(), chapter, verse, "[Fetched From Web]"))
+        .mapToObj(verse -> createScripture(version, locale, book.getName(), chapter, verse, "[Fetched From Web]"))
         .collect(toImmutableList());
   }
 
-  private static Stream<Scripture> createScriptures(String version, String book, int chapter, int verse, String text) {
+  private static Stream<Scripture> createScriptures(
+      String version, String locale, String book, int chapter, int verse, String text) {
     if (version == null) {
       return Stream.of(
-          createScripture("ISR", book, chapter, verse, text),
-          createScripture("RSKJ", book, chapter, verse, text));
+          createScripture("ISR", locale, book, chapter, verse, text),
+          createScripture("RSKJ", locale, book, chapter, verse, text));
     }
 
-    return Stream.of(createScripture(version, book, chapter, verse, text));
+    return Stream.of(createScripture(version, locale, book, chapter, verse, text));
   }
 
-  private static Scripture createScripture(String version, String book, int chapter, int verse, String text) {
-    return new Scripture().setVersion(version).setBook(book).setChapter(chapter).setVerse(verse).setText(text);
+  private static Scripture createScripture(String version, String locale, String book, int chapter, int verse, String text) {
+    return new Scripture().setVersion(version).setLocale(locale).setBook(book).setChapter(chapter).setVerse(verse).setText(text);
   }
 
   @Test
   public void getScriptures() {
     assertThat(scriptureStore.getScriptures(VERSION, EN, "2 Kings 23:5").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
-    assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23:5-7").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures(VERSION, null,  "2 Kings 23:5-7").getItems()).containsExactly(
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(6).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(7).setText("[Scripture Placeholder]"));
@@ -144,6 +148,28 @@ public class ScriptureStoreTest {
     assertThat(scriptureStore.getScripturesTextAllVersions(EN, "2 Kings 23:5,7"))
         .isEqualTo("(ISR) 2 Kings 23:5 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:5 [Scripture Placeholder]\n\n" +
             "(ISR) 2 Kings 23:7 [Scripture Placeholder]\n(RSKJ) 2 Kings 23:7 [Scripture Placeholder]");
+  }
+
+  @Test
+  public void getScriptureFiltersDuplicates() {
+    assertThat(scriptureStore.getScriptures(VERSION, EN, "2 Kings 23:5,5").getItems()).containsExactly(
+       new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
+  }
+
+  @Test
+  public void getScriptures_interlaced() {
+    assertThat(
+        scriptureStore.getScriptures(VERSION, BibleBook.INTERLACED, "2 Kings 23:5").getItems()).containsExactly(
+            new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
+    assertThat(
+        scriptureStore.getScriptures(VERSION, BibleBook.INTERLACED, "2 Kings 23:3-5").getItems()).containsExactly(
+            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder();
   }
 
   @Test

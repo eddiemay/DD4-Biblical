@@ -14,8 +14,9 @@ public class ScriptureVersion {
   private final String version;
   private final int versionNum;
   private final ImmutableSet<BibleBook> bibleBooks;
+  private final ImmutableSet<String> supportedLanguages;
 
-  private static final ImmutableList<ScriptureVersion> ALL_VERSIONS = ImmutableList.of(
+  public static final ImmutableList<ScriptureVersion> ALL_VERSIONS = ImmutableList.of(
       new ScriptureVersion("The Scriptures (1998)", "ISR", 10, BibleBook.CANON),
       new ScriptureVersion("Restored Names King James", "RSKJ", 20, BibleBook.CANON),
       new ScriptureVersion("New Revised Standard Version", "NRSV", 30,
@@ -27,7 +28,7 @@ public class ScriptureVersion {
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,
           ImmutableSet.of(BibleBook.ENOCH, BibleBook.ENOCH_2, BibleBook.JUBILEES, BibleBook.JASHER, BibleBook.BOOK_OF_ADAM_AND_EVE)),
-      new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
+      // new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
       new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),
       new ScriptureVersion("Qumran", "qumran", 56,
@@ -35,19 +36,29 @@ public class ScriptureVersion {
       new ScriptureVersion("University of Chicago", "uchicago", 57, ImmutableSet.of(BibleBook.JOSEPHUS)),
       new ScriptureVersion("M. R. James", "M. R. James", 58, ImmutableSet.of(BibleBook.TESTAMENT_OF_JOB)),
       new ScriptureVersion("Rabbi Ishmael Ben Elisha", "R. Ishmael", 59, ImmutableSet.of(BibleBook.ENOCH_3)),
+      new ScriptureVersion("Sefaria", "Sefaria", 60,
+          ImmutableList.<BibleBook>builder()
+              .add(BibleBook.JUBILEES).addAll(BibleBook.TESTAMENT_OF_THE_TWELVE).build(),
+          ImmutableSet.of(BibleBook.EN, BibleBook.HEBREW)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),
-      new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80, BibleBook.CANON.subList(0, 39)));
+      new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80, BibleBook.CANON.subList(0, 39), ImmutableSet.of(BibleBook.HEBREW)));
 
   private static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
       ALL_VERSIONS.stream().collect(toImmutableMap(ScriptureVersion::getVersion, identity()));
 
   public ScriptureVersion(String name, String version, int versionNum, Iterable<BibleBook> bibleBooks) {
+    this(name, version, versionNum, bibleBooks, ImmutableSet.of(BibleBook.EN));
+  }
+
+  public ScriptureVersion(
+      String name, String version, int versionNum, Iterable<BibleBook> bibleBooks, Iterable<String> supportedLanguages) {
     this.name = name;
     this.version = version;
     this.versionNum = versionNum;
     this.bibleBooks = ImmutableSet.copyOf(bibleBooks);
+    this.supportedLanguages = ImmutableSet.copyOf(supportedLanguages);
   }
 
   public String getName() {
@@ -66,26 +77,36 @@ public class ScriptureVersion {
     return bibleBooks;
   }
 
+  public ImmutableSet<String> getSupportedLanguages() {
+    return supportedLanguages;
+  }
+
+  public boolean meetsCriteria(BibleBook book, String lang) {
+    return getBibleBooks().contains(book) && (lang == null || supportedLanguages.contains(lang));
+  }
+
+  @Override
+  public String toString() {
+    return getVersion();
+  }
+
   public static ScriptureVersion get(String version) {
     // We will support all the different versions of BibleHub without having to create instances for them.
     return BY_VERSION.get(version); // OrDefault(version, new ScriptureVersion(version, version, BibleBook.CANON));
   }
 
-  public static ScriptureVersion getOrFallback(String version, String locale, BibleBook book) {
-    if (version.equals("WLCA")) {
-      version = "WLCO";
-    }
-
+  public static ScriptureVersion getOrFallback(String version, String lang, BibleBook book) {
     ScriptureVersion scriptureVersion = get(version);
     if (scriptureVersion == null) {
       throw new DD4StorageException("Unknown scripture version: " + version, ErrorCode.BAD_REQUEST);
     }
 
-    if (scriptureVersion.getBibleBooks().contains(book)) {
+    if (scriptureVersion.meetsCriteria(book, lang)) {
       return scriptureVersion;
     }
 
-    return BY_VERSION.values().stream().filter(sv -> sv.getBibleBooks().contains(book)).findFirst()
-        .orElseThrow(() -> new DD4StorageException("No source found for book: " + book));
+    return BY_VERSION.values().stream().filter(sv -> sv.meetsCriteria(book, lang)).findFirst()
+        .orElseThrow(() ->
+             new DD4StorageException("No source found for book: " + book + " in language: " + lang));
   }
 }

@@ -2,7 +2,7 @@ com.digitald4.biblical.FlashCardsCtrl = function(highScoreService, userPreferenc
   this.highScoreService = highScoreService;
   this.userPreferences = userPreferences;
   this.tabs = ['Review', 'Test'];
-  this.testOptions = ['Name', 'Modern', 'Paleo', 'Ancient', 'English',
+  this.testOptions = ['Name', 'Modern', 'Paleo', 'Ancient', 'English', 'Aramaic',
       'Meaning', 'Value', 'Random', 'Mixed'];
   this.testStates = {
     NOT_STARTED: 0,

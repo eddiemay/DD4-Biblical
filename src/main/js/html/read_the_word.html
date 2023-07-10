@@ -19,6 +19,9 @@
               <label>Version</label>
               <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.getOrSearch()"
                       data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
+              <label>Language</label>
+              <select data-ng-model="$ctrl.globalData.language" data-ng-change="$ctrl.getOrSearch()"
+                      data-ng-options="language.code as language.name for language in $ctrl.globalData.languages"></select>
               <button data-ng-click="$ctrl.getOrSearch()">Show</button>
             </div>
           </div>

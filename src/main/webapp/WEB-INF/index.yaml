@@ -7,9 +7,22 @@ indexes:
       - name: verse
   - kind: Scripture
     properties:
+      - name: version
+      - name: locale
       - name: book
       - name: chapter
       - name: verse
+  - kind: Scripture
+    properties:
+      - name: book
+      - name: chapter
+      - name: verse
+  - kind: Scripture
+    properties:
+      - name: book
+      - name: chapter
+      - name: verse
+        direction: desc
   - kind: BiblicalEvent
     properties:
       - name: year

@@ -36,6 +36,7 @@ public class ScripturePrinter {
             new ScriptureFetcherKJV1611(apiConnector),
             new ScriptureFetcherOneOff(apiConnector),
             new ScriptureFetcherPseudepigrapha(apiConnector),
+            new ScriptureFetcherSefariaOrg(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)));
 
     if (args.length > 1 && !args[1].isEmpty()) {

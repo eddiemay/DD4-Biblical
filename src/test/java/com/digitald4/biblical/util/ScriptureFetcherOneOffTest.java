@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -255,14 +256,6 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
   public void fetchTestamentOfJob() throws Exception {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/main/webapp/books/testament_of_job.html"));
-
-    /*assertThat(scriptureStore.getScriptures("M R James", "TESTAMENT OF JOB 1:1-3").getItems()).containsExactly(
-        new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(1).setText(
-            "On the day he became sick and (he) knew that he would have to leave his bodily abode, he called his seven sons and his three daughters together and spoke to them as follows:"),
-        new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(2).setText(
-            "“Form a circle around me, children, and hear, and I shall relate to you what the Lord did for me and all that happened to me."),
-        new Scripture().setVersion("M R James").setBook("Testament of Job").setChapter(1).setVerse(3).setText(
-            "For I am Job your father."));*/
 
     assertThat(scriptureStore.getScriptures("M. R. James", EN, "TESTAMENT OF JOB 12:17-19").getItems()).containsExactly(
         new Scripture().setVersion("M. R. James").setBook("Testament of Job").setChapter(12).setVerse(17).setText(

@@ -134,16 +134,6 @@ public class Lesson implements HasModificationTimes {
       return this;
     }
 
-    @Deprecated
-    public String getYoutubeId() {
-      return null;
-    }
-
-    @Deprecated
-    public LessonVersion setYoutubeId(String youtubeId) {
-      return this;
-    }
-
     public StringBuilder getContent() {
       return content;
     }

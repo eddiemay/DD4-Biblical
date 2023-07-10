@@ -10,6 +10,10 @@ import com.google.common.collect.ImmutableSet;
 
 public class BibleBook {
   public static final String EN = "en";
+  public static final String HEBREW = "he";
+  public static final String HEBREW_ANCIENT = "he-A";
+  public static final String INTERLACED = "interlaced";
+
   public static final BibleBook Genesis;
   public static final BibleBook Kings2;
   public static final BibleBook ESTHER;
@@ -167,6 +171,39 @@ public class BibleBook {
   public static final BibleBook TESTAMENT_OF_JOB =
       new BibleBook(95, "Testament of Job", "Apocrypha,Jewish History", 12);
 
+  // public static final BibleBook TESTAMENT_OF_THE_TWELVE_PATRIARCHS =
+      // new BibleBook(100, "Testaments of the Twelve Patriarchs", "Apocrypha,Jewish History", 12);
+  public static final BibleBook TESTAMENT_OF_REUBEN =
+      new BibleBook(101, "Testament of Reuben", "Apocrypha,Jewish History", 7);
+  public static final BibleBook TESTAMENT_OF_SIMEON =
+      new BibleBook(102, "Testament of Simeon", "Apocrypha,Jewish History", 9);
+  public static final BibleBook TESTAMENT_OF_LEVI =
+      new BibleBook(103, "Testament of Levi", "Apocrypha,Jewish History", 19);
+  public static final BibleBook TESTAMENT_OF_JUDAH =
+      new BibleBook(104, "Testament of Judah", "Apocrypha,Jewish History", 26);
+  public static final BibleBook TESTAMENT_OF_ISSACHAR =
+      new BibleBook(105, "Testament of Issachar", "Apocrypha,Jewish History", 7);
+  public static final BibleBook TESTAMENT_OF_ZEBULUN =
+      new BibleBook(106, "Testament of Zebulun", "Apocrypha,Jewish History", 10);
+  public static final BibleBook TESTAMENT_OF_DAN =
+      new BibleBook(107, "Testament of Dan", "Apocrypha,Jewish History", 7);
+  public static final BibleBook TESTAMENT_OF_NAPHTALI =
+      new BibleBook(108, "Testament of Naphtali", "Apocrypha,Jewish History", 9);
+  public static final BibleBook TESTAMENT_OF_GAD =
+      new BibleBook(109, "Testament of Gad", "Apocrypha,Jewish History", 8);
+  public static final BibleBook TESTAMENT_OF_ASHER =
+      new BibleBook(110, "Testament of Asher", "Apocrypha,Jewish History", 8);
+  public static final BibleBook TESTAMENT_OF_JOSEPH =
+      new BibleBook(111, "Testament of Joseph", "Apocrypha,Jewish History", 20);
+  public static final BibleBook TESTAMENT_OF_BENJAMIN =
+      new BibleBook(112, "Testament of Benjamin", "Apocrypha,Jewish History", 12);
+
+  static final ImmutableSet<BibleBook> TESTAMENT_OF_THE_TWELVE = ImmutableSet.of(
+      // TESTAMENT_OF_THE_TWELVE_PATRIARCHS,
+      TESTAMENT_OF_REUBEN, TESTAMENT_OF_SIMEON, TESTAMENT_OF_LEVI, TESTAMENT_OF_JUDAH,
+      TESTAMENT_OF_ISSACHAR, TESTAMENT_OF_ZEBULUN, TESTAMENT_OF_DAN, TESTAMENT_OF_NAPHTALI,
+      TESTAMENT_OF_GAD, TESTAMENT_OF_ASHER, TESTAMENT_OF_JOSEPH, TESTAMENT_OF_BENJAMIN);
+
   public static final ImmutableSet<BibleBook> ALL_BOOKS = ImmutableSet.<BibleBook>builder()
       .addAll(CANON)
       .addAll(APOCRYPHA)
@@ -175,19 +212,20 @@ public class BibleBook {
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
       .add(ENOCH_2, ENOCH_3, JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS,
           BOOK_OF_ADAM_AND_EVE, TESTAMENT_OF_JOB)
+      .addAll(TESTAMENT_OF_THE_TWELVE)
       .build();
 
   private final int bookNum;
   private final String name;
   private final String tags;
-  private final int chapterCount;
+  private final int chapters;
   private final ImmutableList<String> altNames;
 
-  BibleBook(int bookNum, String name, String tags, int chapterCount, String... altNames) {
+  BibleBook(int bookNum, String name, String tags, int chapters, String... altNames) {
     this.bookNum = bookNum;
     this.name = name;
     this.tags = tags;
-    this.chapterCount = chapterCount;
+    this.chapters = chapters;
     this.altNames = ImmutableList.copyOf(altNames);
   }
 
@@ -208,7 +246,7 @@ public class BibleBook {
   }
 
   public int getChapterCount() {
-    return chapterCount;
+    return chapters;
   }
 
   public ImmutableList<String> getAltNames() {

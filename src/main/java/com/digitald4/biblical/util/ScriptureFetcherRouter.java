@@ -13,6 +13,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
   private final ScriptureFetcherKJV1611 kjv1611;
   private final ScriptureFetcherOneOff oneOff;
   private final ScriptureFetcherPseudepigrapha pseudepigrapha;
+  private final ScriptureFetcherSefariaOrg sefariaOrg;
   private final ScriptureFetcherStepBibleOrg stepBibleOrg;
 
   @Inject
@@ -23,6 +24,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
       ScriptureFetcherKJV1611 kjv1611,
       ScriptureFetcherOneOff oneOff,
       ScriptureFetcherPseudepigrapha pseudepigrapha,
+      ScriptureFetcherSefariaOrg sefariaOrg,
       ScriptureFetcherStepBibleOrg stepBibleOrg) {
     this.bibleGateway = bibleGateway;
     this.bibleHub = bibleHub;
@@ -30,6 +32,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
     this.jwOrg = jwOrg;
     this.kjv1611 = kjv1611;
     this.pseudepigrapha = pseudepigrapha;
+    this.sefariaOrg = sefariaOrg;
     this.stepBibleOrg = stepBibleOrg;
   }
 
@@ -58,6 +61,8 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
         return oneOff;
       case "OXFORD":
         return pseudepigrapha;
+      case "Sefaria":
+        return sefariaOrg;
       case "RSKJ":
         return stepBibleOrg;
       default:

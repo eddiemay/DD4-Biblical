@@ -2,8 +2,8 @@ package com.digitald4.biblical.model;
 
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;
+import java.util.Objects;
 
-// Dave Nelson, Coonley,
 public class Scripture extends ModelObject<String> implements Searchable {
   private String version;
   private String locale = BibleBook.EN;
@@ -13,7 +13,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
   private StringBuilder text;
 
   public String getId() {
-    return String.format("%s-%s-%d-%d", getVersion(), getBook(), getChapter(), getVerse())
+    return String.format("%s-%s-%s-%d-%d", getVersion(), getLocale(), getBook(), getChapter(), getVerse())
         .replace(" ", "_");
   }
 
@@ -80,19 +80,13 @@ public class Scripture extends ModelObject<String> implements Searchable {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof Scripture)) {
-      return false;
-    }
-    Scripture other = (Scripture) obj;
-
-    return version.equals(other.version) && locale.equals(other.locale) && book.equals(other.book)
-        && chapter == other.chapter && verse == other.verse && text.toString().contentEquals(other.text);
+  public int hashCode() {
+    return Objects.hash(version, locale, book, chapter, verse, text.toString());
   }
 
   @Override
   public String toString() {
-    return String.format(
-        "(%s) %s %d:%d %s", getVersion(), getBook(), getChapter(), getVerse(), getText());
+    return String.format("(%s:%s) %s %d:%d %s",
+        getVersion(), getLocale(), getBook(), getChapter(), getVerse(), getText());
   }
 }

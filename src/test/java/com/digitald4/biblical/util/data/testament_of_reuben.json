@@ -1,0 +1,139 @@
+{
+  "ref": "The Testaments of the Twelve Patriarchs, The Testament of Reuben the First born Son of Jacob and Leah 2",
+  "heRef": "צוואות השבטים, צוואת ראובן בכור יעקב ולאה ב׳",
+  "isComplex": true,
+  "text": [
+    "And now hear me, my children, what things I saw concerning the seven spirits of deceit, when I repented.",
+    "Seven spirits therefore are appointed against man, and they are the leaders in the works of youth.",
+    "[And seven other spirits are given to him at his creation, that through them should be done every work of man.",
+    "The first is the spirit of life, with which the constitution (of man) is created. The second is the sense of sight, with which ariseth desire.",
+    "The third is the sense of hearing, with which cometh teaching. The fourth is the sense of smell, with which tastes are given to draw air and breath.",
+    "The fifth is the power of speech, with which cometh knowledge.",
+    "The sixth is the sense of taste, with which cometh the eating of meats and drinks; and by it strength is produced, for in food is the foundation of strength.",
+    "The seventh is the power of procreation and sexual intercourse, with which through love of pleasure sins enter in.",
+    "Wherefore it is the last in order of creation, and the first in that of youth, because it is filled with ignorance, and leadeth the youth as a blind man to a pit, and as a beast to a precipice."
+  ],
+  "he": [
+    "ועתה שמעו אלי בני את־אשר ראיתי על־דבר שבעה רוחות התהו באבלי:",
+    "כי שבעה רוחות נתנו נגד האדם והם ראש כל־מעשי נערות:",
+    "ושבעה רוחות אחרים נתנו לו כאשר נוצר ובהם יהי כל־מעשה האדם:",
+    "הראשון הוא רוח החיים אשר בו יוסד קיום האדם השני הוא רוח הראיה אשר בו תוצר התאוה:",
+    "השלישי הוא רוח השמיעה אשר אתו תבא חכמה הרביעי הוא רוח הריח ואתו נתנו הטעם ושאיפת האויר והנשימה:",
+    "החמישי הוא רוח הדבור ואתו תבא תבונה:",
+    "הששי הוא רוח הטעם ועל־ידו תהיה אכילת כל־מאכל ומשקה ועל־ידו יוצר הכח כי במאכלים יסוד הכח:",
+    "הרוח השביעי הוא רוח ההולדה והמשגל ועל־ידו יבא החטא בתאות החשק:",
+    "ועל־כן אחרון הוא במערכת הבריאה וראשון לנער כי מלא הוא כסילות ואת הנער יוביל כעור אל־בור וכבהמה אל־שחת:"
+  ],
+  "versions": [
+    {
+      "title": "The Testaments of the Twelve Patriarchs",
+      "versionTitle": "Tsavaat HaShevatim -- Wikisource",
+      "versionSource": "https://he.wikisource.org/wiki/%D7%A6%D7%95%D7%95%D7%90%D7%95%D7%AA_%D7%94%D7%A9%D7%91%D7%98%D7%99%D7%9D",
+      "language": "he",
+      "status": "locked",
+      "license": "CC-BY-SA",
+      "versionNotes": "",
+      "digitizedBySefaria": "",
+      "priority": "",
+      "versionTitleInHebrew": "צוואת השבטים -- ויקיטקסט",
+      "versionNotesInHebrew": "",
+      "extendedNotes": "",
+      "extendedNotesHebrew": "",
+      "purchaseInformationImage": "",
+      "purchaseInformationURL": "",
+      "shortVersionTitle": "",
+      "shortVersionTitleInHebrew": "",
+      "isBaseText": true
+    },
+    {
+      "title": "The Testaments of the Twelve Patriarchs",
+      "versionTitle": "Testaments of the Twelve Patriarchs, R. H. Charles,1908",
+      "versionSource": "http://www.earlychristianwritings.com/text/patriarchs-charles.html",
+      "language": "en",
+      "status": "locked",
+      "license": "Public Domain",
+      "versionNotes": "",
+      "digitizedBySefaria": "",
+      "priority": "",
+      "versionTitleInHebrew": "",
+      "versionNotesInHebrew": "",
+      "extendedNotes": "",
+      "extendedNotesHebrew": "",
+      "purchaseInformationImage": "",
+      "purchaseInformationURL": "",
+      "shortVersionTitle": "",
+      "shortVersionTitleInHebrew": "",
+      "isBaseText": false
+    }
+  ],
+  "textDepth": 2,
+  "sectionNames": [
+    "Chapter",
+    "Paragraph"
+  ],
+  "addressTypes": [
+    "Integer",
+    "Integer"
+  ],
+  "heTitle": "צוואות השבטים, צוואת ראובן בכור יעקב ולאה",
+  "titleVariants": [
+    "The Testament of Reuben the First born Son of Jacob and Leah"
+  ],
+  "heTitleVariants": [
+    "צוואת ראובן בכור יעקב ולאה"
+  ],
+  "type": "Second Temple",
+  "primary_category": "Second Temple",
+  "book": "The Testaments of the Twelve Patriarchs, The Testament of Reuben the First born Son of Jacob and Leah",
+  "categories": [
+    "Second Temple",
+    "Apocrypha"
+  ],
+  "order": "",
+  "sections": [
+    2
+  ],
+  "toSections": [
+    2
+  ],
+  "isDependant": false,
+  "indexTitle": "The Testaments of the Twelve Patriarchs",
+  "heIndexTitle": "צוואות השבטים",
+  "sectionRef": "The Testaments of the Twelve Patriarchs, The Testament of Reuben the First born Son of Jacob and Leah 2",
+  "firstAvailableSectionRef": "The Testaments of the Twelve Patriarchs, The Testament of Reuben the First born Son of Jacob and Leah 2",
+  "heSectionRef": "צוואות השבטים, צוואת ראובן בכור יעקב ולאה ב׳",
+  "isSpanning": false,
+  "versionTitle": "Testaments of the Twelve Patriarchs, R. H. Charles,1908",
+  "versionTitleInHebrew": "",
+  "shortVersionTitle": "",
+  "shortVersionTitleInHebrew": "",
+  "versionSource": "http://www.earlychristianwritings.com/text/patriarchs-charles.html",
+  "versionStatus": "locked",
+  "versionNotes": "",
+  "extendedNotes": "",
+  "extendedNotesHebrew": "",
+  "versionNotesInHebrew": "",
+  "digitizedBySefaria": false,
+  "license": "Public Domain",
+  "formatEnAsPoetry": false,
+  "heVersionTitle": "Tsavaat HaShevatim -- Wikisource",
+  "heVersionTitleInHebrew": "צוואת השבטים -- ויקיטקסט",
+  "heShortVersionTitle": "",
+  "heShortVersionTitleInHebrew": "",
+  "heVersionSource": "https://he.wikisource.org/wiki/%D7%A6%D7%95%D7%95%D7%90%D7%95%D7%AA_%D7%94%D7%A9%D7%91%D7%98%D7%99%D7%9D",
+  "heVersionStatus": "locked",
+  "heVersionNotes": "",
+  "heExtendedNotes": "",
+  "heExtendedNotesHebrew": "",
+  "heVersionNotesInHebrew": "",
+  "heDigitizedBySefaria": false,
+  "heLicense": "CC-BY-SA",
+  "formatHeAsPoetry": false,
+  "alts": [],
+  "index_offsets_by_depth": {},
+  "next": "The Testaments of the Twelve Patriarchs, The Testament of Reuben the First born Son of Jacob and Leah 3",
+  "prev": "The Testaments of the Twelve Patriarchs, The Testament of Reuben the First born Son of Jacob and Leah 1",
+  "commentary": [],
+  "sheets": [],
+  "layer": []
+}

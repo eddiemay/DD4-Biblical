@@ -8,6 +8,9 @@ import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.common.exception.DD4StorageException;
+import com.digitald4.common.storage.Query;
+import com.digitald4.common.storage.Query.Filter;
+import com.digitald4.common.storage.Query.OrderBy;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
@@ -52,11 +55,15 @@ public class BookService {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "verseCount")
   public AtomicInteger getVerseCount(
-      @Named("book") String book, @Named("chapter") int chapter,
-      @Named("version") @Nullable String version) throws ServiceException {
+      @Named("version") @Nullable String version, @Named("locale") @Nullable String locale,
+      @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
+      Query.List query = Query.forList()
+          .setFilters(Filter.of("book", book), Filter.of("chapter", chapter));
+      if (version != null) query.addFilter(Filter.of("version", version));
+      if (locale != null) query.addFilter(Filter.of("locale", locale));
       return new AtomicInteger(
-          scriptureStore.getScriptures(version, BibleBook.EN, book + " " + chapter).getItems().stream()
+          scriptureStore.list(query).getItems().stream()
               .mapToInt(Scripture::getVerse).max().orElse(0));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);

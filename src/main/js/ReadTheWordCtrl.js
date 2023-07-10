@@ -5,30 +5,39 @@ com.digitald4.biblical.ReadTheWordCtrl = function($location, globalData, scriptu
   this.scriptureService = scriptureService;
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
+  this.language = $location.search()['lang'];
   this.showReference();
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {
   this.locationProvider.search('reference', this.reference.value);
   this.locationProvider.search('version', this.globalData.scriptureVersion);
+  this.locationProvider.search('lang', this.globalData.language);
   this.locationProvider.search('pageToken', page);
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.setReference = function(reference) {
   this.locationProvider.search('reference', reference);
   this.locationProvider.search('version', this.globalData.scriptureVersion);
+  this.locationProvider.search('lang', this.globalData.language);
   this.locationProvider.search('pageToken', undefined);
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(version, book, chapter, verse) {
-  this.globalData.reference = {book: book, chapter: chapter, verse: verse, version: version || this.globalData.scriptureVersion};
+  this.globalData.reference = {book: book, chapter: chapter, verse: verse,
+      version: version || this.globalData.scriptureVersion, lang: this.globalData.language};
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
   if (!this.reference.value) {
     return;
   }
-  var request = {'searchText': this.reference.value, 'version': this.globalData.scriptureVersion, 'pageSize': 50, 'pageToken': this.pageToken};
+  var request = {
+    'searchText': this.reference.value,
+    'version': this.globalData.scriptureVersion,
+    'lang': this.language,
+    'pageSize': 50,
+    'pageToken': this.pageToken};
   this.scriptureService.search(request, response => {
     if (response.resultType == 'GET') {
       this.processScriptureResult(response);

@@ -5,7 +5,7 @@ AlefBet = {
     paleo: '𐤀',
     ancient: '𓃾',
     samaritan: 'ࠀ',
-    arabic: 'ا',
+    aramaic: 'ا',
     value: 1,
     english: 'A',
     meaning: 'ox head, strength'
@@ -14,9 +14,9 @@ AlefBet = {
     name: 'Beth',
     modern: 'ב',
     paleo: '𐤁',
-    ancient: '𓉐',
+    ancient: '𓉔',
     samaritan: 'ࠁ',
-    arabic: 'ب',
+    aramaic: 'ب',
     value: 2,
     english: 'B',
     meaning: 'house'
@@ -27,7 +27,7 @@ AlefBet = {
     paleo: '𐤂',
     ancient: '𓌙',
     samaritan: 'ࠂ',
-    arabic: 'ج',
+    aramaic: 'ج',
     value: 3,
     english: 'G',
     meaning: 'camel'
@@ -38,7 +38,7 @@ AlefBet = {
     paleo: '𐤃',
     ancient: '𓇯',
     samaritan: 'ࠃ',
-    arabic: 'د',
+    aramaic: 'د',
     value: 4,
     english: 'D',
     meaning: 'door'
@@ -49,7 +49,7 @@ AlefBet = {
     paleo: '𐤄',
     ancient: '𓀠',
     samaritan: 'ࠄ',
-    arabic: 'ه',
+    aramaic: 'ه',
     value: 5,
     english: 'H',
     meaning: 'jubilation, window'
@@ -60,7 +60,7 @@ AlefBet = {
     paleo: '𐤅',
     ancient: '𓏲',
     samaritan: 'ࠅ',
-    arabic: 'و',
+    aramaic: 'و',
     value: 6,
     english: 'W/V',
     meaning: 'hook'
@@ -71,7 +71,7 @@ AlefBet = {
     paleo: '𐤆',
     ancient: '𓌻',
     samaritan: 'ࠆ',
-    arabic: 'ز',
+    aramaic: 'ز',
     value: 7,
     english: 'Z',
     meaning: 'weapon'
@@ -80,9 +80,9 @@ AlefBet = {
     name: 'Chet',
     modern: 'ח',
     paleo: '𐤇',
-    ancient: '𓉗/𓈈',
+    ancient: '𓈈',
     samaritan: 'ࠇ',
-    arabic: 'ح',
+    aramaic: 'ح',
     value: 8,
     english: 'Ch',
     meaning: 'courtyard, gate'
@@ -93,7 +93,7 @@ AlefBet = {
     paleo: '𐤈',
     ancient: '𐤈',
     samaritan: 'ࠈ',
-    arabic: 'ط',
+    aramaic: 'ط',
     value: 9,
     english: 'T',
     meaning: 'wheel'
@@ -104,7 +104,7 @@ AlefBet = {
     paleo: '𐤉',
     ancient: '𓂝',
     samaritan: 'ࠉ',
-    arabic: 'ي',
+    aramaic: 'ي',
     value: 10,
     english: 'Y',
     meaning: 'arm, hand'
@@ -113,9 +113,9 @@ AlefBet = {
     name: 'Kaf',
     modern: 'כ',
     paleo: '𐤊',
-    ancient: '𓂧',
+    ancient: '𓂩',
     samaritan: 'ࠊ',
-    arabic: 'ك',
+    aramaic: 'ك',
     value: 20,
     english: 'K,C',
     meaning: 'palm of hand'
@@ -126,7 +126,7 @@ AlefBet = {
     paleo: '𐤋',
     ancient: '𓏱',
     samaritan: 'ࠋ',
-    arabic: 'ل',
+    aramaic: 'ل',
     value: 30,
     english: 'L',
     meaning: 'goad, staff'
@@ -137,7 +137,7 @@ AlefBet = {
     paleo: '𐤌',
     ancient: '𓈖',
     samaritan: 'ࠌ',
-    arabic: 'م',
+    aramaic: 'م',
     value: 40,
     english: 'M',
     meaning: 'water, life'
@@ -148,7 +148,7 @@ AlefBet = {
     paleo: '𐤍',
     ancient: '𓆓',
     samaritan: 'ࠍ',
-    arabic: 'ن',
+    aramaic: 'ن',
     value: 50,
     english: 'N',
     meaning: 'fish'
@@ -159,7 +159,7 @@ AlefBet = {
     paleo: '𐤎',
     ancient: '𓊽',
     samaritan: 'ࠎ',
-    arabic: 'س',
+    aramaic: 'س',
     value: 60,
     english: 'S',
     meaning: 'pillar, support'
@@ -170,7 +170,7 @@ AlefBet = {
     paleo: '𐤏',
     ancient: '𓁹',
     samaritan: 'ࠏ',
-    arabic: 'ع',
+    aramaic: 'ع',
     value: 70,
     english: 'I',
     meaning: 'eye'
@@ -181,7 +181,7 @@ AlefBet = {
     paleo: '𐤐',
     ancient: '𓂋',
     samaritan: 'ࠐ',
-    arabic: 'ف',
+    aramaic: 'ف',
     value: 80,
     english: 'P',
     meaning: 'mouth'
@@ -190,9 +190,9 @@ AlefBet = {
     name: 'Tzadi',
     modern: 'צ',
     paleo: '𐤑',
-    ancient: '',
+    ancient: '𓄘',
     samaritan: 'ࠑ',
-    arabic: 'ص',
+    aramaic: 'ص',
     value: 90,
     english: 'Tz',
     meaning: ''
@@ -203,7 +203,7 @@ AlefBet = {
     paleo: '𐤒',
     ancient: '𐤒',
     samaritan: 'ࠒ',
-    arabic: 'ق',
+    aramaic: 'ق',
     value: 100,
     english: 'Q',
     meaning: 'eye of needle'
@@ -214,7 +214,7 @@ AlefBet = {
     paleo: '𐤓',
     ancient: '𓁶',
     samaritan: 'ࠓ',
-    arabic: 'ر',
+    aramaic: 'ر',
     value: 200,
     english: 'R',
     meaning: 'man head'
@@ -225,7 +225,7 @@ AlefBet = {
     paleo: '𐤔',
     ancient: '𓌓',
     samaritan: 'ࠔ',
-    arabic: 'ش',
+    aramaic: 'ش',
     value: 300,
     english: 'Sh',
     meaning: 'tooth'
@@ -236,7 +236,7 @@ AlefBet = {
     paleo: '𐤕',
     ancient: '𓏴',
     samaritan: 'ࠕ',
-    arabic: 'ت',
+    aramaic: 'ت',
     value: 400,
     english: 'T',
     meaning: 'mark, sign'
@@ -246,6 +246,6 @@ AlefBet = {
 // References
 // https://www.hebrew4christians.com/Grammar/Unit_One/Pictograms/pictograms.html
 // https://en.wikipedia.org/wiki/Hebrew_alphabet
-// https://en.wikipedia.org/wiki/Arabic_alphabet
+// https://en.wikipedia.org/wiki/aramaic_alphabet
 // https://en.wikipedia.org/wiki/Paleo-Hebrew_alphabet
 // https://en.wikipedia.org/wiki/Template:Unicode_chart_Egyptian_Hieroglyphs
