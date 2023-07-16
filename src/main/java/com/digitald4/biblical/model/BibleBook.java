@@ -107,18 +107,22 @@ public class BibleBook {
   public static final BibleBook ESDRAS_2 = new BibleBook(68, "2 Esdras", "Apocrypha,Deuterocanon,Ethiopian,Esdras,Ezra", 16);
   public static final BibleBook WISDOM_OF_SOLOMON;
   public static final BibleBook SIRACH;
+  public static final BibleBook MACCABEES_1;
+  public static final BibleBook MACCABEES_2;
+  public static final BibleBook TOBIT;
   public static final ImmutableList<BibleBook> UNIVERSAL_DEUTEROCANON = ImmutableList.of(
-      new BibleBook(69, "Tobit", "Apocrypha,Deuterocanon,Universal", 14, "Tob", "Tb"),
+      TOBIT = new BibleBook(69, "Tobit", "Apocrypha,Deuterocanon,Universal", 14, "Tob", "Tb"),
       new BibleBook(70, "Judith", "Apocrypha,Deuterocanon,Universal", 16, "Jth", "Jdth", "Jdt"),
       WISDOM_OF_SOLOMON = new BibleBook(71, "Wisdom of Solomon", "Apocrypha,Deuterocanon,Universal", 19, "Wisdom", "Wis", "Ws"),
       SIRACH = new BibleBook(72, "Sirach", "Apocrypha,Deuterocanon,Universal", 51, "Ecclesiasticus", "Sir", "Ecclus"),
       new BibleBook(73, "Baruch", "Apocrypha,Deuterocanon,Universal", 5, "Bar"),
-      new BibleBook(74, "1 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 16,
+      MACCABEES_1 = new BibleBook(74, "1 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 16,
           "1Mac", "1Macc", "1 Machabees"),
-      new BibleBook(75, "2 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 15,
+      MACCABEES_2 = new BibleBook(75, "2 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 15,
           "2Mac", "2Macc", "2 Machabees"));
 
   public static final BibleBook PRAYER_OF_MANASSEH;
+  public static final BibleBook SUSANNA;
   public static final ImmutableList<BibleBook> APOCRYPHA = ImmutableList.<BibleBook>builder()
       .add(ESDRAS_1, ESDRAS_2)
       .addAll(UNIVERSAL_DEUTEROCANON)
@@ -126,7 +130,7 @@ public class BibleBook {
           new BibleBook(76, "Letter of Jeremiah", "Apocrypha", 1, "LJe"),
           new BibleBook(77, "Prayer of Azariah", "Apocrypha", 1, "Song of the Three",
               "Song of the Three Holy Children", "Song of the Three Children", "PrA", "azriah"),
-          new BibleBook(78, "Susanna", "Apocrypha", 1, "Sus"),
+          SUSANNA = new BibleBook(78, "Susanna", "Apocrypha", 1, "Sus"),
           new BibleBook(79, "Bel and the Dragon", "Apocrypha", 1, "Bel"),
           PRAYER_OF_MANASSEH = new BibleBook(80, "Prayer of Manasseh",
               "Apocrypha,Deuterocanon,Eastern", 1, "PrM", "PMa"))
@@ -152,7 +156,7 @@ public class BibleBook {
   public static final BibleBook ENOCH_3 =
       new BibleBook(87, "3 Enoch", "Apocrypha,Enoch", 48, "3 Hanok", "3 Eno");
   public static final BibleBook GIANTS =
-      new BibleBook(88, "Book of Giants", "Apocrypha,Enoch", 48, "Giants");
+      new BibleBook(88, "Book of Giants", "Apocrypha,Enoch", 14, "Giants");
   public static final BibleBook JUBILEES =
       new BibleBook(89, "Jubilees", "Apocrypha,Deuterocanon,Ethiopian", 50, "Jub");
   public static final ImmutableList<BibleBook> ETHIOPIAN_ORTHODOX_DEUTEROCANON =
@@ -170,9 +174,13 @@ public class BibleBook {
       "Apocrypha,Jewish History", 51);
   public static final BibleBook TESTAMENT_OF_JOB =
       new BibleBook(95, "Testament of Job", "Apocrypha,Jewish History", 12);
+  public static final BibleBook GAD_THE_SEER =
+      new BibleBook(96, "Gad the Seer", "Apocrypha,Jewish History", 14);
+  public static final BibleBook LIVES_OF_THE_PROPHETS =
+      new BibleBook(97, "Lives of the Prophets", "Apocrypha,Jewish History", 14, "Prophets");
 
-  // public static final BibleBook TESTAMENT_OF_THE_TWELVE_PATRIARCHS =
-      // new BibleBook(100, "Testaments of the Twelve Patriarchs", "Apocrypha,Jewish History", 12);
+  public static final BibleBook TESTAMENTS_OF_THE_TWELVE_PATRIARCHS =
+      new BibleBook(100, "Testaments of the Twelve Patriarchs", "Apocrypha,Jewish History", 12, "Testaments of the Twelve", "Testaments", "TofT", "ttp");
   public static final BibleBook TESTAMENT_OF_REUBEN =
       new BibleBook(101, "Testament of Reuben", "Apocrypha,Jewish History", 7);
   public static final BibleBook TESTAMENT_OF_SIMEON =
@@ -198,8 +206,8 @@ public class BibleBook {
   public static final BibleBook TESTAMENT_OF_BENJAMIN =
       new BibleBook(112, "Testament of Benjamin", "Apocrypha,Jewish History", 12);
 
-  static final ImmutableSet<BibleBook> TESTAMENT_OF_THE_TWELVE = ImmutableSet.of(
-      // TESTAMENT_OF_THE_TWELVE_PATRIARCHS,
+  static final ImmutableSet<BibleBook> TESTAMENTS_OF_THE_TWELVE = ImmutableSet.of(
+      // TESTAMENTS_OF_THE_TWELVE_PATRIARCHS,
       TESTAMENT_OF_REUBEN, TESTAMENT_OF_SIMEON, TESTAMENT_OF_LEVI, TESTAMENT_OF_JUDAH,
       TESTAMENT_OF_ISSACHAR, TESTAMENT_OF_ZEBULUN, TESTAMENT_OF_DAN, TESTAMENT_OF_NAPHTALI,
       TESTAMENT_OF_GAD, TESTAMENT_OF_ASHER, TESTAMENT_OF_JOSEPH, TESTAMENT_OF_BENJAMIN);
@@ -210,9 +218,10 @@ public class BibleBook {
       .add(ADDITIONS_TO_ESTHER, PSALMS_151)
       .addAll(EASTERN_ORTHODOX_DEUTEROCANON)
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
-      .add(ENOCH_2, ENOCH_3, JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS,
-          BOOK_OF_ADAM_AND_EVE, TESTAMENT_OF_JOB)
-      .addAll(TESTAMENT_OF_THE_TWELVE)
+      .add(ENOCH_2, ENOCH_3, GIANTS, JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS,
+          BOOK_OF_ADAM_AND_EVE, TESTAMENT_OF_JOB, GAD_THE_SEER, LIVES_OF_THE_PROPHETS,
+          TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)
+      // .addAll(TESTAMENTS_OF_THE_TWELVE)
       .build();
 
   private final int bookNum;

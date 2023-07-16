@@ -27,33 +27,36 @@ public class ScriptureVersion {
               .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,
-          ImmutableSet.of(BibleBook.ENOCH, BibleBook.ENOCH_2, BibleBook.JUBILEES, BibleBook.JASHER, BibleBook.BOOK_OF_ADAM_AND_EVE)),
-      // new ScriptureVersion("Enoch Reference", "EnochRef", 35, ImmutableSet.of(BibleBook.ENOCH)),
+          ImmutableSet.of(BibleBook.ENOCH, BibleBook.ENOCH_2, BibleBook.JUBILEES, BibleBook.JASHER,
+              BibleBook.BOOK_OF_ADAM_AND_EVE)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
-      new ScriptureVersion("Essene", "essene", 55, ImmutableSet.of(BibleBook.COMMUNITY_RULE)),
       new ScriptureVersion("Qumran", "qumran", 56,
-          ImmutableSet.of(BibleBook.WAR_SCROLL, BibleBook.GIANTS)),
-      new ScriptureVersion("University of Chicago", "uchicago", 57, ImmutableSet.of(BibleBook.JOSEPHUS)),
-      new ScriptureVersion("M. R. James", "M. R. James", 58, ImmutableSet.of(BibleBook.TESTAMENT_OF_JOB)),
-      new ScriptureVersion("Rabbi Ishmael Ben Elisha", "R. Ishmael", 59, ImmutableSet.of(BibleBook.ENOCH_3)),
+          ImmutableSet.of(BibleBook.COMMUNITY_RULE, BibleBook.WAR_SCROLL, BibleBook.GIANTS)),
       new ScriptureVersion("Sefaria", "Sefaria", 60,
           ImmutableList.<BibleBook>builder()
-              .add(BibleBook.JUBILEES).addAll(BibleBook.TESTAMENT_OF_THE_TWELVE).build(),
+              .add(BibleBook.JUBILEES, BibleBook.MACCABEES_1, BibleBook.MACCABEES_2,
+                  BibleBook.SUSANNA, BibleBook.TOBIT, BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)
+              // .addAll(BibleBook.TESTAMENTS_OF_THE_TWELVE)
+              .build(),
           ImmutableSet.of(BibleBook.EN, BibleBook.HEBREW)),
+      new ScriptureVersion("Covenant Christian Coalition", "CCC", 61,
+          ImmutableSet.of(BibleBook.JOSEPHUS, BibleBook.ENOCH_3, BibleBook.TESTAMENT_OF_JOB,
+              BibleBook.GAD_THE_SEER, BibleBook.LIVES_OF_THE_PROPHETS)),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
-          ImmutableSet.<BibleBook>builder()
-              .addAll(BibleBook.CANON).addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),
-      new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80, BibleBook.CANON.subList(0, 39), ImmutableSet.of(BibleBook.HEBREW)));
+          ImmutableSet.<BibleBook>builder().addAll(BibleBook.CANON)
+              .addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),
+      new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80,
+          BibleBook.CANON.subList(0, 39), ImmutableSet.of(BibleBook.HEBREW)));
 
   private static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
       ALL_VERSIONS.stream().collect(toImmutableMap(ScriptureVersion::getVersion, identity()));
 
-  public ScriptureVersion(String name, String version, int versionNum, Iterable<BibleBook> bibleBooks) {
-    this(name, version, versionNum, bibleBooks, ImmutableSet.of(BibleBook.EN));
+  public ScriptureVersion(String name, String version, int number, Iterable<BibleBook> bibleBooks) {
+    this(name, version, number, bibleBooks, ImmutableSet.of(BibleBook.EN));
   }
 
-  public ScriptureVersion(
-      String name, String version, int versionNum, Iterable<BibleBook> bibleBooks, Iterable<String> supportedLanguages) {
+  public ScriptureVersion(String name, String version, int versionNum,
+      Iterable<BibleBook> bibleBooks, Iterable<String> supportedLanguages) {
     this.name = name;
     this.version = version;
     this.versionNum = versionNum;

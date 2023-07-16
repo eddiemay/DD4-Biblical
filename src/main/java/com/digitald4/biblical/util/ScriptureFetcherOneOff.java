@@ -3,8 +3,12 @@ package com.digitald4.biblical.util;
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.common.exception.DD4StorageException;
+import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.server.APIConnector;
 import com.google.common.collect.ImmutableList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,9 +33,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    if (book == BibleBook.ENOCH) {
-      return fetchEnoch(version, book, chapter);
-    } else if (book == BibleBook.COMMUNITY_RULE) {
+    if (book == BibleBook.COMMUNITY_RULE) {
       return fetchCommunityRule(version, book);
     } else if (book == BibleBook.WAR_SCROLL) {
       return fetchWarScroll(version, book);
@@ -43,6 +45,10 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetch3Enoch(version, book);
     } else if (book == BibleBook.GIANTS) {
       return fetchGiants(version, book);
+    } else if (book == BibleBook.GAD_THE_SEER) {
+      return fetchGadTheSeer(version, book, chapter);
+    } else if (book == BibleBook.LIVES_OF_THE_PROPHETS) {
+      return fetchLivesOfTheProphets(version, book);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -72,33 +78,6 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                 .setChapter(1)
                 .setVerse(verse.incrementAndGet())
                 .setText(text))
-        .collect(toImmutableList());
-  }
-
-  private synchronized ImmutableList<Scripture> fetchEnoch(String version, BibleBook book, int chapter) {
-    final Pattern versePattern = Pattern.compile("(\\d+). ([^<]+)");
-    int rangeStart = getRangeStart(chapter);
-    String htmlResult = apiConnector.sendGet(
-        String.format(
-            "https://bookofenochreferences.wordpress.com/category/the-book-of-enoch-with-biblical-references-chapters-%d-to-%d/chapter-%d/",
-            rangeStart, rangeStart + 9, chapter));
-    Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
-    Elements wrappers = doc.getElementsByClass("entry-content");
-    if (wrappers.size() == 0) {
-      throw new DD4StorageException("Unable to find scripture content");
-    }
-
-    return wrappers.get(0).getElementsByTag("p").stream()
-        .map(Element::ownText)
-        .map(versePattern::matcher)
-        .filter(Matcher::matches)
-        .map(
-            matcher -> new Scripture()
-                .setVersion(version)
-                .setBook(book.getName())
-                .setChapter(chapter)
-                .setVerse(Integer.parseInt(matcher.group(1)))
-                .setText(new StringBuilder(matcher.group(2))))
         .collect(toImmutableList());
   }
 
@@ -180,36 +159,38 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
   private synchronized ImmutableList<Scripture> fetchGiants(String version, BibleBook book) {
     final Pattern versePattern = Pattern.compile("(\\d+) ([^<]+)");
-    String htmlResult = apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");
+    String htmlResult =
+        apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
-    Elements rows = doc.getElementsByTag("tr");
-    if (rows.size() == 0) {
+    Elements blockquotes = doc.getElementsByTag("blockquote").get(1).getElementsByTag("blockquote");
+    if (blockquotes.size() == 0) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
     AtomicInteger chapter = new AtomicInteger();
-    return rows.stream()
-        .map(Element::text)
-        .map(versePattern::matcher)
-        .filter(Matcher::matches)
-        .map(
-            matcher -> {
-              int verse = Integer.parseInt(matcher.group(1));
-              if (verse == 1) {
-                chapter.incrementAndGet();
-              }
+    AtomicInteger verse = new AtomicInteger();
 
-              return new Scripture()
-                  .setVersion(version)
-                  .setBook(book.getName())
-                  .setChapter(chapter.get())
-                  .setVerse(verse)
-                  .setText(new StringBuilder(matcher.group(2)));
-            })
+    return blockquotes.stream()
+        .skip(1)
+        .peek(element -> {
+          chapter.incrementAndGet();
+          verse.set(0);
+        })
+        .flatMap(element -> element.getElementsByTag("p").stream())
+        .map(Element::text)
+        .map(ScriptureFetcher::trim)
+        .filter(text -> !text.isEmpty())
+        .map(text -> new Scripture()
+            .setVersion(version)
+            .setBook(book.getName())
+            .setChapter(chapter.get())
+            .setVerse(verse.incrementAndGet())
+            .setText(new StringBuilder(text)))
         .collect(toImmutableList());
   }
 
-  private synchronized ImmutableList<Scripture> fetchJosephus(String version, BibleBook book, int chapter) {
+  private synchronized ImmutableList<Scripture> fetchJosephus(
+      String version, BibleBook book, int chapter) {
     String urlTemplate = "http://penelope.uchicago.edu/josephus/ant-%d.html";
     final Pattern isNumber = Pattern.compile("(\\d+)");
 
@@ -270,7 +251,101 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  private static int getRangeStart(int chapter) {
-    return ((chapter - 1) / 10) * 10 + 1;
+  private synchronized ImmutableList<Scripture> fetchGadTheSeer(
+      String version, BibleBook book, int chapter) {
+    Pattern chapterPattern = Pattern.compile("(\\d+)\\. ([\\w’,\\- ]+)");
+    Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
+    Pattern referencePattern = Pattern.compile("(\\w+) (\\d+):(\\d+)");
+    String response = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/gad_the_seer.txt");
+    try(BufferedReader reader = new BufferedReader(new StringReader(response))) {
+      String line;
+      int skipLines = 40;
+      int skipped = 0;
+      while (skipped++ < skipLines) {
+        reader.readLine();
+      }
+      int pageChapter = 0;
+      String chapterTitle = null;
+      do {
+        line = reader.readLine();
+        Matcher matcher = chapterPattern.matcher(line);
+        if (matcher.find()) {
+          pageChapter = Integer.parseInt(matcher.group(1));
+          chapterTitle = matcher.group(2);
+        }
+      } while (pageChapter < chapter);
+
+      StringBuilder content = new StringBuilder();
+      do {
+        Matcher reference = referencePattern.matcher(line);
+        if (reference.find()) {
+          System.out.println("Found reference: " + reference.group(0));
+          line = new StringBuilder(line).replace(reference.start(), reference.end(), "").toString();
+        }
+        if (!line.isEmpty()) {
+          content.append(" ").append(line);
+        }
+        // System.out.println(line);
+        line = reader.readLine();
+      } while (!line.contains(" ––"));
+
+      // System.out.println(content);
+      System.out.println("Chapter title: " + chapterTitle);
+      reader.close();
+      Matcher matcher = versePattern.matcher(content);
+      ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+      while (matcher.find()) {
+        String text = matcher.group(2).trim().replaceAll("\n", "");
+        if (!text.isEmpty()) {
+          scriptures.add(
+              new Scripture()
+                  .setVersion(version)
+                  .setBook(book.getName())
+                  .setLocale("en")
+                  .setChapter(chapter)
+                  .setVerse(Integer.parseInt(matcher.group(1)))
+                  .setText(text));
+        }
+      }
+      return scriptures.build();
+    } catch (IOException ioe) {
+      throw new DD4StorageException(
+          "Error reading book" + book, ioe, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public synchronized ImmutableList<Scripture> fetchLivesOfTheProphets(
+      String version, BibleBook book) {
+    final Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
+    String htmlResult =
+        apiConnector.sendGet("http://dd4-biblical.appspot.com/books/lives_of_the_prophets.html");
+    Document doc = Jsoup.parse(htmlResult.trim());
+    Elements divs = doc.getElementsByTag("div");
+    if (divs.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+
+    AtomicInteger chapter = new AtomicInteger();
+
+    return divs.stream()
+        .map(div -> div.getElementsByTag("p").get(0))
+        .map(Element::text)
+        .flatMap(text -> {
+          chapter.incrementAndGet();
+          Matcher matcher = versePattern.matcher(text);
+          ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+          while (matcher.find()) {
+            scriptures.add(
+                new Scripture()
+                    .setVersion(version)
+                    .setBook(book.getName())
+                    .setChapter(chapter.get())
+                    .setVerse(Integer.parseInt(matcher.group(1)))
+                    .setText(new StringBuilder(matcher.group(2).trim())));
+          }
+          return scriptures.build().stream();
+        })
+        .collect(toImmutableList());
+
   }
 }

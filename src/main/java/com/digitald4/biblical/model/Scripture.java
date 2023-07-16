@@ -5,6 +5,7 @@ import com.digitald4.common.model.Searchable;
 import java.util.Objects;
 
 public class Scripture extends ModelObject<String> implements Searchable {
+  private String id;
   private String version;
   private String locale = BibleBook.EN;
   private String book;
@@ -13,11 +14,14 @@ public class Scripture extends ModelObject<String> implements Searchable {
   private StringBuilder text;
 
   public String getId() {
-    return String.format("%s-%s-%s-%d-%d", getVersion(), getLocale(), getBook(), getChapter(), getVerse())
-        .replace(" ", "_");
+    return id != null ? id
+        : String
+            .format("%s-%s-%s-%d-%d", getVersion(), getLocale(), getBook(), getChapter(), getVerse())
+            .replace(" ", "_");
   }
 
   public Scripture setId(String id) {
+    this.id = id;
     return this;
   }
 

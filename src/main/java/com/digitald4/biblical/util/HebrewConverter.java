@@ -111,6 +111,9 @@ public class HebrewConverter {
       .build();
 
   public static String toAncient(char c) {
+    if (c == ' ') {
+      return "  ";
+    }
     // if (!PICTOGRAPH_MAP.containsKey(c) && c != ' ' && c != '־' && c != '׃') throw new IllegalArgumentException("Unknown char: " + c);
 
     return PICTOGRAPH_MAP.getOrDefault(c, String.valueOf(c));

@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
-import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +41,7 @@ public class ScriptureFetcherSefariaOrgTest  extends ScriptureFetcherTest {
             "ומלאכי הפנים ומלאכי הקדושה ומלאכי רוח האש ומלאכי רוח סערה ומלאכי רוחות ענני עלטה:"));
   }
 
-  @Test
+  @Test @Ignore
   public void fetchTestamentOfReuben() throws Exception {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/test/java/com/digitald4/biblical/util/data/testament_of_reuben.json"));

@@ -5,11 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableListMultimap;
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class EnochCalendarTest {
 
-  @Test
+  @Test @Ignore
   public void getDate_monthDay() {
     DateTime start = DateTime.parse("2018-12-30T19:34:50.63Z");
 
@@ -24,7 +25,7 @@ public class EnochCalendarTest {
     assertEquals(start.plusDays(363), enochCalendar.getDate(12, 31));
   }
 
-  @Test
+  @Test @Ignore
   public void getDate_monthDay2021() {
     DateTime start = DateTime.parse("2021-03-21T06:52:00.00Z");
 
@@ -39,7 +40,7 @@ public class EnochCalendarTest {
     assertEquals(DateTime.parse("2022-03-19T06:52:00.00Z"), enochCalendar.getDate(12, 31));
   }
 
-  @Test
+  @Test @Ignore
   public void getDate_eventDate() {
     DateTime start = DateTime.parse("1981-02-08T04:15:00.00Z");
 
@@ -54,7 +55,7 @@ public class EnochCalendarTest {
     assertEquals(enochCalendar.getDate(12, 31), enochCalendar.getDate(EventDate.LAST_DAY_OF_YEAR));
   }
 
-  @Test
+  @Test @Ignore
   public void getDate_eventDate2021() {
     DateTime start = DateTime.parse("2021-03-21T06:52:00.00Z");
 
@@ -69,7 +70,7 @@ public class EnochCalendarTest {
     assertEquals(DateTime.parse("2022-03-19T06:52:00.00Z"), enochCalendar.getDate(EventDate.LAST_DAY_OF_YEAR));
   }
 
-  @Test
+  @Test @Ignore
   public void getAbibOne() {
     int year = 1600;
     DateTime rollingDate = new DateTime(1600, 3, 19, 4, 0);

@@ -5,27 +5,48 @@ import com.digitald4.biblical.util.*;
 import com.digitald4.common.model.Searchable;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.ChangeTracker;
+import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.DAOApiImpl;
 import com.digitald4.common.storage.Query.Search;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 
 public class ScripturePrinter {
+  private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
+  private final static String API_VERSION = "v1";
   public static void main(String[] args) {
     String version = "ISR";
-    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, new SearchIndexer() {
-      @Override
-      public <T extends Searchable> void index(Iterable<T> iterable) {}
-
-      @Override
-      public <T extends Searchable> QueryResult<T> search(Class<T> aClass, Search search) {
-        return null;
+    String language = "en";
+    String reference = null;
+    String idToken = null;
+    boolean useApi = false;
+    for (int a = 0; a < args.length; a++) {
+      if (args[a].isEmpty()) {
+        break;
       }
+      switch (args[a]) {
+        case "--version": version = args[++a]; break;
+        case "--language": language = args[++a]; break;
+        case "--useApi": useApi = true; break;
+        case "--idToken": idToken = args[++a]; break;
+        default: reference = args[a];
+      }
+    }
+    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken(idToken);
+    DAO dao = useApi ? new DAOApiImpl(apiConnector)
+        : new DAOTestingImpl(new ChangeTracker(null, null, new SearchIndexer() {
+            @Override
+            public <T extends Searchable> void index(Iterable<T> iterable) {}
 
-      @Override
-      public <T extends Searchable> void removeIndex(Class<T> aClass, Iterable<?> iterable) {}
-    }, null));
-    APIConnector apiConnector = new APIConnector(null, null, 100);
+            @Override
+            public <T extends Searchable> QueryResult<T> search(Class<T> aClass, Search search) {
+              return null;
+            }
+
+            @Override
+            public <T extends Searchable> void removeIndex(Class<T> aClass, Iterable<?> iterable) {}
+          }, null));
     ScriptureStore scriptureStore = new ScriptureStore(
         () -> dao, null,
         new ScriptureReferenceProcessorSplitImpl(),
@@ -39,10 +60,6 @@ public class ScripturePrinter {
             new ScriptureFetcherSefariaOrg(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)));
 
-    if (args.length > 1 && !args[1].isEmpty()) {
-      version = args[1];
-    }
-
-    scriptureStore.getScriptures(version, "en", args[0]).getItems().forEach(System.out::println);
+    scriptureStore.getScriptures(version, language, reference).getItems().forEach(System.out::println);
   }
 }
