@@ -15,6 +15,7 @@ import com.digitald4.biblical.util.ScriptureFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.exception.DD4StorageException;
+import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
@@ -28,6 +29,8 @@ import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -137,6 +140,56 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     return candidates;
   }
 
+  private static final Pattern CHAPTER_PATTERN = Pattern.compile("CHAPTER (\\d+)");
+  private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)\\s+(\\D+)");
+  public ImmutableList<Scripture> uploadScripture(
+      String version, String language, String book,  int chapter, String text, boolean preview) {
+    ScriptureVersion sv = ScriptureVersion.get(version);
+    if (sv == null) {
+      throw new DD4StorageException("Unknown scriptrue version: " + version, ErrorCode.BAD_REQUEST);
+    }
+
+    BibleBook bibleBook = BibleBook.get(book);
+
+    if (!sv.meetsCriteria(bibleBook, language)) {
+      throw new DD4StorageException(
+          String.format("Scripture version: %s does not support %s:%s", sv, bibleBook, language));
+    }
+
+    Matcher chapterMatcher = CHAPTER_PATTERN.matcher(text);
+    if (chapterMatcher.find()) {
+      chapter = Integer.parseInt(chapterMatcher.group(1));
+    }
+
+    if (chapter > bibleBook.getChapterCount()) {
+      throw new DD4StorageException("Chapter " + chapter + " out of bounds for book: " + bibleBook);
+    }
+
+    text = text.replaceAll("\u00a0", " ");
+
+    ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+    Matcher matcher = VERSE_PATTERN.matcher(text);
+    while (matcher.find()) {
+      String scriptureText = matcher.group(2).trim();
+      if (!scriptureText.isEmpty()) {
+        scriptures.add(
+            new Scripture()
+                .setVersion(version)
+                .setLocale(language)
+                .setBook(bibleBook.getName())
+                .setChapter(chapter)
+                .setVerse(Integer.parseInt(matcher.group(1)))
+                .setText(scriptureText));
+      }
+    }
+
+    if (preview) {
+      return scriptures.build();
+    }
+
+    return create(scriptures.build());
+  }
+
   private ImmutableList<Scripture> getSearchAndReplaceCandidates(String phrase, String replacement, String filter) {
     return search(
         Query.forSearch(String.format("\"%s\" %s", phrase, filter), DEFAULT_ORDER_BY, 1000, 1)).getItems()
@@ -150,8 +203,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   private QueryResult<Scripture> list(
       String version, String lang, String book, int chapter, int startVerse, int endVerse) {
     BibleBook bibleBook = BibleBook.get(book, chapter);
-    if (bibleBook == BibleBook.PSALMS_151 && chapter == 151) {
-      chapter = 1;
+    if (bibleBook == BibleBook.APOCRYPHAL_PSALMS && chapter > 150) {
+      chapter -= 150;
     }
 
     if (version == null) {

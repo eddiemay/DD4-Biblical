@@ -43,9 +43,11 @@ public class BookService {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "books")
-  public ImmutableList<BibleBook> getBibleBooks() throws ServiceException {
+  public ImmutableList<BibleBook> getBibleBooks(
+      @Named("includeUnreleased") @Nullable boolean includeUnreleased) throws ServiceException {
     try {
       return BibleBook.ALL_BOOKS.stream()
+          .filter(book -> includeUnreleased || !book.isUnreleased())
           .sorted(comparing(BibleBook::getBookNum))
           .collect(toImmutableList());
     } catch (DD4StorageException e) {

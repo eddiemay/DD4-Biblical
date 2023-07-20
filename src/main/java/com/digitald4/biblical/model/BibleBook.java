@@ -47,7 +47,7 @@ public class BibleBook {
       ESTHER = new BibleBook(17, "Esther", "Canon,OT,Historical", 16, "Est", "Esth", "Es", "Hadassah"),
       
       new BibleBook(18, "Job", "Canon,OT,Wisdom", 42, "Jb", "Iyov"),
-      Psalms = new BibleBook(19, "Psalms", "Canon,OT,Wisdom", 151, "Ps", "Psalm", "Psa", "Tehillim", "Tikkan"), // Includes the 151 Psalm
+      Psalms = new BibleBook(19, "Psalms", "Canon,OT,Wisdom", 155, "Ps", "Psalm", "Psa", "Tehillim", "Tikkan"), // Includes the 151 Psalm
       new BibleBook(20, "Proverbs", "Canon,OT,Wisdom", 31, "Prov", "Pro", "Prv", "Pr", "Mishlei"),
       new BibleBook(21, "Ecclesiastes", "Canon,OT,Wisdom", 12, "Ecc", "Ec", "kohelet"),
       SONG_OF_SOLOMON = new BibleBook(22, "Song of Solomon", "Canon,OT,Wisdom", 8, "songs", "song", "sos", "ca", "Shir HaShirim"),
@@ -113,7 +113,7 @@ public class BibleBook {
   public static final ImmutableList<BibleBook> UNIVERSAL_DEUTEROCANON = ImmutableList.of(
       TOBIT = new BibleBook(69, "Tobit", "Apocrypha,Deuterocanon,Universal", 14, "Tob", "Tb"),
       new BibleBook(70, "Judith", "Apocrypha,Deuterocanon,Universal", 16, "Jth", "Jdth", "Jdt"),
-      WISDOM_OF_SOLOMON = new BibleBook(71, "Wisdom of Solomon", "Apocrypha,Deuterocanon,Universal", 19, "Wisdom", "Wis", "Ws"),
+      WISDOM_OF_SOLOMON = new BibleBook(71, "Wisdom of Solomon", "Apocrypha,Deutzerocanon,Universal", 19, "Wisdom", "Wis", "Ws"),
       SIRACH = new BibleBook(72, "Sirach", "Apocrypha,Deuterocanon,Universal", 51, "Ecclesiasticus", "Sir", "Ecclus"),
       new BibleBook(73, "Baruch", "Apocrypha,Deuterocanon,Universal", 5, "Bar"),
       MACCABEES_1 = new BibleBook(74, "1 Maccabees", "Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc", 16,
@@ -138,8 +138,8 @@ public class BibleBook {
 
   public static final BibleBook ADDITIONS_TO_ESTHER = new BibleBook(81, "Additions to Esther",
       "Apocrypha,Esther", 16, "Add Esther", "Add Est", "Add Esth", "Add Es");
-  public static final BibleBook PSALMS_151 = new BibleBook(82, "Psalms 151",
-      "Apocrypha,Psalms,Psa", 1, "Add Ps", "Add Psa");
+  public static final BibleBook APOCRYPHAL_PSALMS = new BibleBook(82, "Apocryphal Psalms",
+      "Apocrypha,Psalms,Psa", 5, "Add Ps", "Add Psa");
 
   public static final ImmutableList<BibleBook> EASTERN_ORTHODOX_DEUTEROCANON = ImmutableList.of(
       ESDRAS_1,
@@ -164,23 +164,64 @@ public class BibleBook {
 
   public static final BibleBook JASHER =
       new BibleBook(90, "Jasher", "Apocrypha,Jewish History", 91, "Yasher", "Yahusher");
-  public static final BibleBook COMMUNITY_RULE = new BibleBook(
-      91, "Community Rule", "Apocrypha,Jewish History", 1, "cr", "Manual of Discipline", "MD");
+  public static final BibleBook COMMUNITY_RULE = new BibleBook(91, "Community Rule",
+      "Apocrypha,Jewish History", 1, "cr", "Manual of Discipline", "MD");
   public static final BibleBook WAR_SCROLL =
       new BibleBook(92, "War Scroll", "Apocrypha,Jewish History", 19, "War");
   public static final BibleBook JOSEPHUS =
       new BibleBook(93, "Josephus", "Apocrypha,Jewish History", 20);
-  public static final BibleBook BOOK_OF_ADAM_AND_EVE = new BibleBook(94, "Book of Adam and Eve",
-      "Apocrypha,Jewish History", 51);
-  public static final BibleBook TESTAMENT_OF_JOB =
-      new BibleBook(95, "Testament of Job", "Apocrypha,Jewish History", 12);
-  public static final BibleBook GAD_THE_SEER =
-      new BibleBook(96, "Gad the Seer", "Apocrypha,Jewish History", 14);
-  public static final BibleBook LIVES_OF_THE_PROPHETS =
-      new BibleBook(97, "Lives of the Prophets", "Apocrypha,Jewish History", 14, "Prophets");
+  public static final BibleBook BOOK_OF_ADAM_AND_EVE;
+  public static final BibleBook TESTAMENT_OF_JOB;
+  public static final BibleBook GAD_THE_SEER;
+  public static final BibleBook LIVES_OF_THE_PROPHETS;
 
-  public static final BibleBook TESTAMENTS_OF_THE_TWELVE_PATRIARCHS =
-      new BibleBook(100, "Testaments of the Twelve Patriarchs", "Apocrypha,Jewish History", 12, "Testaments of the Twelve", "Testaments", "TofT", "ttp");
+  public static final BibleBook TESTAMENTS_OF_THE_TWELVE_PATRIARCHS;
+  public static final BibleBook BARUCH_2;
+  public static final ImmutableList<BibleBook> ADDITIONAL_APOCRYPHA = ImmutableList.of(
+      new BibleBook(94, "Book of Creation", "Apocrypha,Jewish History", 6),
+      BOOK_OF_ADAM_AND_EVE =
+          new BibleBook(95, "Book of Adam and Eve", "Apocrypha,Jewish History", 51),
+      new BibleBook(96, "Testament of Abraham", "Apocrypha,Jewish History", 20),
+      new BibleBook(97, "Revelation of Abraham", "Apocrypha,Jewish History", 32),
+      new BibleBook(98, "Testament of Isaac", "Apocrypha,Jewish History", 13),
+      new BibleBook(99, "Testament of Jacob", "Apocrypha,Jewish History", 8),
+      new BibleBook(100, "Ladder of Jacob", "Apocrypha,Jewish History", 8, "Jacob's Ladder"),
+      new BibleBook(101, "Joseph and Asenath", "Apocrypha,Jewish History", 29),
+      TESTAMENT_OF_JOB = new BibleBook(102, "Testament of Job", "Apocrypha,Jewish History", 12),
+      TESTAMENTS_OF_THE_TWELVE_PATRIARCHS =
+          new BibleBook(103, "Testaments of the Twelve Patriarchs", "Apocrypha,Jewish History", 12,
+              "Testaments of the Twelve", "Testaments", "TofT", "ttp"),
+      new BibleBook(104, "Testament of Moses", "Apocrypha,Jewish History", 12),
+      new BibleBook(105, "Testament of Solomon", "Apocrypha,Jewish History", 28),
+      new BibleBook(106, "Psalms of Solomon", "Apocrypha,Jewish History", 18),
+      LIVES_OF_THE_PROPHETS =
+          new BibleBook(107, "Lives of the Prophets", "Apocrypha,Jewish History", 14, "Prophets"),
+      GAD_THE_SEER = new BibleBook(108, "Gad the Seer", "Apocrypha,Jewish History", 14),
+      new BibleBook(109, "Ascension of Isaiah", "Apocrypha,Jewish History", 11),
+      BARUCH_2 = new BibleBook(110, "2 Baruch", "Apocrypha,Jewish History", 87),
+      new BibleBook(111, "3 Baruch", "Apocrypha,Jewish History", 17),
+      new BibleBook(112, "4 Baruch", "Apocrypha,Jewish History", 9),
+      new BibleBook(113, "Revelation of EliJah", "Apocrypha,Jewish History", 5, "Revelation of Eliyah"),
+      new BibleBook(114, "Revelation of Zephaniah", "Apocrypha,Jewish History", 3),
+      new BibleBook(115, "Apocryphon of Ezekiel", "Apocrypha,Jewish History", 6),
+      new BibleBook(116, "Epistle of Aristeas", "Apocrypha,Jewish History", 32).setUnreleased());
+
+  public static final ImmutableList<BibleBook> NEW_TESTAMENT_APOCRYPHA = ImmutableList.of(
+      new BibleBook(117, "Didache", " New Testament Apocrypha", 16).setUnreleased(),
+      new BibleBook(118, "Revelation of Peter", " New Testament Apocrypha", 4),
+      new BibleBook(119, "Epistle of Barnabas", " New Testament Apocrypha", 21),
+      new BibleBook(120, "3 Corinthians",
+          "New Testament Apocrypha,Letters,Corinthians,Cor", 3, "3Co", "3Cor"),
+      new BibleBook(121, "1 Clement", " New Testament Apocrypha", 65).setUnreleased(),
+      new BibleBook(122, "2 Clement", " New Testament Apocrypha", 20).setUnreleased(),
+      new BibleBook(123, "Seven Epistles of Ignatius", " New Testament Apocrypha,Letters", 7).setUnreleased(),
+      new BibleBook(124, "Epistle of Polycarp to the Phillippians", " New Testament Apocrypha,Letters", 14).setUnreleased(),
+      new BibleBook(125, "Martyrdom of Polycarp", " New Testament Apocrypha", 22).setUnreleased(),
+      new BibleBook(126, "Epistle of Mahetes to Diognetus", " New Testament Apocrypha,Letters", 12),
+      new BibleBook(127, "The Shepherd of Hermas", " New Testament Apocrypha", 27).setUnreleased(),
+      new BibleBook(128, "Odes of Peace", " New Testament Apocrypha", 42).setUnreleased(),
+      new BibleBook(129, "Apology of Aristides", " New Testament Apocrypha", 17).setUnreleased());
+
   public static final BibleBook TESTAMENT_OF_REUBEN =
       new BibleBook(101, "Testament of Reuben", "Apocrypha,Jewish History", 7);
   public static final BibleBook TESTAMENT_OF_SIMEON =
@@ -206,22 +247,17 @@ public class BibleBook {
   public static final BibleBook TESTAMENT_OF_BENJAMIN =
       new BibleBook(112, "Testament of Benjamin", "Apocrypha,Jewish History", 12);
 
-  static final ImmutableSet<BibleBook> TESTAMENTS_OF_THE_TWELVE = ImmutableSet.of(
-      // TESTAMENTS_OF_THE_TWELVE_PATRIARCHS,
-      TESTAMENT_OF_REUBEN, TESTAMENT_OF_SIMEON, TESTAMENT_OF_LEVI, TESTAMENT_OF_JUDAH,
-      TESTAMENT_OF_ISSACHAR, TESTAMENT_OF_ZEBULUN, TESTAMENT_OF_DAN, TESTAMENT_OF_NAPHTALI,
-      TESTAMENT_OF_GAD, TESTAMENT_OF_ASHER, TESTAMENT_OF_JOSEPH, TESTAMENT_OF_BENJAMIN);
-
   public static final ImmutableSet<BibleBook> ALL_BOOKS = ImmutableSet.<BibleBook>builder()
       .addAll(CANON)
       .addAll(APOCRYPHA)
-      .add(ADDITIONS_TO_ESTHER, PSALMS_151)
+      .add(ADDITIONS_TO_ESTHER, APOCRYPHAL_PSALMS)
       .addAll(EASTERN_ORTHODOX_DEUTEROCANON)
       .addAll(ETHIOPIAN_ORTHODOX_DEUTEROCANON)
       .add(ENOCH_2, ENOCH_3, GIANTS, JASHER, COMMUNITY_RULE, WAR_SCROLL, JOSEPHUS,
           BOOK_OF_ADAM_AND_EVE, TESTAMENT_OF_JOB, GAD_THE_SEER, LIVES_OF_THE_PROPHETS,
           TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)
-      // .addAll(TESTAMENTS_OF_THE_TWELVE)
+      .addAll(ADDITIONAL_APOCRYPHA)
+      .addAll(NEW_TESTAMENT_APOCRYPHA)
       .build();
 
   private final int bookNum;
@@ -229,6 +265,7 @@ public class BibleBook {
   private final String tags;
   private final int chapters;
   private final ImmutableList<String> altNames;
+  private boolean unreleased;
 
   BibleBook(int bookNum, String name, String tags, int chapters, String... altNames) {
     this.bookNum = bookNum;
@@ -256,6 +293,15 @@ public class BibleBook {
 
   public int getChapterCount() {
     return chapters;
+  }
+
+  public boolean isUnreleased() {
+    return unreleased;
+  }
+
+  public BibleBook setUnreleased() {
+    unreleased = true;
+    return this;
   }
 
   public ImmutableList<String> getAltNames() {
@@ -288,10 +334,8 @@ public class BibleBook {
       return BibleBook.ESTHER;
     }
 
-    if (book == BibleBook.Psalms && chapter == 151) {
-      return BibleBook.PSALMS_151;
-    } else if (book == BibleBook.PSALMS_151 && chapter != 1) {
-      return BibleBook.Psalms;
+    if (book == BibleBook.Psalms && chapter > 150) {
+      return BibleBook.APOCRYPHAL_PSALMS;
     }
 
     return book;

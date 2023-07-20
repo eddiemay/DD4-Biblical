@@ -181,4 +181,31 @@ public class ScriptureStoreTest {
       assertThat(e).hasMessageThat().contains("Verse 42 out of bounds for: (ISR) 2 Kings 23");
     }
   }
+
+  @Test
+  public void uploadScripture() {
+    String text = "\n"
+        + "\t1 “And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering. 2 And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin. 3 They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord.";
+    assertThat(text.replaceAll("\u00a0", " ")).isEqualTo("\n\t1 “And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering. 2 And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin. 3 They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord.");
+    assertThat(scriptureStore.uploadScripture("CCC", "en", "APOCRYPHON OF EZEKIEL", 5, text, true)).containsExactly(
+        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(1).setText(
+            "“And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering."),
+        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(2).setText(
+            "And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin."),
+        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
+            "They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord."));
+  }
+
+  @Test
+  public void uploadScripture_withChapterText() {
+    String text = "CHAPTER 5\n"
+        + "\t1 “And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering. 2 And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin. 3 They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord.";
+    assertThat(scriptureStore.uploadScripture("CCC", "en", "APOCRYPHON OF EZEKIEL", 1, text, true)).containsExactly(
+        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(1).setText(
+            "“And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering."),
+        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(2).setText(
+            "And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin."),
+        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
+            "They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord."));
+  }
 }

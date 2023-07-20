@@ -118,4 +118,18 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
       throw new ServiceException(e.getErrorCode(), e);
     }
   }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "uploadScripture")
+  public ImmutableList<Scripture> uploadScripture(
+      @Named("version") String version, @Named("lang") @DefaultValue("en") String lang,
+      @Named("book") String book, @Named("chapter") int chapter, @Named("text") String text,
+      @Named("preview") @Nullable boolean preview,
+      @Named("idToken") @Nullable String idToken) throws ServiceException {
+    try {
+      resolveLogin(idToken, true);
+      return scriptureStore.uploadScripture(version, lang, book, chapter, text, preview);
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
 }

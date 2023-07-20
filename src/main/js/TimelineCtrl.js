@@ -5,9 +5,9 @@ var VIEW_OPTIONS = {
   COMMON_ERA_ONLY: 'Common Era Only'
 }
 var YEAR_BOUND = {
-  JUBILEE: {name: 'Jubilee', years: 50, abb: 'j'},
-  CENTURY: {name: 'Century', years: 100, abb: 'c'},
-  MILLENNIUM: {name: 'Millennium', years: 1000, abb: 'm'}
+  JUBILEE: {name: 'Jubilee', years: 50, abb: 'j', countBy: 1},
+  CENTURY: {name: 'Century', years: 100, abb: 'c', countBy: 7},
+  MILLENNIUM: {name: 'Millennium', years: 1000, abb: 'm', countBy: 25}
 }
 
 com.digitald4.biblical.TimelineCtrl = function($location, $window, globalData, biblicalEventService) {
@@ -64,17 +64,18 @@ com.digitald4.biblical.TimelineCtrl.prototype.refresh = function() {
 
 	var years = [];
 	var displayYears = this.offsetUnit.years;
+	var countBy = this.offsetUnit.countBy;
+	var middle = Math.floor(displayYears / 2);
 	for (var y = 0; y < displayYears; y++) {
 	  var year = this.startYear + y;
 	  var percentLeft = y * 100 / displayYears;
 	  var style = {left: percentLeft + '%'};
 	  var hoverText = this.getHoverText(year);
-	  if (year % 50 == 0) {
+	  if (y == 0 || y + 1 == middle || y + 1 == displayYears) {
+	    years.push({year: hoverText, display: hoverText, style: style});
+	  } else if (year % 50 == 0) {
 	    years.push({year: hoverText, display: '🎉', style: style});
-	  /* } else if (percentLeft % 7 == 0) {
-	    years.push(
-	        {year: hoverText, display: this.getDisplayYear(year), style: style}); */
-	  } else {
+	  } else if ((y + 1) % countBy == 0) {
 	    years.push({year: hoverText, display: '|', style: style});
 	  }
   }

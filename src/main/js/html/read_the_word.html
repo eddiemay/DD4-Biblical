@@ -3,13 +3,16 @@
     <div class="block-content">
       <h1>READ THE WORD</h1>
       <div class="block-content form">
-        <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.searchAndReplaceShown=true" data-ng-show="!$ctrl.searchAndReplaceShown">
-          <img src="images/icons/web-app/24/Search.png" alt="Search the Word">
+        <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.view = $ctrl.views.READ">
+          <img src="images/icons/web-app/32/Search.png" alt="Read the word">
         </a>
-        <a href="" data-ng-if="appCtrl.isUserLoggedIn()"  data-ng-click="$ctrl.searchAndReplaceShown=false" data-ng-show="$ctrl.searchAndReplaceShown">
-          <img src="images/icons/fugue/cross-circle.png" width="24" height="24" alt="Close search">
+        <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.view = $ctrl.views.SEARCH_AND_REPLACE">
+          <img src="images/icons/web-app/32/Modify.png" alt="Search and replace Word">
         </a>
-        <fieldset data-ng-show="!$ctrl.searchAndReplaceShown">
+        <a href="" data-ng-if="appCtrl.isUserLoggedIn()"  data-ng-click="$ctrl.showUpload()">
+          <img src="images/icons/web-app/32/Load.png" alt="Upload">
+        </a>
+        <fieldset data-ng-show="$ctrl.view == $ctrl.views.READ">
           <div class="columns">
             <div class="colx3-left-double">
               <label><button data-ng-click="$ctrl.reference.shown=true">Book</button></label>
@@ -26,7 +29,7 @@
             </div>
           </div>
         </fieldset>
-        <fieldset data-ng-show="$ctrl.searchAndReplaceShown">
+        <fieldset data-ng-show="$ctrl.view == $ctrl.views.SEARCH_AND_REPLACE">
           <div class="columns">
             <div class="colx3-left">
               <label>Phrase</label>
@@ -42,6 +45,29 @@
               <button data-ng-click="$ctrl.searchAndReplace(true)">Preview</button>
               <button data-ng-show="$ctrl.previewShown" data-ng-click="$ctrl.searchAndReplace(false)">Replace</button>
             </div>
+          </div>
+        </fieldset>
+        <fieldset data-ng-show="$ctrl.view == $ctrl.views.UPLOAD">
+          <div class="columns">
+            <div class="colx3-left">
+              <label>Version</label>
+              <input type="text" data-ng-model="$ctrl.uploadVersion" class="full-width" data-on-enter="$ctrl.searchAndReplace(true)">
+            </div>
+            <div class="colx3-center">
+              <label>Book</label>
+              <select data-ng-model="$ctrl.uploadBook"
+                      data-ng-options="book.name for book in $ctrl.allBooks"></select>
+            </div>
+            <div class="colx3-right">
+              <label>Chapter</label>
+              <select data-ng-model="$ctrl.uploadChapter"
+                      data-ng-options="chapter.number as chapter.number for chapter in $ctrl.uploadBook.chapters"></select>
+            </div>
+          </div>
+          <label>Scripture Text</label>
+          <textarea data-ng-model="$ctrl.uploadText" class="full-width" style="height: 300px"></textarea>
+          <button data-ng-click="$ctrl.uploadScripture(true)">Preview</button>
+          <button data-ng-show="$ctrl.previewShown" data-ng-click="$ctrl.uploadScripture(false)">Upload</button>
           </div>
         </fieldset>
       </div>
@@ -78,6 +104,14 @@
               <button data-ng-click="$ctrl.getOrSearch(page)" data-ng-disabled="page == $ctrl.searchResult.pageToken">{{page}}</button>
             </span>
           </fieldset>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="colx2-left">
+          <button data-ng-show="$ctrl.prevChapter" data-ng-click="$ctrl.setReference($ctrl.prevChapter)">Previous Chapter</button>
+        </div>
+        <div class="colx2-right">
+          <button data-ng-show="$ctrl.nextChapter" data-ng-click="$ctrl.setReference($ctrl.nextChapter)">Next Chapter</button>
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ public class ScriptureVersion {
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON)
               .addAll(BibleBook.APOCRYPHA)
-              .add(BibleBook.PSALMS_151)
+              .add(BibleBook.APOCRYPHAL_PSALMS)
               .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,
@@ -36,12 +36,14 @@ public class ScriptureVersion {
           ImmutableList.<BibleBook>builder()
               .add(BibleBook.JUBILEES, BibleBook.MACCABEES_1, BibleBook.MACCABEES_2,
                   BibleBook.SUSANNA, BibleBook.TOBIT, BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)
-              // .addAll(BibleBook.TESTAMENTS_OF_THE_TWELVE)
               .build(),
           ImmutableSet.of(BibleBook.EN, BibleBook.HEBREW)),
       new ScriptureVersion("Covenant Christian Coalition", "CCC", 61,
-          ImmutableSet.of(BibleBook.JOSEPHUS, BibleBook.ENOCH_3, BibleBook.TESTAMENT_OF_JOB,
-              BibleBook.GAD_THE_SEER, BibleBook.LIVES_OF_THE_PROPHETS)),
+          ImmutableSet.<BibleBook>builder()
+              .add(BibleBook.APOCRYPHAL_PSALMS, BibleBook.JOSEPHUS, BibleBook.ENOCH_3,
+                  BibleBook.TESTAMENT_OF_JOB, BibleBook.GAD_THE_SEER, BibleBook.LIVES_OF_THE_PROPHETS)
+              .addAll(BibleBook.ADDITIONAL_APOCRYPHA).addAll(BibleBook.NEW_TESTAMENT_APOCRYPHA)
+              .build()),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.<BibleBook>builder().addAll(BibleBook.CANON)
               .addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),

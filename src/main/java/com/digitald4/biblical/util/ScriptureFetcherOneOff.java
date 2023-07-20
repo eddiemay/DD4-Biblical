@@ -6,6 +6,7 @@ import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.server.APIConnector;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -49,6 +50,8 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetchGadTheSeer(version, book, chapter);
     } else if (book == BibleBook.LIVES_OF_THE_PROPHETS) {
       return fetchLivesOfTheProphets(version, book);
+    } else if (book == BibleBook.BARUCH_2) {
+      return fetch2Baruch(version, book);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -347,5 +350,23 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         })
         .collect(toImmutableList());
 
+  }
+
+  private synchronized ImmutableList<Scripture> fetch2Baruch(String version, BibleBook book) {
+    final Pattern versePattern = Pattern.compile("2 BARUCH (\\d+):(\\d+)\\s+(\\D+)");
+    String text = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/2_baruch.txt");
+    Matcher matcher = versePattern.matcher(text);
+    ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+    while (matcher.find()) {
+      scriptures.add(
+          new Scripture()
+              .setVersion(version)
+              .setBook(book.getName())
+              .setChapter(Integer.parseInt(matcher.group(1)))
+              .setVerse(Integer.parseInt(matcher.group(2)))
+              .setText(matcher.group(3).trim()));
+    }
+
+    return scriptures.build();
   }
 }

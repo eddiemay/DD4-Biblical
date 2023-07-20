@@ -307,4 +307,23 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
             "4Q531 Frag. 7 3[ . . . great fear] seized me and I fell on my face; I heard his voice [ . . . ] 4[ . . . ] he dwelt among human beings but he did not learn from them [ . . . ]"));
 
   }
+
+  @Test
+  public void fetch2Baruch() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/2_baruch.txt"));
+
+    assertThat(scriptureStore.getScriptures("qumran", EN, "2 Baruch 1").getItems()).containsExactly(
+        new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(1).setText(
+            "And it happened in the twenty-fifth year of YeconiYah (Jeconiah), the king of Yahudah, that the Word of YAHWEH came to Baruch, the son of Neriah,"),
+        new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(2).setText(
+            "And said to him: Have you seen all that this people are doing to ME, the evil things which the two tribes which remained have done more than the ten tribes which were carried away into captivity?"),
+        new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(3).setText(
+            "For the former tribes were forced by their kings to sin, but these two have themselves forced and compelled their kings to sin."),
+        new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(4).setText(
+            "Behold, therefore, I shall bring evil upon this city and its inhabitants. And it will be taken away from before MY presence for a time. And I shall scatter this people among the nations that they may be beneficial to the nations."),
+        new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(5).setText(
+            "And MY people will be chastened, and the time will come that they will look for that which can make their times prosperous."));
+
+  }
 }

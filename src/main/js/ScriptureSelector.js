@@ -1,7 +1,7 @@
 com.digitald4.biblical.ScriptureSelector = function(globalData, bookService) {
   this.globalData = globalData;
   this.bookService = bookService;
-  this.bookService.getBibleBooks(bibleBooks => this.bibleBooks = bibleBooks);
+  this.bookService.getBibleBooks(false, bibleBooks => this.bibleBooks = bibleBooks);
   this.view = 'book';
   this.reference.toString = undefined;
 }

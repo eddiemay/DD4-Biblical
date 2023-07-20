@@ -89,19 +89,19 @@ public class ScriptureFetcherBibleGatewayTest extends ScriptureFetcherTest {
             "</body></html>");
 
     assertThat(scriptureStore.getScriptures("NRSV", EN, "Psalms 151").getItems()).containsExactly(
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(1).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(1).setText(
             "I was small among my brothers, and the youngest in my father’s house; I tended my father’s sheep."),
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(2).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(2).setText(
             "My hands made a harp; my fingers fashioned a lyre."),
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(3).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(3).setText(
             "And who will tell my Lord? The Lord himself; it is he who hears."),
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(4).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(4).setText(
             "It was he who sent his messenger and took me from my father’s sheep, and anointed me with his anointing oil."),
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(5).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(5).setText(
             "My brothers were handsome and tall, but the Lord was not pleased with them."),
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(6).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(6).setText(
             "I went out to meet the Philistine, and he cursed me by his idols."),
-        new Scripture().setVersion("NRSV").setBook("Psalms 151").setChapter(1).setVerse(7).setText(
+        new Scripture().setVersion("NRSV").setBook("Apocryphal Psalms").setChapter(1).setVerse(7).setText(
             "But I drew his own sword; I beheaded him, and took away disgrace from the people of Israel."));
   }
 

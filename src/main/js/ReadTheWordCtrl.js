@@ -1,11 +1,14 @@
-com.digitald4.biblical.ReadTheWordCtrl = function($location, globalData, scriptureService) {
+com.digitald4.biblical.ReadTheWordCtrl = function($location, globalData, bookService, scriptureService) {
   this.locationProvider = $location;
   this.globalData = globalData;
   this.globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
+  this.bookService = bookService;
   this.scriptureService = scriptureService;
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.language = $location.search()['lang'];
+  this.views = {READ: 1, SEARCH_AND_REPLACE: 2, UPLOAD: 3};
+  this.view = this.views.READ;
   this.showReference();
 }
 
@@ -49,18 +52,6 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
   this.scriptures = [{text: this.reference.value}];
 }
 
-com.digitald4.biblical.ReadTheWordCtrl.prototype.searchAndReplace = function(preview) {
-  var request = {'phrase': this.phrase, 'replacement': this.replacement, 'filter': this.filter, 'preview': preview};
-  this.scriptureService.searchAndReplace(request, searchResult => {
-    this.processSearchResult(searchResult);
-    this.previewShown = preview ? true : undefined;
-  });
-
-  this.scriptures = [{text: this.phrase + ' ' + this.filter}];
-  this.searchShown = undefined;
-  this.previewShown = undefined;
-}
-
 com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = function(scriptureResult) {
   this.prevChapter = scriptureResult.prevChapter;
   this.scriptures = scriptureResult.items || [];
@@ -88,4 +79,51 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.processSearchResult = function(
   }
   this.searchResult = searchResult;
   this.searchShown = true;
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.searchAndReplace = function(preview) {
+  var request = {'phrase': this.phrase, 'replacement': this.replacement, 'filter': this.filter, 'preview': preview};
+  this.scriptureService.searchAndReplace(request, searchResult => {
+    this.processSearchResult(searchResult);
+    this.previewShown = preview ? true : undefined;
+  });
+
+  this.scriptures = [{text: this.phrase + ' ' + this.filter}];
+  this.searchShown = undefined;
+  this.previewShown = undefined;
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showUpload = function() {
+  if (!this.allBooks) {
+    this.bookService.getBibleBooks(true, bibleBooks => {
+      this.allBooks = [];
+      for (var b = 0; b < bibleBooks.length; b++) {
+        if (bibleBooks[b].unreleased) {
+          this.allBooks.push(bibleBooks[b]);
+        }
+      }
+      this.allBooks.push({name: '-------------------------------'});
+      [].push.apply(this.allBooks, bibleBooks);
+    });
+  }
+  this.view = this.views.UPLOAD;
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.uploadScripture = function(preview) {
+  var bookName = this.uploadBook.name
+  var request = {'version': this.uploadVersion, 'book': bookName, 'chapter': this.uploadChapter,
+      'text': this.uploadText, 'preview': preview};
+  this.scriptureService.uploadScripture(request, searchResult => {
+    this.processScriptureResult(searchResult);
+    this.previewShown = preview ? true : undefined;
+    if (!preview) {
+      this.uploadText = '';
+      this.uploadChapter++;
+    }
+  });
+
+  this.scriptures =
+      [{text: 'Uploading to: ' + this.uploadVersion + ' ' + bookName + ' ' + this.uploadChapter}];
+  this.searchShown = undefined;
+  this.previewShown = undefined;
 }

@@ -18,9 +18,12 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   })
   .service('bookService', function(apiConnector, globalData) {
     var bookService = new com.digitald4.common.JSONService('book', apiConnector);
-    bookService.getBibleBooks = function(success, error) {
-      if (bookService.bibleBooks) {
+    bookService.getBibleBooks = function(includeUnreleased, success, error) {
+      if (!includeUnreleased && bookService.bibleBooks) {
         success(bookService.bibleBooks);
+        return;
+      } else if (includeUnreleased && bookService.allBooks) {
+        success(bookService.allBooks);
         return;
       }
       var expandChapters = function(bibleBooks) {
@@ -30,10 +33,15 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
             bibleBooks[b].chapters[c] = {number: ++c};
           }
         }
-        bookService.bibleBooks = bibleBooks;
-        success(bookService.bibleBooks);
+        if (!includeUnreleased) {
+          bookService.bibleBooks = bibleBooks;
+        } else {
+          bookService.allBooks = bibleBooks;
+        }
+        success(bibleBooks);
       }
-      bookService.sendRequest({action: 'books'}, response => expandChapters(response.items), error);
+      var request = {action: 'books', params: {includeUnreleased: includeUnreleased}};
+      bookService.sendRequest(request, response => expandChapters(response.items), error);
     };
     bookService.getVerseCount = function(book, chapter, success, error) {
       bookService.sendRequest({action: 'verseCount', params: {'book': book, 'chapter': chapter}}, success, error);
@@ -76,11 +84,15 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
       var request =
           typeof(reference) == 'object' ? reference : {reference: reference, version: globalData.scriptureVersion};
       scriptureService.sendRequest({action: 'scriptures', params: request}, success, error);
-    };
+    }
     scriptureService.searchAndReplace = function(request, success, error) {
       scriptureService.sendRequest({action: 'searchAndReplace', method: 'POST', params: request},
           response => success(processPagination(response)), error);
-    };
+    }
+    scriptureService.uploadScripture = function(request, success, error) {
+      scriptureService.sendRequest({action: 'uploadScripture', method: 'POST', params: request},
+          response => success(processPagination(response)), error);
+    }
     // scriptureService = new ScriptureServiceInMemoryImpl();
     return scriptureService;
   })
