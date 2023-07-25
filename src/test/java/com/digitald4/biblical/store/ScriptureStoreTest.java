@@ -4,7 +4,6 @@ import static com.digitald4.biblical.model.BibleBook.EN;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.truth.Truth.assertThat;
-import static java.util.function.Function.identity;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -61,7 +60,7 @@ public class ScriptureStoreTest {
     int startVerse = (Integer) filterValueByColumnOp.get("verse>=");
     int endVerse = (Integer) filterValueByColumnOp.getOrDefault("verse<=", startVerse);
     String version = (String) filterValueByColumnOp.getOrDefault("version=", null);
-    String locale = (String) filterValueByColumnOp.getOrDefault("locale=", "en");
+    String language = (String) filterValueByColumnOp.getOrDefault("language=", "en");
     endVerse = Math.min(endVerse, 37);
 
     if (chapter != 23) {
@@ -71,31 +70,32 @@ public class ScriptureStoreTest {
     return QueryResult.of(
         IntStream.range(startVerse, endVerse + 1)
             .boxed()
-            .flatMap(verse -> createScriptures(version, locale, book.getName(), chapter, verse, "[Scripture Placeholder]"))
+            .flatMap(verse -> createScriptures(version, language, book.name(), chapter, verse, "[Scripture Placeholder]"))
             .collect(toImmutableList()),
         endVerse + 1 - startVerse, query);
   }
 
   private static ImmutableList<Scripture> fetchFromWeb(
-      String version, String locale, BibleBook book, int chapter) {
+      String version, String language, BibleBook book, int chapter) {
     return IntStream.range(1, 38)
-        .mapToObj(verse -> createScripture(version, locale, book.getName(), chapter, verse, "[Fetched From Web]"))
+        .mapToObj(verse -> createScripture(version, language, book.name(), chapter, verse, "[Fetched From Web]"))
         .collect(toImmutableList());
   }
 
   private static Stream<Scripture> createScriptures(
-      String version, String locale, String book, int chapter, int verse, String text) {
+      String version, String language, String book, int chapter, int verse, String text) {
     if (version == null) {
       return Stream.of(
-          createScripture("ISR", locale, book, chapter, verse, text),
-          createScripture("RSKJ", locale, book, chapter, verse, text));
+          createScripture("ISR", language, book, chapter, verse, text),
+          createScripture("RSKJ", language, book, chapter, verse, text));
     }
 
-    return Stream.of(createScripture(version, locale, book, chapter, verse, text));
+    return Stream.of(createScripture(version, language, book, chapter, verse, text));
   }
 
-  private static Scripture createScripture(String version, String locale, String book, int chapter, int verse, String text) {
-    return new Scripture().setVersion(version).setLocale(locale).setBook(book).setChapter(chapter).setVerse(verse).setText(text);
+  private static Scripture createScripture(String version, String language, String book, int chapter, int verse, String text) {
+    return new Scripture().setVersion(version).setLanguage(language).setBook(book)
+        .setChapter(chapter).setVerse(verse).setText(text);
   }
 
   @Test
@@ -161,14 +161,14 @@ public class ScriptureStoreTest {
     assertThat(
         scriptureStore.getScriptures(VERSION, BibleBook.INTERLACED, "2 Kings 23:5").getItems()).containsExactly(
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
-            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
     assertThat(
         scriptureStore.getScriptures(VERSION, BibleBook.INTERLACED, "2 Kings 23:3-5").getItems()).containsExactly(
-            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
-            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
-            new Scripture().setVersion("WLCO").setLocale(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder();
   }
 
@@ -188,11 +188,11 @@ public class ScriptureStoreTest {
         + "\t1 “And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering. 2 And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin. 3 They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord.";
     assertThat(text.replaceAll("\u00a0", " ")).isEqualTo("\n\t1 “And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering. 2 And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin. 3 They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord.");
     assertThat(scriptureStore.uploadScripture("CCC", "en", "APOCRYPHON OF EZEKIEL", 5, text, true)).containsExactly(
-        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(1).setText(
+        new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(1).setText(
             "“And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering."),
-        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(2).setText(
+        new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(2).setText(
             "And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin."),
-        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
+        new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
             "They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord."));
   }
 
@@ -201,11 +201,11 @@ public class ScriptureStoreTest {
     String text = "CHAPTER 5\n"
         + "\t1 “And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering. 2 And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin. 3 They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord.";
     assertThat(scriptureStore.uploadScripture("CCC", "en", "APOCRYPHON OF EZEKIEL", 1, text, true)).containsExactly(
-        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(1).setText(
+        new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(1).setText(
             "“And I will bind up the lame persons, and I will heal the sick, and I will bring back the wandering."),
-        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(2).setText(
+        new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(2).setText(
             "And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin."),
-        new Scripture().setVersion("CCC").setLocale("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
+        new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
             "They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord."));
   }
 }

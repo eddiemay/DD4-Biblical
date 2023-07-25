@@ -37,7 +37,7 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    String url = String.format(URL, version, formatBookForUrl(book.getName()), chapter);
+    String url = String.format(URL, version, formatBookForUrl(book.name()), chapter);
     // System.out.println("Fetch of: " + url);
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
@@ -83,7 +83,7 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
         .map(
             entry -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter)
                 .setVerse(entry.getKey())
                 .setText(getText(entry.getValue().stream().map(Pair::getRight).collect(toImmutableList()))))
@@ -92,7 +92,7 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
-    if (book.equals(BibleBook.WISDOM_OF_SOLOMON.getName())) {
+    if (book.equals(BibleBook.WISDOM_OF_SOLOMON.name())) {
       book = "Wisdom";
     }
 

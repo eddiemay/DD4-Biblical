@@ -90,7 +90,7 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
           response => success(processPagination(response)), error);
     }
     scriptureService.uploadScripture = function(request, success, error) {
-      scriptureService.sendRequest({action: 'uploadScripture', method: 'POST', params: request},
+      scriptureService.sendRequest({action: 'uploadScripture', method: 'POST', data: request},
           response => success(processPagination(response)), error);
     }
     // scriptureService = new ScriptureServiceInMemoryImpl();

@@ -61,7 +61,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = functi
     if (!previous || previous.chapter != script.chapter || previous.verse + 1 != script.verse || previous.book != script.book) {
       script.showChapter = true;
     }
-    script.dir = script.locale == 'he' ? 'rtl' : 'ltr';
+    script.dir = script.language == 'he' ? 'rtl' : 'ltr';
     previous = script;
   }
 }
@@ -113,8 +113,9 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.uploadScripture = function(prev
   var bookName = this.uploadBook.name
   var request = {'version': this.uploadVersion, 'book': bookName, 'chapter': this.uploadChapter,
       'text': this.uploadText, 'preview': preview};
-  this.scriptureService.uploadScripture(request, searchResult => {
-    this.processScriptureResult(searchResult);
+  this.scriptureService.uploadScripture(request, scriptureResult => {
+    this.processScriptureResult(scriptureResult);
+    this.uploadChapter = scriptureResult.items[0].chapter;
     this.previewShown = preview ? true : undefined;
     if (!preview) {
       this.uploadText = '';

@@ -63,9 +63,9 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/wlco.html"));
 
     assertThat(scriptureStore.getScriptures("WLCO", BibleBook.HEBREW, "Psalms 117").getItems()).containsExactly(
-        new Scripture().setVersion("WLCO").setLocale("he").setBook("Psalms").setChapter(117).setVerse(1)
+        new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(1)
             .setText("הללו את־יהוה כל־גוים בחוהו כל־האמים׃"),
-        new Scripture().setVersion("WLCO").setLocale("he").setBook("Psalms").setChapter(117).setVerse(2)
+        new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(2)
             .setText("כי גבר עלינו ׀ חסדו ואמת־יהוה לעולם הללו־יה׃"));
   }
 }

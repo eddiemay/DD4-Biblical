@@ -11,15 +11,13 @@ import com.digitald4.common.storage.DAOApiImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.QueryResult;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ScriptureBulkDeleter {
   private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
   private final static String API_VERSION = "v1";
-  private final static String VERSE_COUNT_URL = "%s/verseCount?version=%s&locale=%s&book=%s&chapter=%d";
+  private final static String VERSE_COUNT_URL = "%s/verseCount?version=%s&language=%s&book=%s&chapter=%d";
   private final static String ID_FORMAT = "%s-%s-%s-%d-%d";
   private final APIConnector apiConnector;
   private final DAO dao;
@@ -32,10 +30,10 @@ public class ScriptureBulkDeleter {
   public void delete(BibleBook startBook) {
     String booksBaseUrl = apiConnector.formatUrl("books");
     BibleBook.ALL_BOOKS.stream()
-        .filter(book -> startBook == null || book.getBookNum() >= startBook.getBookNum())
+        .filter(book -> startBook == null || book.getNumber() >= startBook.getNumber())
         .forEach(book -> {
-          String bookName = book.getName();
-          System.out.printf("\n%s %d =>", book.getName(), book.getChapterCount());
+          String bookName = book.name();
+          System.out.printf("\n%s %d =>", book.name(), book.getChapterCount());
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
             int verses = Integer.parseInt(
                 apiConnector.sendGet(
@@ -55,10 +53,10 @@ public class ScriptureBulkDeleter {
                             .boxed()
                             .flatMap(
                                 verse ->
-                                    Stream.of("en", "he").map(locale ->
+                                    Stream.of("en", "he").map(language ->
                                         String
-                                            .format(
-                                                ID_FORMAT, version, locale, bookName, chapter, verse)
+                                            .format(ID_FORMAT,
+                                                version, language, bookName, chapter, verse)
                                             .replaceAll(" ", "_")))
                             .peek(System.out::println)
                             .collect(toImmutableList())));

@@ -1,6 +1,5 @@
 package com.digitald4.biblical.server;
 
-
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Comparator.comparing;
 
@@ -8,9 +7,11 @@ import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.common.exception.DD4StorageException;
+import com.digitald4.common.server.service.EntityServiceImpl;
+import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
-import com.digitald4.common.storage.Query.OrderBy;
+import com.digitald4.common.storage.Store;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
@@ -34,11 +35,13 @@ import java.util.concurrent.atomic.AtomicInteger;
     }
     // [END_EXCLUDE]
 )
-public class BookService {
+public class BookService extends EntityServiceImpl<BibleBook, String> {
   private final ScriptureStore scriptureStore;
 
   @Inject
-  BookService(ScriptureStore scriptureStore) {
+  BookService(Store<BibleBook, String> bibleBookStore, LoginResolver loginResolver,
+      ScriptureStore scriptureStore) {
+    super(bibleBookStore, loginResolver);
     this.scriptureStore = scriptureStore;
   }
 
@@ -46,9 +49,9 @@ public class BookService {
   public ImmutableList<BibleBook> getBibleBooks(
       @Named("includeUnreleased") @Nullable boolean includeUnreleased) throws ServiceException {
     try {
-      return BibleBook.ALL_BOOKS.stream()
-          .filter(book -> includeUnreleased || !book.isUnreleased())
-          .sorted(comparing(BibleBook::getBookNum))
+      return getStore().list(Query.forList()).getItems().stream()
+          .filter(book -> includeUnreleased || book.getUnreleased() == null || !book.getUnreleased())
+          .sorted(comparing(BibleBook::getNumber))
           .collect(toImmutableList());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
@@ -57,16 +60,26 @@ public class BookService {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "verseCount")
   public AtomicInteger getVerseCount(
-      @Named("version") @Nullable String version, @Named("locale") @Nullable String locale,
+      @Named("version") @Nullable String version, @Named("language") @Nullable String language,
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
-      Query.List query = Query.forList()
-          .setFilters(Filter.of("book", book), Filter.of("chapter", chapter));
+      Query.List query =
+          Query.forList().setFilters(Filter.of("book", book), Filter.of("chapter", chapter));
       if (version != null) query.addFilter(Filter.of("version", version));
-      if (locale != null) query.addFilter(Filter.of("locale", locale));
+      if (language != null) query.addFilter(Filter.of("language", language));
       return new AtomicInteger(
           scriptureStore.list(query).getItems().stream()
               .mapToInt(Scripture::getVerse).max().orElse(0));
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrateBooks")
+  public AtomicInteger migrateBooks(@Named("idToken") String idToken) throws ServiceException {
+    try {
+      resolveLogin(idToken, true);
+      return new AtomicInteger(getStore().create(BibleBook.ALL_BOOKS).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

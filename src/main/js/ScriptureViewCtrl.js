@@ -7,7 +7,7 @@ com.digitald4.biblical.ScriptureViewCtrl = function($window, globalData, scriptu
 
 var processScriptures = function(scriptures) {
   for (const script of scriptures) {
-    script.dir = script.locale == 'he' ? 'rtl' : 'ltr';
+    script.dir = script.language == 'he' ? 'rtl' : 'ltr';
   }
   return scriptures;
 }

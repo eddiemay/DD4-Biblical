@@ -1,5 +1,6 @@
 package com.digitald4.biblical.server;
 
+import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.HighScore;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.util.*;
@@ -44,6 +45,9 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		bind(new TypeLiteral<ProviderThreadLocalImpl<BasicUser>>(){}).toInstance(userProvider);
 		bind(new TypeLiteral<UserStore<BasicUser>>(){})
 				.toInstance(new GenericUserStore<>(BasicUser.class, getProvider(DAO.class)));
+
+		bind(new TypeLiteral<Store<BibleBook, String>>(){})
+				.toInstance(new GenericStore<>(BibleBook.class, getProvider(DAO.class)));
 		bind(new TypeLiteral<Store<HighScore, Long>>(){})
 				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
 		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){});

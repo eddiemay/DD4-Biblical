@@ -8,6 +8,7 @@ import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.util.Optional;
 
 public class ScriptureVersion {
   private final String name;
@@ -23,7 +24,7 @@ public class ScriptureVersion {
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON)
               .addAll(BibleBook.APOCRYPHA)
-              .add(BibleBook.APOCRYPHAL_PSALMS)
+              // .add(BibleBook.APOCRYPHAL_PSALMS)
               .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,

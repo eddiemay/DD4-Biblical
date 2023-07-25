@@ -38,7 +38,7 @@ public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
         .map(
             verse -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter)
                 .setVerse(Integer.parseInt(verse.getElementsByClass("verseNumber").get(0).text()))
                 .setText(getText(verse.text())))
@@ -55,7 +55,7 @@ public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(BibleBook book, int chapter) {
-    String bookName = book.getName().replace(" ", "");
+    String bookName = book.name().replace(" ", "");
     if (book.getChapterCount() == 1) {
       return bookName;
     }

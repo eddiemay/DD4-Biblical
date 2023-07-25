@@ -25,10 +25,10 @@ public class ScriptureReindexer {
     ScriptureVersion scriptureVersion = ScriptureVersion.get(version);
     scriptureVersion.getBibleBooks().stream()
         .filter(
-            book -> books.isEmpty() || books.contains(book.getName())
+            book -> books.isEmpty() || books.contains(book.name())
                 || book.getAltNames().stream().anyMatch(books::contains))
         .forEach(book -> {
-          System.out.printf("\n%s %d =>", book.getName(), book.getChapterCount());
+          System.out.printf("\n%s %d =>", book.name(), book.getChapterCount());
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
             System.out.printf(" %d", chapter);
             apiConnector.sendGet(String.format(URL, baseUrl, version, book, chapter));

@@ -5,23 +5,18 @@ import com.digitald4.common.model.Searchable;
 import java.util.Objects;
 
 public class Scripture extends ModelObject<String> implements Searchable {
-  private String id;
   private String version;
-  private String locale = BibleBook.EN;
+  private String language = BibleBook.EN;
   private String book;
   private int chapter;
   private int verse;
   private StringBuilder text;
 
   public String getId() {
-    return id != null ? id
-        : String
-            .format("%s-%s-%s-%d-%d", getVersion(), getLocale(), getBook(), getChapter(), getVerse())
-            .replace(" ", "_");
+    return String.format("%s-%s-%s-%d-%d", version, language, book, chapter, verse).replace(" ", "_");
   }
 
   public Scripture setId(String id) {
-    this.id = id;
     return this;
   }
 
@@ -34,12 +29,22 @@ public class Scripture extends ModelObject<String> implements Searchable {
     return this;
   }
 
+  @Deprecated
   public String getLocale() {
-    return locale;
+    return null;
   }
 
-  public Scripture setLocale(String locale) {
-    this.locale = locale;
+  @Deprecated
+  public Scripture setLocale(String language) {
+    return setLanguage(language);
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public Scripture setLanguage(String language) {
+    this.language = language;
     return this;
   }
 
@@ -85,12 +90,11 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(version, locale, book, chapter, verse, text.toString());
+    return Objects.hash(version, language, book, chapter, verse, text.toString());
   }
 
   @Override
   public String toString() {
-    return String.format("(%s:%s) %s %d:%d %s",
-        getVersion(), getLocale(), getBook(), getChapter(), getVerse(), getText());
+    return String.format("(%s:%s) %s %d:%d %s", version, language, book, chapter, verse, text);
   }
 }

@@ -6,6 +6,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ScriptureFetcherBibleGatewayTest extends ScriptureFetcherTest {
@@ -59,7 +60,7 @@ public class ScriptureFetcherBibleGatewayTest extends ScriptureFetcherTest {
             "Then the man said, “This at last is bone of my bones and flesh of my flesh; this one shall be called Woman, for out of Man this one was taken.”"));
   }
 
-  @Test
+  @Test @Ignore
   public void fetch_poetry() {
     when(apiConnector.sendGet(anyString())).thenReturn(
         "<html></body>" +

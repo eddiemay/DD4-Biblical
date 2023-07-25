@@ -1,12 +1,8 @@
 package com.digitald4.biblical.tools;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.common.server.APIConnector;
-import com.google.common.collect.ImmutableSet;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class ScriptureMigrater {
@@ -24,9 +20,9 @@ public class ScriptureMigrater {
 
     ScriptureVersion scriptureVersion = ScriptureVersion.get(version);
     scriptureVersion.getBibleBooks().stream()
-        .filter(book -> startBook == null || book.getBookNum() >= startBook.getBookNum())
+        .filter(book -> startBook == null || book.getNumber() >= startBook.getNumber())
         .forEach(book -> {
-          System.out.printf("\n%s %d =>", book.getName(), book.getChapterCount());
+          System.out.printf("\n%s %d =>", book.name(), book.getChapterCount());
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
             System.out.printf(" %d", chapter);
             apiConnector.sendGet(String.format(URL, baseUrl, version, book, chapter));

@@ -47,7 +47,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
 
   public synchronized ImmutableList<Scripture> fetchOther(String version, BibleBook book, int chapter) {
     String url =
-        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.getName()), chapter);
+        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements chaps = doc.getElementsByClass("chap");
@@ -62,7 +62,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
           .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
           .map(sc -> new Scripture()
               .setVersion(version)
-              .setBook(book.getName())
+              .setBook(book.name())
               .setChapter(chapter)
               .setVerse(
                   Integer.parseInt(sc.getElementsByClass(REF_TEXT).get(0).getElementsByTag("b").text()))
@@ -74,7 +74,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
         .map(
             reftext -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter)
                 .setVerse(Integer.parseInt(reftext.getElementsByTag("b").text()))
                 .setText(getText(reftext)))
@@ -83,7 +83,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
 
   public synchronized ImmutableList<Scripture> fetchWLCO(String version, BibleBook book, int chapter) {
     String url =
-        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.getName()), chapter);
+        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements scs = doc.getElementsByClass("spcl");
@@ -97,8 +97,8 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
         .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
         .map(sc -> new Scripture()
             .setVersion(version)
-            .setLocale("he")
-            .setBook(book.getName())
+            .setLanguage("he")
+            .setBook(book.name())
             .setChapter(chapter)
             .setVerse(verse.incrementAndGet())
             .setText(getText(sc.text())))
@@ -148,9 +148,9 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
-    if (book.equals(BibleBook.SONG_OF_SOLOMON.getName())) {
+    if (book.equals(BibleBook.SONG_OF_SOLOMON.name())) {
       return "songs";
-    } else if (book.equals(BibleBook.SIRACH.getName())) {
+    } else if (book.equals(BibleBook.SIRACH.name())) {
       return "ecclesiasticus";
     }
 

@@ -26,7 +26,7 @@ public class ScriptureFetcherBibleCom  implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet(String.format(URL, formatBookForUrl(book.getName()), chapter, version));
+    String htmlResult = apiConnector.sendGet(String.format(URL, formatBookForUrl(book.name()), chapter, version));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements wrappers = doc.getElementsByClass("chapter");
     if (wrappers.isEmpty()) {
@@ -37,7 +37,7 @@ public class ScriptureFetcherBibleCom  implements ScriptureFetcher {
         .map(
             verse -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter)
                 .setVerse(Integer.parseInt(verse.getElementsByClass("label").get(0).ownText()))
                 .setText(new StringBuilder(ScriptureFetcher.trim(verse.getElementsByClass("content").get(0).text()))))

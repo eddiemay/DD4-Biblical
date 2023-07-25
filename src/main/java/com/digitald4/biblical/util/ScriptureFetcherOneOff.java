@@ -6,7 +6,6 @@ import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.server.APIConnector;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -52,6 +51,10 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetchLivesOfTheProphets(version, book);
     } else if (book == BibleBook.BARUCH_2) {
       return fetch2Baruch(version, book);
+    } else if (book == BibleBook.CLEMENT_1) {
+      return fetch1Clem(version, book);
+    } else if (book == BibleBook.ODES_OF_PEACE) {
+      return fetchOdesOfPeace(version, book);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -77,7 +80,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .map(
             text -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(1)
                 .setVerse(verse.incrementAndGet())
                 .setText(text))
@@ -107,7 +110,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
               return new Scripture()
                   .setVersion(version)
-                  .setBook(book.getName())
+                  .setBook(book.name())
                   .setChapter(chapter.get())
                   .setVerse(verse)
                   .setText(new StringBuilder(matcher.group(2)));
@@ -149,7 +152,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                 builder.add(
                     new Scripture()
                         .setVersion(version)
-                        .setBook(book.getName())
+                        .setBook(book.name())
                         .setChapter(chapter.get())
                         .setVerse(verse)
                         .setText(new StringBuilder(text)));
@@ -185,7 +188,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .filter(text -> !text.isEmpty())
         .map(text -> new Scripture()
             .setVersion(version)
-            .setBook(book.getName())
+            .setBook(book.name())
             .setChapter(chapter.get())
             .setVerse(verse.incrementAndGet())
             .setText(new StringBuilder(text)))
@@ -216,7 +219,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .map(
             text -> new Scripture()
                   .setVersion(version)
-                  .setBook(book.getName())
+                  .setBook(book.name())
                   .setChapter(chapter)
                   .setVerse(verse.incrementAndGet())
                   .setText(new StringBuilder(text)))
@@ -246,7 +249,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
           }
           return new Scripture()
               .setVersion(version)
-              .setBook(book.getName())
+              .setBook(book.name())
               .setChapter(chapter.get())
               .setVerse(verse)
               .setText(new StringBuilder(matcher.group(2)));
@@ -303,8 +306,8 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
           scriptures.add(
               new Scripture()
                   .setVersion(version)
-                  .setBook(book.getName())
-                  .setLocale("en")
+                  .setBook(book.name())
+                  .setLanguage("en")
                   .setChapter(chapter)
                   .setVerse(Integer.parseInt(matcher.group(1)))
                   .setText(text));
@@ -341,7 +344,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
             scriptures.add(
                 new Scripture()
                     .setVersion(version)
-                    .setBook(book.getName())
+                    .setBook(book.name())
                     .setChapter(chapter.get())
                     .setVerse(Integer.parseInt(matcher.group(1)))
                     .setText(new StringBuilder(matcher.group(2).trim())));
@@ -361,10 +364,54 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       scriptures.add(
           new Scripture()
               .setVersion(version)
-              .setBook(book.getName())
+              .setBook(book.name())
               .setChapter(Integer.parseInt(matcher.group(1)))
               .setVerse(Integer.parseInt(matcher.group(2)))
               .setText(matcher.group(3).trim()));
+    }
+
+    return scriptures.build();
+  }
+
+  private synchronized ImmutableList<Scripture> fetch1Clem(String version, BibleBook book) {
+    final Pattern versePattern = Pattern.compile("1 Clem\\. (\\d+):(\\d+)\\s+(\\D+)");
+    String text = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/1_clem.txt");
+    Matcher matcher = versePattern.matcher(text);
+    ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+    while (matcher.find()) {
+      scriptures.add(
+          new Scripture()
+              .setVersion(version)
+              .setBook(book.name())
+              .setChapter(Integer.parseInt(matcher.group(1)))
+              .setVerse(Integer.parseInt(matcher.group(2)))
+              .setText(matcher.group(3).trim()));
+    }
+
+    return scriptures.build();
+  }
+
+  private synchronized ImmutableList<Scripture> fetchOdesOfPeace(String version, BibleBook book) {
+    final Pattern chapterPattern = Pattern.compile("ODE (\\d+)\\s+(.+)");
+    final Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
+    String[] lines = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/odes_of_peace.txt")
+        .replaceAll("\u00a0", " ").split("\n");
+    ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+    for (String line : lines) {
+      Matcher matcher = chapterPattern.matcher(line);
+      if (matcher.matches()) {
+        int chapter = Integer.parseInt(matcher.group(1));
+        Matcher verseMatcher = versePattern.matcher(matcher.group(2));
+        while (verseMatcher.find()) {
+          scriptures.add(
+              new Scripture()
+                  .setVersion(version)
+                  .setBook(book.name())
+                  .setChapter(chapter)
+                  .setVerse(Integer.parseInt(verseMatcher.group(1)))
+                  .setText(verseMatcher.group(2).trim()));
+        }
+      }
     }
 
     return scriptures.build();

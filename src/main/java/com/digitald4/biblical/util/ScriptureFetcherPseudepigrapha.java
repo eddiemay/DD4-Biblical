@@ -54,7 +54,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
   }
 
   private ImmutableList<Scripture> fetchJubilees(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet(String.format(URL, book.getName().toLowerCase(), chapter));
+    String htmlResult = apiConnector.sendGet(String.format(URL, book.name().toLowerCase(), chapter));
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements wrappers = doc.getElementsByTag("ol");
     if (wrappers.size() == 0) {
@@ -67,7 +67,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
         .map(
             li -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter)
                 .setVerse(verse.incrementAndGet())
                 .setText(new StringBuilder(li.text().trim())))
@@ -100,7 +100,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
         .map(
             matcher -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter.get())
                 .setVerse(Integer.parseInt(matcher.group(1)))
                 .setText(new StringBuilder(matcher.group(2).trim())))
@@ -126,7 +126,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
                 1,
                 new Scripture()
                     .setVersion(version)
-                    .setBook(book.getName())
+                    .setBook(book.name())
                     .setChapter(chapter)
                     .setVerse(1)
                     .setText(new StringBuilder(td.getElementsByTag("p").get(0).text().trim())));
@@ -136,7 +136,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
                   Integer.parseInt(matcher.group(1)),
                   verse -> new Scripture()
                       .setVersion(version)
-                      .setBook(book.getName())
+                      .setBook(book.name())
                       .setChapter(chapter)
                       .setVerse(verse)
                       .setText(new StringBuilder()));
@@ -178,7 +178,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
         .map(
             matcher -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter.get())
                 .setVerse(Integer.parseInt(matcher.group(1)))
                 .setText(new StringBuilder(matcher.group(2).trim())))
@@ -203,7 +203,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
             scriptures.add(
                 new Scripture()
                     .setVersion(version)
-                    .setBook(book.getName())
+                    .setBook(book.name())
                     .setChapter(chapter.get())
                     .setVerse(Integer.parseInt(matcher.group(1)))
                     .setText(new StringBuilder(matcher.group(2).trim())));
@@ -274,7 +274,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
 
           return new Scripture()
               .setVersion(version)
-              .setBook(book.getName())
+              .setBook(book.name())
               .setChapter(chapter.get())
               .setVerse(verse)
               .setText(new StringBuilder(matcher.group(2).trim()));

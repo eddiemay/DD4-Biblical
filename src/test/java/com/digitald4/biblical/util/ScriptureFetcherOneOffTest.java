@@ -324,6 +324,37 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
             "Behold, therefore, I shall bring evil upon this city and its inhabitants. And it will be taken away from before MY presence for a time. And I shall scatter this people among the nations that they may be beneficial to the nations."),
         new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(5).setText(
             "And MY people will be chastened, and the time will come that they will look for that which can make their times prosperous."));
+  }
 
+  @Test
+  public void fetch1Clem() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/1_clem.txt"));
+
+    assertThat(scriptureStore.getScriptures("qumran", EN, "1 Clem 3").getItems()).containsExactly(
+        new Scripture().setVersion("CCC").setBook("1 Clement").setChapter(3).setVerse(1).setText(
+            "All glory and enlargement was given unto you, and that was fulfilled which is written My beloved ate and drank and was enlarged and waxed fat and kicked."),
+        new Scripture().setVersion("CCC").setBook("1 Clement").setChapter(3).setVerse(2).setText(
+            "Hence come jealousy and envy, strife and sedition, persecution and tumult, war and captivity."),
+        new Scripture().setVersion("CCC").setBook("1 Clement").setChapter(3).setVerse(3).setText(
+            "So men were stirred up, the mean against the honorable, the ill reputed against the highly reputed, the foolish against the wise, the young against the elder."),
+        new Scripture().setVersion("CCC").setBook("1 Clement").setChapter(3).setVerse(4).setText(
+            "For this cause righteousness and peace stand aloof, while each man hath forsaken the fear of the Lord and become purblind in the faith of Him, neither walketh in the ordinances of His commandments nor liveth according to that which becometh Christ, but each goeth after the lusts of his evil heart, seeing that they have conceived an unrighteous and ungodly jealousy, through which also death entered into the world."));
+  }
+
+  @Test
+  public void fetchOdes() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/odes_of_peace.txt"));
+
+    assertThat(scriptureStore.getScriptures("qumran", EN, "Odes 37").getItems()).containsExactly(
+        new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(1).setText(
+            "I stretched out my hands to my Lord, || and to the Most High I raised my voice:"),
+        new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(2).setText(
+            "And I spoke with the lips of my heart, || and He heard me when my voice reached Him;"),
+        new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(3).setText(
+            "His answer came to me and gave me the fruits of my labors;"),
+        new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(4).setText(
+            "And it gave me rest by the grace of the Lord. Hallelujah!"));
   }
 }

@@ -26,7 +26,7 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    String htmlResult = apiConnector.sendGet(String.format(URL + "/", formatBookForUrl(book.getName()), chapter));
+    String htmlResult = apiConnector.sendGet(String.format(URL + "/", formatBookForUrl(book.name()), chapter));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements wrappers = doc.getElementsByClass("bx-wrapper");
     if (wrappers.size() == 0) {
@@ -38,7 +38,7 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
         .map(
             p -> new Scripture()
                 .setVersion(version)
-                .setBook(book.getName())
+                .setBook(book.name())
                 .setChapter(chapter)
                 .setVerse(Integer.parseInt(p.getElementsByTag("span").get(0).ownText()))
                 .setText(new StringBuilder(p.ownText().trim())))
@@ -46,7 +46,7 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
-    if (book.equals(BibleBook.SIRACH.getName())) {
+    if (book.equals(BibleBook.SIRACH.name())) {
       return "Ecclesiasticus";
     }
 

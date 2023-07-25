@@ -6,7 +6,8 @@ import com.google.common.collect.ImmutableList;
 
 public interface ScriptureFetcher {
   ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter);
-  default ImmutableList<Scripture> fetch(String version, String locale, BibleBook book, int chapter) {
+  default ImmutableList<Scripture> fetch(
+      String version, String language, BibleBook book, int chapter) {
     return fetch(version, book, chapter);
   }
 
