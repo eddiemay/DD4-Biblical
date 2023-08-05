@@ -3,6 +3,7 @@ package com.digitald4.biblical.store;
 import static com.digitald4.common.storage.Query.forList;
 import static com.digitald4.biblical.util.HebrewConverter.toAncient;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -23,14 +24,19 @@ import com.digitald4.common.storage.Query.OrderBy;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.SearchableStoreImpl;
+import com.digitald4.common.util.Calculate;
+import com.digitald4.common.util.Pair;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.Streams;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -80,21 +86,65 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     int startVerse = verseRange.getStartVerse();
     int endVerse = verseRange.getEndVerse();
 
-    return expandLanguages(language).stream()
-        .flatMap(lan -> list(version, lan, book, chapter, startVerse, endVerse).getItems().stream())
+    HashMap<String, String> verseMap = new HashMap<>();
+    return expandSelection(version, language, verseRange.getBook())
+        .stream()
+        .flatMap(pair -> {
+          String ver = pair.getLeft();
+          String lang = pair.getRight();
+          if ("Audit".equals(ver)) {
+            return IntStream.range(startVerse, endVerse + 1)
+                .mapToObj(
+                    verse -> new Scripture()
+                        .setVersion("Audit")
+                        .setBook(book)
+                        .setLanguage("he")
+                        .setChapter(chapter)
+                        .setVerse(verse)
+                        .setText(
+                            getDiffHtml(
+                                verseMap.getOrDefault("DSS-" + verse, ""),
+                                verseMap.getOrDefault(String.valueOf(verse), ""))))
+                .filter(scripture -> scripture.getText().length() > 0);
+          } else if (BibleBook.HEBREW.equals(lang)) {
+            return list(ver, lang, book, chapter, startVerse, endVerse).getItems().stream()
+                .peek(
+                    s ->
+                        verseMap.put(
+                            s.getVersion().equals("DSS")
+                                ? s.getVersion() + "-" + s.getVerse() : String.valueOf(s.getVerse()),
+                    s.getText().toString()));
+          }
+          return list(ver, lang, book, chapter, startVerse, endVerse).getItems().stream();
+        })
         .sorted(comparing(Scripture::getVerse))
         .collect(toImmutableList());
   }
 
-  private List<String> expandLanguages(String language) {
-    if (language == null) {
-      ArrayList<String> list = new ArrayList<>();
-      list.add(null);
-      return list;
+  private static String getDiffHtml(String original, String revised) {
+    if (original.isEmpty() && revised.isEmpty()) {
+      return "";
     }
 
-    return BibleBook.INTERLACED.equals(language)
-        ? ImmutableList.of(BibleBook.HEBREW, BibleBook.EN) : ImmutableList.of(language);
+    return String.format("%s accuracy: %d%%",
+        Calculate.getDiffHtml(original, revised),
+        original.isEmpty() ? 0 : ((original.length() - Calculate.LD(original, revised)) * 100 / original.length()));
+  }
+
+  private static ImmutableList<Pair<String, String>> expandSelection(
+      String version, String language, BibleBook book) {
+    if (BibleBook.INTERLACED.equals(language)) {
+      return book != BibleBook.ISAIAH
+          ? ImmutableList.of(Pair.of(version, BibleBook.HEBREW), Pair.of(version, BibleBook.EN))
+          : ImmutableList.of(
+              Pair.of(version, BibleBook.EN),
+              Pair.of(version, BibleBook.HEBREW),
+              Pair.of("DSS", BibleBook.HEBREW),
+              Pair.of("Audit", BibleBook.HEBREW),
+              Pair.of("DSS", BibleBook.EN));
+    }
+
+    return ImmutableList.of(Pair.of(version, language));
   }
 
   public String getScripturesTextAllVersions(String lang, String reference) {

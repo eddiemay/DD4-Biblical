@@ -24,15 +24,12 @@ public class ScriptureVersion {
           ImmutableSet.<BibleBook>builder()
               .addAll(BibleBook.CANON)
               .addAll(BibleBook.APOCRYPHA)
-              // .add(BibleBook.APOCRYPHAL_PSALMS)
               .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
               .build()),
       new ScriptureVersion("Oxford", "OXFORD", 40,
           ImmutableSet.of(BibleBook.ENOCH, BibleBook.ENOCH_2, BibleBook.JUBILEES, BibleBook.JASHER,
               BibleBook.BOOK_OF_ADAM_AND_EVE)),
       new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
-      new ScriptureVersion("Qumran", "qumran", 56,
-          ImmutableSet.of(BibleBook.COMMUNITY_RULE, BibleBook.WAR_SCROLL, BibleBook.GIANTS)),
       new ScriptureVersion("Sefaria", "Sefaria", 60,
           ImmutableList.<BibleBook>builder()
               .add(BibleBook.JUBILEES, BibleBook.MACCABEES_1, BibleBook.MACCABEES_2,
@@ -49,7 +46,11 @@ public class ScriptureVersion {
           ImmutableSet.<BibleBook>builder().addAll(BibleBook.CANON)
               .addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),
       new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80,
-          BibleBook.CANON.subList(0, 39), ImmutableSet.of(BibleBook.HEBREW)));
+          BibleBook.CANON.subList(0, 39), ImmutableSet.of(BibleBook.HEBREW)),
+      new ScriptureVersion("Dead Sea Scrolls", "DSS", 82,
+          ImmutableSet.of(
+              BibleBook.COMMUNITY_RULE, BibleBook.WAR_SCROLL, BibleBook.GIANTS, BibleBook.ISAIAH),
+          ImmutableSet.of(BibleBook.EN, BibleBook.HEBREW)));
 
   private static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
       ALL_VERSIONS.stream().collect(toImmutableMap(ScriptureVersion::getVersion, identity()));

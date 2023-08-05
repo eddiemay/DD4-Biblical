@@ -89,7 +89,7 @@ public class ScriptureBulkDeleter {
   public static void main(String[] args) {
     String version = null;
     String language = null;
-    String idToken = null;
+    String idToken = "750425853";
     for (int a = 0; a < args.length; a++) {
       if (args[a].isEmpty()) {
         break;

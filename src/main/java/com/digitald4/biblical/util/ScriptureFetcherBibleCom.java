@@ -25,7 +25,7 @@ public class ScriptureFetcherBibleCom  implements ScriptureFetcher {
   }
 
   @Override
-  public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     String htmlResult = apiConnector.sendGet(String.format(URL, formatBookForUrl(book.name()), chapter, version));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements wrappers = doc.getElementsByClass("chapter");

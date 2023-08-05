@@ -25,12 +25,14 @@ public class ScriptureDeleter {
     QueryResult<Scripture> result =
         scriptureStore.search(Query.forSearch(searchText).setPageSize(1000));
     result.getItems().forEach(System.out::println);
-    System.out.printf(
-        "\nFound %d items to delete.\nProceed with deletion? y/N\n", result.getItems().size());
-    int read = System.in.read();
-    if (read == 'Y' || read == 'y') {
-      scriptureStore.delete(
-          result.getItems().stream().map(Scripture::getId).collect(toImmutableList()));
+    System.out.printf("\nFound %d items to delete\n", result.getItems().size());
+    if (result.getTotalSize() > 0) {
+      System.out.println("Proceed with deletion? y/N");
+      int read = System.in.read();
+      if (read == 'Y' || read == 'y') {
+        scriptureStore.delete(
+            result.getItems().stream().map(Scripture::getId).collect(toImmutableList()));
+      }
     }
   }
 
@@ -41,16 +43,16 @@ public class ScriptureDeleter {
       return;
     }
 
+    String searchText = args[0];
+
     if (args.length == 2) {
       idToken = args[1];
     }
 
-    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100);
-    apiConnector.setIdToken(idToken);
-    apiConnector.login();
+    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken(idToken);
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
     new ScriptureDeleter(
         new ScriptureStore(() -> dao, null, new ScriptureReferenceProcessorSplitImpl(), null))
-            .preview(args[0]);
+            .preview(searchText);
   }
 }

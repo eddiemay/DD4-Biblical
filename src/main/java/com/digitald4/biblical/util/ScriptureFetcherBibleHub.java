@@ -37,7 +37,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
     this.apiConnector = apiConnector;
   }
   @Override
-  public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     if (version.equals("WLCO")) {
       return fetchWLCO(version, book, chapter);
     }

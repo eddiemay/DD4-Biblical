@@ -177,7 +177,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch1b.htm"));
 
-    ImmutableList<Scripture> results = scriptureFetcher.fetch("Other", BibleBook.ENOCH, 2);
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("Other", "en", BibleBook.ENOCH, 2);
 
     assertThat(results.stream().filter(s -> s.getChapter() == 2).collect(toImmutableList())).containsExactly(
         new Scripture().setVersion("Other").setBook("Enoch").setChapter(2).setVerse(1).setText(
@@ -193,7 +193,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch1b.htm"));
 
-    ImmutableList<Scripture> results = scriptureFetcher.fetch("Other", BibleBook.ENOCH, 3).stream()
+    ImmutableList<Scripture> results = scriptureFetcher.fetch("Other", "en", BibleBook.ENOCH, 3).stream()
         .filter(s -> s.getChapter() == 3).collect(toImmutableList());
 
     assertThat(results).containsExactly(
@@ -206,7 +206,7 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/enoch1b.htm"));
 
-    assertThat(scriptureFetcher.fetch("Other", BibleBook.ENOCH, 92)).containsAtLeast(
+    assertThat(scriptureFetcher.fetch("Other", "en", BibleBook.ENOCH, 92)).containsAtLeast(
         new Scripture().setVersion("Other").setBook("Enoch").setChapter(92).setVerse(1).setText(
             "The book written by Enoch-Enoch indeed wrote this complete doctrine of wisdom, (which is) praised of all men and a judge of all the earth" +
             " for all my children who shall dwell on the earth. And for the future generations who shall observe uprightness and peace."),

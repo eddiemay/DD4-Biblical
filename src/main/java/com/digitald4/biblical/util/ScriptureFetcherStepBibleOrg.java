@@ -27,7 +27,7 @@ public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
   }
 
   @Override
-  public ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+  public ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     String result = apiConnector.sendGet(String.format(URL, formatBookForUrl(book, chapter), version));
     // System.out.println(result);
 

@@ -22,6 +22,7 @@ public class BibleBook {
   public static final BibleBook Psalms;
   public static final BibleBook SONG_OF_SOLOMON;
   public static final BibleBook Jude;
+  public static final BibleBook ISAIAH;
 
   // Abbreviations help provided by: https://www.logos.com/bible-book-abbreviations
   // Hebrew names provided by: https://headcoverings-by-devorah.com/HebrewBibleNames.html,
@@ -44,8 +45,8 @@ public class BibleBook {
       Kings2 = BibleBook.of(12, "2 Kings", "Canon,OT,Historical,Kings", 25,"2Ki", "2 Kgs", "2 Malachim"),
       BibleBook.of(13, "1 Chronicles", "Canon,OT,Historical,Chronicles,Chr", 29, "1Ch", "1Chr", "1 Divrei HaYamim"),
       BibleBook.of(14, "2 Chronicles", "Canon,OT,Historical,Chronicles,Chr", 36, "2Ch", "2Chr", "2 Divrei HaYamim"),
-      BibleBook.of(15, "Ezra", "Canon,OT,Historical", 10, "Ezr", "Ez"),
-      BibleBook.of(16, "Nehemiah", "Canon,OT,Historical", 13, "Neh", "Ne", "Nechemya"),
+      BibleBook.of(15, "Ezra", "Canon,OT,Historical", 10, "Ezr", "Ez", "1 Ezra"),
+      BibleBook.of(16, "Nehemiah", "Canon,OT,Historical", 13, "Neh", "Ne", "Nechemya", "2 Ezra"),
       ESTHER = BibleBook.of(17, "Esther", "Canon,OT,Historical", 16, "Est", "Esth", "Es", "Hadassah"),
       
       BibleBook.of(18, "Job", "Canon,OT,Wisdom", 42, "Jb", "Iyov"),
@@ -54,7 +55,7 @@ public class BibleBook {
       BibleBook.of(21, "Ecclesiastes", "Canon,OT,Wisdom", 12, "Ecc", "Ec", "kohelet"),
       SONG_OF_SOLOMON = BibleBook.of(22, "Song of Solomon", "Canon,OT,Wisdom", 8, "songs", "song", "sos", "ca", "Shir HaShirim"),
       
-      BibleBook.of(23, "Isaiah", "Canon,OT,Prophets", 66, "Isa", "Is", "Yeshayahu", "Yashayahu", "Yashaiahu"),
+      ISAIAH = BibleBook.of(23, "Isaiah", "Canon,OT,Prophets", 66, "Isa", "Is", "Yeshayahu", "Yashayahu", "Yashaiahu"),
       BibleBook.of(24, "Jeremiah", "Canon,OT,Prophets", 52, "Jer", "Je", "Yirmeyahu", "Yirmiyah"),
       BibleBook.of(25, "Lamentations", "Canon,OT,Prophets", 5, "Lam", "La", "Eicha"),
       BibleBook.of(26, "Ezekiel", "Canon,OT,Prophets", 48, "Ezek", "Eze", "Ezk", "Yechezkel"),
@@ -105,8 +106,10 @@ public class BibleBook {
       Jude = BibleBook.of(65, "Jude", "Canon,NT,Letters", 1, "Jud", "Jd", "Yahudah"),
       BibleBook.of(66, "Revelation", "Canon,NT,Prophecy", 22, "Rev", "Re", "Revelations", "Hagilu Natan Elohim\t"));
 
-  public static final BibleBook ESDRAS_1 = BibleBook.of(67, "1 Esdras", "Apocrypha,Deuterocanon,Eastern,Esdras,Ezra", 9);
-  public static final BibleBook ESDRAS_2 = BibleBook.of(68, "2 Esdras", "Apocrypha,Deuterocanon,Ethiopian,Esdras,Ezra", 16);
+  public static final BibleBook ESDRAS_1 =
+      BibleBook.of(67, "1 Esdras", "Apocrypha,Deuterocanon,Eastern,Esdras,Ezra", 9, "3 Ezra");
+  public static final BibleBook ESDRAS_2 =
+      BibleBook.of(68, "2 Esdras", "Apocrypha,Deuterocanon,Ethiopian,Esdras,Ezra", 16, "4 Ezra");
   public static final BibleBook WISDOM_OF_SOLOMON;
   public static final BibleBook SIRACH;
   public static final BibleBook MACCABEES_1;
@@ -156,7 +159,7 @@ public class BibleBook {
   public static final BibleBook ENOCH_2 =
       BibleBook.of(86, "2 Enoch", "Apocrypha,Enoch", 68, "2 Hanok", "2 Eno");
   public static final BibleBook ENOCH_3 =
-      BibleBook.of(87, "3 Enoch", "Apocrypha,Enoch", 48, "3 Hanok", "3 Eno");
+      BibleBook.of(87, "3 Enoch", "Apocrypha,Enoch", 49, "3 Hanok", "3 Eno");
   public static final BibleBook GIANTS =
       BibleBook.of(88, "Book of Giants", "Apocrypha,Enoch", 14, "Giants");
   public static final BibleBook JUBILEES =
@@ -195,7 +198,7 @@ public class BibleBook {
       BibleBook.of(105, "Testament of Solomon", "Apocrypha,Jewish History", 28),
       BibleBook.of(106, "Psalms of Solomon", "Apocrypha,Jewish History", 18),
       LIVES_OF_THE_PROPHETS =
-          BibleBook.of(107, "Lives of the Prophets", "Apocrypha,Jewish History", 14, "Prophets"),
+          BibleBook.of(107, "Lives of the Prophets", "Apocrypha,Jewish History", 23, "Prophets"),
       GAD_THE_SEER = BibleBook.of(108, "Gad the Seer", "Apocrypha,Jewish History", 14),
       BibleBook.of(109, "Ascension of Isaiah", "Apocrypha,Jewish History", 11),
       BARUCH_2 = BibleBook.of(110, "2 Baruch", "Apocrypha,Jewish History", 87),
@@ -353,7 +356,8 @@ public class BibleBook {
   public static BibleBook get(String name) {
     BibleBook book = BY_NAME.get(collapseName(name));
     if (book == null) {
-      throw new DD4StorageException("Unknown bible book: " + name, DD4StorageException.ErrorCode.BAD_REQUEST);
+      throw new DD4StorageException(
+          "Unknown Bible book: " + name, DD4StorageException.ErrorCode.BAD_REQUEST);
     }
 
     return book;

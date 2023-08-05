@@ -38,7 +38,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
   }
 
   @Override
-  public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     if (book == BibleBook.JUBILEES) {
       return fetchJubilees(version, book, chapter);
     } else if (book == BibleBook.JASHER) {

@@ -13,7 +13,7 @@
         <a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter)">
           {{scripture.book}} {{scripture.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(scripture.version, scripture.book, scripture.chapter, scripture.verse)">{{scripture.verse}}
         </a>
-        {{scripture.text}}
+        <span data-bind-html-compile="scripture.text"></span>
       </p>
       <div class="columns">
         <div class="colx2-left" data-ng-show="!$ctrl.reference.verse">

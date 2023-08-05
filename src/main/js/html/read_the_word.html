@@ -16,7 +16,8 @@
           <div class="columns">
             <div class="colx3-left-double">
               <label><button data-ng-click="$ctrl.reference.shown=true">Book</button></label>
-              <input type="text" data-ng-model="$ctrl.reference.value" class="full-width" data-on-enter="$ctrl.getOrSearch()">
+              <input type="text" data-ng-model="$ctrl.reference.value" class="full-width"
+                     placeholder="Gen 2:3 or Exo 20:8-11 or Law NT" data-on-enter="$ctrl.getOrSearch()">
             </div>
             <div class="colx3-right">
               <label>Version</label>
@@ -71,6 +72,14 @@
           </div>
         </fieldset>
       </div>
+      <div class="columns">
+        <div class="colx2-left">
+          <button data-ng-show="$ctrl.prevChapter" data-ng-click="$ctrl.setReference($ctrl.prevChapter)">Previous Chapter</button>
+        </div>
+        <div class="colx2-right">
+          <button data-ng-show="$ctrl.nextChapter" data-ng-click="$ctrl.setReference($ctrl.nextChapter)">Next Chapter</button>
+        </div>
+      </div>
       <div class="block-content form">
         <!-- a data-ng-show="$ctrl.prevChapter" href="" title="Previous Chapter" style="float: left; top: 50%;"
            data-ng-click="$ctrl.setReference($ctrl.prevChapter)">
@@ -84,8 +93,8 @@
           <p data-ng-repeat="script in $ctrl.scriptures" dir="{{script.dir}}">
             <span data-ng-show="script.showChapter">
               <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
-                {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
-            {{script.text}}
+                ({{script.version}}) {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+            <span data-bind-html-compile="script.text"></span>
           </p>
         </div>
         <div data-ng-show="$ctrl.searchShown && $ctrl.searchResult">
@@ -96,7 +105,7 @@
             <span class="verse" data-ng-repeat="result in group.items">
               <br>
               (<a href="" data-ng-click="$ctrl.showScripture(result.version, result.book, result.chapter)">{{result.version}}</a>)
-              {{result.text}}
+              <span data-bind-html-compile="result.text"></span>
             </span>
           </p>
           <fieldset>

@@ -78,7 +78,9 @@ public class ScriptureStoreTest {
   private static ImmutableList<Scripture> fetchFromWeb(
       String version, String language, BibleBook book, int chapter) {
     return IntStream.range(1, 38)
-        .mapToObj(verse -> createScripture(version, language, book.name(), chapter, verse, "[Fetched From Web]"))
+        .mapToObj(
+            verse ->
+                createScripture(version, language, book.name(), chapter, verse, "[Fetched " + version + " From Web]"))
         .collect(toImmutableList());
   }
 
@@ -130,9 +132,9 @@ public class ScriptureStoreTest {
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(35).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(36).setText("[Scripture Placeholder]"),
         new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(37).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(1).setText("[Fetched From Web]"),
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(2).setText("[Fetched From Web]"),
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(3).setText("[Fetched From Web]"));
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(1).setText("[Fetched " + VERSION + " From Web]"),
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(2).setText("[Fetched " + VERSION + " From Web]"),
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(24).setVerse(3).setText("[Fetched " + VERSION + " From Web]"));
 
     assertThat(scriptureStore.getScriptures(VERSION, EN,  "2 Kings 23").getItems()).hasSize(37);
   }
@@ -170,6 +172,26 @@ public class ScriptureStoreTest {
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
             new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder();
+  }
+
+  @Test
+  public void getScriptures_comparison() {
+    assertThat(
+        scriptureStore.getScriptures(VERSION, BibleBook.INTERLACED, "Isa 56:6").getItems()).containsExactly(
+            new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(56).setVerse(6).setText("[Fetched " + VERSION + " From Web]"),
+            new Scripture().setVersion("WLCO").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(BibleBook.HEBREW).setText("[Fetched WLCO From Web]"),
+            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(BibleBook.HEBREW).setText("[Fetched DSS From Web]"),
+            new Scripture().setVersion("Audit").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(BibleBook.HEBREW)
+                .setText("[Fetched <span class=\"diff-delete\">DSS</span><span class=\"diff-insert\">WLCO</span> From Web] accuracy: 81%"),
+            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(BibleBook.EN).setText("[Fetched DSS From Web]")).inOrder();
+    /* assertThat(
+        scriptureStore.getScriptures(VERSION, BibleBook.INTERLACED, "Isa 23:3-5").getItems()).containsExactly(
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("Isaiah").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("Isaiah").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion("WLCO").setLanguage(BibleBook.HEBREW).setBook("Isaiah").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+            new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder(); */
   }
 
   @Test

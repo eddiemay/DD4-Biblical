@@ -26,11 +26,6 @@ public class ScriptureFetcherJWOrg implements ScriptureFetcher {
     this.apiConnector = apiConnector;
   }
 
-  @Override
-  public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    return fetch(version, "en", book, chapter);
-  }
-
   public synchronized ImmutableList<Scripture> fetch(
       String version, String language, BibleBook book, int chapter) {
     String htmlResult = apiConnector.sendGet(String.format(URL, formatBookForUrl(book.name()), chapter));

@@ -32,7 +32,7 @@ public class ScriptureFetcherBibleComTest {
             "</div></div>" +
             "</body></html>");
 
-    assertThat(scriptureFetcher.fetch("TS2009", BibleBook.Psalms, 117)).containsExactly(
+    assertThat(scriptureFetcher.fetch("TS2009", "en", BibleBook.Psalms, 117)).containsExactly(
         new Scripture().setVersion("TS2009").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "Praise יהוה, all you nations! Extol Him, all you peoples!"),
         new Scripture().setVersion("TS2009").setBook("Psalms").setChapter(117).setVerse(2).setText(

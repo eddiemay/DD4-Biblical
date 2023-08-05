@@ -11,6 +11,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
   private int chapter;
   private int verse;
   private StringBuilder text;
+  private String location;
 
   public String getId() {
     return String.format("%s-%s-%s-%d-%d", version, language, book, chapter, verse).replace(" ", "_");
@@ -27,16 +28,6 @@ public class Scripture extends ModelObject<String> implements Searchable {
   public Scripture setVersion(String version) {
     this.version = version;
     return this;
-  }
-
-  @Deprecated
-  public String getLocale() {
-    return null;
-  }
-
-  @Deprecated
-  public Scripture setLocale(String language) {
-    return setLanguage(language);
   }
 
   public String getLanguage() {
@@ -88,6 +79,15 @@ public class Scripture extends ModelObject<String> implements Searchable {
     return setText(new StringBuilder(text));
   }
 
+  public String getLocation() {
+    return location;
+  }
+
+  public Scripture setLocation(String location) {
+    this.location = location;
+    return this;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(version, language, book, chapter, verse, text.toString());
@@ -95,6 +95,8 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
   @Override
   public String toString() {
-    return String.format("(%s:%s) %s %d:%d %s", version, language, book, chapter, verse, text);
+    return String.format("(%s:%s%s) %s %d:%d %s", version, language,
+        location == null ? "" : ":" + location,
+        book, chapter, verse, text);
   }
 }

@@ -15,12 +15,15 @@ public class ScriptureMigrater {
     this.apiConnector = apiConnector;
   }
 
-  public void migrate(String version, BibleBook startBook) {
+  public void migrate(String version, BibleBook startBook, BibleBook endBook) {
     String baseUrl = apiConnector.formatUrl("scriptures");
+    System.out.println("Startbook: " + startBook);
+    System.out.println("Endbook: " + endBook);
 
     ScriptureVersion scriptureVersion = ScriptureVersion.get(version);
     scriptureVersion.getBibleBooks().stream()
         .filter(book -> startBook == null || book.getNumber() >= startBook.getNumber())
+        .filter(book -> endBook == null || book.getNumber() < endBook.getNumber())
         .forEach(book -> {
           System.out.printf("\n%s %d =>", book.name(), book.getChapterCount());
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
@@ -39,6 +42,7 @@ public class ScriptureMigrater {
 
     new ScriptureMigrater(new APIConnector(API_URL, API_VERSION, 100)).migrate(
         args[0],
-        args.length < 2 || args[1].isEmpty() ? null : BibleBook.get(args[1]));;
+        args.length < 2 || args[1].isEmpty() ? null : BibleBook.get(args[1]),
+        args.length < 3 || args[2].isEmpty() ? null : BibleBook.get(args[2]));
   }
 }

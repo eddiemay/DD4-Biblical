@@ -1,12 +1,14 @@
 package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.model.BibleBook.EN;
+import static com.digitald4.biblical.model.BibleBook.HEBREW;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
@@ -52,10 +54,10 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
         "\t\tThey must not turn aside from the ordinances of God's truth either to the right\n" +
         "\t\tor to the left.</B></P><P><B><FONT COLOR=\"#800000\">Of Initiation.</FONT></B></P></BODY</HTML>");
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "COMMUNITY RULE 1").getItems()).containsExactly(
-        new Scripture().setVersion("qumran").setBook("Community Rule").setChapter(1).setVerse(1).setText(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "COMMUNITY RULE 1").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Community Rule").setChapter(1).setVerse(1).setText(
             "Of the Commitment."),
-        new Scripture().setVersion("qumran").setBook("Community Rule").setChapter(1).setVerse(2).setText(
+        new Scripture().setVersion("DSS").setBook("Community Rule").setChapter(1).setVerse(2).setText(
             "Everyone who wishes to join the community must pledge himself to respect God and man; to live according " +
                 "to the communal rule: to seek God [ ]; to do what is good and upright in His sight, in accordance " +
                 "with what He has commanded through Moses and through His servants the prophets; to love all that He " +
@@ -66,7 +68,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
                 "of God; to walk blamelessly before Him in conformity with all that has been revealed as relevant to " +
                 "the several periods during which they are to bear witness (to Him) ; to love all the children of " +
                 "light, each according to the measure of his guilt, which God will ultimately requite."),
-        new Scripture().setVersion("qumran").setBook("Community Rule").setChapter(1).setVerse(3).setText(
+        new Scripture().setVersion("DSS").setBook("Community Rule").setChapter(1).setVerse(3).setText(
             "All who declare their willingness to serve God's truth must bring all of their mind, all of their " +
                 "strength, and all of their wealth into the community of God, so that their minds may be purified by " +
                 "the truth of His precepts, their strength controlled by His perfect ways, and their wealth disposed " +
@@ -74,7 +76,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
                 "orders of God at the times appointed for them; they must neither advance the statutory times nor " +
                 "postpone the prescribed seasons. They must not turn aside from the ordinances of God's truth either " +
                 "to the right or to the left."),
-        new Scripture().setVersion("qumran").setBook("Community Rule").setChapter(1).setVerse(4).setText(
+        new Scripture().setVersion("DSS").setBook("Community Rule").setChapter(1).setVerse(4).setText(
             "Of Initiation."));
   }
 
@@ -87,11 +89,11 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
         "  <META NAME=\"GENERATOR\" CONTENT=\"IzzyED/2\">\n" +
         "  <META NAME=\"Author\" content=\"Andreas Itzchak Rehberg\">\n" +
         "  <META NAME=\"Description\" content=\"War Scroll (1QM)\">\n" +
-        "  <META NAME=\"KeyWords\" lang=\"de\" content=\"Kriegsrolle, 1QM, Qumran, Essener\">\n" +
-        "  <META NAME=\"KeyWords\" lang=\"en\" content=\"War Scroll, 1QM, Qumran, Essenes\">\n" +
+        "  <META NAME=\"KeyWords\" lang=\"de\" content=\"Kriegsrolle, 1QM, DSS, Essener\">\n" +
+        "  <META NAME=\"KeyWords\" lang=\"en\" content=\"War Scroll, 1QM, DSS, Essenes\">\n" +
         "  <META http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n" +
         "  <META http-equiv=\"Content-Language\" content=\"en\">\n" +
-        "  <LINK REL=\"stylesheet\" TYPE=\"text/css\" HREF=\"/styles/qumran.css\">\n" +
+        "  <LINK REL=\"stylesheet\" TYPE=\"text/css\" HREF=\"/styles/DSS.css\">\n" +
         "  <LINK REL=\"stylesheet\" TYPE=\"text/css\" HREF=\"/styles/text.css\">\n" +
         "  </HEAD><BODY>\n" +
         "<H1>War Scroll (1QM)</H1>\n" +
@@ -129,24 +131,24 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
             " <TR><TD VALIGN=\"top\">(18)</TD><TD>[...]</TD></TR>" +
         "</TABLE></BODY></HTML>");
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "WAR SCROLL 1-2").getItems()).containsExactly(
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(1).setText(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "WAR SCROLL 1-2").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(1).setVerse(1).setText(
             "For the In[structor, the Rule of] the War. The first attack of the Sons of Light shall be undertaken against the forces of the Sons of Darkness, the army of Belial: the troops of Edom, Moab, the sons of Ammon, the [Amalekites],"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(2).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(1).setVerse(2).setText(
             "Philistia, and the troops of the Kittim of Asshur. Supporting them are those who have violated the covenant. The sons of Levi, the sons of Judah, and the sons of Benjamin, those exiled to the wilderness, shall fight against them"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(1).setVerse(3).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(1).setVerse(3).setText(
             "with [...] against all their troops, when the exiles of the Sons of Light return from the Wilderness of the Peoples to camp in the Wilderness of Jerusalem. Then after the battle they shall go up from that place"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(1).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(2).setVerse(1).setText(
             "the congregation's clans, fifty-two. They shall rank the chiefs of the priests after the Chief Priest and his deputy; twelve chief priests to serve"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(2).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(2).setVerse(2).setText(
             "in the regular offering before God. The chiefs of the courses, twenty-six, shall serve in their courses. After them the chiefs of the Levites serve continually, twelve in all, one"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(15).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(2).setVerse(15).setText(
             "[The Rule of the Trumpets: the trumpets] of alarm for all their service for the [...] for their commissioned men,"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(16).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(2).setVerse(16).setText(
             "[by tens of thousands and thousands and hundreds and fifties] and tens. Upon the t[rumpets ...]"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(17).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(2).setVerse(17).setText(
             "[...]"),
-        new Scripture().setVersion("qumran").setBook("War Scroll").setChapter(2).setVerse(18).setText(
+        new Scripture().setVersion("DSS").setBook("War Scroll").setChapter(2).setVerse(18).setText(
             "[...]"));
   }
 
@@ -292,18 +294,18 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/test/java/com/digitald4/biblical/util/data/dss_book_of_giants.htm"));
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "Giants 1").getItems()).containsExactly(
-        new Scripture().setVersion("qumran").setBook("Book of Giants").setChapter(1).setVerse(1).setText(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "Giants 1").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Book of Giants").setChapter(1).setVerse(1).setText(
             "1Q23 Frag. 9 + 14 + 15 2[ . . . ] they knew the secrets of [ . . . ] 3[ . . . si]n was great in the earth [ . . . ] 4[ . . . ] and they killed manY [ . . ] 5[ . . . they begat] giants [ . . . ]"));
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "Giants 4").getItems()).containsExactly(
-        new Scripture().setVersion("qumran").setBook("Book of Giants").setChapter(4).setVerse(1).setText(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "Giants 4").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Book of Giants").setChapter(4).setVerse(1).setText(
             "4Q531 Frag. 2 [ . . . ] they defiled [ . . . ] 2[ . . . they begot] giants and monsters [ . . . ] 3[ . . . ] they begot, and, behold, all [the earth was corrupted . . . ] 4[ . . . ] with its blood and by the hand of [ . . . ] 5[giant's] which did not suffice for them and [ . . . ] 6[ . . . ] and they were seeking to devour many [ . . . ] 7[ . . . ] 8[ . . . ] the monsters attacked it."),
-        new Scripture().setVersion("qumran").setBook("Book of Giants").setChapter(4).setVerse(2).setText(
+        new Scripture().setVersion("DSS").setBook("Book of Giants").setChapter(4).setVerse(2).setText(
             "4Q532 Col. 2 Frags. 1 - 6 2[ . . . ] flesh [ . . . ] 3al[l . . . ] monsters [ . . . ] will be [ . . . ] 4[ . . . ] they would arise [ . . . ] lacking in true knowledge [ . . . ] because [ . . . ] 5[ . . . ] the earth [grew corrupt . . . ] mighty [ . . . ] 6[ . . . ] they were considering [ . . . ] 7[ . . . ] from the angels upon [ . . . ] 8[ . . . ] in the end it will perish and die [ . . . ] 9[ . . . ] they caused great corruption in the [earth . . . ] [ . . . this did not] suffice to [ . . . ] \"they will be [ . . . ]"));
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "Giants 14").getItems()).containsExactly(
-        new Scripture().setVersion("qumran").setBook("Book of Giants").setChapter(14).setVerse(1).setText(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "Giants 14").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Book of Giants").setChapter(14).setVerse(1).setText(
             "4Q531 Frag. 7 3[ . . . great fear] seized me and I fell on my face; I heard his voice [ . . . ] 4[ . . . ] he dwelt among human beings but he did not learn from them [ . . . ]"));
 
   }
@@ -313,7 +315,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/main/webapp/books/2_baruch.txt"));
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "2 Baruch 1").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "2 Baruch 1").getItems()).containsExactly(
         new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(1).setText(
             "And it happened in the twenty-fifth year of YeconiYah (Jeconiah), the king of Yahudah, that the Word of YAHWEH came to Baruch, the son of Neriah,"),
         new Scripture().setVersion("CCC").setBook("2 Baruch").setChapter(1).setVerse(2).setText(
@@ -331,7 +333,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/main/webapp/books/1_clem.txt"));
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "1 Clem 3").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "1 Clem 3").getItems()).containsExactly(
         new Scripture().setVersion("CCC").setBook("1 Clement").setChapter(3).setVerse(1).setText(
             "All glory and enlargement was given unto you, and that was fulfilled which is written My beloved ate and drank and was enlarged and waxed fat and kicked."),
         new Scripture().setVersion("CCC").setBook("1 Clement").setChapter(3).setVerse(2).setText(
@@ -347,7 +349,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/main/webapp/books/odes_of_peace.txt"));
 
-    assertThat(scriptureStore.getScriptures("qumran", EN, "Odes 37").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("DSS", EN, "Odes 37").getItems()).containsExactly(
         new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(1).setText(
             "I stretched out my hands to my Lord, || and to the Most High I raised my voice:"),
         new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(2).setText(
@@ -356,5 +358,27 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
             "His answer came to me and gave me the fruits of my labors;"),
         new Scripture().setVersion("CCC").setBook("Odes of Peace").setChapter(37).setVerse(4).setText(
             "And it gave me rest by the grace of the Lord. Hallelujah!"));
+  }
+
+  @Test
+  public void fetchIsaiahDSS() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/isaiah_dss.txt"));
+
+    assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 1:1-4,31,2:1-2").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-1").setChapter(1).setVerse(1).setText(
+            "חזון יש‸ע‸יהו בן אמוץ אשר חזה על יהודה וירושל‸י‸ם ‸ו‸בימי עוזיה יותם אחז ‸י‸חזקיה מלכי יהודה"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-2").setChapter(1).setVerse(2).setText(
+            "שמעו שמים והאזינו הארץ כיא יהוה דבר בנים גדלתי ורו‸מ‸מת [ ] והמה פשעו בי"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-3").setChapter(1).setVerse(3).setText(
+            "ידע שור ק‸י‸ונהו וחמור אבוס בעליו ישראל לוא ידע ועמי לוא [ ]ן"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-4").setChapter(1).setVerse(4).setText(
+            "הוי גוי חוטה עם כבד עוון זרע מרעים בנים משחיתים עזבו את יה[ ] נא.ו את קדוש ישראל נזרו אחור"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-II-5").setChapter(1).setVerse(31).setText(
+            "והיה החסנכם לנעורת ופעלכם לניצוץ ובערו שניהם יחדו ואין מכבה"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-II-7").setChapter(2).setVerse(1).setText(
+            "הדבר אשר חזה ישעיה בן אמוץ על יהודה וירושלים"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-II-7").setChapter(2).setVerse(2).setText(
+            "והיה באחרית הימים נכון יהיה הר בית יהוה בראש הרים ונשא מגבעות ונהרו עלוהי כול הגואים"));
   }
 }

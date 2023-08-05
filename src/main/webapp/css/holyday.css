@@ -110,6 +110,18 @@
   background-size: 100% 100%;
 }
 .has-error {
-    color: red;
-    background-color: yellow;
+  color: red;
+  background-color: yellow;
+}
+
+.diff-insert {
+  color: red;
+  background-color: yellow;
+  font-weight: bold;
+}
+
+.diff-delete {
+  color: red;
+  background-color: lime;
+  font-weight: bold;
 }

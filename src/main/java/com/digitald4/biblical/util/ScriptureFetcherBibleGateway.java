@@ -36,7 +36,7 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
   }
 
   @Override
-  public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     String url = String.format(URL, version, formatBookForUrl(book.name()), chapter);
     // System.out.println("Fetch of: " + url);
     String htmlResult = apiConnector.sendGet(url);

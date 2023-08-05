@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,19 +33,29 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
   }
 
   @Override
-  public synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
+    if (book == BibleBook.ISAIAH) {
+      return language.equals(BibleBook.HEBREW)
+          ? fetchDSSIsaiahHe(version, book) : fetchDSSIsaiahEn(version, book, chapter);
+    }
+
+    // Temporary code until we can find Hebrews sources for the other DSS books.
+    if (language.equals(BibleBook.HEBREW)) {
+      return ImmutableList.of();
+    }
+
     if (book == BibleBook.COMMUNITY_RULE) {
       return fetchCommunityRule(version, book);
     } else if (book == BibleBook.WAR_SCROLL) {
       return fetchWarScroll(version, book);
+    } else if (book == BibleBook.GIANTS) {
+      return fetchGiants(version, book);
     } else if (book == BibleBook.JOSEPHUS) {
       return fetchJosephus(version, book, chapter);
     } else if (book == BibleBook.TESTAMENT_OF_JOB) {
       return fetchTestamentOfJob(version, book);
     } else if (book == BibleBook.ENOCH_3) {
       return fetch3Enoch(version, book);
-    } else if (book == BibleBook.GIANTS) {
-      return fetchGiants(version, book);
     } else if (book == BibleBook.GAD_THE_SEER) {
       return fetchGadTheSeer(version, book, chapter);
     } else if (book == BibleBook.LIVES_OF_THE_PROPHETS) {
@@ -412,6 +423,132 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                   .setText(verseMatcher.group(2).trim()));
         }
       }
+    }
+
+    return scriptures.build();
+  }
+
+  private synchronized ImmutableList<Scripture> fetchDSSIsaiahHe(String version, BibleBook book) {
+    final Pattern rangeMultiChapterPattern = // Col. XX, Isaiah 25:6–26:18
+        Pattern.compile("Col\\. (\\w+), Isaiah (\\d+):(\\d+)–(\\d+):(\\d+)");
+    final Pattern rangeSingleChapterPattern = // Col. I, Isaiah 1:1–26
+        Pattern.compile("Col\\. (\\w+), Isaiah (\\d+):(\\d+)–(\\d+)");
+    final Pattern verseLinePattern = Pattern.compile("(\\d+)\\s+(.+)");
+    final Pattern chapterPattern = Pattern.compile("(\\d+):(\\d+)(.+)");
+    final Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
+    String[] lines = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/isaiah_dss.txt")
+        .replaceAll("\u00a0", " ").split("\n");
+    final String fragment = "1QIsaA";
+    ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+    String col = null;
+    int chapterStart;
+    int verseStart;
+    int chapterEnd;
+    int verseEnd;
+    int chapter = 0;
+    Scripture lastScripture = null;
+    for (String line : lines) {
+      // System.out.println(line);
+      Matcher rangeMatcher = rangeMultiChapterPattern.matcher(line);
+      if (!rangeMatcher.matches()) {
+        rangeMatcher = rangeSingleChapterPattern.matcher(line);
+      }
+      if (rangeMatcher.matches()) {
+        col = rangeMatcher.group(1);
+        chapterStart = Integer.parseInt(rangeMatcher.group(2));
+        verseStart = Integer.parseInt(rangeMatcher.group(3));
+        chapterEnd =
+            rangeMatcher.groupCount() == 5 ? Integer.parseInt(rangeMatcher.group(4)) : chapterStart;
+        verseEnd = rangeMatcher.groupCount() == 5
+            ? Integer.parseInt(rangeMatcher.group(5)) : Integer.parseInt(rangeMatcher.group(4));
+        chapter = chapterStart;
+
+        // System.out.printf("Isaiah %d:%d-%d:%d\n", chapterStart, verseStart, chapterEnd, verseEnd);
+      } else {
+        Matcher verseLineMatcher = verseLinePattern.matcher(line);
+        if (verseLineMatcher.matches()) {
+          int lineNumber = Integer.parseInt(verseLineMatcher.group(1));
+          String versePart = verseLineMatcher.group(2);
+          Matcher chapterMatcher = chapterPattern.matcher(versePart);
+          if (chapterMatcher.find()) {
+            chapter = Integer.parseInt(chapterMatcher.group(1));
+            // System.out.println(chapterMatcher.group(0));
+            // System.out.println("Chapter: " + chapter);
+
+            if (chapterMatcher.start() > 2) {
+              lastScripture.getText().append(" ")
+                  .append(ScriptureFetcher.trim(versePart.substring(0, chapterMatcher.start())));
+            }
+            versePart = chapterMatcher.group(3);
+
+            int verse = Integer.parseInt(chapterMatcher.group(2));
+            if (chapter == 8 && verse == 23) {
+              chapter = 9;
+              verse = 0;
+            }
+            scriptures.add(
+                lastScripture = new Scripture()
+                    .setVersion(version)
+                    .setBook(book.name())
+                    .setLanguage(BibleBook.HEBREW)
+                    .setChapter(chapter)
+                    .setVerse(chapter == 9 ? verse + 1 : verse)
+                    .setText("")
+                    .setLocation(String.format("%s-%s-%d", fragment, col, lineNumber)));
+          }
+          Matcher verseMatcher = versePattern.matcher(versePart);
+          if (!verseMatcher.find()) {
+            lastScripture.getText().append(" ").append(ScriptureFetcher.trim(versePart));
+          } else {
+            if (verseMatcher.start() > 2) {
+              lastScripture.getText().append(" ")
+                  .append(ScriptureFetcher.trim(versePart.substring(0, verseMatcher.start())));
+            }
+            do {
+              int verse = Integer.parseInt(verseMatcher.group(1));
+              scriptures.add(
+                  lastScripture = new Scripture()
+                      .setVersion(version)
+                      .setBook(book.name())
+                      .setLanguage(BibleBook.HEBREW)
+                      .setChapter(chapter)
+                      .setVerse(chapter == 9 ? verse + 1 : verse)
+                      .setText(ScriptureFetcher.trim(verseMatcher.group(2)))
+                      .setLocation(String.format("%s-%s-%d", fragment, col, lineNumber)));
+            } while (verseMatcher.find());
+          }
+        }
+      }
+    }
+
+    return scriptures.build().stream()
+        .filter(scripture -> !scripture.getText().toString().isEmpty())
+        .peek(scripture -> scripture.setText(scripture.getText().toString().trim()))
+        .peek(s -> {
+          if (s.getChapter() == 8 && s.getVerse() == 23) {
+            s.setChapter(9).setVerse(1);
+          }
+        })
+        .collect(toImmutableList());
+  }
+
+  private synchronized ImmutableList<Scripture> fetchDSSIsaiahEn(
+      String version, BibleBook book, int chapter) {
+    final String URL = "http://dss.collections.imj.org.il/api/get_translation?id=%d:%d&lang=en";
+    int verseMax = 10;
+    int verse = 1;
+    ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+    JSONObject json = new JSONObject(apiConnector.sendGet(String.format(URL, chapter, verse)));
+    while (json.has("text")) {
+      scriptures.add(
+          new Scripture()
+              .setVersion(version)
+              .setBook(book.name())
+              .setLanguage("en")
+              .setChapter(chapter)
+              .setVerse(verse)
+              .setText(json.getString("text")));
+      json = new JSONObject(apiConnector.sendGet(String.format(URL, chapter, ++verse)));
     }
 
     return scriptures.build();

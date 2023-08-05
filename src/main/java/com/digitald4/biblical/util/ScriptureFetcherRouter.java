@@ -37,8 +37,8 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
   }
 
   @Override
-  public ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter) {
-    return getFetcher(version).fetch(version, book, chapter);
+  public ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
+    return getFetcher(version).fetch(version, language, book, chapter);
   }
 
   private ScriptureFetcher getFetcher(String version) {
@@ -52,7 +52,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
         return jwOrg;
       case "KJV1611":
         return kjv1611;
-      case "qumran":
+      case "DSS":
       case "CCC":
         return oneOff;
       case "OXFORD":

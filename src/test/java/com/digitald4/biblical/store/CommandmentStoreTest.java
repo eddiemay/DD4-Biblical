@@ -39,7 +39,7 @@ public class CommandmentStoreTest {
               .setSummary("Keep the Sabbath").setScriptures("Tiffin 36U").setTags("ten commandments,worship, sabbath"));
       fail("Should not have got here");
     } catch (Exception e) {
-      assertThat(e).hasMessageThat().contains("Unknown bible book: Tiffin");
+      assertThat(e).hasMessageThat().contains("Unknown Bible book: Tiffin");
     }
 
     verify(dao, never()).create(any(Commandment.class));
