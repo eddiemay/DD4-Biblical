@@ -1,12 +1,13 @@
 package com.digitald4.biblical.model;
 
+import com.digitald4.biblical.util.Language;
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;
 import java.util.Objects;
 
 public class Scripture extends ModelObject<String> implements Searchable {
   private String version;
-  private String language = BibleBook.EN;
+  private String language = Language.EN;
   private String book;
   private int chapter;
   private int verse;

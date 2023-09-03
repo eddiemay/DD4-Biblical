@@ -92,7 +92,7 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
-    if (book.equals(BibleBook.WISDOM_OF_SOLOMON.name())) {
+    if (book.equals(BibleBook.WISDOM_OF_SOLOMON)) {
       book = "Wisdom";
     }
 

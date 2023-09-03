@@ -148,9 +148,9 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
-    if (book.equals(BibleBook.SONG_OF_SOLOMON.name())) {
+    if (book.equals(BibleBook.SONG_OF_SOLOMON)) {
       return "songs";
-    } else if (book.equals(BibleBook.SIRACH.name())) {
+    } else if (book.equals(BibleBook.SIRACH)) {
       return "ecclesiasticus";
     }
 

@@ -1,14 +1,15 @@
 package com.digitald4.biblical.util;
 
-import static com.digitald4.biblical.model.BibleBook.EN;
-import static com.digitald4.biblical.model.BibleBook.HEBREW;
+import static com.digitald4.biblical.util.Language.EN;
+import static com.digitald4.biblical.util.Language.HEBREW;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
@@ -365,20 +366,77 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/main/webapp/books/isaiah_dss.txt"));
 
-    assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 1:1-4,31,2:1-2").getItems()).containsExactly(
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-1").setChapter(1).setVerse(1).setText(
-            "חזון יש‸ע‸יהו בן אמוץ אשר חזה על יהודה וירושל‸י‸ם ‸ו‸בימי עוזיה יותם אחז ‸י‸חזקיה מלכי יהודה"),
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-2").setChapter(1).setVerse(2).setText(
-            "שמעו שמים והאזינו הארץ כיא יהוה דבר בנים גדלתי ורו‸מ‸מת [ ] והמה פשעו בי"),
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-3").setChapter(1).setVerse(3).setText(
-            "ידע שור ק‸י‸ונהו וחמור אבוס בעליו ישראל לוא ידע ועמי לוא [ ]ן"),
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-I-4").setChapter(1).setVerse(4).setText(
-            "הוי גוי חוטה עם כבד עוון זרע מרעים בנים משחיתים עזבו את יה[ ] נא.ו את קדוש ישראל נזרו אחור"),
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-II-5").setChapter(1).setVerse(31).setText(
-            "והיה החסנכם לנעורת ופעלכם לניצוץ ובערו שניהם יחדו ואין מכבה"),
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-II-7").setChapter(2).setVerse(1).setText(
-            "הדבר אשר חזה ישעיה בן אמוץ על יהודה וירושלים"),
-        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-II-7").setChapter(2).setVerse(2).setText(
-            "והיה באחרית הימים נכון יהיה הר בית יהוה בראש הרים ונשא מגבעות ונהרו עלוהי כול הגואים"));
+    assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 1:1-4,31,2:1-2")
+        .getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-I-1").setChapter(1).setVerse(1).setText(
+                "חזון יש‸ע‸יהו בן אמוץ אשר חזה על יהודה וירושל‸י‸ם ‸ו‸בימי עוזיה יותם אחז ‸י‸חזקיה מלכי יהודה"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-I-2").setChapter(1).setVerse(2).setText(
+                "שמעו שמים והאזינו הארץ כיא יהוה דבר בנים גדלתי ורו‸מ‸מת [ ] והמה פשעו בי"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-I-3").setChapter(1).setVerse(3).setText(
+                "ידע שור ק‸י‸ונהו וחמור אבוס בעליו ישראל לוא ידע ועמי לוא [ ]ן"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-I-4").setChapter(1).setVerse(4).setText(
+                "הוי גוי חוטה עם כבד עוון זרע מרעים בנים משחיתים עזבו את יה[ ] נא.ו את קדוש ישראל נזרו אחור"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-II-5").setChapter(1).setVerse(31).setText(
+                "והיה החסנכם לנעורת ופעלכם לניצוץ ובערו שניהם יחדו ואין מכבה"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-II-7").setChapter(2).setVerse(1).setText(
+                "הדבר אשר חזה ישעיה בן אמוץ על יהודה וירושלים"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he")
+            .setLocation("1QIsaA-II-7").setChapter(2).setVerse(2).setText(
+                "והיה באחרית הימים נכון יהיה הר בית יהוה בראש הרים ונשא מגבעות ונהרו עלוהי כול הגואים"));
+  }
+
+  @Test
+  public void fetchIsaiahDSS_noVerseLeftBehind() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/isaiah_dss.txt"));
+
+    assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 45:24-46:1").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XXXIX-4").setChapter(45).setVerse(24).setText(
+            "אך ביהוה ליא יאמר צדקות ועוז עדיו יבואו יבושו כול הנחרים בו"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XXXIX-5").setChapter(45).setVerse(25).setText(
+            "ביהוה יצדקו ויתהללו כול זרע ישראל"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XXXIX-5").setChapter(46).setVerse(1).setText(
+            "כרע בל קרס נבו היו עצביהמה לחיה לבהמה נשאותיכמה עמוסות משמיעיהמה"));
+  }
+
+  @Test
+  public void fetchIsaiahDSS_noVerseLeftBehind64() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/isaiah_dss.txt"));
+
+    assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 63:19-64:2").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-LI-14").setChapter(63).setVerse(19).setText(
+            "היינו מעולם לוא משלתה בם לוא נ.רא שמכה עליהמה"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-LI-15").setChapter(64).setVerse(1).setText(
+            "לוא קרעתה שמים וירדתה מפניכה הרים נזלו"),
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-LI-16").setChapter(64).setVerse(2).setText(
+            "כקדוח אש עמסים מים תבעה אש לצריכה להודיע שמכה לצריכה ‸מ‸.פניכה גואים ירגזו"));
+  }
+
+  @Test
+  public void fetchIsaiahDSS_duplicates() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/main/webapp/books/isaiah_dss.txt"));
+
+    assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 16:14").getItems()).containsExactly(
+        new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XIII-31").setChapter(16).setVerse(14).setText(
+            "ועתה דבר י.וה לאמור בשלוש שנים כשני ש.יר ונקלה כבוד מואב בכול ההמון הרב ושאר מעט מ‸ז‸צער ולוא כבוד"));
+
+    // Make sure there are no duplicates by reading in all verses into an ImmutableMap.
+    ImmutableMap<String, String> all = scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 1-66")
+        .getItems()
+        .stream()
+        .collect(
+            toImmutableMap(
+                s -> String.format("Isaiah-%d-%d", s.getChapter(), s.getVerse()),
+                s -> s.getText().toString()));
+
+    assertThat(all).hasSize(1291);
   }
 }

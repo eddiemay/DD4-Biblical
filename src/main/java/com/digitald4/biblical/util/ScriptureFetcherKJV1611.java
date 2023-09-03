@@ -46,7 +46,7 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
   }
 
   private static String formatBookForUrl(String book) {
-    if (book.equals(BibleBook.SIRACH.name())) {
+    if (book.equals(BibleBook.SIRACH)) {
       return "Ecclesiasticus";
     }
 

@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import com.digitald4.biblical.model.Commandment;
+import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.storage.DAO;
@@ -19,8 +20,11 @@ public class CommandmentStoreTest {
   @Mock private final DAO dao = mock(DAO.class);
   @Mock private final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   @Mock private final ScriptureStore scriptureStore = mock(ScriptureStore.class);
+  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
 
-  private final ScriptureReferenceProcessor scriptureRefProcessor = new ScriptureReferenceProcessorSplitImpl();
+  private final ScriptureReferenceProcessor scriptureRefProcessor =
+      new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
   private CommandmentStore commandmentStore;
 
   @Before

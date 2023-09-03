@@ -34,37 +34,37 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
-    if (book == BibleBook.ISAIAH) {
-      return language.equals(BibleBook.HEBREW)
+    if (book.name().equals(BibleBook.ISAIAH)) {
+      return language.equals(Language.HEBREW)
           ? fetchDSSIsaiahHe(version, book) : fetchDSSIsaiahEn(version, book, chapter);
     }
 
     // Temporary code until we can find Hebrews sources for the other DSS books.
-    if (language.equals(BibleBook.HEBREW)) {
+    if (language.equals(Language.HEBREW)) {
       return ImmutableList.of();
     }
 
-    if (book == BibleBook.COMMUNITY_RULE) {
+    if (book.name().equals(BibleBook.COMMUNITY_RULE)) {
       return fetchCommunityRule(version, book);
-    } else if (book == BibleBook.WAR_SCROLL) {
+    } else if (book.name().equals(BibleBook.WAR_SCROLL)) {
       return fetchWarScroll(version, book);
-    } else if (book == BibleBook.GIANTS) {
+    } else if (book.name().equals(BibleBook.GIANTS)) {
       return fetchGiants(version, book);
-    } else if (book == BibleBook.JOSEPHUS) {
+    } else if (book.name().equals(BibleBook.JOSEPHUS)) {
       return fetchJosephus(version, book, chapter);
-    } else if (book == BibleBook.TESTAMENT_OF_JOB) {
+    } else if (book.name().equals(BibleBook.TESTAMENT_OF_JOB)) {
       return fetchTestamentOfJob(version, book);
-    } else if (book == BibleBook.ENOCH_3) {
+    } else if (book.name().equals(BibleBook.ENOCH_3)) {
       return fetch3Enoch(version, book);
-    } else if (book == BibleBook.GAD_THE_SEER) {
+    } else if (book.name().equals(BibleBook.GAD_THE_SEER)) {
       return fetchGadTheSeer(version, book, chapter);
-    } else if (book == BibleBook.LIVES_OF_THE_PROPHETS) {
+    } else if (book.name().equals(BibleBook.LIVES_OF_THE_PROPHETS)) {
       return fetchLivesOfTheProphets(version, book);
-    } else if (book == BibleBook.BARUCH_2) {
+    } else if (book.name().equals(BibleBook.BARUCH_2)) {
       return fetch2Baruch(version, book);
-    } else if (book == BibleBook.CLEMENT_1) {
+    } else if (book.name().equals(BibleBook.CLEMENT_1)) {
       return fetch1Clem(version, book);
-    } else if (book == BibleBook.ODES_OF_PEACE) {
+    } else if (book.name().equals(BibleBook.ODES_OF_PEACE)) {
       return fetchOdesOfPeace(version, book);
     }
 
@@ -363,7 +363,6 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
           return scriptures.build().stream();
         })
         .collect(toImmutableList());
-
   }
 
   private synchronized ImmutableList<Scripture> fetch2Baruch(String version, BibleBook book) {
@@ -490,7 +489,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                 lastScripture = new Scripture()
                     .setVersion(version)
                     .setBook(book.name())
-                    .setLanguage(BibleBook.HEBREW)
+                    .setLanguage(Language.HEBREW)
                     .setChapter(chapter)
                     .setVerse(chapter == 9 ? verse + 1 : verse)
                     .setText("")
@@ -510,7 +509,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                   lastScripture = new Scripture()
                       .setVersion(version)
                       .setBook(book.name())
-                      .setLanguage(BibleBook.HEBREW)
+                      .setLanguage(Language.HEBREW)
                       .setChapter(chapter)
                       .setVerse(chapter == 9 ? verse + 1 : verse)
                       .setText(ScriptureFetcher.trim(verseMatcher.group(2)))
@@ -535,20 +534,19 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
   private synchronized ImmutableList<Scripture> fetchDSSIsaiahEn(
       String version, BibleBook book, int chapter) {
     final String URL = "http://dss.collections.imj.org.il/api/get_translation?id=%d:%d&lang=en";
-    int verseMax = 10;
-    int verse = 1;
     ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
-    JSONObject json = new JSONObject(apiConnector.sendGet(String.format(URL, chapter, verse)));
-    while (json.has("text")) {
-      scriptures.add(
-          new Scripture()
-              .setVersion(version)
-              .setBook(book.name())
-              .setLanguage("en")
-              .setChapter(chapter)
-              .setVerse(verse)
-              .setText(json.getString("text")));
-      json = new JSONObject(apiConnector.sendGet(String.format(URL, chapter, ++verse)));
+    for (int verse = 1; verse <= 38; verse++) {
+      JSONObject json = new JSONObject(apiConnector.sendGet(String.format(URL, chapter, verse)));
+      if (json.has("text")) {
+        scriptures.add(
+            new Scripture()
+                .setVersion(version)
+                .setBook(book.name())
+                .setLanguage("en")
+                .setChapter(chapter)
+                .setVerse(verse)
+                .setText(json.getString("text")));
+      }
     }
 
     return scriptures.build();

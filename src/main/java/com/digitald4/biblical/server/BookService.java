@@ -5,6 +5,7 @@ import static java.util.Comparator.comparing;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.service.EntityServiceImpl;
@@ -39,8 +40,8 @@ public class BookService extends EntityServiceImpl<BibleBook, String> {
   private final ScriptureStore scriptureStore;
 
   @Inject
-  BookService(Store<BibleBook, String> bibleBookStore, LoginResolver loginResolver,
-      ScriptureStore scriptureStore) {
+  BookService(
+      BibleBookStore bibleBookStore, LoginResolver loginResolver, ScriptureStore scriptureStore) {
     super(bibleBookStore, loginResolver);
     this.scriptureStore = scriptureStore;
   }
@@ -70,16 +71,6 @@ public class BookService extends EntityServiceImpl<BibleBook, String> {
       return new AtomicInteger(
           scriptureStore.list(query).getItems().stream()
               .mapToInt(Scripture::getVerse).max().orElse(0));
-    } catch (DD4StorageException e) {
-      throw new ServiceException(e.getErrorCode(), e);
-    }
-  }
-
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrateBooks")
-  public AtomicInteger migrateBooks(@Named("idToken") String idToken) throws ServiceException {
-    try {
-      resolveLogin(idToken, true);
-      return new AtomicInteger(getStore().create(BibleBook.ALL_BOOKS).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

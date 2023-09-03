@@ -1,13 +1,15 @@
 package com.digitald4.biblical.server;
 
-import static com.digitald4.biblical.model.BibleBook.EN;
+import static com.digitald4.biblical.util.Language.EN;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
+import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.model.BasicUser;
@@ -21,8 +23,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 public class ScriptureServiceTest {
+  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
   private static final ScriptureReferenceProcessor scriptureRefProcessor =
-      new ScriptureReferenceProcessorSplitImpl();
+      new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
   @Mock private final SessionStore<BasicUser> sessionStore = mock(SessionStore.class);
   @Mock private final ScriptureStore scriptureStore = mock(ScriptureStore.class);
   private ScriptureService scriptureService;

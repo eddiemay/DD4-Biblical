@@ -8,6 +8,7 @@ import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Commandment;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.ScriptureVersion;
+import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.storage.SearchIndexerAppEngineImpl;
@@ -24,12 +25,14 @@ import javax.inject.Provider;
 public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
   private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final Provider<ScriptureStore> scriptureStore;
+  private final BibleBookStore bibleBookStore;
 
   @Inject
-  public SearchIndexImpl(
-      ScriptureReferenceProcessor scriptureRefProcessor, Provider<ScriptureStore> scriptureStore) {
+  public SearchIndexImpl(ScriptureReferenceProcessor scriptureRefProcessor,
+      Provider<ScriptureStore> scriptureStore, BibleBookStore bibleBookStore) {
     this.scriptureRefProcessor = scriptureRefProcessor;
     this.scriptureStore = scriptureStore;
+    this.bibleBookStore = bibleBookStore;
   }
 
   @Override
@@ -45,7 +48,7 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
 
   public Document toDocument(Scripture scripture) {
     ScriptureVersion scriptureVersion = ScriptureVersion.get(scripture.getVersion());
-    BibleBook bibleBook = BibleBook.get(scripture.getBook());
+    BibleBook bibleBook = bibleBookStore.get(scripture.getBook());
 
     return Document.newBuilder()
         .setId(scripture.getId())
@@ -80,7 +83,7 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
         .addField(Field.newBuilder().setName("verse").setNumber(firstDeclared.getStartVerse()))
         .addField(Field.newBuilder().setName("scriptureText").setText(
             scriptureStore.get()
-                .getScripturesTextAllVersions(BibleBook.EN, commandment.getScriptures())))
+                .getScripturesTextAllVersions(Language.EN, commandment.getScriptures())))
         .addField(Field.newBuilder().setName("bookTags").setText(
             bibleBooks.stream()
                 .flatMap(bibleBook -> stream(bibleBook.getTags().split(",")))

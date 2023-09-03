@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.ScriptureVersion;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.DAOApiImpl;
@@ -21,15 +22,17 @@ public class ScriptureBulkDeleter {
   private final static String ID_FORMAT = "%s-%s-%s-%d-%d";
   private final APIConnector apiConnector;
   private final DAO dao;
+  private final BibleBookStore bibleBookStore;
 
   public ScriptureBulkDeleter(APIConnector apiConnector, DAO dao) {
     this.apiConnector = apiConnector;
     this.dao = dao;
+    bibleBookStore = new BibleBookStore(() -> dao);
   }
 
   public void delete(BibleBook startBook) {
     String booksBaseUrl = apiConnector.formatUrl("books");
-    BibleBook.ALL_BOOKS.stream()
+    bibleBookStore.getAllBooks().stream()
         .filter(book -> startBook == null || book.getNumber() >= startBook.getNumber())
         .forEach(book -> {
           String bookName = book.name();
@@ -44,8 +47,8 @@ public class ScriptureBulkDeleter {
               return;
             }
             ScriptureVersion.ALL_VERSIONS.stream()
-                .filter(version -> version.meetsCriteria(book, null))
                 .map(ScriptureVersion::getVersion)
+                .filter(version -> bibleBookStore.meetsCriteria(version, book, null))
                 .peek(version -> System.out.printf(" %s", version))
                 .forEach(version ->
                     dao.delete(Scripture.class,
@@ -67,7 +70,7 @@ public class ScriptureBulkDeleter {
 
   public ScriptureBulkDeleter deleteDepcreatedVersions() {
     ScriptureVersion.ALL_VERSIONS.stream()
-        .filter(version -> version.getBibleBooks().isEmpty())
+        .filter(version -> version.getTags().isEmpty())
         .forEach(version -> {
           QueryResult<Scripture> queryResult =
               dao.list(Scripture.class, Query.forList().setFilters(Filter.of("version", version)));

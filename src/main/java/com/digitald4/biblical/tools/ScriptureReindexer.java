@@ -2,8 +2,9 @@ package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
-import com.digitald4.biblical.model.ScriptureVersion;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.DAOApiImpl;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Arrays;
@@ -12,18 +13,20 @@ import java.util.stream.IntStream;
 public class ScriptureReindexer {
   private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
   private final static String API_VERSION = "v1";
-  private final static String URL = "%s/reindex?version=%s&book=%s&chapter=%d";
+  private final static String URL = "%s/reindex?version=%s&book=%s&chapter=%d&lang=en";
   private final APIConnector apiConnector;
+  private final BibleBookStore bibleBookStore;
 
   public ScriptureReindexer(APIConnector apiConnector) {
     this.apiConnector = apiConnector;
+    DAOApiImpl daoApi = new DAOApiImpl(apiConnector);
+    bibleBookStore = new BibleBookStore(() -> daoApi);
   }
 
   public void reindex(String version, ImmutableSet<String> books) {
     String baseUrl = apiConnector.formatUrl("scriptures");
 
-    ScriptureVersion scriptureVersion = ScriptureVersion.get(version);
-    scriptureVersion.getBibleBooks().stream()
+    bibleBookStore.getBibleBooks(version).stream()
         .filter(
             book -> books.isEmpty() || books.contains(book.name())
                 || book.getAltNames().stream().anyMatch(books::contains))

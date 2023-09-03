@@ -29,13 +29,13 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     String bookName = book.name().replace(" ", "_");
 
-    if (book == BibleBook.MACCABEES_1) {
+    if (book.name().equals(BibleBook.MACCABEES_1)) {
       return fetch(version, book, chapter, "The_Book_of_Maccabees_I");
-    } else if (book == BibleBook.MACCABEES_2) {
+    } else if (book.name().equals(BibleBook.MACCABEES_2)) {
       return fetch(version, book, chapter, "The_Book_of_Maccabees_II");
-    } else if (book == BibleBook.SUSANNA) {
+    } else if (book.name().equals(BibleBook.SUSANNA)) {
       return fetch(version, book, chapter, "The_Book_of_Susanna");
-    } else if (book == BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS) {
+    } else if (book.name().equals(BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)) {
       return fetchTestamentsOfTheTwelve(version, book, chapter);
     }
 

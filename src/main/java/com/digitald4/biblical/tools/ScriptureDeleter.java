@@ -3,6 +3,7 @@ package com.digitald4.biblical.tools;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.server.APIConnector;
@@ -51,8 +52,9 @@ public class ScriptureDeleter {
 
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken(idToken);
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> dao);
     new ScriptureDeleter(
-        new ScriptureStore(() -> dao, null, new ScriptureReferenceProcessorSplitImpl(), null))
+        new ScriptureStore(() -> dao, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), null))
             .preview(searchText);
   }
 }

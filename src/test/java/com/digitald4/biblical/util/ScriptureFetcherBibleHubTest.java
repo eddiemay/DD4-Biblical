@@ -4,9 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
-import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,7 +28,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             "For His kindness is mighty over us, And the truth of יהוה is everlasting. Praise Yah!</p>" +
             "</div></body></html>");
 
-    assertThat(scriptureStore.getScriptures("ISR", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("ISR", Language.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("ISR").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "Praise יהוה, all you nations! Extol Him, all you peoples!"),
         new Scripture().setVersion("ISR").setBook("Psalms").setChapter(117).setVerse(2).setText(
@@ -50,7 +48,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             "<a name=\"footnotes\"></a><div class=\"footnotes\"><h4>Footnotes:</h4><ol><li id=\"fen-NKJV-15869a\"><span class=\"fnref\" title=\"Go to Psalm 117:1\">Psalm 117:1</span> <span class=\"footnote-text\"><i>Praise</i></span></li></ol></div> <!--end of footnotes--></div>" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("NKJV", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("NKJV", Language.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("NKJV").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "Praise the Lord, all you Gentiles! Laud Him, all you peoples!"),
         new Scripture().setVersion("NKJV").setBook("Psalms").setChapter(117).setVerse(2).setText(
@@ -62,7 +60,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/wlco.html"));
 
-    assertThat(scriptureStore.getScriptures("WLCO", BibleBook.HEBREW, "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("WLCO", Language.HEBREW, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(1)
             .setText("הללו את־יהוה כל־גוים בחוהו כל־האמים׃"),
         new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(2)

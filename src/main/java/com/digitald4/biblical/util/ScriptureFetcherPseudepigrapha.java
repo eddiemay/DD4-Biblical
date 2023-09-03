@@ -39,15 +39,15 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
-    if (book == BibleBook.JUBILEES) {
+    if (book.name().equals(BibleBook.JUBILEES)) {
       return fetchJubilees(version, book, chapter);
-    } else if (book == BibleBook.JASHER) {
+    } else if (book.name().equals(BibleBook.JASHER)) {
       return fetchJasher(version, book);
-    } else if (book == BibleBook.ENOCH) {
+    } else if (book.name().equals(BibleBook.ENOCH)) {
       return version.equals("OXFORD") ? fetchEnoch(version, book) : fetchEnochOther(version, book);
-    } else if (book == BibleBook.ENOCH_2) {
+    } else if (book.name().equals(BibleBook.ENOCH_2)) {
       return fetch2Enoch(version, book);
-    } else if (book == BibleBook.BOOK_OF_ADAM_AND_EVE) {
+    } else if (book.name().equals(BibleBook.BOOK_OF_ADAM_AND_EVE)) {
       return fetchBookOfAdamAndEve(version, book);
     }
     throw new DD4StorageException(String.format("Unsupported book: (%s) %s %d", version, book, chapter));

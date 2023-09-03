@@ -1,6 +1,6 @@
 package com.digitald4.biblical.util;
 
-import static com.digitald4.biblical.model.BibleBook.EN;
+import static com.digitald4.biblical.util.Language.EN;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ScriptureFetcherSefariaOrgTest  extends ScriptureFetcherTest {

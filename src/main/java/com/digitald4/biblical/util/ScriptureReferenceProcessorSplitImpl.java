@@ -4,12 +4,14 @@ import static com.digitald4.common.exception.DD4StorageException.ErrorCode.BAD_R
 import static java.lang.Integer.parseInt;
 
 import com.digitald4.biblical.model.BibleBook;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.common.exception.DD4StorageException;
 import com.google.common.collect.ImmutableList;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import javax.inject.Inject;
 
 public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceProcessor {
   private static final Pattern BASE_PATTERN = Pattern.compile("([\\w ]+)\\.? (\\d+)([:\\d,;\\-–]*)");
@@ -20,6 +22,13 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
   private static final Pattern VERSE_RANGE = Pattern.compile("(\\d+)[-,–](\\d+)");
   private static final Pattern FULL_CHAPTERS = Pattern.compile("[-,–](\\d+)");
   private static final Pattern SINGLE_VERSE = Pattern.compile("(\\d+)");
+
+  private final BibleBookStore bibleBookStore;
+
+  @Inject
+  public ScriptureReferenceProcessorSplitImpl(BibleBookStore bibleBookStore) {
+    this.bibleBookStore = bibleBookStore;
+  }
 
   @Override
   public boolean matchesPattern(String reference) {
@@ -35,7 +44,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
 
     ImmutableList.Builder<VerseRange> verseRanges = ImmutableList.builder();
     do {
-      BibleBook book = BibleBook.get(matcher.group(1).trim());
+      BibleBook book = bibleBookStore.get(matcher.group(1).trim());
       int chapter = parseInt(matcher.group(2));
       String[] parts = matcher.group(3).trim().split("[,;]");
 

@@ -95,6 +95,7 @@
               <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
                 ({{script.version}}) {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
             <span data-bind-html-compile="script.text"></span>
+            <hr data-ng-if="script.version=='Audit'" />
           </p>
         </div>
         <div data-ng-show="$ctrl.searchShown && $ctrl.searchResult">

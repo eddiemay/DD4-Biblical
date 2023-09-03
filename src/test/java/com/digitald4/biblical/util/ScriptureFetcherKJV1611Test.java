@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import org.junit.Test;
 
@@ -71,7 +70,7 @@ public class ScriptureFetcherKJV1611Test extends ScriptureFetcherTest {
             "</div>" +
             "</body></html>");
 
-    assertThat(scriptureStore.getScriptures("KJV1611", BibleBook.EN, "1 MACCABEES 4").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("KJV1611", Language.EN, "1 MACCABEES 4").getItems()).containsExactly(
         new Scripture().setVersion("KJV1611").setBook("1 Maccabees").setChapter(4).setVerse(1).setText(
             "Then tooke Gorgias fiue thousand footmen, and a thousand of the best horsemen, and remooued out of the campe by night:"),
         new Scripture().setVersion("KJV1611").setBook("1 Maccabees").setChapter(4).setVerse(2).setText(

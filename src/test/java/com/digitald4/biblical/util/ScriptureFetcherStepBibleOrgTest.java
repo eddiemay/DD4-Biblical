@@ -5,12 +5,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
-import com.digitald4.common.server.APIConnector;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
 public class ScriptureFetcherStepBibleOrgTest extends ScriptureFetcherTest {
   @Test
@@ -96,7 +92,7 @@ public class ScriptureFetcherStepBibleOrgTest extends ScriptureFetcherTest {
             "    ]\n" +
             "}");
 
-    assertThat(scriptureStore.getScriptures("RSKJ", BibleBook.EN, "Psalms 117").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("RSKJ", Language.EN, "Psalms 117").getItems()).containsExactly(
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "O praise יהוה, all ye nations: praise him, all ye people."),
         new Scripture().setVersion("RSKJ").setBook("Psalms").setChapter(117).setVerse(2).setText(

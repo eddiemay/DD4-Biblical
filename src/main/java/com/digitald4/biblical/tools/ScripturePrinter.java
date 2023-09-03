@@ -1,6 +1,8 @@
 package com.digitald4.biblical.tools;
 
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
+import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.*;
 import com.digitald4.common.model.Searchable;
 import com.digitald4.common.server.APIConnector;
@@ -47,9 +49,11 @@ public class ScripturePrinter {
             @Override
             public <T extends Searchable> void removeIndex(Class<T> aClass, Iterable<?> iterable) {}
           }, null));
+    StaticDataDAO staticDataDAO = new StaticDataDAO();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
     ScriptureStore scriptureStore = new ScriptureStore(
-        () -> dao, null,
-        new ScriptureReferenceProcessorSplitImpl(),
+        () -> dao, null, bibleBookStore,
+        new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
         new ScriptureFetcherRouter(
             new ScriptureFetcherBibleGateway(apiConnector),
             new ScriptureFetcherBibleHub(apiConnector),

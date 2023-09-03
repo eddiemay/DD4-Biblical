@@ -58,7 +58,8 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = functi
   this.nextChapter = scriptureResult.nextChapter;
   var previous;
   for (const script of this.scriptures) {
-    if (!previous || previous.chapter != script.chapter || previous.verse + 1 != script.verse || previous.book != script.book) {
+    if (!previous || previous.chapter != script.chapter || previous.verse + 1 != script.verse
+        || previous.book != script.book || previous.version != script.version) {
       script.showChapter = true;
     }
     script.dir = script.language == 'he' ? 'rtl' : 'ltr';

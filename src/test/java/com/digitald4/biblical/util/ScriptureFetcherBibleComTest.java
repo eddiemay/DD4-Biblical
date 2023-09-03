@@ -15,6 +15,8 @@ import org.mockito.Mock;
 public class ScriptureFetcherBibleComTest {
   @Mock private final APIConnector apiConnector = mock(APIConnector.class);
   private ScriptureFetcher scriptureFetcher;
+  BibleBook PSALMS =
+      BibleBook.of(19, "Psalms", "Canon,OT,Wisdom", 155, "Ps", "Psalm", "Psa", "Tehillim", "Tikkan");
 
   @Before
   public void setup() {
@@ -32,7 +34,7 @@ public class ScriptureFetcherBibleComTest {
             "</div></div>" +
             "</body></html>");
 
-    assertThat(scriptureFetcher.fetch("TS2009", "en", BibleBook.Psalms, 117)).containsExactly(
+    assertThat(scriptureFetcher.fetch("TS2009", "en", PSALMS, 117)).containsExactly(
         new Scripture().setVersion("TS2009").setBook("Psalms").setChapter(117).setVerse(1).setText(
             "Praise יהוה, all you nations! Extol Him, all you peoples!"),
         new Scripture().setVersion("TS2009").setBook("Psalms").setChapter(117).setVerse(2).setText(

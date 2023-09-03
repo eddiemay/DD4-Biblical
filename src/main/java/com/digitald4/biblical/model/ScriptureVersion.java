@@ -3,68 +3,56 @@ package com.digitald4.biblical.model;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
-import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.exception.DD4StorageException.ErrorCode;
+import com.digitald4.biblical.util.Language;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
 
 public class ScriptureVersion {
   private final String name;
   private final String version;
   private final int versionNum;
-  private final ImmutableSet<BibleBook> bibleBooks;
+  private final ImmutableSet<String> tags;
   private final ImmutableSet<String> supportedLanguages;
 
   public static final ImmutableList<ScriptureVersion> ALL_VERSIONS = ImmutableList.of(
-      new ScriptureVersion("The Scriptures (1998)", "ISR", 10, BibleBook.CANON),
-      new ScriptureVersion("Restored Names King James", "RSKJ", 20, BibleBook.CANON),
+      new ScriptureVersion("The Scriptures (1998)", "ISR", 10, "Canon"),
+      new ScriptureVersion("Restored Names King James", "RSKJ", 20, "Canon"),
       new ScriptureVersion("New Revised Standard Version", "NRSV", 30,
-          ImmutableSet.<BibleBook>builder()
-              .addAll(BibleBook.CANON)
-              .addAll(BibleBook.APOCRYPHA)
-              .addAll(BibleBook.EASTERN_ORTHODOX_DEUTEROCANON)
-              .build()),
+          ImmutableSet.of("Canon", "OT Additions", "Deuterocanon", "Eastern")),
       new ScriptureVersion("Oxford", "OXFORD", 40,
-          ImmutableSet.of(BibleBook.ENOCH, BibleBook.ENOCH_2, BibleBook.JUBILEES, BibleBook.JASHER,
-              BibleBook.BOOK_OF_ADAM_AND_EVE)),
-      new ScriptureVersion("New World Translation", "NWT", 50, BibleBook.CANON),
+          ImmutableSet.of("Ethiopian", "2 Enoch", "Jubilees", "Jasher", "Book of Adam and Eve")),
+      new ScriptureVersion("New World Translation", "NWT", 50, "Canon"),
       new ScriptureVersion("Sefaria", "Sefaria", 60,
-          ImmutableList.<BibleBook>builder()
-              .add(BibleBook.JUBILEES, BibleBook.MACCABEES_1, BibleBook.MACCABEES_2,
-                  BibleBook.SUSANNA, BibleBook.TOBIT, BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)
-              .build(),
-          ImmutableSet.of(BibleBook.EN, BibleBook.HEBREW)),
+          ImmutableSet.of("Jubilees", "1 Macc", "2 Macc", "Susanna", "Tobit", "TofT"),
+          ImmutableSet.of(Language.EN, Language.HEBREW)),
       new ScriptureVersion("Covenant Christian Coalition", "CCC", 61,
-          ImmutableSet.<BibleBook>builder()
-              .add(BibleBook.APOCRYPHAL_PSALMS, BibleBook.JOSEPHUS, BibleBook.ENOCH_3,
-                  BibleBook.TESTAMENT_OF_JOB, BibleBook.GAD_THE_SEER, BibleBook.LIVES_OF_THE_PROPHETS)
-              .addAll(BibleBook.ADDITIONAL_APOCRYPHA).addAll(BibleBook.NEW_TESTAMENT_APOCRYPHA)
-              .build()),
+          ImmutableSet.of("Additional Apocrypha", "New Testament Apocrypha")),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
-          ImmutableSet.<BibleBook>builder().addAll(BibleBook.CANON)
-              .addAll(BibleBook.APOCRYPHA).add(BibleBook.ADDITIONS_TO_ESTHER).build()),
+          ImmutableSet.of("Canon", "OT Additions", "Deuterocanon")),
       new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80,
-          BibleBook.CANON.subList(0, 39), ImmutableSet.of(BibleBook.HEBREW)),
+          ImmutableSet.of("OT"), ImmutableSet.of(Language.HEBREW)),
       new ScriptureVersion("Dead Sea Scrolls", "DSS", 82,
-          ImmutableSet.of(
-              BibleBook.COMMUNITY_RULE, BibleBook.WAR_SCROLL, BibleBook.GIANTS, BibleBook.ISAIAH),
-          ImmutableSet.of(BibleBook.EN, BibleBook.HEBREW)));
+          ImmutableSet.of("Community Rule", "War Scroll", "Book of Giants", BibleBook.ISAIAH),
+          ImmutableSet.of(Language.EN, Language.HEBREW)));
 
-  private static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
+  public static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
       ALL_VERSIONS.stream().collect(toImmutableMap(ScriptureVersion::getVersion, identity()));
 
-  public ScriptureVersion(String name, String version, int number, Iterable<BibleBook> bibleBooks) {
-    this(name, version, number, bibleBooks, ImmutableSet.of(BibleBook.EN));
+  public ScriptureVersion(String name, String version, int number, String tag) {
+    this(name, version, number, ImmutableSet.of(tag), ImmutableSet.of(Language.EN));
   }
 
-  public ScriptureVersion(String name, String version, int versionNum,
-      Iterable<BibleBook> bibleBooks, Iterable<String> supportedLanguages) {
+  public ScriptureVersion(String name, String version, int number, Iterable<String> tags) {
+    this(name, version, number, tags, ImmutableSet.of(Language.EN));
+  }
+
+  public ScriptureVersion(String name, String version, int versionNum, Iterable<String> tags,
+      Iterable<String> supportedLanguages) {
     this.name = name;
     this.version = version;
     this.versionNum = versionNum;
-    this.bibleBooks = ImmutableSet.copyOf(bibleBooks);
+    this.tags = ImmutableSet.copyOf(tags);
     this.supportedLanguages = ImmutableSet.copyOf(supportedLanguages);
   }
 
@@ -80,17 +68,14 @@ public class ScriptureVersion {
     return versionNum;
   }
 
-  public ImmutableSet<BibleBook> getBibleBooks() {
-    return bibleBooks;
+  public ImmutableSet<String> getTags() {
+    return tags;
   }
 
   public ImmutableSet<String> getSupportedLanguages() {
     return supportedLanguages;
   }
 
-  public boolean meetsCriteria(BibleBook book, String lang) {
-    return getBibleBooks().contains(book) && (lang == null || supportedLanguages.contains(lang));
-  }
 
   @Override
   public String toString() {
@@ -99,21 +84,6 @@ public class ScriptureVersion {
 
   public static ScriptureVersion get(String version) {
     // We will support all the different versions of BibleHub without having to create instances for them.
-    return BY_VERSION.get(version); // OrDefault(version, new ScriptureVersion(version, version, BibleBook.CANON));
-  }
-
-  public static ScriptureVersion getOrFallback(String version, String lang, BibleBook book) {
-    ScriptureVersion scriptureVersion = get(version);
-    if (scriptureVersion == null) {
-      throw new DD4StorageException("Unknown scripture version: " + version, ErrorCode.BAD_REQUEST);
-    }
-
-    if (scriptureVersion.meetsCriteria(book, lang)) {
-      return scriptureVersion;
-    }
-
-    return BY_VERSION.values().stream().filter(sv -> sv.meetsCriteria(book, lang)).findFirst()
-        .orElseThrow(() ->
-             new DD4StorageException("No source found for book: " + book + " in language: " + lang));
+    return BY_VERSION.get(version); // OrDefault(version, new ScriptureVersion(version, version, "Canon"));
   }
 }

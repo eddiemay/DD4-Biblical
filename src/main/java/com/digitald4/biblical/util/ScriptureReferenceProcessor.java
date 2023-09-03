@@ -51,4 +51,28 @@ public interface ScriptureReferenceProcessor {
           chapter == other.chapter && startVerse == other.startVerse && endVerse == other.endVerse;
     }
   }
+
+  class LanguageRequest {
+    private final String version;
+    private final String language;
+    private final boolean required;
+
+    public LanguageRequest (String version, String language, boolean required) {
+      this.version = version;
+      this.language = language;
+      this.required = required;
+    }
+
+    public String getVersion() {
+      return version;
+    }
+
+    public String getLanguage() {
+      return language;
+    }
+
+    public boolean isRequired() {
+      return required;
+    }
+  }
 }
