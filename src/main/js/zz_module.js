@@ -57,8 +57,7 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
         new com.digitald4.common.JSONService('highscore', apiConnector);
     highScoreService.list = function(game, config, pageSize, pageToken, success, error) {
       highScoreService.sendRequest(
-        {action: 'list', params: {game: game, config: config, pageSize: 20}},
-        success, error);
+        {action: 'list', params: {game: game, config: config, pageSize: 20}}, success, error);
     };
     return highScoreService;
   })
@@ -75,11 +74,19 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     }
     return lessonService;
   })
+  .service('lexiconService', function(apiConnector) {
+    var lexiconService = new com.digitald4.common.JSONService('lexicon', apiConnector);
+    lexiconService.getReferences = function(request, success, error) {
+      return lexiconService.sendRequest({action: 'getReferences', params: request}, success, error);
+    }
+    return lexiconService;
+  })
   .service('notificationService', function(apiConnector) {
     return new com.digitald4.common.JSONService('notification', apiConnector);
   })
-  .service('scriptureService', function(apiConnector, globalData) {
+  .service('scriptureService', function($http, apiConnector, globalData) {
     var scriptureService = new com.digitald4.common.JSONService('scripture', apiConnector);
+    var dssByVerse;
     scriptureService.scriptures = function(reference, success, error) {
       var request =
           typeof(reference) == 'object' ? reference : {reference: reference, version: globalData.scriptureVersion};
@@ -92,6 +99,17 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     scriptureService.uploadScripture = function(request, success, error) {
       scriptureService.sendRequest({action: 'uploadScripture', method: 'POST', data: request},
           response => success(processPagination(response)), error);
+    }
+    scriptureService.getScrollCoords = function(scripture, success, error) {
+      const errorCallback = error || notifyError;
+      const url = 'http://dss.collections.imj.org.il/api/get_translation?id=' + scripture.chapter + '%3A' + scripture.verse;
+      if (!dssByVerse) {
+        dssByVerse = {};
+        DSS_ISA_BY_COLUMN.forEach(column =>
+            column.forEach(verse => dssByVerse['Isaiah ' + verse.chapter + ":" + verse.verse] = verse));
+      }
+
+      return success(dssByVerse[scripture.reference]);
     }
     // scriptureService = new ScriptureServiceInMemoryImpl();
     return scriptureService;

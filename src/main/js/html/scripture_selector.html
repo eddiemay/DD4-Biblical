@@ -20,12 +20,6 @@
         <button data-ng-repeat="v in [].constructor($ctrl.reference.chapter.verseCount) track by $index"
                 data-ng-click="$ctrl.setVerse($index + 1)">{{$index + 1}}</button>
       </div>
-      <div class="columns">
-        <label>Version</label>
-        <select data-ng-model="$ctrl.globalData.version" data-ng-change="$ctrl.refresh()"
-                data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
-        <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
-      </div>
     </div>
     <div class="modal-resize-tl"></div>
     <div class="modal-resize-t"></div>

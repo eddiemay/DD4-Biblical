@@ -81,28 +81,65 @@
         </div>
       </div>
       <div class="block-content form">
-        <!-- a data-ng-show="$ctrl.prevChapter" href="" title="Previous Chapter" style="float: left; top: 50%;"
-           data-ng-click="$ctrl.setReference($ctrl.prevChapter)">
-          <img src="images/chevron-left.png" width="18" height="26">
-        </a>
-        <a data-ng-show="$ctrl.nextChapter"  href="" title="Next Chapter" style="float: right; top: 50%;"
-           data-ng-click="$ctrl.setReference($ctrl.nextChapter)">
-          <img src="images/chevron.png" width="18" height="26">
-        </a -->
         <div data-ng-show="!$ctrl.searchShown">
-          <p data-ng-repeat="script in $ctrl.scriptures" dir="{{script.dir}}">
-            <span data-ng-show="script.showChapter">
-              <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
-                ({{script.version}}) {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
-            <span data-bind-html-compile="script.text"></span>
-            <hr data-ng-if="script.version=='Audit'" />
-          </p>
+          <div data-ng-repeat="script in $ctrl.scriptures" dir="{{script.dir}}">
+            <p data-ng-if="script.text">
+              <span data-ng-show="script.showChapter">
+                <a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter)">
+                  ({{script.version}}) {{script.book}} {{script.chapter}}</a>:</span><a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+              <span data-bind-html-compile="script.text"></span>
+              <a data-ng-if="script.version == 'DSS'" href="" data-ng-click="$ctrl.showScroll(script)" title="View Scroll">📜</a>
+            </p>
+            <hr data-ng-if="script.version=='DSS' && script.language=='en'"/>
+            <div data-ng-if="script.interlinears">
+              <div align="right" class="maintable2">
+                <table border="0" cellspacing="0" cellpadding="0" align="center">
+                  <tr>
+                    <td>
+                      <div id="leftbox">
+                        <div class="padleft">
+                          <div class="vheading">
+                            <a href="" data-ng-click="$ctrl.showScripture(undefined, script.book, script.chapter)">
+                              ({{script.version}}) {{script.book}} {{script.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+                            <a data-ng-if="script.book == 'Isaiah'" href="" data-ng-click="$ctrl.showScroll(script)" title="View Scroll">📜</a>
+                          </div>
+                          <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
+                            <tr>
+                              <td class="strongs" data-ng-class="interlinear.highlight">
+                                <a href="" data-ng-click="$ctrl.showStrongsDefs(interlinear.strongsId)">
+                                  {{interlinear.strongsId || '-'}}
+                                </a>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="translit">
+                                <a href="" data-ng-click="$ctrl.showStrongsRefs(interlinear)">
+                                  {{interlinear.transliteration}}
+                                </a>
+                              </td>
+                            </tr>
+                            <tr><td class="hebrew">{{interlinear.word}}</td></tr>
+                            <tr data-ng-if="interlinear.dssDiff">
+                              <td class="hebrew" data-bind-html-compile="interlinear.dssDiff"></td>
+                            </tr>
+                            <tr><td class="eng">{{interlinear.translation}}</td></tr>
+                            <tr><td class="strongsnt">{{interlinear.morphology}}</td></tr>
+                          </table>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
         <div data-ng-show="$ctrl.searchShown && $ctrl.searchResult">
           <h2>Search Results: {{$ctrl.searchResult.start}} to {{$ctrl.searchResult.end}} of {{$ctrl.searchResult.totalSize}}</h2>
           <p data-ng-repeat="group in $ctrl.searchResult.grouped">
-            <a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter)">
-              {{group.book}} {{group.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
+            <a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter)">{{group.book}}
+              {{group.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(group.version, group.book, group.chapter, group.verse)">{{group.verse}}</a>
+            <a href="" data-ng-click="$ctrl.setReference(group.book + ' ' + group.chapter + ':' + group.verse)"><img src="images/icons/link_arrow.png" height="14"></a>
             <span class="verse" data-ng-repeat="result in group.items">
               <br>
               (<a href="" data-ng-click="$ctrl.showScripture(result.version, result.book, result.chapter)">{{result.version}}</a>)
@@ -126,5 +163,153 @@
       </div>
     </div>
   </div>
+  <!-- Lexicon dialog start -->
+  <div data-ng-show="$ctrl.dialogShown=='LEXICON'" id="eventModal" style="display:block; position:absolute; left:0px;" data-ng-style="$ctrl.dialogStyle">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li>
+          <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+            <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+          </a>
+        </li>
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
+          <a href="" data-ng-click="$ctrl.showEditLexiconDialog($ctrl.event)" title="Edit Event">Edit</a>
+        </li>
+      </ul>
+      <div class="block-content form">
+        <h2>Lexicon :: Strong's {{$ctrl.lexicon.id}} - {{$ctrl.lexicon.word}}</h2>
+        <div class="columns">
+          <div class="colx2-left">
+            <h3>Ancient</h3>
+            <p>{{$ctrl.lexicon.ancient}}</p>
+          </div>
+          <div class="colx2-right">
+            <h3>Constants Only</h3>
+            <p>{{$ctrl.lexicon.constantsOnly}}</p>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <h3>Transliteration</h3>
+            <p>{{$ctrl.lexicon.transliteration}}</p>
+          </div>
+          <div class="colx2-right">
+            <h3>Pronunciation</h3>
+            <p>{{$ctrl.lexicon.pronunciation}}</p>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <h3>Part of Speech</h3>
+            <p>{{$ctrl.lexicon.partOfSpeech}}</p>
+          </div>
+          <div class="colx2-right">
+            <h3>Root Word</h3>
+            <p data-bind-html-compile="$ctrl.lexicon.rootWord"></p>
+          </div>
+        </div>
+        <div class="columns">
+          <h3>Strong's Definitions</h3>
+          <p data-bind-html-compile="$ctrl.lexicon.strongsDefinition"></p>
+        </div>
+        <div class="columns">
+          <h3>KJV Translation Count</h3>
+          <p>
+            <b>The KJV translates Strong's H2416 in the following manner:</b>
+            <span data-ng-repeat="tc in $ctrl.lexicon.translationCounts">{{tc.word}} ({{tc.count}}x), </span>
+          </p>
+        </div>
+        <div class="columns">
+          <h3>Outline of Biblical Usage</h3>
+          <ol style="list-style: decimal">
+            <li data-ng-repeat="node in $ctrl.lexicon.outline">
+              {{node.value}}
+              <ol style="list-style: upper-alpha">
+                <li data-ng-repeat="subNode in node.children">{{subNode.value}}
+                  <ol style="list-style: lower-alpha"><li data-ng-repeat="botNode in subNode.children">{{botNode.value}}</li></ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </div>
+        <div class="columns">
+          <h3>Dictionary Aids</h3>
+          <p>{{$ctrl.lexicon.dictionaryAid}}</p>
+        </div>
+        <div class="columns">
+          <div class="colx3-left">
+            <button class="float-left" data-ng-click="$ctrl.prevStrongsDefs()">Previous</button>
+          </div>
+          <div class="colx3-center">
+            <button class="float-center" data-ng-click="$ctrl.nextStrongsDefs()">Next</button>
+          </div>
+          <div class="colx3-right">
+            <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Lexicon dialog end -->
+  <!-- References dialog start -->
+  <div data-ng-show="$ctrl.dialogShown=='REFERENCES'" id="eventModal" style="display:block; position:absolute; left:0px;" data-ng-style="$ctrl.dialogStyle">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li>
+          <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+            <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+          </a>
+        </li>
+      </ul>
+      <div class="block-content form">
+        <h2>References for Strong's {{$ctrl.interlinear.strongsId}} {{$ctrl.interlinear.constantsOnly}}</h2>
+        <h4>{{$ctrl.references.start}} to {{$ctrl.references.end}} of {{$ctrl.references.totalSize}}</h4>
+        <fieldset>
+          <h4>Match Criteria</h4>
+          <span>
+            <span><input type="checkbox" data-ng-model="$ctrl.globalData.matchStrongs"
+                         data-ng-change="$ctrl.showStrongsRefs($ctrl.interlinear)"/>Strong's</span>
+            <span><input type="checkbox" data-ng-model="$ctrl.globalData.matchWord"
+                         data-ng-change="$ctrl.showStrongsRefs($ctrl.interlinear)"/>Word</span>
+            <span>
+              <input type="checkbox" data-ng-model="$ctrl.globalData.matchConstantsOnly"
+                     data-ng-change="$ctrl.showStrongsRefs($ctrl.interlinear)"/>Hebrew Letters</span>
+          </span>
+        </fieldset>
+        <div data-ng-repeat="reference in $ctrl.references.items">
+          <h3>
+            <a href="" data-ng-click="$ctrl.showScripture(undefined, reference.book, reference.chapter)">{{reference.book}}
+              {{reference.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(reference.version, reference.book, reference.chapter, reference.verse)">{{reference.verse}}</a>
+            <a href="" data-ng-click="$ctrl.setReference(reference.reference)"><img src="images/icons/link_arrow.png" height="14"></a>
+          </h3>
+          <p>{{reference.constantsOnly}} {{reference.translation}}</p>
+        </div>
+        <fieldset>
+          <span data-ng-repeat="page in $ctrl.references.pages">
+            <button data-ng-click="$ctrl.showStrongsRefs($ctrl.interlinear, page)"
+                    data-ng-disabled="page == $ctrl.references.pageToken">{{page}}</button>
+          </span>
+        </fieldset>
+        <div class="columns">
+          <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- References dialog end -->
+  <!-- ScrollView dialog start -->
+  <div data-ng-show="$ctrl.dialogShown=='SCROLL_VIEW'" id="eventModal" style="display:block; position:absolute; left:0px;" data-ng-style="$ctrl.dialogStyle">
+    <div class="modal-window block-border" style="width: unset;">
+      <ul class="action-tabs right">
+        <li>
+          <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+            <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+          </a>
+        </li>
+      </ul>
+      <canvas id="scrollview" width="1135" height="300"></canvas>
+    </div>
+  </div>
+  <!-- References dialog end -->
   <scripture-selector data-ng-if="$ctrl.reference.shown" data-reference="$ctrl.reference"></scripture-selector>
 </section>

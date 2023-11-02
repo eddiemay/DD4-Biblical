@@ -35,3 +35,8 @@ indexes:
       direction: desc
     - name: elapsedTime
     - name: startTime
+  - kind: Interlinear
+    properties:
+      - name: book
+      - name: chapter
+      - name: verse

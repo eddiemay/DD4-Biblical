@@ -1,4 +1,6 @@
 /bin
 /.idea
+/data
+/dss_images
 /target
 .DS_Store

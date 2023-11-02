@@ -1,13 +1,6 @@
 package com.digitald4.biblical.model;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-
-import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.util.Pair;
 import com.google.api.server.spi.config.ApiResourceProperty;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class BibleBook {

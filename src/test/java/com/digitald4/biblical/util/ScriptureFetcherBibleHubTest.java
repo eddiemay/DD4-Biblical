@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
@@ -35,26 +34,6 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             "For His kindness is mighty over us, And the truth of יהוה is everlasting. Praise Yah!"));
   }
 
-  @Test @Ignore
-  public void fetchNKJV() {
-    when(apiConnector.sendGet(anyString())).thenReturn(
-        "<html></body>" +
-            "<div class=\"chap\"> <h3>Let All Peoples Praise the <span style=\"font-variant: small-caps\" class=\"small-caps divine-name\">Lord</span></h3>" +
-            "<div class=\"poetry\"><p class=\"line\"><span class=\"chapter-3\">" +
-            "<span class=\"text Ps-117-1\"><span class=\"reftext\"><a href=\"http://biblehub.com/psalms/117-1.htm\"><b>1</b></a></span>Praise the <span style=\"font-variant: small-caps\" class=\"small-caps divine-name\">Lord</span>, all you Gentiles!</span>" +
-            "</span><br><span class=\"text Ps-117-1\"><span class=\"fn\"><a href=\"#footnotes\">[a]</a></span>Laud Him, all you peoples!</span><br>\n" +
-            "<span class=\"reftext\"><a href=\"http://biblehub.com/psalms/117-2.htm\"><b>2</b></a></span>For His merciful kindness is great toward us,<br><span class=\"text Ps-117-2\">And the truth of the <span style=\"font-variant: small-caps\" class=\"small-caps divine-name\">Lord</span> <i>endures</i> forever.</span></p></div>" +
-            "<div class=\"poetry_top-1\"><p class=\"line\"><span class=\"text Ps-117-2\">Praise the <span style=\"font-variant: small-caps\" class=\"small-caps divine-name\">Lord</span>!</span></p></div>" +
-            "<a name=\"footnotes\"></a><div class=\"footnotes\"><h4>Footnotes:</h4><ol><li id=\"fen-NKJV-15869a\"><span class=\"fnref\" title=\"Go to Psalm 117:1\">Psalm 117:1</span> <span class=\"footnote-text\"><i>Praise</i></span></li></ol></div> <!--end of footnotes--></div>" +
-            "</body></html>");
-
-    assertThat(scriptureStore.getScriptures("NKJV", Language.EN, "Psalms 117").getItems()).containsExactly(
-        new Scripture().setVersion("NKJV").setBook("Psalms").setChapter(117).setVerse(1).setText(
-            "Praise the Lord, all you Gentiles! Laud Him, all you peoples!"),
-        new Scripture().setVersion("NKJV").setBook("Psalms").setChapter(117).setVerse(2).setText(
-            "For His merciful kindness is great toward us, And the truth of the Lord endures forever. Praise the Lord!"));
-  }
-
   @Test
   public void fetchWLCO() throws Exception {
     when(apiConnector.sendGet(anyString()))
@@ -65,5 +44,23 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             .setText("הללו את־יהוה כל־גוים בחוהו כל־האמים׃"),
         new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(2)
             .setText("כי גבר עלינו ׀ חסדו ואמת־יהוה לעולם הללו־יה׃"));
+  }
+
+  @Test
+  public void fetchGreek() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/test/java/com/digitald4/biblical/util/data/biblehub_nestle_matthew_1.htm"));
+
+    assertThat(scriptureStore.getScriptures("Nestle", Language.GREEK, "Matt 1:1-5").getItems()).containsExactly(
+        new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(1)
+            .setText("Βίβλος γενέσεως Ἰησοῦ Χριστοῦ υἱοῦ Δαυεὶδ υἱοῦ Ἀβραάμ."),
+        new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(2)
+            .setText("Ἀβραὰμ ἐγέννησεν τὸν Ἰσαάκ, Ἰσαὰκ δὲ ἐγέννησεν τὸν Ἰακώβ, Ἰακὼβ δὲ ἐγέννησεν τὸν Ἰούδαν καὶ τοὺς ἀδελφοὺς αὐτοῦ,"),
+        new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(3)
+            .setText("Ἰούδας δὲ ἐγέννησεν τὸν Φαρὲς καὶ τὸν Ζαρὰ ἐκ τῆς Θάμαρ, Φαρὲς δὲ ἐγέννησεν τὸν Ἐσρώμ, Ἐσρὼμ δὲ ἐγέννησεν τὸν Ἀράμ,"),
+        new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(4)
+            .setText("Ἀρὰμ δὲ ἐγέννησεν τὸν Ἀμιναδάβ, Ἀμιναδὰβ δὲ ἐγέννησεν τὸν Ναασσών, Ναασσὼν δὲ ἐγέννησεν τὸν Σαλμών,"),
+        new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(5)
+            .setText("Σαλμὼν δὲ ἐγέννησεν τὸν Βόες ἐκ τῆς Ῥαχάβ, Βόες δὲ ἐγέννησεν τὸν Ἰωβὴδ ἐκ τῆς Ῥούθ, Ἰωβὴδ δὲ ἐγέννησεν τὸν Ἰεσσαί,"));
   }
 }

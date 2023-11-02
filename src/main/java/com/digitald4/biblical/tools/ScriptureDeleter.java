@@ -54,7 +54,7 @@ public class ScriptureDeleter {
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> dao);
     new ScriptureDeleter(
-        new ScriptureStore(() -> dao, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), null))
+        new ScriptureStore(() -> dao, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), null, null))
             .preview(searchText);
   }
 }

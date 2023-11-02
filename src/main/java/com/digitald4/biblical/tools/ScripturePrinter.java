@@ -19,8 +19,8 @@ public class ScripturePrinter {
   private final static String API_VERSION = "v1";
   public static void main(String[] args) {
     String version = "ISR";
-    String language = "en";
-    String reference = null;
+    String language = "interlaced";
+    String reference = "Gen 2:2";
     String idToken = null;
     boolean useApi = false;
     for (int a = 0; a < args.length; a++) {
@@ -62,8 +62,10 @@ public class ScripturePrinter {
             new ScriptureFetcherOneOff(apiConnector),
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherSefariaOrg(apiConnector),
-            new ScriptureFetcherStepBibleOrg(apiConnector)));
+            new ScriptureFetcherStepBibleOrg(apiConnector)),
+        null);
 
-    scriptureStore.getScriptures(version, language, reference).getItems().forEach(System.out::println);
+    scriptureStore.getScriptures(version, language, reference).getItems()
+        .forEach(System.out::println);
   }
 }

@@ -32,6 +32,8 @@ public class ScriptureVersion {
           ImmutableSet.of("Canon", "OT Additions", "Deuterocanon")),
       new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80,
           ImmutableSet.of("OT"), ImmutableSet.of(Language.HEBREW)),
+      new ScriptureVersion("Nestle 104 GNT", "Nestle", 81, ImmutableSet.of("NT"),
+          ImmutableSet.of(Language.GREEK)),
       new ScriptureVersion("Dead Sea Scrolls", "DSS", 82,
           ImmutableSet.of("Community Rule", "War Scroll", "Book of Giants", BibleBook.ISAIAH),
           ImmutableSet.of(Language.EN, Language.HEBREW)));

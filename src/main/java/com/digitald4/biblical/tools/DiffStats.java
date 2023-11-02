@@ -2,16 +2,26 @@ package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 
+import com.digitald4.biblical.model.Lexicon.Interlinear;
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.biblical.store.InterlinearStore;
+import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
+import com.digitald4.biblical.util.HebrewConverter;
+import com.digitald4.biblical.util.Language;
+import com.digitald4.biblical.util.LexiconFetcher;
+import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.biblical.util.ScriptureFetcherBibleGateway;
 import com.digitald4.biblical.util.ScriptureFetcherBibleHub;
 import com.digitald4.biblical.util.ScriptureFetcherJWOrg;
@@ -21,29 +31,24 @@ import com.digitald4.biblical.util.ScriptureFetcherPseudepigrapha;
 import com.digitald4.biblical.util.ScriptureFetcherRouter;
 import com.digitald4.biblical.util.ScriptureFetcherSefariaOrg;
 import com.digitald4.biblical.util.ScriptureFetcherStepBibleOrg;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.server.APIConnector;
-import com.digitald4.common.storage.DAOApiImpl;
-import com.digitald4.common.storage.DAOInMemoryImpl;
+import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.util.Calculate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Diff;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
-import org.checkerframework.checker.units.qual.A;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class DiffStats {
   private final static String BASE_URL = "https://dd4-biblical.appspot.com";
@@ -52,9 +57,11 @@ public class DiffStats {
   private final static String DB_FILE = "data/Isaiah-Hebrew.db";
 
   private final ScriptureStore scriptureStore;
+  private final InterlinearStore interlinearStore;
 
-  public DiffStats(ScriptureStore scriptureStore) {
+  public DiffStats(ScriptureStore scriptureStore, InterlinearStore interlinearStore) {
     this.scriptureStore = scriptureStore;
+    this.interlinearStore = interlinearStore;
   }
 
   public ImmutableList<ScriptureDiffStats> process(boolean ignorePun) {
@@ -83,14 +90,44 @@ public class DiffStats {
         .collect(toImmutableList());
   }
 
+  public void printWordStats(String version) {
+    ImmutableList<String> totalWords = IntStream.range(1, 67)
+        .boxed()
+        .flatMap(c -> scriptureStore.getScriptures(version, "he", String.format("Isa %d", c)).getItems().stream())
+        .map(Scripture::getText)
+        .map(HebrewConverter::removePunctuation)
+        .flatMap(text -> Arrays.stream(text.split(" ")))
+        .collect(toImmutableList());
+    System.out.printf("%d total words in the %s book of Isaiah\n", totalWords.size(), version);
+
+    Map<String, Long> wordCounts = totalWords.stream().collect(groupingBy(identity(), counting()));
+    System.out.printf("%d unique %s words\n", wordCounts.size(), version);
+
+    wordCounts.entrySet().stream().sorted(Entry.comparingByValue(reverseOrder()))
+        .limit(21).forEach(System.out::println);
+  }
+
+  public void fillDssWords() {
+    IntStream.range(1, 67).boxed()
+        .flatMap(c -> scriptureStore.getScriptures("WLCO", Language.INTERLINEAR, "Isa " + c).getItems().stream())
+        .forEach(scripture -> interlinearStore.create(((InterlinearScripture) scripture).getInterlinears()));
+  }
+
   public static void main(String[] args) throws IOException {
+    long startTime = System.currentTimeMillis();
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken("39284720");
-    DAOInMemoryImpl dao = new DAOInMemoryImpl().loadFromFile(DB_FILE);
+    DAOFileBasedImpl dao = new DAOFileBasedImpl(DB_FILE).loadFromFile();
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    ScriptureReferenceProcessor referenceProcessor =
+        new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
+    LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector, false);
+    InterlinearStore interlinearStore =
+        new InterlinearStore(() -> dao, referenceProcessor, lexiconFetcher);
+    LexiconStore lexiconStore = new LexiconStore(() -> dao, lexiconFetcher);
     ScriptureStore scriptureStore = new ScriptureStore(
         () -> dao, null, bibleBookStore,
-        new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
+        referenceProcessor,
         new ScriptureFetcherRouter(
             new ScriptureFetcherBibleGateway(apiConnector),
             new ScriptureFetcherBibleHub(apiConnector),
@@ -99,11 +136,14 @@ public class DiffStats {
             new ScriptureFetcherOneOff(apiConnector),
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherSefariaOrg(apiConnector),
-            new ScriptureFetcherStepBibleOrg(apiConnector)));
+            new ScriptureFetcherStepBibleOrg(apiConnector)),
+        interlinearStore);
 
     scriptureStore.getScriptures("DSS", "he", "Isa 64:1");
 
-    ImmutableList<ScriptureDiffStats> stats = new DiffStats(scriptureStore).process(true);
+    DiffStats statsProcessor = new DiffStats(scriptureStore, interlinearStore);
+
+    /* ImmutableList<ScriptureDiffStats> stats = statsProcessor.process(true);
     HashMap<Character, AtomicLong> removed = new HashMap<>();
     HashMap<Character, AtomicLong> added = new HashMap<>();
     stats.forEach(s -> {
@@ -213,30 +253,136 @@ public class DiffStats {
     }
     bw.close();
 
-    dao.saveToFile(DB_FILE);
-
-    String url = "%s/search?lang=en&pageSize=50&pageToken=1&searchText=Isa+%d&version=DSS";
-    String baseUrl = apiConnector.formatUrl("scriptures");
     for (int c = 1; c <= 66; c++) {
-      JSONArray scriptures = new JSONObject(apiConnector.sendGet(String.format(url, baseUrl, c)))
-          .getJSONArray("items");
-      HashSet<Integer> enVerses = new HashSet<>();
-      for (int i = 0; i < scriptures.length(); i++) {
-        enVerses.add(scriptures.getJSONObject(i).getInt("verse"));
-      }
       scriptureStore.getScriptures("DSS", "he", "Isa " + c).getItems().stream()
-          .filter(s -> !enVerses.contains(s.getVerse()))
+          .filter(s -> {
+            try {
+              return scriptureStore.getScriptures(
+                  "DSS", "en", String.format("Isa %d:%d", s.getChapter(), s.getVerse())) == null;
+            } catch (Exception e) {
+              return true;
+            }
+          })
           .forEach(
               s -> System.out.printf("Missing DSS en: Isa %d:%d\n", s.getChapter(), s.getVerse()));
-    }
+    } */
 
-    /* DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
-    ScriptureStore scriptureStore1 =
-        new ScriptureStore(() -> apiDao, null, new ScriptureReferenceProcessorSplitImpl(), null);
-    scriptureStore1.create(
-        scriptureStore1.getScriptures("DSS", "en", "Isa 1").getItems().stream()
-            .peek(s -> s.setVersion("qumran"))
-            .collect(toImmutableList())); */
+    statsProcessor.printWordStats("WLCO");
+    statsProcessor.printWordStats("DSS");
+
+    // statsProcessor.fillDssWords();
+
+    ImmutableList<Interlinear> allInterlinears = IntStream.range(1, 67).boxed()
+        .flatMap(c -> interlinearStore.getInterlinear("Isa " + c).stream())
+        .collect(toImmutableList());
+
+    Map<String, Long> strongIds = allInterlinears.stream()
+        .map(Interlinear::getStrongsId)
+        .filter(Objects::nonNull)
+        .collect(groupingBy(identity(), counting()));
+    System.out.printf("%d unique Strong's Ids\n", strongIds.size());
+
+    strongIds.entrySet().stream().sorted(Entry.comparingByValue(reverseOrder()))
+        .limit(21)
+        .forEach(e ->
+            System.out.printf("%s %s %d\n",
+                e.getKey(), lexiconStore.get(e.getKey()).getConstantsOnly(), e.getValue()));
+
+    Map<String, Map<String, List<Interlinear>>> wordsByStrongIds = allInterlinears.stream()
+        .filter(i -> i.getStrongsId() != null)
+        .collect(groupingBy(Interlinear::getConstantsOnly, groupingBy(Interlinear::getStrongsId)));
+
+    BufferedWriter bw = new BufferedWriter(new FileWriter("data/isa-overrides.csv"));
+    bw.write("Hebrew Word"
+        + ",First Strongs,DSS Word,First Link,First Count"
+        + ",Second Strongs,DSS Word,Second Link,Second Count"
+        + ",Third Strongs,DSS Word,Third Link,Third Count"
+        + ",Fourth Strongs,DSS Word,Fourth Link,Fourth Count"
+        + ",Fifth Strongs,DSS Word,Fifth Link,Fifth Count\n");
+
+    wordsByStrongIds.entrySet().stream().filter(e -> e.getValue().size() > 1).sorted(Entry.comparingByKey()).forEach(e -> {
+      try {
+        bw.write(e.getKey());
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      e.getValue().entrySet().stream()
+          .sorted(comparing(i -> i.getValue().size(), reverseOrder()))
+          .forEach(i -> {
+            try {
+              bw.write(
+                  String.format(",%s,%s,%s,%d", i.getKey(), statsProcessor.getDssWord(i.getValue()),
+                      createLink(i.getValue()), i.getValue().size()));
+            } catch (IOException ioe) {
+              throw new RuntimeException(ioe);
+            }
+          });
+      try {
+        bw.write("\n");
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+    });
+    bw.close();
+
+    BufferedWriter bw2 = new BufferedWriter(new FileWriter("data/isa-interlinear.csv"));
+    bw2.write(
+        "Id,Strong's Id,MT Word,Transliteration,Hebrew Word,DSS Word,Change,Translation,Word Type,Link\n");
+    allInterlinears
+        // .stream().sorted(comparing(i -> String.format("%s-%s", i.getStrongsId(), i.getConstantsOnly())))
+        .stream().filter(i -> "-".equals(i.getTranslation()) && i.getStrongsId() == null && i.getMorphology() == null)
+        .forEach(i -> {
+          try {
+            bw2.write(
+                String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                    i.getId(), sanitize(i.getStrongsId()), i.getWord(), sanitize(i.getTransliteration()),
+                    i.getConstantsOnly(), i.getDss(), i.getConstantsOnly().equals(i.getDss()) ? "" : "TRUE",
+                    i.getTranslation(), sanitize(i.getMorphology()),
+                    createLink(ImmutableList.of(i))));
+          } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+          }
+        });
+    bw2.close();
+
+    BufferedWriter bw3 = new BufferedWriter(new FileWriter("data/isa-words.csv"));
+    bw3.write("Strong's Id,MT Word,Hebrew Word,DSS Word,Change,Link,Count\n");
+    allInterlinears.stream()
+        .collect(groupingBy(i -> String.format("%s-%s", i.getStrongsId(), i.getConstantsOnly())))
+        .entrySet().stream()
+        .sorted(comparing(e -> String.format("%s-%s", e.getValue().get(0).getStrongsId(), e.getValue().get(0).getConstantsOnly())))
+        .map(Entry::getValue).forEach(is -> {
+          Interlinear i = is.get(0);
+          String dssWord = statsProcessor.getDssWord(is);
+          try {
+            bw3.write(
+                String.format("%s,%s,%s,%s,%s,%s,%d\n", i.getStrongsId(), i.getWord(),
+                    i.getConstantsOnly(), dssWord,
+                    i.getConstantsOnly().equals(dssWord) ? "" : "TRUE", createLink(is), is.size()));
+          } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+          }
+        });
+    bw3.close();
+
+    dao.saveToFile();
+    System.out.printf("Total time: %3.2f seconds", (System.currentTimeMillis() - startTime) / 1000.0);
+  }
+
+  private static String createLink(Iterable<Interlinear> interlinears) {
+    return String.format("%s/#/read_the_word?highlight=%s&reference=Isa%%20%s&lang=interlinear",
+        BASE_URL, interlinears.iterator().next().getStrongsId(),
+        stream(interlinears).limit(7).map(s -> s.getChapter() + ":" + s.getVerse()).collect(joining(";")));
+  }
+
+  private static String sanitize(String input) {
+    return input == null ? "" : input.replaceAll(",", ";");
+  }
+
+  private String getDssWord(Iterable<Interlinear> interlinears) {
+    return stream(interlinears).map(Interlinear::getDss).filter(Objects::nonNull)
+        .collect(groupingBy(identity(), counting()))
+        .entrySet().stream().min(Entry.comparingByValue(reverseOrder())).map(Entry::getKey).orElse("");
   }
 
   private static class ScriptureDiffStats {
@@ -288,10 +434,8 @@ public class DiffStats {
     public static ScriptureDiffStats of(
         String name, int chapter, int verse, String original, String revised, boolean ignorePun) {
       if (ignorePun) {
-        revised = revised.replaceAll("־", " ");
-        if (revised.indexOf("׃") > 0) {
-          revised = revised.substring(0, revised.indexOf("׃")).trim();
-        }
+        original = HebrewConverter.removePunctuation(original);
+        revised = HebrewConverter.removePunctuation(revised);
       }
 
       return new ScriptureDiffStats(name, chapter, verse, original, revised);

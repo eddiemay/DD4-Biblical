@@ -35,7 +35,8 @@ public class ScriptureFetcherTest {
             new ScriptureFetcherOneOff(apiConnector),
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherSefariaOrg(apiConnector),
-            new ScriptureFetcherStepBibleOrg(apiConnector)));
+            new ScriptureFetcherStepBibleOrg(apiConnector)),
+        null);
   }
 
   protected static String getContent(String filename) throws Exception {

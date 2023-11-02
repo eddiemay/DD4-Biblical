@@ -1,6 +1,7 @@
 package com.digitald4.biblical.server;
 
 import com.digitald4.biblical.model.HighScore;
+import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.util.*;
 import com.digitald4.common.model.BasicUser;
@@ -37,6 +38,9 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		bind(Duration.class).annotatedWith(Annotations.SessionDuration.class)
 				.toInstance(Duration.ofHours(8));
 		bind(Boolean.class).annotatedWith(Annotations.SessionCacheEnabled.class).toInstance(false);
+		bind(Boolean.class)
+				.annotatedWith(com.digitald4.biblical.store.Annotations.FetchLexiconByVerse.class)
+				.toInstance(false);
 
 		ProviderThreadLocalImpl<BasicUser> userProvider = new ProviderThreadLocalImpl<>();
 		bind(User.class).toProvider(userProvider);
@@ -47,12 +51,15 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 
 		bind(new TypeLiteral<Store<HighScore, Long>>(){})
 				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
+		bind(new TypeLiteral<Store<Lexicon, String>>(){})
+				.toInstance(new GenericStore<>(Lexicon.class, getProvider(DAO.class)));
 		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){});
 
 		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
 
 		bind(SearchIndexer.class).to(SearchIndexImpl.class);
 		bind(ScriptureFetcher.class).to(ScriptureFetcherRouter.class);
+		bind(LexiconFetcher.class).to(LexiconFetcherBlueLetterImpl.class);
 		bind(ScriptureReferenceProcessor.class).to(ScriptureReferenceProcessorSplitImpl.class);
 		bind(SunTimeUtil.class).to(SunTimeUtilSunriseSunsetOrg.class);
 
@@ -69,6 +76,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CalendarValidatorService.class,
 						CommandmentService.class,
 						HighScoreService.class,
+						LexiconService.class,
 						LessonService.class,
 						ScriptureService.class));
 	}

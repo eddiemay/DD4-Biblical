@@ -8,7 +8,8 @@ var EVENT_TYPES = ['BIBLICAL', 'NOTIFICATION'];
 // 365.2425 146097 20871 (20800 + 80 - 8)
 // 365.24219 146096.876 20870.982285714285714
 
-com.digitald4.biblical.CalendarCtrl = function($location, $window, globalData, biblicalEventService, scriptureService) {
+com.digitald4.biblical.CalendarCtrl =
+    function($location, $window, globalData, biblicalEventService, scriptureService) {
   globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.locationProvider = $location;
   this.window = $window;

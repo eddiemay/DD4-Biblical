@@ -25,12 +25,12 @@ AlefBet = {
     name: 'Gimel',
     modern: 'ג',
     paleo: '𐤂',
-    ancient: '𓌙',
+    ancient: '𓃀',
     samaritan: 'ࠂ',
     aramaic: 'ج',
     value: 3,
     english: 'G',
-    meaning: 'camel'
+    meaning: 'foot, camel'
   },
   Dalet: {
     name: 'Dalet',

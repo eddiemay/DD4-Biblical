@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.model.Scripture.AuditScripture;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.ScriptureFetcher;
@@ -47,7 +48,7 @@ public class ScriptureStoreTest {
   @Before
   public void setup() {
     scriptureStore = new ScriptureStore(
-        () -> dao, searchIndexer, bibleBookStore, scriptureRefProcessor, scriptureFetcher);
+        () -> dao, searchIndexer, bibleBookStore, scriptureRefProcessor, scriptureFetcher, null);
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).then(
         i -> getScriptures(i.getArgument(1)));
@@ -100,7 +101,8 @@ public class ScriptureStoreTest {
     return Stream.of(createScripture(version, language, book, chapter, verse, text));
   }
 
-  private static Scripture createScripture(String version, String language, String book, int chapter, int verse, String text) {
+  private static Scripture createScripture(
+      String version, String language, String book, int chapter, int verse, String text) {
     return new Scripture().setVersion(version).setLanguage(language).setBook(book)
         .setChapter(chapter).setVerse(verse).setText(text);
   }
@@ -181,30 +183,30 @@ public class ScriptureStoreTest {
 
   @Test
   public void getScriptures_interlacedNotSupported() {
-    assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Matt 1:1").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Jasher 1:1").getItems())
         .containsExactly(
-            new Scripture().setVersion(VERSION).setBook("Matthew").setChapter(1).setVerse(1).setText("[Fetched ISR From Web]"));
-    assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Matt 5:17-19").getItems())
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
+    assertThat(scriptureStore.getScriptures("OXFORD", Language.INTERLACED, "Jasher 5:17-19").getItems())
         .containsExactly(
-            new Scripture().setVersion(VERSION).setBook("Matthew").setChapter(5).setVerse(17).setText("[Fetched ISR From Web]"),
-            new Scripture().setVersion(VERSION).setBook("Matthew").setChapter(5).setVerse(18).setText("[Fetched ISR From Web]"),
-            new Scripture().setVersion(VERSION).setBook("Matthew").setChapter(5).setVerse(19).setText("[Fetched ISR From Web]"));
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(19).setText("[Fetched OXFORD From Web]"));
   }
 
   @Test
   public void getScriptures_comparison() {
     assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Isa 56:6").getItems())
         .containsExactly(
-            new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(56).setVerse(6).setText("[Fetched " + VERSION + " From Web]"),
-            new Scripture().setVersion("WLCO").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(
-                Language.HEBREW).setText("[Fetched WLCO From Web]"),
-            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(
-                Language.HEBREW).setText("[Fetched DSS From Web]"),
-            new Scripture().setVersion("Audit").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(
-                    Language.HEBREW)
-                .setText("[Fetched <span class=\"diff-delete\">DSS</span><span class=\"diff-insert\">WLCO</span> From Web] LD: 4"),
-            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(
-                Language.EN).setText("[Fetched DSS From Web]")).inOrder();
+            new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(56).setVerse(6)
+                .setText("[Fetched " + VERSION + " From Web]"),
+            new Scripture().setVersion("WLCO").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(Language.HEBREW)
+                .setText("[Fetched WLCO From Web]"),
+            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(Language.HEBREW)
+                .setText("[Fetched DSS From Web]"),
+            new AuditScripture("Isaiah", 56, 6,
+                "Fetched <span class=\"diff-delete\">DSS</span><span class=\"diff-insert\">WLCO</span> From Web", 4),
+            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(Language.EN)
+                .setText("[Fetched DSS From Web]")).inOrder();
     assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Isa 24:3-5").getItems())
         .containsExactlyElementsIn(
             IntStream.range(3, 6)
@@ -212,15 +214,14 @@ public class ScriptureStoreTest {
                 .flatMap(
                     verse -> Stream.of(
                         new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(24).setVerse(verse).setText("[Fetched " + VERSION + " From Web]"),
-                        new Scripture().setVersion("WLCO").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(
-                            Language.HEBREW).setText("[Fetched WLCO From Web]"),
-                        new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(
-                            Language.HEBREW).setText("[Fetched DSS From Web]"),
-                        new Scripture().setVersion("Audit").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(
-                                Language.HEBREW)
-                            .setText("[Fetched <span class=\"diff-delete\">DSS</span><span class=\"diff-insert\">WLCO</span> From Web] LD: 4"),
-                        new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(
-                            Language.EN).setText("[Fetched DSS From Web]")))
+                        new Scripture().setVersion("WLCO").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(Language.HEBREW)
+                            .setText("[Fetched WLCO From Web]"),
+                        new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(Language.HEBREW)
+                            .setText("[Fetched DSS From Web]"),
+                        new AuditScripture("Isaiah", 24, verse,
+                            "Fetched <span class=\"diff-delete\">DSS</span><span class=\"diff-insert\">WLCO</span> From Web", 4),
+                        new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(24).setVerse(verse).setLanguage(Language.EN)
+                            .setText("[Fetched DSS From Web]")))
                 .collect(toImmutableList())).inOrder();
   }
 

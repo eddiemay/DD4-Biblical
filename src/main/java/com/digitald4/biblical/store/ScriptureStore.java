@@ -3,12 +3,17 @@ package com.digitald4.biblical.store;
 import static com.digitald4.common.storage.Query.forList;
 import static com.digitald4.biblical.util.HebrewConverter.toAncient;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.BibleBook;
+import com.digitald4.biblical.model.Lexicon.Interlinear;
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.model.Scripture.AuditScripture;
+import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
@@ -27,10 +32,12 @@ import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.SearchableStoreImpl;
 import com.digitald4.common.util.Calculate;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -45,16 +52,19 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   private final BibleBookStore bibleBookStore;
   private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final ScriptureFetcher scriptureFetcher;
+  private final InterlinearStore interlinearStore;
 
   @Inject
   public ScriptureStore(
       Provider<DAO> daoProvider, SearchIndexer searchIndexer, BibleBookStore bibleBookStore,
-      ScriptureReferenceProcessor scriptureRefProcessor, ScriptureFetcher scriptureFetcher) {
+      ScriptureReferenceProcessor scriptureRefProcessor, ScriptureFetcher scriptureFetcher,
+      InterlinearStore interlinearStore) {
     super(Scripture.class, daoProvider);
     this.searchIndexer = searchIndexer;
     this.bibleBookStore = bibleBookStore;
     this.scriptureRefProcessor = scriptureRefProcessor;
     this.scriptureFetcher = scriptureFetcher;
+    this.interlinearStore = interlinearStore;
   }
 
   public GetOrSearchResponse getScriptures(String version, String language, String reference) {
@@ -92,25 +102,30 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
           if ("Audit".equals(languageRequest.getVersion())) {
             return IntStream.range(startVerse, endVerse + 1)
                 .mapToObj(
-                    verse -> new Scripture()
-                        .setVersion("Audit")
-                        .setBook(book)
-                        .setLanguage("he")
-                        .setChapter(chapter)
-                        .setVerse(verse)
-                        .setText(
-                            getDiffHtml(
-                                verseMap.getOrDefault("DSS-" + verse, ""),
-                                verseMap.getOrDefault(String.valueOf(verse), ""))))
-                .filter(scripture -> scripture.getText().length() > 0);
+                    verse -> createAuditScripture(book, chapter, verse,
+                        verseMap.getOrDefault("DSS-" + verse, ""),
+                        verseMap.getOrDefault(String.valueOf(verse), "")))
+                .filter(Objects::nonNull);
           } else if (Language.HEBREW.equals(languageRequest.getLanguage())) {
+            // if we find Hebrew, index it in case we are going to be doing an Audit.
             return list(languageRequest, book, chapter, startVerse, endVerse).getItems().stream()
-                .peek(
-                    s ->
-                        verseMap.put(
-                            s.getVersion().equals("DSS")
-                                ? s.getVersion() + "-" + s.getVerse() : String.valueOf(s.getVerse()),
-                    s.getText().toString()));
+                .peek(s -> verseMap.put(
+                    s.getVersion().equals("DSS") ? s.getVersion() + "-" + s.getVerse()
+                        : String.valueOf(s.getVerse()), s.getText().toString()));
+          } else if (Language.HEBREW_ANCIENT.equals(languageRequest.getLanguage())) {
+            return list(new LanguageRequest(version, Language.HEBREW, false), book, chapter, startVerse, endVerse)
+                .getItems().stream()
+                .peek(s -> s.setLanguage(Language.HEBREW_ANCIENT).setText(toAncient(s.getText())));
+          } else if (Language.INTERLINEAR.equals(languageRequest.getLanguage())) {
+            ImmutableMap<Integer, String> dssReferences = !book.equals(BibleBook.ISAIAH)
+                ? ImmutableMap.of()
+                : list(new LanguageRequest("DSS", Language.HEBREW, false), book, chapter, startVerse, endVerse)
+                    .getItems().stream().collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
+
+            return interlinearStore.getInterlinear(verseRange).stream()
+                .collect(groupingBy(Interlinear::getVerse)).values().stream()
+                .map(InterlinearScripture::new)
+                .peek(s -> InterlinearStore.fillDss(s, dssReferences.get(s.getVerse())));
           }
           return list(languageRequest, book, chapter, startVerse, endVerse).getItems().stream();
         })
@@ -118,31 +133,33 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
         .collect(toImmutableList());
   }
 
-  private static String getDiffHtml(String original, String revised) {
+  private static AuditScripture createAuditScripture(
+      String book, int chapter, int verse, String original, String revised) {
     if (original.isEmpty() && revised.isEmpty()) {
-      return "";
+      return null;
     }
 
-    revised = revised.replaceAll("־", " ");
-    if (revised.indexOf("׃") > 0) {
-      revised = revised.substring(0, revised.indexOf("׃")).trim();
-    }
+    original = HebrewConverter.removePunctuation(original);
+    revised = HebrewConverter.removePunctuation(revised);
 
-    return String.format(
-        "%s LD: %d", Calculate.getDiffHtml(original, revised), Calculate.LD(original, revised));
+    return new AuditScripture(book, chapter, verse,
+        Calculate.getDiffHtml(original, revised), Calculate.LD(original, revised));
   }
 
   private static ImmutableList<LanguageRequest> expandSelection(
       String version, String language, BibleBook book) {
     if (Language.INTERLACED.equals(language)) {
-      return !book.name().equals(BibleBook.ISAIAH)
-          ? ImmutableList.of(new LanguageRequest(version, Language.EN, true), new LanguageRequest(version, Language.HEBREW, false))
-          : ImmutableList.of(
+      return book.name().equals(BibleBook.ISAIAH)
+          ? ImmutableList.of(
               new LanguageRequest(version, Language.EN, true),
               new LanguageRequest(version, Language.HEBREW, true),
               new LanguageRequest("DSS", Language.HEBREW, false),
               new LanguageRequest("Audit", Language.HEBREW, false),
-              new LanguageRequest("DSS", Language.EN, false));
+              new LanguageRequest("DSS", Language.EN, false))
+          : ImmutableList.of(
+              new LanguageRequest(version, Language.EN, true),
+              new LanguageRequest(version, Language.HEBREW, false),
+              new LanguageRequest(version, Language.GREEK, false));
     }
 
     return ImmutableList.of(new LanguageRequest(version, language, true));
@@ -271,9 +288,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
       return list(languageRequest.getLanguage(), bibleBook, chapter, startVerse, endVerse);
     }
 
-    String lang = Language.HEBREW_ANCIENT.equals(language) ? Language.HEBREW : language;
     ScriptureVersion scriptureVersion =
-        bibleBookStore.getOrFallback(version, lang, bibleBook, languageRequest.isRequired());
+        bibleBookStore.getOrFallback(version, language, bibleBook, languageRequest.isRequired());
     if (scriptureVersion == null) {
       return QueryResult.of(ImmutableList.of(), 0, null);
     }
@@ -285,8 +301,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
             Filter.of("version", version),
             Filter.of("book", bibleBook.name()), Filter.of("chapter", chapter),
             Filter.of("verse", ">=", startVerse), Filter.of("verse", "<=", endVerse));
-    if (lang != null) {
-      query.addFilter(Filter.of("language", lang));
+    if (language != null) {
+      query.addFilter(Filter.of("language", language));
     }
     query.setOrderBys(OrderBy.of("verse"));
 
@@ -296,8 +312,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
           Filter.of("book", bibleBook.name()),
           Filter.of("chapter", chapter), Filter.of("verse", ">=",  1),
           Filter.of("version", version));
-      if (lang != null) {
-        query2.addFilter(Filter.of("language", lang));
+      if (language != null) {
+        query2.addFilter(Filter.of("language", language));
       }
       if (startVerse > 1 && !list(query2).getItems().isEmpty()) {
         throw new DD4StorageException(
@@ -305,25 +321,21 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
                 "Verse %d out of bounds for: (%s) %s %d", startVerse, version, book, chapter));
       }
       ImmutableList<Scripture> fetched =
-          fetchFromWeb(version, lang, bibleBook, chapter, startVerse, endVerse);
+          fetchFromWeb(version, language, bibleBook, chapter, startVerse, endVerse);
       queryResult = QueryResult.of(fetched, fetched.size(), query);
     }
 
-    if (Language.HEBREW_ANCIENT.equals(language)) {
-      queryResult.getItems().forEach(s -> s.setLanguage(language).setText(toAncient(s.getText())));
-    }
     return queryResult;
   }
 
   private QueryResult<Scripture> list(
-      String lang, BibleBook bibleBook, int chapter, int startVerse, int endVerse) {
+      String language, BibleBook bibleBook, int chapter, int startVerse, int endVerse) {
     Query.List query = forList()
         .setFilters(
             Filter.of("book", bibleBook.name()), Filter.of("chapter", chapter),
             Filter.of("verse", ">=", startVerse), Filter.of("verse", "<=", endVerse));
-    if (lang != null) {
-      query.addFilter(
-          Filter.of("language", Language.HEBREW_ANCIENT.equals(lang) ? Language.HEBREW : lang));
+    if (language != null) {
+      query.addFilter(Filter.of("language", language));
     }
     query.setOrderBys(OrderBy.of("verse"));
 
@@ -331,11 +343,6 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
 
     return QueryResult.of(
         queryResult.getItems().stream()
-            .peek(s -> {
-              if (Language.HEBREW_ANCIENT.equals(lang)) {
-                s.setLanguage(lang).setText(HebrewConverter.toAncient(s.getText()));
-              }
-            })
             .sorted(
                 comparing(Scripture::getVerse)
                     .thenComparing(s -> ScriptureVersion.get(s.getVersion()).getVersionNum()))

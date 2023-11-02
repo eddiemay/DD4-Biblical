@@ -14,7 +14,7 @@ kbd, keygen,
 label, legend, li,
 meter,
 nav,
-object, ol, output,
+object, output,
 p, pre, progress,
 q,
 s, samp, section, small, source, span, strike, strong, sub, sup,
@@ -25,7 +25,7 @@ var, video {
 	padding: 0;
 	border: 0;
 	outline: 0;
-	font-size: 103%;
+	font-size: 100%;
 	vertical-align: baseline;
 	background: transparent;
 	z-index: 1;

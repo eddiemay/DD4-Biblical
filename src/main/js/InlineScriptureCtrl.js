@@ -16,9 +16,11 @@ com.digitald4.biblical.InlineScriptureCtrl.prototype.refresh = function() {
       this.scriptureGroups = [];
       var group;
       for (const script of scriptures) {
-        if (!group || group.book != script.book || group.chapter != script.chapter || group.curVer + 1 != script.verse) {
-          group = {book: script.book, chapter: script.chapter, verse: script.verse,
-              dir: script.dir, scriptures: []};
+        if (!group || group.version != script.version || group.book != script.book
+            || group.language != script.language || group.chapter != script.chapter
+            || group.curVer + 1 != script.verse || group.scriptures.length == 5) {
+          group = {version: script.version, book: script.book, language: script.language,
+              chapter: script.chapter, verse: script.verse, dir: script.dir, scriptures: []};
           this.scriptureGroups.push(group);
         }
         group.scriptures.push(script);

@@ -40,6 +40,8 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     if (version.equals("WLCO")) {
       return fetchWLCO(version, book, chapter);
+    } else if (version.equals("Nestle")) {
+      return fetchNestle(version, book, chapter);
     }
 
     return fetchOther(version, book, chapter);
@@ -84,8 +86,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   public synchronized ImmutableList<Scripture> fetchWLCO(String version, BibleBook book, int chapter) {
     String url =
         String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
-    String htmlResult = apiConnector.sendGet(url);
-    Document doc = Jsoup.parse(htmlResult.trim());
+    Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
     Elements scs = doc.getElementsByClass("spcl");
     if (scs.size() == 0) {
       throw new DD4StorageException("Unable to find scripture content for " + url);
@@ -102,6 +103,28 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
             .setChapter(chapter)
             .setVerse(verse.incrementAndGet())
             .setText(getText(sc.text())))
+        .collect(toImmutableList());
+  }
+
+  public synchronized ImmutableList<Scripture> fetchNestle(String version, BibleBook book, int chapter) {
+    String url =
+        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
+    Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
+    Elements spans = doc.getElementsByClass("chap").first().getElementsByClass("greek");
+    if (spans.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content for " + url);
+    }
+
+    AtomicInteger verse = new AtomicInteger();
+
+    return spans.stream()
+        .map(span -> new Scripture()
+            .setVersion(version)
+            .setLanguage("gk")
+            .setBook(book.name())
+            .setChapter(chapter)
+            .setVerse(verse.incrementAndGet())
+            .setText(getText(span.text())))
         .collect(toImmutableList());
   }
 
@@ -147,7 +170,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  private static String formatBookForUrl(String book) {
+  public static String formatBookForUrl(String book) {
     if (book.equals(BibleBook.SONG_OF_SOLOMON)) {
       return "songs";
     } else if (book.equals(BibleBook.SIRACH)) {
