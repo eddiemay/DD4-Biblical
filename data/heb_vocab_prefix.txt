@@ -1,0 +1,19 @@
+*** Prefixes ***
+** {"translation":"I ","word":"א"}
+{"translation":"in ","word":"ב"}
+{"translation":"the ","word":"ה","asSuffix":""}
+{"translation":"and ","word":"ו","asSuffix":" of him"}
+{"translation":"he ","word":"י","asSuffix":" of me"}
+{"translation":"like ","word":"כ"}
+{"translation":"to ","word":"ל"}
+{"translation":"from ","word":"מ"}
+{"translation":"we ","word":"נ"}
+{"translation":"that which ","word":"ש"}
+{"translation":"you ","word":"ת","asSuffix":""}
+*** Suffixes ***
+{"translation":"","word":"ים","asSuffix":"s"}
+{"translation":"","word":"ם","asSuffix":"s"}
+{"translation":"","word":"הם","asSuffix":" of them"}
+{"translation":"","word":"ם","asSuffix":"s"}
+{"translation":"","word":"נו","asSuffix":" of us"}
+{"translation":"","word":"הו","asSuffix":" of it"}
