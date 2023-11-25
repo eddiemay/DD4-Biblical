@@ -7,7 +7,7 @@ public class BibleBook {
 
   public static final String ESTHER = "Esther";
   public static final String Psalms = "Psalms";
-  public static final String SONG_OF_SOLOMON = "Songs of Solomon";
+  public static final String SONG_OF_SOLOMON = "Song of Solomon";
   public static final String ISAIAH = "Isaiah";
   public static final String ADDITIONS_TO_ESTHER = "Additions to Esther";
   public static final String APOCRYPHAL_PSALMS = "Apocryphal Psalms";

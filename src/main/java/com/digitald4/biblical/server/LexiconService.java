@@ -3,15 +3,18 @@ package com.digitald4.biblical.server;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.digitald4.biblical.model.Lexicon;
-import com.digitald4.biblical.model.Lexicon.Interlinear;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
+import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.server.service.EntityServiceImpl;
 import com.digitald4.common.storage.LoginResolver;
+import com.digitald4.common.storage.Query;
+import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.Store;
 import com.google.api.server.spi.ServiceException;
@@ -35,8 +38,8 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   private final BibleBookStore bibleBookStore;
 
   @Inject
-  LexiconService(Store<Lexicon, String> store, LoginResolver loginResolver,
-      LexiconFetcher lexiconFetcher, InterlinearStore interlinearStore, BibleBookStore bibleBookStore) {
+  LexiconService(LexiconStore store, LoginResolver loginResolver, LexiconFetcher lexiconFetcher,
+      InterlinearStore interlinearStore, BibleBookStore bibleBookStore) {
     super(store, loginResolver);
     this.lexiconFetcher = lexiconFetcher;
     this.interlinearStore = interlinearStore;
@@ -61,14 +64,14 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrateLexicon")
   public AtomicInteger migrateLexicon(
       @Named("startIndex") int startIndex, @Named("endIndex") int endIndex,
-      @Named("language") @DefaultValue("H") String language) throws ServiceException {
+      @Named("lang") @DefaultValue("H") String lang) throws ServiceException {
     try {
       return new AtomicInteger(
           getStore().create(
               getStore()
                   .get(
                       IntStream.range(startIndex, endIndex)
-                          .mapToObj(id -> language + id)
+                          .mapToObj(id -> lang + id)
                           .collect(toImmutableList()))
                   .stream()
                   .peek(LexiconService::processReferences)
@@ -83,8 +86,37 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
       return new AtomicInteger(
-          interlinearStore.create(
-              lexiconFetcher.fetchInterlinear(bibleBookStore.get(book), chapter, 1, 400)).size());
+          interlinearStore
+              .create(lexiconFetcher.fetchInterlinear(bibleBookStore.get(book), chapter)).size());
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    } catch (Exception e) {
+      throw new ServiceException(ErrorCode.INTERNAL_SERVER_ERROR.getErrorCode(), e);
+    }
+  }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrateInterlinear")
+  public AtomicInteger migrateInterlinear(
+      @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
+    try {
+      return new AtomicInteger(
+          interlinearStore.create(interlinearStore.getInterlinear(book + " " + chapter)).size());
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    } catch (Exception e) {
+      throw new ServiceException(ErrorCode.INTERNAL_SERVER_ERROR.getErrorCode(), e);
+    }
+  }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "deleteInterlinear")
+  public AtomicInteger deleteInterlinear(
+      @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
+    try {
+      return new AtomicInteger(
+          interlinearStore.delete(
+              interlinearStore
+                  .list(Query.forList(Filter.of("book", book), Filter.of("chapter", chapter)))
+                  .getItems().stream().map(Interlinear::getId).collect(toImmutableList())));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     } catch (Exception e) {
@@ -119,7 +151,7 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
 
   @Override
   protected boolean requiresLogin(String method) {
-    return !method.equals("get") && super.requiresLogin(method);
+    return !method.equals("get") && !method.equals("list") && super.requiresLogin(method);
   }
 
   private static Lexicon processReferences(Lexicon lexicon) {

@@ -5,12 +5,11 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Lexicon;
-import com.digitald4.biblical.model.Lexicon.Interlinear;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Lexicon.Node;
 import com.digitald4.biblical.model.Lexicon.TranslationCount;
-import com.digitald4.biblical.store.Annotations.FetchLexiconByVerse;
+import com.digitald4.biblical.store.Annotations.FetchInterlinearByVerse;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
-import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
@@ -28,6 +27,7 @@ import org.jsoup.select.Elements;
 
 public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
   private static final String URL = "https://www.blueletterbible.org/lexicon/%s/kjv/wlc/0-1/";
+  private static final String INTERLINEAR_PAGE_URL = "https://biblehub.com/interlinear/%s/%d.htm";
   private static final String INTERLINEAR_URL = "https://biblehub.com/text/%s/%d-%d.htm";
   private static final Pattern LEX_COUNT = Pattern.compile("([A-z()0-9 ]+) \\(([0-9]+)x\\)");
   private static final Pattern VERSE_PATTERN = Pattern.compile("([0-9]+:[0-9]+)");
@@ -40,13 +40,14 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
 
   @Inject
   public LexiconFetcherBlueLetterImpl(
-      APIConnector apiConnector, @FetchLexiconByVerse boolean fetchByVerse) {
+      APIConnector apiConnector, @FetchInterlinearByVerse boolean fetchByVerse) {
     this.apiConnector = apiConnector;
     this.fetchByVerse = fetchByVerse;
   }
 
   @Override
   public Lexicon getLexicon(String strongsId) {
+    // System.out.println("Fetching: " + strongsId);
     String htmlResult = apiConnector.sendGet(String.format(URL, strongsId));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     String modern = doc.getElementsByClass("lexTitle" + (strongsId.startsWith("H") ? "Hb" : "GK"))
@@ -161,37 +162,17 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
 
   @Override
   public ImmutableList<Interlinear> fetchInterlinear(VerseRange vr) {
-    return fetchInterlinear(vr.getBook(), vr.getChapter(), vr.getStartVerse(), vr.getEndVerse());
-  }
-
-  @Override
-  public ImmutableList<Interlinear> fetchInterlinear(
-      BibleBook book, int chapter, int startVerse, int endVerse) {
-    return !fetchByVerse ? fetchInterlinear(book, chapter)
-        : IntStream.range(startVerse, endVerse + 1).boxed()
-            .flatMap(verse -> fetchInterlinear(book, chapter, verse).stream())
+    return !fetchByVerse ? fetchInterlinear(vr.getBook(), vr.getChapter())
+        : IntStream.range(vr.getStartVerse(), vr.getEndVerse() + 1).boxed()
+            .flatMap(verse -> fetchInterlinear(vr.getBook(), vr.getChapter(), verse).stream())
             .collect(toImmutableList());
   }
 
-  private ImmutableList<Interlinear> fetchInterlinear(BibleBook book, int chapter) {
-    ImmutableList.Builder<Interlinear> interlinears = ImmutableList.builder();
-    AtomicInteger verse = new AtomicInteger();
-    while (true) {
-      try {
-        interlinears.addAll(fetchInterlinear(book, chapter, verse.incrementAndGet()));
-      } catch (DD4StorageException e) {
-        // We simply keep looping until there is a verse we can't find.
-        return interlinears.build();
-      }
-    }
-  }
-
-  private ImmutableList<Interlinear> fetchInterlinear(BibleBook book, int chapter, int verse) {
+  @Override
+  public ImmutableList<Interlinear> fetchInterlinear(BibleBook book, int chapter, int verse) {
     String htmlResult = apiConnector.sendGet(
-        String.format(INTERLINEAR_URL, formatBookForUrl(book.name().toLowerCase()), chapter, verse));
+        String.format(INTERLINEAR_URL, formatBookForUrl(book.name()), chapter, verse));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.htmlParser());
-
-    System.out.printf("Fetching %s %d:%d\n", book, chapter, verse);
 
     AtomicInteger index = new AtomicInteger();
     AtomicReference<Interlinear> strongIdOwner = new AtomicReference<>();
@@ -241,19 +222,77 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
         .collect(toImmutableList());
   }
 
+  @Override
+  public ImmutableList<Interlinear> fetchInterlinear(BibleBook book, int chapter) {
+    String htmlResult = apiConnector.sendGet(
+        String.format(INTERLINEAR_PAGE_URL, formatBookForUrl(book.name()), chapter));
+    Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.htmlParser());
+    AtomicInteger verse = new AtomicInteger();
+    AtomicInteger index = new AtomicInteger();
+    AtomicReference<Interlinear> strongIdOwner = new AtomicReference<>();
+    return doc.getElementsByClass("chap").first().children().stream()
+        .filter(child -> child.tagName().equals("table"))
+        .flatMap(verseTable -> verseTable.children().first().children().first().children().first().children().stream())
+        .map(iTable -> {
+          Element verseElem = iTable.getElementsByClass("refheb").first();
+          if (verseElem != null) {
+            verse.set(Integer.parseInt(verseElem.text().trim()));
+            index.set(0);
+            strongIdOwner.set(null);
+          }
+          Element strongsElem = iTable.getElementsByClass("strongs").first();
+          if (strongsElem.getElementsByTag("a").first() == null && iTable.getElementsByClass("strongs").size() > 1) {
+            strongsElem = iTable.getElementsByClass("strongs").get(1);
+          }
+          String strongsId = getStrongsId(strongsElem.getElementsByTag("a").first());
+          String transliteration = iTable.getElementsByClass("translit").last().text();
+          String word = iTable.getElementsByClass("hebrew").last().text();
+          if (word.endsWith("׃")) {
+            word = word.substring(0, word.length() - 1);
+          }
+          String translation = iTable.getElementsByClass("eng").last().text();
+          String morphology = iTable.getElementsByClass("strongsnt").last().text();
+
+          // Get rid of the last item if it doesn't have a translation, this is normally the marker,
+          // of end of a paragraph or end of a chapter.
+          if (strongsId == null && translation == null && "Punc".equals(morphology)) {
+            return null;
+          }
+
+          if (strongsId != null && strongIdOwner.get() != null) {
+            strongIdOwner.get().setStrongsId(strongsId).setTranslation(translation);
+            strongsId = translation = null;
+            strongIdOwner.set(null);
+          }
+
+          Interlinear interlinear = new Interlinear()
+              .setBook(book.name())
+              .setBookNumber(book.getNumber())
+              .setChapter(chapter)
+              .setVerse(verse.get())
+              .setIndex(index.incrementAndGet())
+              .setStrongsId(strongsId)
+              .setWord(word)
+              .setConstantsOnly(HebrewConverter.toConstantsOnly(word))
+              .setTransliteration(transliteration)
+              .setMorphology(morphology)
+              .setTranslation(translation);
+
+          if (strongsId == null && "-".equals(translation) && morphology.isEmpty()
+              && strongIdOwner.get() == null) {
+            strongIdOwner.set(interlinear);
+          }
+
+          return interlinear;
+        })
+        .collect(toImmutableList());
+  }
+
   private static String getStrongsId(Element strongsLink) {
     if (strongsLink == null) {
       return null;
     }
 
     return (strongsLink.attr("href").contains("/hebrew") ? "H" : "G") + strongsLink.text();
-  }
-
-  private static String getMorphology(Element element) {
-    if (element == null) {
-      return null;
-    }
-
-    return element.attr("title").trim();
   }
 }

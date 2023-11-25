@@ -215,7 +215,7 @@
         <div class="columns">
           <h3>KJV Translation Count</h3>
           <p>
-            <b>The KJV translates Strong's H2416 in the following manner:</b>
+            <b>The KJV translates in the following manner:</b>
             <span data-ng-repeat="tc in $ctrl.lexicon.translationCounts">{{tc.word}} ({{tc.count}}x), </span>
           </p>
         </div>
@@ -245,6 +245,14 @@
           </div>
           <div class="colx3-right">
             <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="colx3-left">
+            <input data-ng-model="$ctrl.strongsId" class="full-width"/>
+          </div>
+          <div class="colx3-center">
+            <button data-ng-click="$ctrl.showStrongsDefs()">Show</button>
           </div>
         </div>
       </div>
@@ -307,7 +315,7 @@
           </a>
         </li>
       </ul>
-      <canvas id="scrollview" width="1135" height="300"></canvas>
+      <canvas id="scrollview" width="{{$ctrl.canvasWidth}}" height="454"></canvas>
     </div>
   </div>
   <!-- References dialog end -->

@@ -2,6 +2,7 @@ package com.digitald4.biblical.server;
 
 import com.digitald4.biblical.model.HighScore;
 import com.digitald4.biblical.model.Lexicon;
+import com.digitald4.biblical.store.Annotations.FetchInterlinearByVerse;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.util.*;
 import com.digitald4.common.model.BasicUser;
@@ -39,7 +40,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 				.toInstance(Duration.ofHours(8));
 		bind(Boolean.class).annotatedWith(Annotations.SessionCacheEnabled.class).toInstance(false);
 		bind(Boolean.class)
-				.annotatedWith(com.digitald4.biblical.store.Annotations.FetchLexiconByVerse.class)
+				.annotatedWith(FetchInterlinearByVerse.class)
 				.toInstance(false);
 
 		ProviderThreadLocalImpl<BasicUser> userProvider = new ProviderThreadLocalImpl<>();
@@ -51,8 +52,6 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 
 		bind(new TypeLiteral<Store<HighScore, Long>>(){})
 				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
-		bind(new TypeLiteral<Store<Lexicon, String>>(){})
-				.toInstance(new GenericStore<>(Lexicon.class, getProvider(DAO.class)));
 		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){});
 
 		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
@@ -75,6 +74,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CalendarRuleService.class,
 						CalendarValidatorService.class,
 						CommandmentService.class,
+						FileService.class,
 						HighScoreService.class,
 						LexiconService.class,
 						LessonService.class,

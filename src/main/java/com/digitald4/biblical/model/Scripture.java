@@ -1,6 +1,5 @@
 package com.digitald4.biblical.model;
 
-import com.digitald4.biblical.model.Lexicon.Interlinear;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;

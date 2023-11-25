@@ -18,5 +18,5 @@ public final class Annotations {
 
   @BindingAnnotation
   @Retention(RetentionPolicy.RUNTIME)
-  public @interface FetchLexiconByVerse {}
+  public @interface FetchInterlinearByVerse {}
 }

@@ -1,22 +1,4 @@
 indexes:
-  - kind: Scripture
-    properties:
-      - name: book
-      - name: chapter
-      - name: verse
-  - kind: Scripture
-    properties:
-      - name: version
-      - name: book
-      - name: chapter
-      - name: verse
-  - kind: Scripture
-    properties:
-      - name: version
-      - name: book
-      - name: language
-      - name: chapter
-      - name: verse
   - kind: BiblicalEvent
     properties:
       - name: year
@@ -38,5 +20,27 @@ indexes:
   - kind: Interlinear
     properties:
       - name: book
+      - name: chapter
+      - name: verse
+  - kind: Lexicon
+    properties:
+      - name: lang
+      - name: strongsNumber
+  - kind: Scripture
+    properties:
+      - name: book
+      - name: chapter
+      - name: verse
+  - kind: Scripture
+    properties:
+      - name: version
+      - name: book
+      - name: chapter
+      - name: verse
+  - kind: Scripture
+    properties:
+      - name: version
+      - name: book
+      - name: language
       - name: chapter
       - name: verse

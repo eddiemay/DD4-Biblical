@@ -10,7 +10,8 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 
-import com.digitald4.biblical.model.Lexicon.Interlinear;
+import com.digitald4.biblical.model.Interlinear;
+import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.BibleBookStore;
@@ -284,9 +285,11 @@ public class DiffStats {
 
     strongIds.entrySet().stream().sorted(Entry.comparingByValue(reverseOrder()))
         .limit(21)
-        .forEach(e ->
-            System.out.printf("%s %s %d\n",
-                e.getKey(), lexiconStore.get(e.getKey()).getConstantsOnly(), e.getValue()));
+        .forEach(e -> {
+          Lexicon lexicon = lexiconStore.get(e.getKey());
+          System.out.printf("%s %s %s %d\n",
+              e.getKey(), lexicon.getConstantsOnly(), lexicon.translation(), e.getValue());
+        });
 
     Map<String, Map<String, List<Interlinear>>> wordsByStrongIds = allInterlinears.stream()
         .filter(i -> i.getStrongsId() != null)
@@ -346,7 +349,7 @@ public class DiffStats {
     bw2.close();
 
     BufferedWriter bw3 = new BufferedWriter(new FileWriter("data/isa-words.csv"));
-    bw3.write("Strong's Id,MT Word,Hebrew Word,DSS Word,Change,Link,Count\n");
+    bw3.write("Strong's Id,MT Word,Hebrew Word,DSS Word,Translation,Transliteration,Change,Link,Count\n");
     allInterlinears.stream()
         .collect(groupingBy(i -> String.format("%s-%s", i.getStrongsId(), i.getConstantsOnly())))
         .entrySet().stream()
@@ -356,8 +359,8 @@ public class DiffStats {
           String dssWord = statsProcessor.getDssWord(is);
           try {
             bw3.write(
-                String.format("%s,%s,%s,%s,%s,%s,%d\n", i.getStrongsId(), i.getWord(),
-                    i.getConstantsOnly(), dssWord,
+                String.format("%s,%s,%s,%s,%s,%s,%s,%s,%d\n", i.getStrongsId(), i.getWord(),
+                    i.getConstantsOnly(), dssWord, i.getTranslation(), sanitize(i.getTransliteration()),
                     i.getConstantsOnly().equals(dssWord) ? "" : "TRUE", createLink(is), is.size()));
           } catch (IOException ioe) {
             throw new RuntimeException(ioe);
@@ -413,14 +416,16 @@ public class DiffStats {
       lettersRemoved = diffs.stream()
           .filter(d -> d.operation == Operation.DELETE)
           .flatMapToInt(d -> d.text.chars())
-          .mapToObj(i -> (char) i).collect(groupingBy(identity(), counting()));
+          .mapToObj(i -> (char) i)
+          .collect(groupingBy(identity(), counting()));
       added = diffs.stream()
           .filter(d -> d.operation == Operation.INSERT).map(d -> d.text).collect(joining(" "));
       lettersAdded = diffs.stream()
           .filter(d -> d.operation == Operation.INSERT)
           .flatMapToInt(d -> d.text.chars())
-          .mapToObj(i -> (char) i).collect(groupingBy(identity(), counting()));
-      percentMatch = dss.isEmpty() ? 0 : ((dss.length() - ld) * 100 / dss.length());
+          .mapToObj(i -> (char) i)
+          .collect(groupingBy(identity(), counting()));
+      percentMatch = dss.isEmpty() ? 0 : (dss.length() - ld) * 100 / dss.length();
     }
 
     public int getLd() {

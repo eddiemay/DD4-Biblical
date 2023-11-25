@@ -4,7 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.Truth.assertThat;
 import static java.util.stream.Collectors.toList;
 
-import com.digitald4.biblical.model.Lexicon.Interlinear;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
@@ -93,6 +93,16 @@ public class InterlinearStoreTest {
         .containsExactly("Hello", "Immanuel", "-");
     assertThat(interlinears.stream().map(Interlinear::dssDiff).collect(toList())).containsExactly(
         "Hello", "Immanu<span class=\"diff-delete\">el</span>", "<span class=\"diff-insert\">el</span>");
+  }
+
+  @Test
+  public void fillDss_wordsCombined() {
+    ImmutableList<Interlinear> interlinears = createInterlinears("watch basketball game");
+    InterlinearStore.fillDss(new InterlinearScripture(interlinears), "watch basket ball game");
+    assertThat(interlinears.stream().map(Interlinear::getDss).collect(toList()))
+        .containsExactly("watch", "basket ball", "game");
+    assertThat(interlinears.stream().map(Interlinear::dssDiff).collect(toList())).containsExactly(
+        "watch", "basket<span class=\"diff-delete\"> </span>ball", "game");
   }
 
   @Test

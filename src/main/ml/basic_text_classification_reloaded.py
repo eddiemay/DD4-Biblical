@@ -1,8 +1,14 @@
 import tensorflow as tf
+import torch
 
 from src.main.ml.global_functions import custom_standardization
 
 print(tf.__version__)
+
+x = torch.rand(5, 3)
+print(x)
+
+print(custom_standardization("The movie was okay, not great!"))
 
 reloaded = tf.keras.models.load_model(
   'text_classification',

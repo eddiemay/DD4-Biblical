@@ -92,10 +92,10 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(versio
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDefs = function(strongsId) {
-  if (strongsId == undefined) {return;}
-  this.strongsId = strongsId;
-  this.lexicon = {id: strongsId, word: 'Loading...', strongsDefinition: '', rootWord: ''};
-  this.lexiconService.get(strongsId, lexicon => {this.lexicon = lexicon});
+  this.strongsId = strongsId || this.strongsId;
+  if (this.strongsId == undefined) {return;}
+  this.lexicon = {id: this.strongsId, word: 'Loading...', strongsDefinition: '', rootWord: ''};
+  this.lexiconService.get(this.strongsId, lexicon => {this.lexicon = lexicon});
   this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
   this.dialogShown = 'LEXICON';
 }
@@ -123,19 +123,6 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(inte
   this.dialogShown = 'REFERENCES';
 }
 
-printBaseWidth = function(ctx) {
-  var total = 0;
-  var getWidth = function(fileName) {
-    console.log('Loading: ' + fileName);
-    var img = new Image();
-    img.onload = () => {total += img.width; console.log(total); }
-    img.src = fileName;
-  }
-  for (var c = 1; c < 55; c++) {
-    getWidth('http://tiles.imj.org.il/columns/isaiah/isaiah' + c + '.jpg');
-  }
-}
-
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showScroll = function(scripture) {
   this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
   const canvas = document.getElementById("scrollview");
@@ -147,11 +134,12 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showScroll = function(scripture
   const ctx = canvas.getContext("2d");
 
   this.scriptureService.getScrollCoords(scripture, scrollData => {
-    drawScroll(ctx, scrollData);
+    this.canvasWidth = DSS_ISA_COLUMN_INFO[scrollData.columns[0]].width * 3.7445;
+    this.drawScroll(ctx, scrollData);
   });
 }
 
-drawScroll = function(ctx, scrollData) {
+com.digitald4.biblical.ReadTheWordCtrl.prototype.drawScroll = function(ctx, scrollData) {
   // printBaseWidth(ctx);
 
   // Zoom 9 is 250 images wide and 10 images high.
@@ -180,7 +168,7 @@ drawScroll = function(ctx, scrollData) {
   var values = paths[0].split(',');
   var coords = [];
   var rollOffset = (54 - scrollData.columns[0]) / 53 * 90;
-  var minX, minY, maxX, maxY;
+  var minY, maxY;
   for (var i = 0; i < values.length; i++) {
     var coord = {
       x: Math.round(parseInt(values[i]) * 3.7445) + rollOffset,
@@ -188,53 +176,78 @@ drawScroll = function(ctx, scrollData) {
     coords.push(coord);
     console.log(coord.x + ',' + coord.y);
     if (i == 1) {
-      minX = maxX = coord.x;
       minY = maxY = coord.y;
-    } else {
-      if (coord.x < minX) {
-        minX = coord.x;
-      } else if (coord.x > maxX) {
-        maxX = coord.x;
-      }
-
-      if (coord.y < minY) {
-        minY = coord.y;
-      } else if (coord.y > maxY) {
-        maxY = coord.y;
-      }
+    } else if (coord.y < minY) {
+      minY = coord.y;
+    } else if (coord.y > maxY) {
+      maxY = coord.y;
     }
   }
 
-  const col = Math.floor(minX / 227);
-  const row = Math.floor(minY / 227);
+  const startX = DSS_ISA_COLUMN_INFO[scrollData.columns[0]].start * 3.7445;
+  const endX = startX + DSS_ISA_COLUMN_INFO[scrollData.columns[0]].width * 3.7445;
 
-  const xOffset = col * 227;
-  const yOffset = row * 227;
+  const startTileCol = Math.floor(startX / 227);
+  const endTileCol = Math.floor(endX / 227);
+  const startTileRow = Math.floor(minY / 227);
+  const endTileRow = Math.floor(maxY / 227);
+
+  const xOffset = startTileCol * 227;
+  const yOffset = startTileRow * 227;
 
   var totalDrawn = 0;
+  const bookService = this.bookService;
   var drawTile = function(c, r) {
-    var fileName = 'http://tiles.imj.org.il/tiles/isaiah/9_' + (col + c) + '_' + (row + r) + '.jpg';
+    var fileName = bookService
+        .getFileUrl('tiles_isaiah_9_' + (startTileCol + c) + '_' + (startTileRow + r) + '.jpg');
     console.log('Loading: ' + fileName);
     var img = new Image();
     img.onload = () => {
-      ctx.drawImage(img, c * 227, r * 227);
+      if (c == 0) {
+        ctx.drawImage(
+            img, (startX - xOffset), 0, img.width, img.height, 0, r * 227, img.width, img.height);
+      } else {
+        ctx.drawImage(img, c * 227 - (startX - xOffset), r * 227);
+      }
       if (++totalDrawn == 10) {
-        ctx.strokeStyle = 'green';
-        ctx.beginPath();
-        ctx.moveTo(coords[0].x - xOffset, coords[0].y - yOffset);
-        for (var i = 1; i < coords.length; i++) {
-          ctx.lineTo(coords[i].x - xOffset, coords[i].y - yOffset);
-        }
-        ctx.stroke();
+        setTimeout(function() {
+          ctx.strokeStyle = 'green';
+          ctx.beginPath();
+          ctx.moveTo(coords[0].x - startX, coords[0].y - yOffset);
+          for (var i = 1; i < coords.length; i++) {
+            ctx.lineTo(coords[i].x - startX, coords[i].y - yOffset);
+          }
+          ctx.stroke();
+        }, 500); // Wait 1/2 a second before drawing lines to give time for images to be drawn.
       }
     }
     img.src = fileName;
   }
 
-  for (var c = 0; c < 5; c++) {
+  for (var c = startTileCol; c <= endTileCol; c++) {
     for (var r = 0; r < 2; r++) {
-      drawTile(c, r);
+      drawTile(c - startTileCol, r);
     }
+  }
+}
+
+printBaseWidth = function(ctx) {
+  var total = 0;
+  console.log('var DSS_ISA_COLUMN_STARTS = [');
+  var getWidth = function(c) {
+    var fileName = 'http://tiles.imj.org.il/columns/isaiah/isaiah' + c + '.jpg';
+    // console.log('Loading: ' + fileName);
+    var img = new Image();
+    img.onload = () => {
+      console.log('{column: ' + c + ', start: ' + total + ', width: ' + img.width + '}');
+
+      total += img.width;
+      // console.log(total);
+    }
+    img.src = fileName;
+  }
+  for (var c = 54; c > 0; c--) {
+    getWidth(c);
   }
 }
 

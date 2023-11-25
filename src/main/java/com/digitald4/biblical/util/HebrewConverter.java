@@ -162,4 +162,13 @@ public class HebrewConverter {
   public static String toConstantsOnly(StringBuilder text) {
     return toConstantsOnly(text.toString());
   }
+
+  public static String toStrongsId(String strongsRef) {
+    switch (strongsRef.length()) {
+      case 2: return strongsRef.charAt(0) + "000" + strongsRef.substring(1);
+      case 3: return strongsRef.charAt(0) + "00" + strongsRef.substring(1);
+      case 4: return strongsRef.charAt(0) + "0" + strongsRef.substring(1);
+    }
+    return strongsRef;
+  }
 }

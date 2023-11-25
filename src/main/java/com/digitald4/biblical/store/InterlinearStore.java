@@ -5,7 +5,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 
-import com.digitald4.biblical.model.Lexicon.Interlinear;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
@@ -132,18 +132,14 @@ public class InterlinearStore extends GenericStore<Interlinear, String> {
           interlinears.stream().map(Interlinear::getConstantsOnly).collect(joining(" "))).split(" ");
     }
 
-    try {
-      String[] words = dssSplit;
-      IntStream.range(0, interlinears.size()).forEach(index ->
-          interlinears.get(index)
-              .setDss(words[index])
-              .setDssDiff(
-                  Calculate.getDiffHtml(
-                      words[index].equals("-") ? "" : words[index],
-                      interlinears.get(index).getConstantsOnly())));
-    } catch (ArrayIndexOutOfBoundsException e) {
-      // Just work with the words we already set.
-    }
+    String[] words = dssSplit;
+    IntStream.range(0, Math.min(interlinears.size(), words.length)).forEach(index ->
+        interlinears.get(index)
+            .setDss(words[index].replaceAll("_", " "))
+            .setDssDiff(
+                Calculate.getDiffHtml(
+                    words[index].equals("-") ? "" : words[index].replaceAll("_", " "),
+                    interlinears.get(index).getConstantsOnly())));
 
     return scripture;
   }
@@ -153,7 +149,9 @@ public class InterlinearStore extends GenericStore<Interlinear, String> {
     AtomicBoolean splitDetected = new AtomicBoolean();
     return Calculate.getDiff(original, modified).stream()
         .map(diff -> {
-          if (diff.operation == Operation.DELETE && diff.text.contains(" ")) {
+          if (diff.operation == Operation.DELETE && diff.text.equals(" ")) {
+            return "_";
+          } else if (diff.operation == Operation.DELETE && diff.text.contains(" ")) {
             return "";
           } else if (diff.operation == Operation.INSERT && diff.text.equals(" ")) {
             splitDetected.set(true);

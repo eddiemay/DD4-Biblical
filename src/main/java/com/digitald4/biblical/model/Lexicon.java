@@ -10,6 +10,7 @@ public class Lexicon extends ModelObject<String> {
   // Indexed values
   private String word;
   private String constantsOnly;
+  private String strongsId;
 
   // Non Indexed values
   private String transliteration;
@@ -20,9 +21,24 @@ public class Lexicon extends ModelObject<String> {
   private ImmutableList<TranslationCount> translationCounts;
   private ImmutableList<Node> outline;
   private StringBuilder strongsDefinition;
+  private String translation;
 
   public Lexicon setId(String id) {
+    switch (id.length()) {
+      case 2: id = id.charAt(0) + "000" + id.substring(1); break;
+      case 3: id = id.charAt(0) + "00" + id.substring(1); break;
+      case 4: id = id.charAt(0) + "0" + id.substring(1);  break;
+    }
     super.setId(id);
+    return this;
+  }
+
+  public String getStrongsId() {
+    return strongsId != null ? strongsId : getId();
+  }
+
+  public Lexicon setStrongsId(String strongsId) {
+    this.strongsId = strongsId;
     return this;
   }
 
@@ -46,7 +62,7 @@ public class Lexicon extends ModelObject<String> {
 
   @ApiResourceProperty
   public String ancient() {
-    return HebrewConverter.toAncient(constantsOnly);
+    return HebrewConverter.toAncientRtl(constantsOnly);
   }
 
   @NonIndexed
@@ -155,6 +171,32 @@ public class Lexicon extends ModelObject<String> {
     return this;
   }
 
+  public String getTranslation() {
+    return null;
+  }
+
+  public Lexicon setTranslation(String translation) {
+    this.translation = translation;
+    return this;
+  }
+
+  @ApiResourceProperty
+  public String translation() {
+    if (translation == null) {
+      if (translationCounts != null && !translationCounts.isEmpty()) {
+        return getTranslationCounts().get(0).getWord();
+      } else if (getOutline() != null && !getOutline().isEmpty()) {
+        String translation = getOutline().get(0).getValue();
+        if (translation.contains(",")) {
+          translation = translation.substring(0, translation.indexOf(','));
+        }
+        return translation;
+      }
+    }
+
+    return translation;
+  }
+
   public String toString() {
     return String.format(
         "Strong's %s - %s - %s - %s - %s - %s - %s - %s - %s - %s",
@@ -216,252 +258,4 @@ public class Lexicon extends ModelObject<String> {
     }
   }
 
-  @Deprecated
-  public static class Translation {
-    private String version;
-    private String translation;
-
-    public String getVersion() {
-      return version;
-    }
-
-    public Translation setVersion(String version) {
-      this.version = version;
-      return this;
-    }
-
-    public String getTranslation() {
-      return translation;
-    }
-
-    public Translation setTranslation(String translation) {
-      this.translation = translation;
-      return this;
-    }
-
-    @Override
-    public String toString() {
-      return version + "-" + translation;
-    }
-  }
-
-  public static class Interlinear {
-    // Id values
-    private String version = "WLC";
-    private String book;
-    private int chapter;
-    private int verse;
-    private int index;
-
-    // Indexed values
-    private String strongsId;
-    private String word;
-    private String constantsOnly;
-
-    // Non indexed values
-    private String transliteration;
-    private String morphology;
-    private String morphologyAbb;
-    private int bookNumber; // For sorting by Bible book number.
-    private String translation;
-
-    // FE only values
-    private int matchValue;
-    private String dss;
-    private String dssDiff;
-
-    public String getId() {
-      return String.format("%s-%s-%d-%d-%d",
-          getVersion(), getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
-    }
-
-    public String getVersion() {
-      return version;
-    }
-
-    public Interlinear setVersion(String version) {
-      this.version = version;
-      return this;
-    }
-
-    public String getBook() {
-      return book;
-    }
-
-    public Interlinear setBook(String book) {
-      this.book = book;
-      return this;
-    }
-
-    public int getChapter() {
-      return chapter;
-    }
-
-    public Interlinear setChapter(int chapter) {
-      this.chapter = chapter;
-      return this;
-    }
-
-    public int getVerse() {
-      return verse;
-    }
-
-    public Interlinear setVerse(int verse) {
-      this.verse = verse;
-      return this;
-    }
-
-    @NonIndexed
-    public int getIndex() {
-      return index;
-    }
-
-    public Interlinear setIndex(int index) {
-      this.index = index;
-      return this;
-    }
-
-    @ApiResourceProperty
-    public String reference() {
-      return String.format("%s %d:%d", getBook(), getChapter(), getVerse());
-    }
-
-    public String getWord() {
-      return word;
-    }
-
-    public Interlinear setWord(String word) {
-      this.word = word;
-      return this;
-    }
-
-    @NonIndexed
-    public String getTransliteration() {
-      return transliteration;
-    }
-
-    public Interlinear setTransliteration(String transliteration) {
-      this.transliteration = transliteration;
-      return this;
-    }
-
-    public String getStrongsId() {
-      return strongsId;
-    }
-
-    public Interlinear setStrongsId(String strongsId) {
-      this.strongsId = strongsId;
-      return this;
-    }
-
-    public String getConstantsOnly() {
-      return constantsOnly;
-    }
-
-    public Interlinear setConstantsOnly(String constantsOnly) {
-      this.constantsOnly = constantsOnly;
-      return this;
-    }
-
-    @ApiResourceProperty
-    public String ancient() {
-      return HebrewConverter.toAncient(constantsOnly);
-    }
-
-    @NonIndexed
-    public String getMorphology() {
-      return morphologyAbb != null ? morphologyAbb : morphology;
-    }
-
-    public Interlinear setMorphology(String morphology) {
-      this.morphology = "".equals(morphology) ? null :morphology;
-      return this;
-    }
-
-    @NonIndexed @Deprecated
-    public String getMorphologyAbb() {
-      return null;
-    }
-
-    @Deprecated
-    public Interlinear setMorphologyAbb(String morphologyAbb) {
-      this.morphologyAbb = "".equals(morphologyAbb) ? null : morphologyAbb;
-      return this;
-    }
-
-    @NonIndexed
-    public int getBookNumber() {
-      return bookNumber;
-    }
-
-    public Interlinear setBookNumber(int bookNumber) {
-      this.bookNumber = bookNumber;
-      return this;
-    }
-
-    @NonIndexed
-    public String getTranslation() {
-      return translation;
-    }
-
-    public Interlinear setTranslation(String translation) {
-      this.translation = translation;
-      return this;
-    }
-
-    @Deprecated
-    public ImmutableList<Translation> getTranslations() {
-      return null;
-    }
-
-    @Deprecated
-    public Interlinear setTranslations(Iterable<Translation> translations) {
-      this.translation = translations.iterator().next().getTranslation();
-      return this;
-    }
-
-    public int matchValue() {
-      return matchValue;
-    }
-
-    public Interlinear setMatchValue(int matchValue) {
-      this.matchValue = matchValue;
-      return this;
-    }
-
-    public Interlinear setDss(String dss) {
-      this.dss = dss;
-      return this;
-    }
-
-    public String getDss() {
-      return dss;
-    }
-
-    public Interlinear setDssDiff(String dssDiff) {
-      this.dssDiff = dssDiff;
-      return this;
-    }
-
-    @ApiResourceProperty
-    public String dssDiff() {
-      return dssDiff;
-    }
-
-    @Override
-    public int hashCode() {
-      return getId().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return obj instanceof Interlinear && toString().equals(obj.toString());
-    }
-
-    @Override
-    public String toString() {
-      return String.format("%s - %s - %s - %s - %s%s - %s", getId(), getStrongsId(),
-          getTransliteration(), getWord(), getConstantsOnly(), dss != null ? " - " + dss : "", getTranslation());
-    }
-  }
 }

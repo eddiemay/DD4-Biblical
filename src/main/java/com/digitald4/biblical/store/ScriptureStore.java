@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.BibleBook;
-import com.digitald4.biblical.model.Lexicon.Interlinear;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.AuditScripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
