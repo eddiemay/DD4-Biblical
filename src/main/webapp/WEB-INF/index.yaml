@@ -22,10 +22,6 @@ indexes:
       - name: book
       - name: chapter
       - name: verse
-  - kind: Lexicon
-    properties:
-      - name: lang
-      - name: strongsNumber
   - kind: Scripture
     properties:
       - name: book

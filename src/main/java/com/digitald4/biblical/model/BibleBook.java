@@ -4,7 +4,6 @@ import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableSet;
 
 public class BibleBook {
-
   public static final String ESTHER = "Esther";
   public static final String Psalms = "Psalms";
   public static final String SONG_OF_SOLOMON = "Song of Solomon";

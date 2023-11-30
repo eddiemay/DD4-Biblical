@@ -2,15 +2,19 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.biblical.util.HebrewConverter.toStrongsId;
+import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
+import com.digitald4.biblical.model.AncientLexicon;
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
 import com.digitald4.biblical.model.Lexicon;
+import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
@@ -48,7 +52,7 @@ public class MachineTranslator {
     subwordTokenizer = new SubwordTokenizer(
         stream(tokenWordsProvider.get())
             .peek(tokenWord -> builder.put(tokenWord.getWord(), tokenWord))
-            .flatMap(tokenWord -> Stream.of(tokenWord.getWord(), "##" + tokenWord.getWord()))
+            // .flatMap(tokenWord -> Stream.of(tokenWord.getWord(), "##" + tokenWord.getWord()))
             .collect(toImmutableSet()));
     tokenWordsByWord = builder.build();
   }
@@ -77,7 +81,7 @@ public class MachineTranslator {
 
     AtomicBoolean wordFound = new AtomicBoolean();
     interlinear.setSubtokens(
-        subwordTokenizer.tokenizeWord(interlinear.getConstantsOnly()).stream()
+        subwordTokenizer.tokenizeWord(unfinalize(interlinear.getConstantsOnly())).stream()
             .map(subWord -> getTranslation(subWord, interlinear.getStrongsId(), wordFound.get()))
             .peek(subToken -> wordFound.set(wordFound.get() || subToken.getStrongsId() != null))
             .collect(toImmutableList()));
@@ -91,7 +95,23 @@ public class MachineTranslator {
   public ImmutableList<Interlinear> translate(String text) {
     return translate(
         stream(text.split(" "))
-            .map(word -> new Interlinear().setWord(word).setConstantsOnly(toConstantsOnly(word)))
+            .map(word -> new Interlinear().setBook("").setWord(word).setConstantsOnly(toConstantsOnly(word)))
+            .collect(toImmutableList()));
+  }
+
+  public ImmutableList<Interlinear> translate(Scripture scripture) {
+    if (scripture instanceof InterlinearScripture) {
+      return translate(((InterlinearScripture) scripture).getInterlinears());
+    }
+
+    return translate(
+        stream(scripture.getText().toString().split(" "))
+            .map(
+                word ->
+                    new Interlinear()
+                        .setBook(scripture.getBook())
+                        .setChapter(scripture.getChapter()).setVerse(scripture.getVerse())
+                        .setWord(word).setConstantsOnly(toConstantsOnly(word)))
             .collect(toImmutableList()));
   }
 
@@ -100,6 +120,8 @@ public class MachineTranslator {
     private String translation;
     private String strongsId;
     private String asSuffix;
+    enum TokenType {PREFIX, PREFIX_ONLY, SUFFIX, SUFFIX_ONLY, WORD, WHOLE_WORD_ONLY}
+    private TokenType tokenType;
 
     public String getWord() {
       return word;
@@ -141,6 +163,19 @@ public class MachineTranslator {
       return asSuffix == null ? translation : asSuffix;
     }
 
+    public TokenType getTokenType() {
+      return tokenType;
+    }
+
+    public TokenWord setTokenType(TokenType tokenType) {
+      this.tokenType = tokenType;
+      return this;
+    }
+
+    public TokenType tokenType() {
+      return tokenType == null ? TokenType.WORD : tokenType;
+    }
+
     @Override
     public String toString() {
       return String.format(
@@ -149,15 +184,30 @@ public class MachineTranslator {
 
     public static TokenWord from(Lexicon lexicon) {
       return new TokenWord()
-          .setWord(lexicon.getConstantsOnly())
+          .setWord(unfinalize(lexicon.getConstantsOnly()))
           .setTranslation(lexicon.translation())
           .setStrongsId(lexicon.getStrongsId());
+    }
+
+    public static ImmutableList<TokenWord> from(AncientLexicon ancientLexicon) {
+      if (ancientLexicon.getStrongIds() == null || ancientLexicon.getTranslation() == null) {
+        return ImmutableList.of();
+      }
+
+      return ancientLexicon.getWords().stream()
+          .flatMap(
+              word -> ancientLexicon.getStrongIds().stream().map(
+                  strongsId -> new TokenWord()
+                      .setWord(unfinalize(word))
+                      .setTranslation(ancientLexicon.translation())
+                      .setStrongsId(strongsId.replaceAll("A", "H"))))
+          .collect(toImmutableList());
     }
   }
 
   private static ImmutableList<TokenWord> tokenWordProvider() {
     ImmutableList.Builder<TokenWord> tokenWords = ImmutableList.builder();
-    Stream.of("data/heb_vocab_prefix.txt", "data/heb_vocab_from_strongs.txt").forEach(tokenFile -> {
+    Stream.of("data/heb_vocab_prefix.txt", "data/heb_vocab_from_ancient_lexicon.txt").forEach(tokenFile -> {
       try (BufferedReader br = new BufferedReader(new FileReader(tokenFile))) {
         String line;
         while ((line = br.readLine()) != null) {
@@ -187,36 +237,52 @@ public class MachineTranslator {
     InterlinearStore interlinearStore = new InterlinearStore(
         () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), lexiconFetcher);
 
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:1");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:2");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:3");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:4");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:5");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:6");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:7");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:8");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:9");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:10");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:11");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:12");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:13");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:14");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:15");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:16");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:17");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:18");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:19");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:20");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:21");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:22");
-    translateAndPrint(machineTranslator, interlinearStore, "Gen 1:23");
+    /* printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:1")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:2")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:3")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:4")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:5")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:6"))); */
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:7")));
+    /* printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:8")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:9")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:10")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:11")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:12")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:13")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:14")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:15")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:16")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:17")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:18")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:19")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:20")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:21")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:22")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:23")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:24")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:25")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:26")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:27")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:28")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:29")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:30")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 1:31")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 2:1")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 2:2")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Gen 2:3")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Isa 9:6")));
+    printTranslation(
+        machineTranslator.translate(
+            new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(9).setVerse(6).setText(
+                "כי ילד יולד לנו בן נתן לנו ותהי המשורה על שכמו וקרא שמו פלא יועץ אל גבור אבי עד שר השלום")));
+    printTranslation(machineTranslator.translate(interlinearStore.getInterlinear("Psa 83:18"))); */
+
     fileDao.saveToFile();
   }
 
-  public static void translateAndPrint(
-      MachineTranslator mt, InterlinearStore interlinearStore, String ref) {
-    ImmutableList<Interlinear> translated = mt.translate(interlinearStore.getInterlinear(ref));
-    System.out.println("\n" + ref);
+  public static void printTranslation(ImmutableList<Interlinear> translated) {
+    System.out.println("\n" + translated.get(0).reference());
     System.out.println(translated.stream().map(Interlinear::getStrongsId).collect(joining(" ")));
     System.out.println(translated.stream().map(Interlinear::getTranslation).collect(joining(" ")));
     System.out.println(translated.stream().map(Interlinear::getConstantsOnly).collect(joining(" ")));
@@ -228,6 +294,5 @@ public class MachineTranslator {
         translated.stream()
             .map(i -> i.getSubTokens().stream().map(SubToken::getTranslation).collect(joining("")))
             .collect(joining(" ")));
-
   }
 }

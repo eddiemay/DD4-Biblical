@@ -1,10 +1,11 @@
 package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
+import static java.util.Comparator.comparing;
 
+import com.digitald4.biblical.model.AncientLexicon;
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Lexicon;
@@ -12,6 +13,7 @@ import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
+import com.digitald4.biblical.util.AncientLexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.biblical.util.MachineTranslator.TokenWord;
@@ -32,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,14 +52,17 @@ public class LexiconTool {
   private final LexiconFetcher lexiconFetcher;
   private final InterlinearStore interlinearStore;
   private final BibleBookStore bibleBookStore;
+  private final AncientLexiconFetcher ancientLexiconFetcher;
 
   LexiconTool(APIConnector apiConnector, LexiconStore lexiconStore, LexiconFetcher lexiconFetcher,
-      InterlinearStore interlinearStore, BibleBookStore bibleBookStore) {
+      InterlinearStore interlinearStore, BibleBookStore bibleBookStore,
+      AncientLexiconFetcher ancientLexiconFetcher) {
     this.apiConnector = apiConnector;
     this.lexiconStore = lexiconStore;
     this.lexiconFetcher = lexiconFetcher;
     this.interlinearStore = interlinearStore;
     this.bibleBookStore = bibleBookStore;
+    this.ancientLexiconFetcher = ancientLexiconFetcher;
   }
 
   public void reindexLexicon(String language, int startIndex, int endIndex) {
@@ -241,11 +245,31 @@ public class LexiconTool {
     return lexicons;
   }
 
+  private ImmutableList<AncientLexicon> getAncientLexicons(int batch) {
+    return ancientLexiconFetcher.fetch(batch);
+  }
+
   private void outputLexiconJSON() throws IOException {
     try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/heb_vocab_strongs.txt"))) {
       range(0, 9).boxed().flatMap(batch -> getLexicons(batch).stream())
           .map(TokenWord::from)
-          .sorted(Comparator.comparing(TokenWord::getStrongsId))
+          .sorted(comparing(TokenWord::getStrongsId))
+          .map(JSONObject::new)
+          .forEach(json -> {
+            try {
+              bw.write(json + "\n");
+            } catch (IOException ioe) {
+              throw new DD4StorageException("Error writing value: " + json, ioe);
+            }
+          });
+    }
+  }
+
+  private void outputAncientLexiconJSON() throws IOException {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/heb_vocab_ancient_lexicon.txt"))) {
+      range(0, 23).boxed().flatMap(batch -> getAncientLexicons(batch).stream())
+          .flatMap(ancientLexicon -> TokenWord.from(ancientLexicon).stream())
+          .sorted(comparing(TokenWord::getStrongsId))
           .map(JSONObject::new)
           .forEach(json -> {
             try {
@@ -273,6 +297,7 @@ public class LexiconTool {
 
   public static void main(String[] args) throws IOException {
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50);
+    apiConnector.setIdToken("716656750");
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector, true);
@@ -283,8 +308,9 @@ public class LexiconTool {
         new InterlinearStore(() -> fileDao, referenceProcessor, lexiconFetcher);
     DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
-    LexiconTool lexiconTool =
-        new LexiconTool(apiConnector, lexiconStore, lexiconFetcher, interlinearStore, bibleBookStore);
+    AncientLexiconFetcher ancientLexiconFetcher = new AncientLexiconFetcher(apiConnector);
+    LexiconTool lexiconTool = new LexiconTool(apiConnector,
+        lexiconStore, lexiconFetcher, interlinearStore, bibleBookStore, ancientLexiconFetcher);
     // lexiconTool.printInterlinear("Gen 1:1-2,2:2-3");
 
     System.out.println(lexiconStore.get("H997"));
@@ -294,7 +320,8 @@ public class LexiconTool {
         // .forEach(s -> lexiconTool.migrateLexicon("G", s * batchSize + 1, (s + 1) * batchSize + 1));
     // lexiconTool.migrateLexicon("G", 6090, 6091);
 
-    // lexiconTool.outputLexiconJSON();
+    lexiconTool.outputLexiconJSON();
+    lexiconTool.outputAncientLexiconJSON();
     /* lexiconStore.list(Query.forList()).getItems().stream()
         .collect(groupingBy(Lexicon::getConstantsOnly)).entrySet().stream()
         .filter(e -> e.getValue().size() > 1)

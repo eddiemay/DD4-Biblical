@@ -163,7 +163,33 @@ public class HebrewConverter {
     return toConstantsOnly(text.toString());
   }
 
+  public static String unfinalize(String word) {
+    int lastIndex = word.length() - 1;
+    switch (word.charAt(lastIndex)) {
+      case 'ך': return word.substring(0, lastIndex) + 'כ';
+      case 'ם': return word.substring(0, lastIndex) + 'מ';
+      case 'ן': return word.substring(0, lastIndex) + 'נ';
+      case 'ף': return word.substring(0, lastIndex) + 'פ';
+      case 'ץ': return word.substring(0, lastIndex) + 'צ';
+    }
+    return word;
+  }
+
+  public static String finalize(String word) {
+    int lastIndex = word.length() - 1;
+    switch (word.charAt(lastIndex)) {
+      case 'כ': return word.substring(0, lastIndex) + 'ך';
+      case 'מ': return word.substring(0, lastIndex) + 'ם';
+      case 'נ': return word.substring(0, lastIndex) + 'ן';
+      case 'פ': return word.substring(0, lastIndex) + 'ף';
+      case 'צ': return word.substring(0, lastIndex) + 'ץ';
+    }
+    return word;
+  }
+
   public static String toStrongsId(String strongsRef) {
+    if (strongsRef == null) return null;
+
     switch (strongsRef.length()) {
       case 2: return strongsRef.charAt(0) + "000" + strongsRef.substring(1);
       case 3: return strongsRef.charAt(0) + "00" + strongsRef.substring(1);

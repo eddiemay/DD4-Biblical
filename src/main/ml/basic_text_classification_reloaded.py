@@ -17,7 +17,7 @@ reloaded = tf.keras.models.load_model(
 examples = [
   "The movie was great!",
   "The movie was okay.",
-  "The movie was terrible...",
+  "The movie was absolute trash...",
   "This movie was good, so good. It is the best, just the absolute best. There has ever been a better movie in the history of the world.",
   "This movie is such trash, just the worse, the worse movie ever made, whoever made it is a stone cold loser."
 ]
