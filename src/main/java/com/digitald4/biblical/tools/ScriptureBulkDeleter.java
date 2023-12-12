@@ -6,6 +6,7 @@ import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.DAOApiImpl;
@@ -16,8 +17,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ScriptureBulkDeleter {
-  private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
-  private final static String API_VERSION = "v1";
   private final static String VERSE_COUNT_URL = "%s/verseCount?version=%s&language=%s&book=%s&chapter=%d";
   private final static String ID_FORMAT = "%s-%s-%s-%d-%d";
   private final APIConnector apiConnector;
@@ -103,7 +102,8 @@ public class ScriptureBulkDeleter {
         case "--idToken": idToken = args[++a]; break;
       }
     }
-    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken(idToken);
+    APIConnector apiConnector =
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken(idToken);
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
     new ScriptureBulkDeleter(apiConnector, dao).deleteDepcreatedVersions();
         // .delete(args.length < 1 || args[0].isEmpty() ? null : BibleBook.get(args[0]));

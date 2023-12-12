@@ -1,6 +1,8 @@
 package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
 import static java.util.Comparator.comparing;
@@ -14,9 +16,11 @@ import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.AncientLexiconFetcher;
+import com.digitald4.biblical.util.BPETokenizer;
+import com.digitald4.biblical.util.Constants;
+import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
-import com.digitald4.biblical.util.MachineTranslator.TokenWord;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
@@ -35,6 +39,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -250,8 +255,11 @@ public class LexiconTool {
   }
 
   private void outputLexiconJSON() throws IOException {
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/heb_vocab_strongs.txt"))) {
-      range(0, 9).boxed().flatMap(batch -> getLexicons(batch).stream())
+    ImmutableList<Lexicon> lexicons = range(0, 9).boxed()
+        .flatMap(batch -> getLexicons(batch).stream())
+        .collect(toImmutableList());
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_lexicon_strongs.txt"))) {
+      lexicons.stream()
           .map(TokenWord::from)
           .sorted(comparing(TokenWord::getStrongsId))
           .map(JSONObject::new)
@@ -266,11 +274,48 @@ public class LexiconTool {
   }
 
   private void outputAncientLexiconJSON() throws IOException {
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/heb_vocab_ancient_lexicon.txt"))) {
-      range(0, 23).boxed().flatMap(batch -> getAncientLexicons(batch).stream())
+    ImmutableList<AncientLexicon> ancientLexicons = range(0, 23).boxed()
+        .flatMap(batch -> getAncientLexicons(batch).stream())
+        .collect(toImmutableList());
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_lexicon_ancient.txt"))) {
+      ancientLexicons.stream()
           .flatMap(ancientLexicon -> TokenWord.from(ancientLexicon).stream())
           .sorted(comparing(TokenWord::getStrongsId))
           .map(JSONObject::new)
+          .forEach(json -> {
+            try {
+              bw.write(json + "\n");
+            } catch (IOException ioe) {
+              throw new DD4StorageException("Error writing value: " + json, ioe);
+            }
+          });
+    }
+  }
+
+  private static void outputLexiconOverridesJSON() throws IOException {
+    ImmutableSet<String> declared = Constants.VOCAB_FILES.stream()
+        .filter(file -> !file.equals("heb_vocab_overrides.txt"))
+        .flatMap(file -> TranslationTool.loadFromFile(file).stream())
+        .map(JSONObject::new)
+        .map(JSONObject::toString)
+        .collect(toImmutableSet());
+
+    ImmutableList<TokenWord> overrides = TranslationTool.loadFromFile("heb_vocab_overrides.txt");
+
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_overrides2.txt"));
+        BufferedWriter bw2 = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_overrides.txt"))) {
+      overrides
+          .stream()
+          .map(JSONObject::new)
+          .map(JSONObject::toString)
+          .peek(json -> {
+            try {
+              bw2.write(json + "\n");
+            } catch (IOException ioe) {
+              throw new DD4StorageException("Error writing value: " + json, ioe);
+            }
+          })
+          .filter(json -> !declared.contains(json))
           .forEach(json -> {
             try {
               bw.write(json + "\n");
@@ -295,6 +340,12 @@ public class LexiconTool {
     System.out.println("]");
   }
 
+  public static void findRoots(Iterable<Interlinear> interlinears) {
+    BPETokenizer bpeTokenizer = new BPETokenizer();
+    stream(interlinears).map(Interlinear::getConstantsOnly).forEach(bpeTokenizer::tokenize);
+    System.out.println(bpeTokenizer.getTokens());
+  }
+
   public static void main(String[] args) throws IOException {
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50);
     apiConnector.setIdToken("716656750");
@@ -313,15 +364,20 @@ public class LexiconTool {
         lexiconStore, lexiconFetcher, interlinearStore, bibleBookStore, ancientLexiconFetcher);
     // lexiconTool.printInterlinear("Gen 1:1-2,2:2-3");
 
-    System.out.println(lexiconStore.get("H997"));
+    // System.out.println(lexiconStore.get("H997"));
+
+    findRoots(lexiconTool.getReferences("strongsId", "H410", "H426", "H430", "H433"));
+    findRoots(lexiconTool.getReferences("strongsId", "H175"));
+
 
     int batchSize = 100;
     // range(0, 7000 / 100)
         // .forEach(s -> lexiconTool.migrateLexicon("G", s * batchSize + 1, (s + 1) * batchSize + 1));
     // lexiconTool.migrateLexicon("G", 6090, 6091);
 
-    lexiconTool.outputLexiconJSON();
-    lexiconTool.outputAncientLexiconJSON();
+    // lexiconTool.outputLexiconJSON();
+    // lexiconTool.outputAncientLexiconJSON();
+    outputLexiconOverridesJSON();
     /* lexiconStore.list(Query.forList()).getItems().stream()
         .collect(groupingBy(Lexicon::getConstantsOnly)).entrySet().stream()
         .filter(e -> e.getValue().size() > 1)
@@ -341,7 +397,9 @@ public class LexiconTool {
         .flatMapToInt(book -> range(1, book.getChapterCount() + 1).map(c -> lexiconTool.deleteInterlinear(book.name(), c)))
         .sum()); */
 
-    lexiconFetcher.fetchInterlinear(bibleBookStore.get("Song of Solomon"), 1);
+    // lexiconFetcher.fetchInterlinear(bibleBookStore.get("Song of Solomon"), 1);
+
+
 
     // lexiconTool.migrateInterlinear("Judges", 21);
 

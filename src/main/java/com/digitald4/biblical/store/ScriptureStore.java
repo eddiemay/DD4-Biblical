@@ -17,6 +17,7 @@ import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
+import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.LanguageRequest;
@@ -53,18 +54,20 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final ScriptureFetcher scriptureFetcher;
   private final InterlinearStore interlinearStore;
+  private final MachineTranslator machineTranslator;
 
   @Inject
   public ScriptureStore(
       Provider<DAO> daoProvider, SearchIndexer searchIndexer, BibleBookStore bibleBookStore,
       ScriptureReferenceProcessor scriptureRefProcessor, ScriptureFetcher scriptureFetcher,
-      InterlinearStore interlinearStore) {
+      InterlinearStore interlinearStore, MachineTranslator machineTranslator) {
     super(Scripture.class, daoProvider);
     this.searchIndexer = searchIndexer;
     this.bibleBookStore = bibleBookStore;
     this.scriptureRefProcessor = scriptureRefProcessor;
     this.scriptureFetcher = scriptureFetcher;
     this.interlinearStore = interlinearStore;
+    this.machineTranslator = machineTranslator;
   }
 
   public GetOrSearchResponse getScriptures(String version, String language, String reference) {
@@ -123,6 +126,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
                     .getItems().stream().collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
 
             return interlinearStore.getInterlinear(verseRange).stream()
+                .peek(machineTranslator::translate)
                 .collect(groupingBy(Interlinear::getVerse)).values().stream()
                 .map(InterlinearScripture::new)
                 .peek(s -> InterlinearStore.fillDss(s, dssReferences.get(s.getVerse())));

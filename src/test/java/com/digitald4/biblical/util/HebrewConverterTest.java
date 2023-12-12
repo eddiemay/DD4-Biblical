@@ -30,4 +30,9 @@ public class HebrewConverterTest {
     assertThat(HebrewConverter.toConstantsOnly("וַיְבָ֤רֶךְ אֱלֹהִים֙ אֶת־יֹ֣ום הַשְּׁבִיעִ֔י וַיְקַדֵּ֖שׁ אֹתֹ֑ו כִּ֣י בֹ֤ו שָׁבַת֙ מִכָּל־מְלַאכְתֹּ֔ו אֲשֶׁר־בָּרָ֥א אֱלֹהִ֖ים לַעֲשֹֽׂות׃ פ"))
         .isEqualTo("ויברך אלהים את יום השביעי ויקדש אתו כי בו שבת מכל מלאכתו אשר ברא אלהים לעשות");
   }
+
+  @Test
+  public void toContantsOnly_removesHidden() {
+    assertThat(HebrewConverter.toConstantsOnly("פָּנָֽ֗יַ\u202A\u202C")).isEqualTo("פני");
+  }
 }

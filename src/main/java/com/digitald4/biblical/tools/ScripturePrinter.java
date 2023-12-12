@@ -15,8 +15,6 @@ import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 
 public class ScripturePrinter {
-  private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
-  private final static String API_VERSION = "v1";
   public static void main(String[] args) {
     String version = "ISR";
     String language = "interlaced";
@@ -35,7 +33,8 @@ public class ScripturePrinter {
         default: reference = args[a];
       }
     }
-    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken(idToken);
+    APIConnector apiConnector =
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken(idToken);
     DAO dao = useApi ? new DAOApiImpl(apiConnector)
         : new DAOTestingImpl(new ChangeTracker(null, null, new SearchIndexer() {
             @Override
@@ -63,7 +62,7 @@ public class ScripturePrinter {
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherSefariaOrg(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)),
-        null);
+        null, null);
 
     scriptureStore.getScriptures(version, language, reference).getItems()
         .forEach(System.out::println);

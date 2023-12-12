@@ -1,10 +1,13 @@
 package com.digitald4.biblical.server;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Arrays.stream;
+
 import com.digitald4.biblical.model.HighScore;
-import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.Annotations.FetchInterlinearByVerse;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.util.*;
+import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.model.User;
 import com.digitald4.common.server.APIConnector;
@@ -20,8 +23,10 @@ import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.SessionStore;
 import com.digitald4.common.storage.Store;
 import com.digitald4.common.storage.UserStore;
+import com.digitald4.common.util.JSONUtil;
 import com.digitald4.common.util.ProviderThreadLocalImpl;
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 
 import java.time.Duration;
@@ -79,5 +84,17 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						LexiconService.class,
 						LessonService.class,
 						ScriptureService.class));
+	}
+
+	@Provides
+	public static Iterable<TokenWord> tokenWordProvider() {
+		APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
+		return Constants.VOCAB_FILES.stream()
+				.map(file -> String.format("http://dd4-biblical.appspot.com/ml/%s", file))
+				.map(apiConnector::sendGet)
+				.flatMap(result -> stream(result.split("\n")))
+				.filter(line -> !line.startsWith("*"))
+				.map(line -> JSONUtil.toObject(TokenWord.class, line))
+				.collect(toImmutableList());
 	}
 }

@@ -112,7 +112,7 @@ public class Interlinear {
   }
 
   public Interlinear setStrongsId(String strongsId) {
-    this.strongsId = strongsId;
+    this.strongsId = HebrewConverter.toStrongsId(strongsId);
     return this;
   }
 
@@ -121,7 +121,7 @@ public class Interlinear {
   }
 
   public Interlinear setConstantsOnly(String constantsOnly) {
-    this.constantsOnly = constantsOnly;
+    this.constantsOnly = HebrewConverter.toConstantsOnly(constantsOnly);
     return this;
   }
 

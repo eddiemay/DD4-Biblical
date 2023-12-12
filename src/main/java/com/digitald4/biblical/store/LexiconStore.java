@@ -1,8 +1,5 @@
 package com.digitald4.biblical.store;
 
-
-import static com.digitald4.biblical.util.HebrewConverter.toStrongsId;
-
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.common.storage.DAO;
@@ -24,8 +21,10 @@ public class LexiconStore extends GenericStore<Lexicon, String> {
 
   @Override
   public Lexicon get(String strongsId) {
-    ImmutableList<Lexicon> results =
-        list(Query.forList(Filter.of("id", toStrongsId(strongsId)))).getItems();
+    if (strongsId == null) {
+      return null;
+    }
+    ImmutableList<Lexicon> results = list(Query.forList(Filter.of("id", strongsId))).getItems();
     if (results.isEmpty()) {
       return create(lexiconFetcher.getLexicon(strongsId));
     }

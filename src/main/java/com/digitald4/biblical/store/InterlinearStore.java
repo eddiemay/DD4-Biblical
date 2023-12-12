@@ -20,7 +20,6 @@ import com.digitald4.common.util.Calculate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,7 +59,7 @@ public class InterlinearStore extends GenericStore<Interlinear, String> {
                 Filter.of("verse", "<=", vr.getEndVerse()))
             .setOrderBys(OrderBy.of("verse")))
         .getItems().stream()
-        .sorted(Comparator.comparing(Interlinear::getVerse).thenComparing(Interlinear::getIndex))
+        .sorted(comparing(Interlinear::getVerse).thenComparing(Interlinear::getIndex))
         .collect(toImmutableList());
 
     if (interlinears.isEmpty()) {

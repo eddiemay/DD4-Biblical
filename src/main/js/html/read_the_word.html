@@ -104,25 +104,27 @@
                             <a data-ng-if="script.book == 'Isaiah'" href="" data-ng-click="$ctrl.showScroll(script)" title="View Scroll">📜</a>
                           </div>
                           <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
-                            <tr>
-                              <td class="strongs" data-ng-class="interlinear.highlight">
-                                <a href="" data-ng-click="$ctrl.showStrongsDefs(interlinear.strongsId)">
-                                  {{interlinear.strongsId || '-'}}
-                                </a>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td class="translit">
-                                <a href="" data-ng-click="$ctrl.showStrongsRefs(interlinear)">
-                                  {{interlinear.transliteration}}
-                                </a>
-                              </td>
-                            </tr>
+                            <tr><td class="strongs" data-ng-class="interlinear.highlight">
+                              <a href="" data-ng-click="$ctrl.showStrongsDefs(interlinear.strongsId)">
+                                {{interlinear.strongsId || '-'}}
+                              </a>
+                            </td></tr>
+                            <tr><td class="translit">
+                              <a href="" data-ng-click="$ctrl.showStrongsRefs(interlinear)">
+                                {{interlinear.transliteration}}
+                              </a>
+                            </td></tr>
                             <tr><td class="hebrew">{{interlinear.word}}</td></tr>
                             <tr data-ng-if="interlinear.dssDiff">
                               <td class="hebrew" data-bind-html-compile="interlinear.dssDiff"></td>
                             </tr>
                             <tr><td class="eng">{{interlinear.translation}}</td></tr>
+                            <tr data-ng-if="interlinear.subTokens"><td class="hebrew">
+                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.word}} </span>
+                            </td></tr>
+                            <tr data-ng-if="interlinear.subTokens"><td class="eng">
+                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.translation}}</span>
+                            </td></tr>
                             <tr><td class="strongsnt">{{interlinear.morphology}}</td></tr>
                           </table>
                         </div>
@@ -243,9 +245,6 @@
           <div class="colx3-center">
             <button class="float-center" data-ng-click="$ctrl.nextStrongsDefs()">Next</button>
           </div>
-          <div class="colx3-right">
-            <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
-          </div>
         </div>
         <div class="columns">
           <div class="colx3-left">
@@ -253,6 +252,9 @@
           </div>
           <div class="colx3-center">
             <button data-ng-click="$ctrl.showStrongsDefs()">Show</button>
+          </div>
+          <div class="colx3-right">
+            <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
           </div>
         </div>
       </div>

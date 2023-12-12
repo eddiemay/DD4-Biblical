@@ -47,7 +47,7 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
 
   @Override
   public Lexicon getLexicon(String strongsId) {
-    // System.out.println("Fetching: " + strongsId);
+    System.out.println("Fetching: " + strongsId);
     String htmlResult = apiConnector.sendGet(String.format(URL, strongsId));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     String modern = doc.getElementsByClass("lexTitle" + (strongsId.startsWith("H") ? "Hb" : "GK"))

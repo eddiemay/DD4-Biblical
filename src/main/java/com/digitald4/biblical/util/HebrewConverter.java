@@ -155,7 +155,7 @@ public class HebrewConverter {
   }
 
   public static String toConstantsOnly(String text) {
-    return removePunctuation(text).chars().filter(c -> c < 1425 || c > 1479)
+    return removePunctuation(text).chars().filter(c -> (c < 1425 || c > 1479) && c != '\u202A' && c != '\u202C')
         .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
   }
 

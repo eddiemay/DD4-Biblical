@@ -1,27 +1,22 @@
 package com.digitald4.biblical.util;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
-import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
 
-import com.digitald4.biblical.util.MachineTranslator.TokenWord;
-import com.digitald4.biblical.util.MachineTranslator.TokenWord.TokenType;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableSet;
 
 public class SubwordTokenizer {
   public static final String UNKNOWN_WORD_DEFAULT = "[UNK]";
-  private final ImmutableListMultimap<String, TokenType> tokenMap;
+  private final ImmutableSet<String> tokenList;
   private final ImmutableList<String> unknownReturn;
 
-  public SubwordTokenizer(Iterable<TokenWord> tokenList, String unknownWord) {
-    this.tokenMap = stream(tokenList)
-        .collect(toImmutableListMultimap(TokenWord::getWord, TokenWord::tokenType));
+  public SubwordTokenizer(Iterable<String> tokenList, String unknownWord) {
+    this.tokenList = ImmutableSet.copyOf(tokenList);
     this.unknownReturn = unknownWord == null ? null : ImmutableList.of(unknownWord);
   }
 
-  public SubwordTokenizer(Iterable<TokenWord> tokenList) {
+  public SubwordTokenizer(Iterable<String> tokenList) {
     this(tokenList, UNKNOWN_WORD_DEFAULT);
   }
 
@@ -42,12 +37,8 @@ public class SubwordTokenizer {
     int strLen = word.length();
     for (int len = strLen; len > 0; len--) {
       for (int start = 0; start + len <= strLen; start++) {
-        String subword = word.substring(start, start + len);
-        ImmutableList<TokenType> tokenTypes = tokenMap.get(subword);
-        if (!tokenTypes.isEmpty()) {
-          if (isSuffix && tokenTypes.stream().allMatch(tt -> tt == TokenType.PREFIX_ONLY)) {
-            continue;
-          }
+        String subword = (start > 0 || isSuffix ? "##" : "") + word.substring(start, start + len);
+        if (tokenList.contains(subword)) {
           ImmutableList<String> pretokens;
           if (start > 0) {
             pretokens = tokenizeWord(word.substring(0, start), isSuffix);

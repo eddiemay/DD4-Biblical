@@ -2,13 +2,12 @@ package com.digitald4.biblical.tools;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOApiImpl;
 import java.util.stream.IntStream;
 
 public class ScriptureMigrater {
-  private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
-  private final static String API_VERSION = "v1";
   private final static String URL = "%s/migrateScriptures?version=%s&book=%s&chapter=%d";
   private final APIConnector apiConnector;
   private final BibleBookStore bibleBookStore;
@@ -43,7 +42,7 @@ public class ScriptureMigrater {
       System.exit(1);
     }
 
-    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100);
+    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> new DAOApiImpl(apiConnector));
 
     new ScriptureMigrater(apiConnector).migrate(

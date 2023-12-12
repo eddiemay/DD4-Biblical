@@ -1,0 +1,165 @@
+{"strongsId":"H0215","root":"האיר","translation":"shine"}
+{"strongsId":"H0259","root":"אחד","translation":"united"}
+{"strongsId":"H0311","root":"אחרי","translation":"after"}
+{"strongsId":"H0311","root":"from~","translation":"after"}
+{"strongsId":"H0311","root":"אחר","translation":"after"}
+{"strongsId":"H0312","root":"אחר","translation":"other"}
+{"strongsId":"H0312","root":"אחרי","translation":"other"}
+{"strongsId":"H0400","root":"אוכל","translation":"food"}
+{"strongsId":"H0402","root":"אכלה","translation":"food"}
+{"strongsId":"H0426","root":"אלוה","translation":"Mighty One"}
+{"strongsId":"H0426","root":"אלה","translation":"Mighty One"}
+{"strongsId":"H0430","root":"אלוה","translation":"Mighty One"}
+{"strongsId":"H0430","root":"אלה","translation":"Mighty One"}
+{"strongsId":"H0559","root":"אמר","translation":"said"}
+{"strongsId":"H0852","root":"את","translation":"you"}
+{"strongsId":"H0853","root":"את","translation":"you"}
+{"strongsId":"H0854","root":"את","translation":"you"}
+{"strongsId":"H0859(X4)","root":"אתמ","translation":"them"}
+{"strongsId":"H0859","root":"אתה","translation":"you"}
+{"strongsId":"H0905","root":"בד","translation":"alone"}
+{"strongsId":"H0914","root":"בדיל","translation":"separation"}
+{"strongsId":"H0914","root":"מבדיל","translation":"division"}
+{"strongsId":"H1254","root":"ברא","translation":"created"}
+{"strongsId":"H1419","root":"גדל","translation":"great"}
+{"strongsId":"H1961","root":"היתה","translation":"was"}
+{"strongsId":"H1961","root":"הי","translation":"will be"}
+{"strongsId":"H1961","root":"יהי","translation":"let there be"}
+{"strongsId":"H1961","root":"והיו","translation":"and let it be"}
+{"strongsId":"H1961","root":"ויהי","translation":"and there came to be"}
+{"strongsId":"H2100","root":"זב","translation":"flow"}
+{"strongsId":"H2142","root":"זכור","translation":"remember"}
+{"strongsId":"H2142","root":"זכיר","translation":"remember"}
+{"strongsId":"H2232","root":"זריע","translation":"sowing"}
+{"strongsId":"H3004","root":"יבשה","translation":"dry land"}
+{"strongsId":"H3068","root":"יהוה","translation":"יהוה"}
+{"strongsId":"H3117","root":"ימ","translation":"day"}
+{"strongsId":"H3117","root":"ימימ","translation":"days"}
+{"strongsId":"H3220","root":"הימ","translation":"the sea"}
+{"strongsId":"H3220","root":"ימימ","translation":"seas"}
+{"strongsId":"H3289","root":"יועצ","translation":"counselor"}
+{"strongsId":"H3318","root":"וצא","translation":"bring out"}
+{"strongsId":"H3487","root":"את","translation":"you"}
+{"strongsId":"H3588","root":"כי","translation":"for"}
+{"strongsId":"H3966","root":"מאד","translation":"very"}
+{"strongsId":"H3974","root":"מאר","translation":"light source"}
+{"strongsId":"H4150","root":"מועד","translation":"feast"}
+{"strongsId":"H4151","root":"מועד","translation":"feast"}
+{"strongsId":"H4325","root":"מימ","translation":"waters"}
+{"strongsId":"H4427","root":"מלכ","translation":"king"}
+{"strongsId":"H4475","root":"ממשלה","translation":"dominate"}
+{"strongsId":"H6391","root":"מבדיל","translation":"division"}
+{"strongsId":"H4723","root":"מקוה","translation":"collection"}
+{"strongsId":"H4725","root":"מקו","translation":"place"}
+{"strongsId":"H4725","root":"מקומ","translation":"places"}
+{"strongsId":"H5128","root":"נע","translation":"shake"}
+{"strongsId":"H5414","root":"תנ","translation":"set"}
+{"strongsId":"H5414","root":"נתת","translation":"given"}
+{"strongsId":"H5703","root":"עד","translation":"forever"}
+{"strongsId":"H5704","root":"עד","translation":"until"}
+{"strongsId":"H5774","root":"עופפ","translation":"fly"}
+{"strongsId":"H6153","root":"ערב","translation":"evening"}
+{"strongsId":"H6155","root":"ערב","translation":"evening"}
+{"strongsId":"H6213","root":"עשה","translation":"made"}
+{"strongsId":"H6213","root":"עש","translation":"made"}
+{"strongsId":"H6382","root":"פלא","translation":"wonderful"}
+{"strongsId":"H6440","root":"פני","translation":"face"}
+{"strongsId":"H6440","root":"פני","translation":"face"}
+{"strongsId":"H6509","root":"פר","translation":"fruitful"}
+{"strongsId":"H6960","root":"יקוו","translation":"let be gathered"}
+{"strongsId":"H7200","root":"רא","translation":"saw"}
+{"strongsId":"H7363","root":"מרחפת","translation":"hovering"}
+{"strongsId":"H7430","root":"רומש","translation":"that creeps"}
+{"strongsId":"H7782","root":"שפר","translation":"trumpet"}
+{"strongsId":"H7812","root":"שתח","translation":"worship"}
+{"strongsId":"H8064","root":"שמימ","translation":"heavens"}
+{"strongsId":"H8141","root":"שנימ","translation":"years"}
+{"strongsId":"H8147","root":"שני","translation":"two"}
+{"strongsId":"H8147","root":"שתי","translation":"two"}
+{"strongsId":"H8414","root":"תהו","translation":"formless"}
+{"strongsId":"H8478","root":"מתחת","translation":"under"}
+{"strongsId":"H0021","root":"אבי","translation":"father"}
+{"strongsId":"H0175","root":"אהרנ","translation":"Aaron"}
+{"strongsId":"H0215","root":"האיר","translation":"shine"}
+{"strongsId":"H0217","root":"אור","translation":"fire"}
+{"strongsId":"H0259","root":"אחד","translation":"united"}
+{"strongsId":"H0402","root":"אכלה","translation":"food"}
+{"strongsId":"H0430","root":"אלהימ","translation":"Mighty Ones"}
+{"strongsId":"H0433","root":"אלוה","translation":"Mighty One"}
+{"strongsId":"H0518","root":"אמ","translation":"if"}
+{"strongsId":"H0559","root":"אמר","translation":"said"}
+{"strongsId":"H0595","root":"אנכי","translation":"I am"}
+{"strongsId":"H0852","root":"אתת","translation":"sign"}
+{"strongsId":"H0853","root":"את","translation":"you"}
+{"strongsId":"H0859","root":"אתה","translation":"you"}
+{"strongsId":"H0914","root":"בדיל","translation":"separation"}
+{"strongsId":"H0914","root":"מבדיל","translation":"distinction"}
+{"strongsId":"H1254","root":"ברא","translation":"created"}
+{"strongsId":"H1431","root":"גדל","translation":"great"}
+{"strongsId":"H1710","root":"דגת","translation":"fish"}
+{"strongsId":"H2416","root":"חיתו","translation":"his life"}
+{"strongsId":"H2421","root":"חיה","translation":"life"}
+{"strongsId":"H3004","root":"יבשה","translation":"dry land"}
+{"strongsId":"H3068","root":"יהוה","translation":"יהוה"}
+{"strongsId":"H3069","root":"יהוה","translation":"יהוה"}
+{"strongsId":"H3117","root":"ימימ","translation":"days"}
+{"strongsId":"H3119","root":"יוממ","translation":"days"}
+{"strongsId":"H3220","root":"ימימ","translation":"seas"}
+{"strongsId":"H3221","root":"ימימ","translation":"seas"}
+{"strongsId":"H3222","root":"ימימ","translation":"seas"}
+{"strongsId":"H3289","root":"יועצ","translation":"counselor"}
+{"strongsId":"H3381","root":"ירד","translation":"set down"}
+{"strongsId":"H3533","root":"כבשה","translation":"subdue"}
+{"strongsId":"H3588","root":"כי","translation":"for"}
+{"strongsId":"H3615","root":"כלו","translation":"completed"}
+{"strongsId":"H3794","root":"כתימ","translation":"Chittim"}
+{"strongsId":"H3838","root":"לבנה","translation":"Lebanah"}
+{"strongsId":"H3866","root":"לודיי","translation":"Ludim"}
+{"strongsId":"H3924","root":"לולי","translation":"loop"}
+** {"strongsId":"H3974","root":"מאור","translation":"luminary"}
+** {"strongsId":"H3974","root":"מאר","translation":"luminary"}
+{"strongsId":"H4150","root":"מועד","translation":"appointed time"}
+{"strongsId":"H4183","root":"מורשתי","translation":"Morasthite"}
+{"strongsId":"H4208","root":"מזלות","translation":"constellation"}
+{"strongsId":"H4216","root":"מזרה","translation":"Mazzaroth"}
+{"strongsId":"H4325","root":"מימ","translation":"waters"}
+{"strongsId":"H4399","root":"מלאכת","translation":"work"}
+{"strongsId":"H4442","root":"צדק","translation":"Zedek"}
+{"strongsId":"H4723","root":"מקוה","translation":"collection"}
+{"strongsId":"H4725","root":"מקו","translation":"place"}
+{"strongsId":"H5019","root":"נבוכדנאצר","translation":"Nebuchadnezzar"}
+{"strongsId":"H5414","root":"נתנ","translation":"given"}
+{"strongsId":"H5414","root":"תנ","translation":"set"}
+{"strongsId":"H5414","root":"נתת","translation":"given"}
+{"strongsId":"H5774","root":"עופפ","translation":"fly"}
+{"strongsId":"H5775","root":"עופ","translation":"bird"}
+{"strongsId":"H5973","root":"עמ","translation":"with"}
+{"strongsId":"H6153","root":"ערב","translation":"evening"}
+{"strongsId":"H6213","root":"עש","translation":"made"}
+{"strongsId":"H6213","root":"עשה","translation":"create"}
+{"strongsId":"H6213","root":"עשות","translation":"accomplish"}
+{"strongsId":"H6382","root":"פלא","translation":"wonderful"}
+{"strongsId":"H6509","root":"פרו","translation":"increase"}
+{"strongsId":"H7235","root":"רבו","translation":"multiply"}
+{"strongsId":"H7235","root":"ירב","translation":"let multiply"}
+{"strongsId":"H7287","root":"רדו","translation":"rule"}
+{"strongsId":"H7430","root":"רומש","translation":"that move"}
+{"strongsId":"H7673","root":"שבת","translation":"shabbat"}
+{"strongsId":"H7674","root":"שבת","translation":"shabbat"}
+{"strongsId":"H7675","root":"שבת","translation":"shabbat"}
+{"strongsId":"H7676","root":"שבת","translation":"shabbat"}
+{"strongsId":"H8064","root":"שמימ","translation":"heavens"}
+{"strongsId":"H8141","root":"ושנימ","translation":"and years"}
+{"strongsId":"H8147","root":"שני","translation":"two"}
+{"strongsId":"H8414","root":"תהו","translation":"formless"}
+{"strongsId":"H1961","root":"הי","translation":"will be"}
+{"strongsId":"H1961","root":"יהי","translation":"let there be"}
+{"strongsId":"H1961","root":"והיו","translation":"and let it be"}
+{"strongsId":"H1961","root":"ויהי","translation":"and there came to be"}
+{"strongsId":"H1961","root":"היתה","translation":"was"}
+{"strongsId":"H8317","root":"ישרצו","translation":"let abound"}
+{"strongsId":"H8317","root":"שרצו","translation":"abound"}
+{"strongsId":"H6440","root":"פני","translation":"face"}
+{"strongsId":"H7200","root":"רא","translation":"saw"}
+{"strongsId":"H7363","root":"מרחפת","translation":"was hovering"}
+{"strongsId":"H3318","root":"וצא","translation":"out"}

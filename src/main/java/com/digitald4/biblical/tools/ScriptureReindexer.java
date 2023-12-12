@@ -3,6 +3,7 @@ package com.digitald4.biblical.tools;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOApiImpl;
 import com.google.common.collect.ImmutableSet;
@@ -11,8 +12,6 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class ScriptureReindexer {
-  private final static String API_URL = "https://dd4-biblical.appspot.com/_api";
-  private final static String API_VERSION = "v1";
   private final static String URL = "%s/reindex?version=%s&book=%s&chapter=%d&lang=en";
   private final APIConnector apiConnector;
   private final BibleBookStore bibleBookStore;
@@ -46,7 +45,7 @@ public class ScriptureReindexer {
       System.exit(1);
     }
 
-    new ScriptureReindexer(new APIConnector(API_URL, API_VERSION, 100)).reindex(
+    new ScriptureReindexer(new APIConnector(Constants.API_URL, Constants.API_VERSION, 100)).reindex(
         args[0],
         Arrays.stream(args)
             .skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));

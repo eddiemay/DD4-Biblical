@@ -190,6 +190,9 @@ public class Lexicon extends ModelObject<String> {
         if (translation.contains(",")) {
           translation = translation.substring(0, translation.indexOf(','));
         }
+        if (translation.contains(" = ")) {
+          translation = translation.substring(0, translation.indexOf(" = "));
+        }
         return translation;
       }
     }

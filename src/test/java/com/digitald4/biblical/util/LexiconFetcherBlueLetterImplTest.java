@@ -108,8 +108,8 @@ public class LexiconFetcherBlueLetterImplTest {
         lexiconFetcher.fetchInterlinear(new BibleBook().setName("Psalms"), 117);
 
     assertThat(interlinears.stream().map(Interlinear::getStrongsId).collect(toList()))
-        .containsExactly("H1984", "H853", "H3068", "H3605", "H1471", "H7623", "H3605", "H523",
-            "H3588", "H1396", "H5921", "H2617", "H571", "H3068", "H5769", "H1984", "H3050");
+        .containsExactly("H1984", "H0853", "H3068", "H3605", "H1471", "H7623", "H3605", "H0523",
+            "H3588", "H1396", "H5921", "H2617", "H0571", "H3068", "H5769", "H1984", "H3050");
 
     assertThat(interlinears.stream().map(Interlinear::getTransliteration).collect(toList()))
         .containsExactly("hal·lū", "’eṯ-", "Yah·weh", "kāl-", "gō·w·yim;", "bə·ḥū·hū,", "kāl-",
@@ -249,8 +249,8 @@ public class LexiconFetcherBlueLetterImplTest {
         lexiconFetcher.fetchInterlinear(new BibleBook().setName("Isaiah"), 8, 3);
 
     assertThat(interlinears.stream().map(Interlinear::getStrongsId).collect(toList()))
-        .containsExactly("H7126", "H413", "H5031", "H2029", "H3205", "H1121", "H559", "H3068",
-            "H413", "H7121", "H8034", null, "H4122", null, null);
+        .containsExactly("H7126", "H0413", "H5031", "H2029", "H3205", "H1121", "H0559", "H3068",
+            "H0413", "H7121", "H8034", null, "H4122", null, null);
 
     assertThat(interlinears.stream().map(Interlinear::getTranslation).collect(toList()))
         .containsExactly("And I went", "to", "the prophetess", "and she conceived", "and bore", "a son",

@@ -19,6 +19,8 @@ import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
+import com.digitald4.biblical.util.BPETokenizer;
+import com.digitald4.biblical.util.Constants;
 import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.LexiconFetcher;
@@ -52,9 +54,6 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Diff;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
 
 public class DiffStats {
-  private final static String BASE_URL = "https://dd4-biblical.appspot.com";
-  private final static String API_URL = BASE_URL + "/_api";
-  private final static String API_VERSION = "v1";
   private final static String DB_FILE = "data/Isaiah-Hebrew.db";
 
   private final ScriptureStore scriptureStore;
@@ -92,12 +91,14 @@ public class DiffStats {
   }
 
   public void printWordStats(String version) {
+    BPETokenizer bpeTokenizer = new BPETokenizer();
     ImmutableList<String> totalWords = IntStream.range(1, 67)
         .boxed()
         .flatMap(c -> scriptureStore.getScriptures(version, "he", String.format("Isa %d", c)).getItems().stream())
         .map(Scripture::getText)
         .map(HebrewConverter::removePunctuation)
         .flatMap(text -> Arrays.stream(text.split(" ")))
+        .peek(bpeTokenizer::tokenize)
         .collect(toImmutableList());
     System.out.printf("%d total words in the %s book of Isaiah\n", totalWords.size(), version);
 
@@ -106,6 +107,8 @@ public class DiffStats {
 
     wordCounts.entrySet().stream().sorted(Entry.comparingByValue(reverseOrder()))
         .limit(21).forEach(System.out::println);
+
+    System.out.println("Root words: " + bpeTokenizer.getTokens().subList(0, 100));
   }
 
   public void fillDssWords() {
@@ -116,7 +119,8 @@ public class DiffStats {
 
   public static void main(String[] args) throws IOException {
     long startTime = System.currentTimeMillis();
-    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 100).setIdToken("39284720");
+    APIConnector apiConnector =
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken("39284720");
     DAOFileBasedImpl dao = new DAOFileBasedImpl(DB_FILE).loadFromFile();
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
@@ -138,7 +142,7 @@ public class DiffStats {
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherSefariaOrg(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)),
-        interlinearStore);
+        interlinearStore, null);
 
     scriptureStore.getScriptures("DSS", "he", "Isa 64:1");
 
@@ -374,7 +378,7 @@ public class DiffStats {
 
   private static String createLink(Iterable<Interlinear> interlinears) {
     return String.format("%s/#/read_the_word?highlight=%s&reference=Isa%%20%s&lang=interlinear",
-        BASE_URL, interlinears.iterator().next().getStrongsId(),
+        Constants.BASE_URL, interlinears.iterator().next().getStrongsId(),
         stream(interlinears).limit(7).map(s -> s.getChapter() + ":" + s.getVerse()).collect(joining(";")));
   }
 

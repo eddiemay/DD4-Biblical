@@ -47,8 +47,8 @@ public class ScriptureStoreTest {
 
   @Before
   public void setup() {
-    scriptureStore = new ScriptureStore(
-        () -> dao, searchIndexer, bibleBookStore, scriptureRefProcessor, scriptureFetcher, null);
+    scriptureStore = new ScriptureStore(() -> dao,
+        searchIndexer, bibleBookStore, scriptureRefProcessor, scriptureFetcher, null, null);
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).then(
         i -> getScriptures(i.getArgument(1)));
