@@ -4,7 +4,7 @@
 {"strongsId":"H0215","root":"האיר","translation":"shine"}
 {"strongsId":"H0215","root":"האיר","translation":"shine"}
 {"strongsId":"H0217","root":"אור","translation":"fire"}
-** {"strongsId":"H0259","root":"אחד","translation":"united"}
+{"strongsId":"H0259","root":"אחד","translation":"united"}
 {"strongsId":"H0310","root":"אחר","translation":"after"}
 {"strongsId":"H0311","root":"אחרי","translation":"after"}
 {"strongsId":"H0311","root":"אחר","translation":"after"}
