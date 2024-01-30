@@ -19,8 +19,10 @@ import com.digitald4.biblical.util.AncientLexiconFetcher;
 import com.digitald4.biblical.util.BPETokenizer;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
+import com.digitald4.biblical.util.InterlinearFetcher;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
+import com.digitald4.biblical.util.ScriptureFetcherBibleHub;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
@@ -56,16 +58,18 @@ public class LexiconTool {
   private final LexiconStore lexiconStore;
   private final LexiconFetcher lexiconFetcher;
   private final InterlinearStore interlinearStore;
+  private final InterlinearFetcher interlinearFetcher;
   private final BibleBookStore bibleBookStore;
   private final AncientLexiconFetcher ancientLexiconFetcher;
 
   LexiconTool(APIConnector apiConnector, LexiconStore lexiconStore, LexiconFetcher lexiconFetcher,
-      InterlinearStore interlinearStore, BibleBookStore bibleBookStore,
-      AncientLexiconFetcher ancientLexiconFetcher) {
+      InterlinearStore interlinearStore, InterlinearFetcher interlinearFetcher,
+      BibleBookStore bibleBookStore, AncientLexiconFetcher ancientLexiconFetcher) {
     this.apiConnector = apiConnector;
     this.lexiconStore = lexiconStore;
     this.lexiconFetcher = lexiconFetcher;
     this.interlinearStore = interlinearStore;
+    this.interlinearFetcher = interlinearFetcher;
     this.bibleBookStore = bibleBookStore;
     this.ancientLexiconFetcher = ancientLexiconFetcher;
   }
@@ -119,7 +123,8 @@ public class LexiconTool {
 
   public void printInterlinear(String scripture) {
     AtomicReference<String> currentScripture = new AtomicReference<>();
-    interlinearStore.getInterlinear(scripture)
+    interlinearFetcher.fetchInterlinear(new BibleBook().setName("Ezra"), 10)
+    //interlinearStore.getInterlinear(scripture)
         .forEach(inter -> {
           String script =
               String.format("%s %d:%d", inter.getBook(), inter.getChapter(), inter.getVerse());
@@ -302,20 +307,13 @@ public class LexiconTool {
 
     ImmutableList<TokenWord> overrides = TranslationTool.loadFromFile("heb_vocab_overrides.txt");
 
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_overrides2.txt"));
-        BufferedWriter bw2 = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_overrides.txt"))) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_overrides.txt"))) {
       overrides
           .stream()
+          .sorted(comparing(TokenWord::getStrongsId))
           .map(JSONObject::new)
           .map(JSONObject::toString)
-          .peek(json -> {
-            try {
-              bw2.write(json + "\n");
-            } catch (IOException ioe) {
-              throw new DD4StorageException("Error writing value: " + json, ioe);
-            }
-          })
-          .filter(json -> !declared.contains(json))
+          // .filter(json -> !declared.contains(json))
           .forEach(json -> {
             try {
               bw.write(json + "\n");
@@ -351,18 +349,19 @@ public class LexiconTool {
     apiConnector.setIdToken("716656750");
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
-    LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector, true);
+    LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
+    InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
     ScriptureReferenceProcessor referenceProcessor =
         new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     InterlinearStore interlinearStore =
-        new InterlinearStore(() -> fileDao, referenceProcessor, lexiconFetcher);
+        new InterlinearStore(() -> fileDao, referenceProcessor, interlinearFetcher);
     DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
     AncientLexiconFetcher ancientLexiconFetcher = new AncientLexiconFetcher(apiConnector);
-    LexiconTool lexiconTool = new LexiconTool(apiConnector,
-        lexiconStore, lexiconFetcher, interlinearStore, bibleBookStore, ancientLexiconFetcher);
-    // lexiconTool.printInterlinear("Gen 1:1-2,2:2-3");
+    LexiconTool lexiconTool = new LexiconTool(apiConnector, lexiconStore, lexiconFetcher,
+        interlinearStore, interlinearFetcher, bibleBookStore, ancientLexiconFetcher);
+    lexiconTool.printInterlinear("Judges 21");
 
     // System.out.println(lexiconStore.get("H997"));
 
@@ -377,7 +376,7 @@ public class LexiconTool {
 
     // lexiconTool.outputLexiconJSON();
     // lexiconTool.outputAncientLexiconJSON();
-    outputLexiconOverridesJSON();
+    // outputLexiconOverridesJSON();
     /* lexiconStore.list(Query.forList()).getItems().stream()
         .collect(groupingBy(Lexicon::getConstantsOnly)).entrySet().stream()
         .filter(e -> e.getValue().size() > 1)
@@ -387,9 +386,22 @@ public class LexiconTool {
 
     // Reindexed without chapter & verse: Gen-2Chr .
     // Reindexed correctly: Esra-Mal, -Psa, -Jer
+
+    // lexiconTool.reindexInterlinear("Ezra", 10);
     // lexiconTool.reindexInterlinear("Eze", "Mal");
     // IntStream.range(51, 151).forEach(chapter -> lexiconTool.reindexInterlinear("Psa", chapter));
     // lexiconTool.reindexInterlinear("Jer", 31);
+
+    Stream.of(bibleBookStore.get("Isa"), bibleBookStore.get("Ezra"))
+    /* bibleBookStore.getAllBooks().stream()
+        .filter(b -> b.getNumber() > 20 && b.getNumber() < 40
+            && !b.name().equals("Daniel") && !b.name().equals("Isaiah")
+            && !b.name().equals("Jeremiah") && !b.name().equals("Ezekiel")) */
+        .forEach(book -> {
+          int end = book.getChapterCount() + 1;
+          range(1, end).forEach(c -> lexiconTool.deleteInterlinear(book.name(), c));
+          range(1, end).forEach(c -> lexiconTool.reindexInterlinear(book.name(), c));
+        });
 
     /* System.out.println("Total records deleted: " + Stream
         .of(bibleBookStore.get("Matt"), bibleBookStore.get("Luke"), bibleBookStore.get("John"),

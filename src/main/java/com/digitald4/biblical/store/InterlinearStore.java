@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
-import com.digitald4.biblical.util.LexiconFetcher;
+import com.digitald4.biblical.util.InterlinearFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.storage.DAO;
@@ -30,17 +30,16 @@ import javax.inject.Provider;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
 
 public class InterlinearStore extends GenericStore<Interlinear, String> {
-
   private final ScriptureReferenceProcessor scriptureReferenceProcessor;
-  private final LexiconFetcher lexiconFetcher;
+  private final InterlinearFetcher interlinearFetcher;
 
   @Inject
   public InterlinearStore(Provider<DAO> daoProvider,
       ScriptureReferenceProcessor scriptureReferenceProcessor,
-      LexiconFetcher lexiconFetcher) {
+      InterlinearFetcher interlinearFetcher) {
     super(Interlinear.class, daoProvider);
     this.scriptureReferenceProcessor = scriptureReferenceProcessor;
-    this.lexiconFetcher = lexiconFetcher;
+    this.interlinearFetcher = interlinearFetcher;
   }
 
   public ImmutableList<Interlinear> getInterlinear(String scriptureReference) {
@@ -63,7 +62,8 @@ public class InterlinearStore extends GenericStore<Interlinear, String> {
         .collect(toImmutableList());
 
     if (interlinears.isEmpty()) {
-      interlinears = create(lexiconFetcher.fetchInterlinear(vr)).stream()
+      interlinears = create(interlinearFetcher.fetchInterlinear(vr.getBook(), vr.getChapter()))
+          .stream()
           .filter(i -> i.getVerse() >= vr.getStartVerse() && i.getVerse() <= vr.getEndVerse())
           .collect(toImmutableList());
     }

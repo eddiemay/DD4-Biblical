@@ -3,7 +3,7 @@ HolyDay = function(title, cssClass, matcher, references, summary) {
   this.cssClass = cssClass;
   this.matches = matcher;
   this.references = references;
-  this.summary = summary || '<inline-scripture ref="' + references + '"/>';
+  this.summary = '<inline-scripture ref="' + references + '"></inline-scripture>' + (summary || '');
 }
 
 var SEPARATE_DAYS = 'Enoch 75:1-2';

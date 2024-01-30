@@ -13,7 +13,6 @@ public class BPETokenizerTest {
 
   @Test @Ignore
   public void tokenizeDoNotSteal() {
-    assertThat(new BPETokenizer().tokenize("לא תגנב")).containsExactly(
-        "לא", "תגנב");
+    assertThat(new BPETokenizer().tokenize("לא תגנב")).containsExactly("לא", "תגנב");
   }
 }

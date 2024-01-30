@@ -2,6 +2,7 @@ package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HebrewConverterTest {
@@ -34,5 +35,30 @@ public class HebrewConverterTest {
   @Test
   public void toContantsOnly_removesHidden() {
     assertThat(HebrewConverter.toConstantsOnly("פָּנָֽ֗יַ\u202A\u202C")).isEqualTo("פני");
+  }
+
+  @Test
+  public void toFullHebrew_waw() {
+    assertThat(HebrewConverter.toFullHebrew("יֻלַּד")).isEqualTo("יולד");
+    assertThat(HebrewConverter.toFullHebrew("יֹשְׁבֵי֙")).isEqualTo("יושבי");
+    assertThat(HebrewConverter.toFullHebrew("אֱלֹהֵ֣י")).isEqualTo("אלוהי");
+    assertThat(HebrewConverter.toFullHebrew("אָדֹ֖ם")).isEqualTo("אדום");
+    // assertThat(HebrewConverter.toFullHebrew("וְגֹאֲל֖וֹ")).isEqualTo("וגואליו");
+    assertThat(HebrewConverter.toFullHebrew("גֹּאֲלֶ֔ךָ")).isEqualTo("גואלך"); // redeemer
+  }
+
+  @Test @Ignore
+  public void toFullHebrew_yod() {
+    assertThat(HebrewConverter.toFullHebrew("וִירוּשָׁלִָ֑ם")).isEqualTo("וירושלים");
+    assertThat(HebrewConverter.toFullHebrew("דִּבּוּר")).isEqualTo("דיבור");
+  }
+
+  @Test @Ignore
+  public void toFullHebrew_dibur() {
+    assertThat(HebrewConverter.toFullHebrew("דִּבּוּר")).isEqualTo("דיבור"); // divur, speak
+    assertThat(HebrewConverter.toFullHebrew("דָבָ֔ר")).isEqualTo("דבר"); // deber, anything
+    assertThat(HebrewConverter.toFullHebrew("וַיְדַבֵּ֥ר")).isEqualTo("וידבר"); // dabar, and he spoke
+    assertThat(HebrewConverter.toFullHebrew("דַּבֵּ֞ר")).isEqualTo("דבר"); // dabar, speak
+    assertThat(HebrewConverter.toFullHebrew("דִּבֵּר")).isEqualTo("דיבר"); // dibar, he spoke
   }
 }

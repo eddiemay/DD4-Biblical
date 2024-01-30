@@ -7,6 +7,7 @@ import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
+import com.digitald4.biblical.util.InterlinearFetcher;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.common.exception.DD4StorageException;
@@ -16,7 +17,6 @@ import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.QueryResult;
-import com.digitald4.common.storage.Store;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 
@@ -34,16 +34,19 @@ import javax.inject.Inject;
 )
 public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   private final LexiconFetcher lexiconFetcher;
+  private final InterlinearFetcher interlinearFetcher;
   private final InterlinearStore interlinearStore;
   private final BibleBookStore bibleBookStore;
 
   @Inject
-  LexiconService(LexiconStore store, LoginResolver loginResolver, LexiconFetcher lexiconFetcher,
+  LexiconService(LexiconStore store, LoginResolver loginResolver,
+      LexiconFetcher lexiconFetcher, InterlinearFetcher interlinearFetcher,
       InterlinearStore interlinearStore, BibleBookStore bibleBookStore) {
     super(store, loginResolver);
     this.lexiconFetcher = lexiconFetcher;
     this.interlinearStore = interlinearStore;
     this.bibleBookStore = bibleBookStore;
+    this.interlinearFetcher = interlinearFetcher;
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
@@ -86,8 +89,8 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
       return new AtomicInteger(
-          interlinearStore
-              .create(lexiconFetcher.fetchInterlinear(bibleBookStore.get(book), chapter)).size());
+          interlinearStore.create(
+              interlinearFetcher.fetchInterlinear(bibleBookStore.get(book), chapter)).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     } catch (Exception e) {

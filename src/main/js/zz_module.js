@@ -156,6 +156,7 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     bindings: {
       ref: '@',
       version: '@',
+      language: '@',
     },
     templateUrl: 'js/html/inline_scripture.html',
   })

@@ -8,6 +8,6 @@ public interface ScriptureFetcher {
   ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter);
 
   static String trim(String text) {
-    return text.replace("\u00a0", "").replaceAll("\u202C", "").trim();
+    return HebrewConverter.removeGarbage(text.replace("\u00a0", "")).trim();
   }
 }

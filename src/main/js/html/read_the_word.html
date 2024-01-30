@@ -1,8 +1,8 @@
 <section class="grid_12">
   <div class="block-border">
-    <div class="block-content">
+    <div class="block-content form">
       <h1>READ THE WORD</h1>
-      <div class="block-content form">
+      <div>
         <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.view = $ctrl.views.READ">
           <img src="images/icons/web-app/32/Search.png" alt="Read the word">
         </a>
@@ -97,37 +97,42 @@
                   <tr>
                     <td>
                       <div id="leftbox">
-                        <div class="padleft">
-                          <div class="vheading">
-                            <a href="" data-ng-click="$ctrl.showScripture(undefined, script.book, script.chapter)">
-                              ({{script.version}}) {{script.book}} {{script.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
-                            <a data-ng-if="script.book == 'Isaiah'" href="" data-ng-click="$ctrl.showScroll(script)" title="View Scroll">📜</a>
-                          </div>
-                          <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
-                            <tr><td class="strongs" data-ng-class="interlinear.highlight">
-                              <a href="" data-ng-click="$ctrl.showStrongsDefs(interlinear.strongsId)">
-                                {{interlinear.strongsId || '-'}}
-                              </a>
-                            </td></tr>
-                            <tr><td class="translit">
-                              <a href="" data-ng-click="$ctrl.showStrongsRefs(interlinear)">
-                                {{interlinear.transliteration}}
-                              </a>
-                            </td></tr>
-                            <tr><td class="hebrew">{{interlinear.word}}</td></tr>
-                            <tr data-ng-if="interlinear.dssDiff">
-                              <td class="hebrew" data-bind-html-compile="interlinear.dssDiff"></td>
-                            </tr>
-                            <tr><td class="eng">{{interlinear.translation}}</td></tr>
-                            <tr data-ng-if="interlinear.subTokens"><td class="hebrew">
-                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.word}} </span>
-                            </td></tr>
-                            <tr data-ng-if="interlinear.subTokens"><td class="eng">
-                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.translation}}</span>
-                            </td></tr>
-                            <tr><td class="strongsnt">{{interlinear.morphology}}</td></tr>
-                          </table>
+                        <div class="vheading">
+                          <a href="" data-ng-click="$ctrl.showScripture(undefined, script.book, script.chapter)">
+                            ({{script.version}}) {{script.book}} {{script.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+                          <a data-ng-if="script.book == 'Isaiah'" href="" data-ng-click="$ctrl.showScroll(script)" title="View Scroll">📜</a>
                         </div>
+                        <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
+                          <tr><td class="strongs" data-ng-class="interlinear.highlight">
+                            <a href="" data-ng-click="$ctrl.showStrongsDefs(interlinear.strongsId)">
+                              {{interlinear.strongsId || '-'}}
+                            </a>
+                          </td></tr>
+                          <tr><td class="translit">
+                            <a href="" data-ng-click="$ctrl.showStrongsRefs(interlinear)">
+                              {{interlinear.transliteration}}
+                            </a>
+                          </td></tr>
+                          <tr><td class="hebrew">{{interlinear.word}}</td></tr>
+                          <tr data-ng-if="interlinear.dssDiff">
+                            <td class="hebrew" data-bind-html-compile="interlinear.dssDiff"></td>
+                          </tr>
+                          <tr><td class="eng">{{interlinear.translation}}</td></tr>
+                          <tr><td class="strongsnt">{{interlinear.morphology}}</td></tr>
+                          <tr><td class="strongs" data-ng-class="interlinear.highlight">
+                            <span data-ng-repeat="subToken in interlinear.subTokens">
+                              <a href="" data-ng-click="$ctrl.showStrongsDefs(subToken.strongsId)">
+                                {{subToken.strongsId || '&nbsp;'}}
+                              </a>
+                            </span>
+                          </td></tr>
+                          <tr><td class="hebrew">
+                            <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.word}} </span>
+                          </td></tr>
+                          <tr><td class="eng">
+                            <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.translation}}</span>
+                          </td></tr>
+                        </table>
                       </div>
                     </td>
                   </tr>
@@ -317,7 +322,20 @@
           </a>
         </li>
       </ul>
-      <canvas id="scrollview" width="{{$ctrl.canvasWidth}}" height="454"></canvas>
+      <div class="block-content form">
+        <h1>{{$ctrl.canvasTitle}}</h1>
+        <canvas id="scrollview" width="{{$ctrl.canvasWidth}}" height="454"></canvas>
+        <div data-ng-if="$ctrl.dialogShown=='SCROLL_VIEW' && !$ctrl.canvasShowAudit">
+          <inline-scripture ref="{{$ctrl.canvasReference}}" version="DSS" language="he"></inline-scripture>
+          <inline-scripture ref="{{$ctrl.canvasReference}}" version="DSS" language="en"></inline-scripture>
+        </div>
+        <button data-ng-click="$ctrl.showDSSAudit()">Show Audit Diff</button>
+        <div>
+          <inline-scripture data-ng-if="$ctrl.canvasShowAudit" ref="{{$ctrl.canvasReference}}" language="interlaced">
+          </inline-scripture>
+        </div>
+        <button class="float-left" data-ng-click="$ctrl.closeDialog()">Close</button>
+      </div>
     </div>
   </div>
   <!-- References dialog end -->

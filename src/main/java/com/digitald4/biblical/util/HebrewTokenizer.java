@@ -4,10 +4,10 @@ import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.Streams.stream;
+import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 
 import com.digitald4.biblical.model.AncientLexicon;
-import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.digitald4.common.util.JSONUtil;
@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 public class HebrewTokenizer {
   public static final String UNKNOWN_WORD_DEFAULT = "[UNK]";
-  private enum SearchState {PREFIX, WORD, SUFFIX};
+  private enum SearchState {PREFIX, WORD_MATCH_STRONGS, WORD, SUFFIX};
   private final ImmutableListMultimap<String, TokenWord> tokenMap;
   private final ImmutableList<String> unknownReturn;
 
@@ -28,11 +28,20 @@ public class HebrewTokenizer {
   }
 
   public HebrewTokenizer(Iterable<TokenWord> tokenList) {
-    this(tokenList, UNKNOWN_WORD_DEFAULT);
+    this(tokenList, null);
   }
 
-  public ImmutableList<String> tokenizeWord(Interlinear word) {
-    return tokenizeWord(word.getWord(), word.getStrongsId());
+  public ImmutableList<ImmutableList<String>> tokenize(String sentence) {
+    return stream(sentence.split(" ")).map(this::tokenizeWord).collect(toImmutableList());
+  }
+
+  public ImmutableList<String> tokenizeWord(String word) {
+    ImmutableList<String> tokenized = tokenizeWord(word, null, SearchState.WORD);
+    if (tokenized.isEmpty()) {
+      return unknownReturn == null ? ImmutableList.of(word) : unknownReturn;
+    }
+
+    return tokenized;
   }
 
   public ImmutableList<String> tokenizeWord(String word, String strongsId) {
@@ -40,16 +49,8 @@ public class HebrewTokenizer {
       return ImmutableList.of();
     }
 
-    ImmutableList<String> tokenized = tokenizeWord(word, strongsId, SearchState.WORD);
-    if (tokenized.isEmpty() && strongsId != null) {
-      tokenized = tokenizeWord(word, null, SearchState.WORD);
-    }
-
-    if (tokenized.isEmpty()) {
-      return unknownReturn == null ? ImmutableList.of(word) : unknownReturn;
-    }
-
-    return tokenized;
+    ImmutableList<String> tokenized = tokenizeWord(word, strongsId, SearchState.WORD_MATCH_STRONGS);
+    return tokenized.isEmpty() ? tokenizeWord(word) : tokenized;
   }
 
   private ImmutableList<String> tokenizeWord(String word, String strongsId, SearchState state) {
@@ -90,17 +91,19 @@ public class HebrewTokenizer {
 
   public static boolean hasGoodOption(SearchState state, ImmutableList<TokenWord> options, String strongsId) {
     switch (state) {
-      case WORD:
-        return options.stream().anyMatch(o -> o.tokenType() == TokenType.WORD)
-            && (strongsId == null || options.stream().anyMatch(o -> Objects.equals(strongsId, o.getStrongsId())));
+      case WORD_MATCH_STRONGS:
+        return options.stream().anyMatch(
+            o -> o.tokenType() == TokenType.WORD && Objects.equals(strongsId, o.getStrongsId()));
+      case WORD: return options.stream().anyMatch(o -> o.tokenType() == TokenType.WORD);
       case PREFIX:
         return options.stream().map(TokenWord::tokenType)
-            .anyMatch(tt -> tt != TokenType.WORD && tt != TokenType.SUFFIX_ONLY);
+            .anyMatch(tt -> tt == TokenType.PREFIX || tt == TokenType.PREFIX_ONLY);
       case SUFFIX:
-        return options.stream().map(TokenWord::tokenType)
-            .anyMatch(tt -> tt != TokenType.WORD && tt != TokenType.PREFIX_ONLY);
+        return options.stream().anyMatch(o ->
+            o.getTokenType() == TokenType.SUFFIX || o.getTokenType() == TokenType.SUFFIX_ONLY
+                || o.getTokenType() == TokenType.PREFIX && o.asSuffix() != null);
     }
-    return true;
+    throw new IllegalArgumentException("How did we get here?");
   }
 
   public static class TokenWord {

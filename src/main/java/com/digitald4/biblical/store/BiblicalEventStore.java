@@ -2,6 +2,8 @@ package com.digitald4.biblical.store;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 
 import com.digitald4.biblical.model.BiblicalEvent;
 import com.digitald4.biblical.model.BiblicalEvent.Dependency.Relationship;
@@ -14,7 +16,6 @@ import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
@@ -30,18 +31,19 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
   public ImmutableList<BiblicalEvent> getAll() {
     return list(Query.forList()).getItems().stream()
         .sorted(
-            Comparator.comparing(BiblicalEvent::getYear)
+            comparing(BiblicalEvent::getYear)
                 .thenComparing(BiblicalEvent::getMonth)
                 .thenComparing(BiblicalEvent::getDay)
-                .thenComparing(BiblicalEvent::getEndYear, Comparator.reverseOrder()))
+                .thenComparing(BiblicalEvent::getEndYear, reverseOrder()))
         .collect(toImmutableList());
   }
 
   public ImmutableList<BiblicalEvent> getBiblicalEvents(int month) {
     return list(Query.forList().setFilters(Query.Filter.of("month", month))).getItems().stream()
+        // For the calendar we don't show events that last for years, such as the life of person.
         .filter(event -> event.getYear() == event.getEndYear())
         // Temp sorting until we get all the years filled in.
-        .sorted(Comparator.comparing(BiblicalEvent::getDay).thenComparing(BiblicalEvent::getYear))
+        .sorted(comparing(BiblicalEvent::getDay).thenComparing(BiblicalEvent::getYear))
         .collect(toImmutableList());
   }
 
@@ -54,10 +56,10 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
         list(Query.forList().setFilters(Query.Filter.of("end_year", ">=", startYear))).getItems().stream()
             .filter(event -> event.getYear() <= endYear))
         .sorted(
-            Comparator.comparing(BiblicalEvent::getYear)
+            comparing(BiblicalEvent::getYear)
                 .thenComparing(BiblicalEvent::getMonth)
                 .thenComparing(BiblicalEvent::getDay)
-                .thenComparing(BiblicalEvent::getEndYear, Comparator.reverseOrder()))
+                .thenComparing(BiblicalEvent::getEndYear))
         .collect(toImmutableList());
   }
 
@@ -82,7 +84,8 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
             throw new DD4StorageException("Dependent Loop detected", DD4StorageException.ErrorCode.BAD_REQUEST);
           }
           timesChanged.set(
-              updated.getYear() != current.getYear() || !Objects.equals(updated.getEndYear(), current.getEndYear()));
+              updated.getYear() != current.getYear()
+                  || !Objects.equals(updated.getEndYear(), current.getEndYear()));
           return updated;
         });
 

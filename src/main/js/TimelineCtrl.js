@@ -7,6 +7,7 @@ var VIEW_OPTIONS = {
 var YEAR_BOUND = {
   JUBILEE: {name: 'Jubilee', years: 50, abb: 'j', countBy: 1},
   CENTURY: {name: 'Century', years: 100, abb: 'c', countBy: 7},
+  JUBILEE_10: {name: '10 Jubilee', years: 500, abb: 't', countBy: 25},
   MILLENNIUM: {name: 'Millennium', years: 1000, abb: 'm', countBy: 25}
 }
 

@@ -4,11 +4,11 @@ import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.common.storage.Annotations.NonIndexed;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableList;
+// This has to be List or the compiler throws an error for some reason during JSON parsing.
 import java.util.List;
 
 public class Interlinear {
   // Id values
-  private String version = "WLC";
   private String book;
   private int chapter;
   private int verse;
@@ -22,7 +22,6 @@ public class Interlinear {
   // Non indexed values
   private String transliteration;
   private String morphology;
-  private String morphologyAbb;
   private int bookNumber; // For sorting by bible book number.
   private String translation;
 
@@ -33,16 +32,17 @@ public class Interlinear {
   private List<SubToken> subTokens;
 
   public String getId() {
-    return String.format("%s-%s-%d-%d-%d",
-        getVersion(), getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
+    return String.format(
+        "%s-%d-%d-%d", getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
   }
 
+  @Deprecated
   public String getVersion() {
-    return version;
+    return  null;
   }
 
+  @Deprecated
   public Interlinear setVersion(String version) {
-    this.version = version;
     return this;
   }
 
@@ -112,7 +112,7 @@ public class Interlinear {
   }
 
   public Interlinear setStrongsId(String strongsId) {
-    this.strongsId = HebrewConverter.toStrongsId(strongsId);
+    this.strongsId = strongsId;
     return this;
   }
 
@@ -121,7 +121,7 @@ public class Interlinear {
   }
 
   public Interlinear setConstantsOnly(String constantsOnly) {
-    this.constantsOnly = HebrewConverter.toConstantsOnly(constantsOnly);
+    this.constantsOnly = constantsOnly;
     return this;
   }
 
@@ -132,23 +132,11 @@ public class Interlinear {
 
   @NonIndexed
   public String getMorphology() {
-    return morphologyAbb != null ? morphologyAbb : morphology;
+    return morphology;
   }
 
   public Interlinear setMorphology(String morphology) {
     this.morphology = "".equals(morphology) ? null : morphology;
-    return this;
-  }
-
-  @NonIndexed
-  @Deprecated
-  public String getMorphologyAbb() {
-    return null;
-  }
-
-  @Deprecated
-  public Interlinear setMorphologyAbb(String morphologyAbb) {
-    this.morphologyAbb = "".equals(morphologyAbb) ? null : morphologyAbb;
     return this;
   }
 
@@ -178,17 +166,6 @@ public class Interlinear {
 
   public Interlinear setSubtokens(Iterable<SubToken> subTokens) {
     this.subTokens = ImmutableList.copyOf(subTokens);
-    return this;
-  }
-
-  @Deprecated
-  public ImmutableList<Translation> getTranslations() {
-    return null;
-  }
-
-  @Deprecated
-  public Interlinear setTranslations(Iterable<Translation> translations) {
-    this.translation = translations.iterator().next().getTranslation();
     return this;
   }
 
@@ -235,35 +212,6 @@ public class Interlinear {
     return String.format("%s - %s - %s - %s - %s%s - %s", getId(), getStrongsId(),
         getTransliteration(), getWord(), getConstantsOnly(), dss != null ? " - " + dss : "",
         getTranslation());
-  }
-
-  @Deprecated
-  public static class Translation {
-    private String version;
-    private String translation;
-
-    public String getVersion() {
-      return version;
-    }
-
-    public Translation setVersion(String version) {
-      this.version = version;
-      return this;
-    }
-
-    public String getTranslation() {
-      return translation;
-    }
-
-    public Translation setTranslation(String translation) {
-      this.translation = translation;
-      return this;
-    }
-
-    @Override
-    public String toString() {
-      return version + "-" + translation;
-    }
   }
 
   public static class SubToken {

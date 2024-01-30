@@ -3,14 +3,11 @@ package com.digitald4.biblical.util;
 import com.digitald4.biblical.model.SunTimeData;
 import com.digitald4.common.server.APIConnector;
 import com.google.common.annotations.VisibleForTesting;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.inject.Inject;
-
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

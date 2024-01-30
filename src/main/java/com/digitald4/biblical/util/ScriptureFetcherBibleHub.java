@@ -1,17 +1,20 @@
 package com.digitald4.biblical.util;
 
+import static com.digitald4.biblical.util.HebrewConverter.*;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.BibleBook;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.util.Pair;
 import com.google.common.collect.ImmutableList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,8 +27,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ScriptureFetcherBibleHub implements ScriptureFetcher {
+public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFetcher {
   private static final String CHAPTER_URL = "https://biblehub.com/%s/%s/%d.htm";
+  private static final String INTERLINEAR_PAGE_URL = "https://biblehub.com/interlinear/%s/%d.htm";
   private static final String REF_TEXT = "reftext";
   private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)(.+)");
   private static final Pattern VERSE_CLS_PATTERN = Pattern.compile("([\\d\\w]+)-(\\d+)-(\\d+)");
@@ -38,8 +42,8 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
   }
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
-    if (version.equals("WLCO")) {
-      return fetchWLCO(version, book, chapter);
+    if (version.startsWith("WLC")) {
+      return fetchWLC(version, book, chapter);
     } else if (version.equals("Nestle")) {
       return fetchNestle(version, book, chapter);
     }
@@ -83,7 +87,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  public synchronized ImmutableList<Scripture> fetchWLCO(String version, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetchWLC(String version, BibleBook book, int chapter) {
     String url =
         String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
@@ -98,7 +102,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
         .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
         .map(sc -> new Scripture()
             .setVersion(version)
-            .setLanguage("he")
+            .setLanguage(version.equals("WLC") ? Language.HEBREWISH : Language.HEBREW)
             .setBook(book.name())
             .setChapter(chapter)
             .setVerse(verse.incrementAndGet())
@@ -168,6 +172,87 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher {
                 .setText(getText(entry.getValue().stream().map(Pair::getRight).collect(toImmutableList()))))
         .sorted(comparing(Scripture::getVerse))
         .collect(toImmutableList());
+  }
+
+  @Override
+  public ImmutableList<Interlinear> fetchInterlinear(BibleBook book, int chapter) {
+    boolean hebrew = book.getNumber() < 40;
+    String url = String.format(INTERLINEAR_PAGE_URL, formatBookForUrl(book.name()), chapter);
+    String htmlResult = apiConnector.sendGet(url);
+    Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.htmlParser());
+    AtomicInteger verse = new AtomicInteger(1);
+    AtomicInteger index = new AtomicInteger();
+    AtomicReference<Interlinear> strongIdOwner = new AtomicReference<>();
+    try {
+      return doc.getElementsByClass("chap").first().getElementsByTag("table").stream()
+          .filter(table ->
+              table.hasAttr("border") && table.hasAttr("cellspacing") && table.hasAttr("cellpadding"))
+          .flatMap(vTable -> vTable.getElementsByClass(hebrew ? "tablefloatheb" : "tablefloat").stream())
+          .map(iTable -> {
+            Element verseElem = iTable.getElementsByClass(hebrew ? "refheb" : "refmain").first();
+            if (verseElem != null && !verseElem.text().isEmpty()) {
+              verse.set(Integer.parseInt(verseElem.text().trim()));
+              index.set(0);
+              strongIdOwner.set(null);
+            }
+            Elements strongsElems = iTable.getElementsByClass(hebrew ? "strongs" : "pos");
+            Element strongsElem = strongsElems.first();
+            if (strongsElem.getElementsByTag("a").first() == null && strongsElems.size() > 1) {
+              strongsElem = strongsElems.get(1);
+            }
+            String strongsId = getStrongsId(strongsElem.getElementsByTag("a").first());
+            String transliteration = iTable.getElementsByClass("translit").last().text();
+            String word =
+                removeGarbage(iTable.getElementsByClass(hebrew ? "hebrew" : "greek").last().text());
+            if (word.endsWith("׃")) {
+              word = word.substring(0, word.length() - 1);
+            }
+            String translation = iTable.getElementsByClass("eng").last().text();
+            String morphology =
+                iTable.getElementsByClass(hebrew ? "strongsnt" : "strongsnt2").last().text();
+
+            // Get rid of the last item if it doesn't have a translation, this is normally the
+            // marker of end of a paragraph or end of a chapter.
+            if (strongsId == null && translation == null && "Punc".equals(morphology)) {
+              return null;
+            }
+
+            if (strongsId != null && strongIdOwner.get() != null) {
+              strongIdOwner.get().setStrongsId(strongsId).setTranslation(translation);
+              strongsId = translation = null;
+              strongIdOwner.set(null);
+            }
+
+            Interlinear interlinear = new Interlinear()
+                .setBook(book.name())
+                .setBookNumber(book.getNumber())
+                .setChapter(chapter)
+                .setVerse(verse.get())
+                .setIndex(index.incrementAndGet())
+                .setStrongsId(strongsId)
+                .setWord(word)
+                .setConstantsOnly(toConstantsOnly(word))
+                .setTransliteration(transliteration)
+                .setMorphology(morphology)
+                .setTranslation(translation);
+
+            if (strongsId == null && "-".equals(translation) && morphology.isEmpty()
+                && strongIdOwner.get() == null) {
+              strongIdOwner.set(interlinear);
+            }
+
+            return interlinear;
+          })
+          .collect(toImmutableList());
+    } catch (NullPointerException | NumberFormatException npe) {
+      throw new DD4StorageException(
+          String.format("Error while reading: %s %d:%s:%s %s", book, chapter, verse, index, url), npe);
+    }
+  }
+
+  private static String getStrongsId(Element strongsLink) {
+    return strongsLink == null ? null : toStrongsId(
+        (strongsLink.attr("href").contains("/hebrew") ? "H" : "G") + strongsLink.text());
   }
 
   public static String formatBookForUrl(String book) {

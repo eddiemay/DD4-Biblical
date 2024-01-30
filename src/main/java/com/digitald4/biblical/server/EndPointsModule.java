@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Arrays.stream;
 
 import com.digitald4.biblical.model.HighScore;
-import com.digitald4.biblical.store.Annotations.FetchInterlinearByVerse;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.util.*;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
@@ -44,9 +43,6 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		bind(Duration.class).annotatedWith(Annotations.SessionDuration.class)
 				.toInstance(Duration.ofHours(8));
 		bind(Boolean.class).annotatedWith(Annotations.SessionCacheEnabled.class).toInstance(false);
-		bind(Boolean.class)
-				.annotatedWith(FetchInterlinearByVerse.class)
-				.toInstance(false);
 
 		ProviderThreadLocalImpl<BasicUser> userProvider = new ProviderThreadLocalImpl<>();
 		bind(User.class).toProvider(userProvider);
@@ -64,6 +60,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		bind(SearchIndexer.class).to(SearchIndexImpl.class);
 		bind(ScriptureFetcher.class).to(ScriptureFetcherRouter.class);
 		bind(LexiconFetcher.class).to(LexiconFetcherBlueLetterImpl.class);
+		bind(InterlinearFetcher.class).to(ScriptureFetcherBibleHub.class);
 		bind(ScriptureReferenceProcessor.class).to(ScriptureReferenceProcessorSplitImpl.class);
 		bind(SunTimeUtil.class).to(SunTimeUtilSunriseSunsetOrg.class);
 

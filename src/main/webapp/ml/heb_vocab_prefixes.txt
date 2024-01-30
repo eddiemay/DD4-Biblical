@@ -1,0 +1,35 @@
+*** Prefixes ***
+{"translation":"I ","word":"א","tokenType":"PREFIX_ONLY"}
+{"translation":"in ","word":"ב","tokenType":"PREFIX_ONLY"}
+{"translation":"the ","word":"ה","tokenType":"PREFIX","asSuffix":" it"}
+{"translation":"and ","word":"ו","tokenType":"PREFIX","asSuffix":" of him"}
+{"translation":"he ","word":"י","tokenType":"PREFIX","asSuffix":"s of"}
+{"translation":"like ","word":"כ","tokenType":"PREFIX","asSuffix":" of you"}
+{"translation":"to ","word":"ל","tokenType":"PREFIX_ONLY"}
+{"translation":"from ","word":"מ","tokenType":"PREFIX","asSuffix":"s"}
+{"translation":"we ","word":"נ","tokenType":"PREFIX","asSuffix":" us"}
+{"translation":"that which ","word":"ש","tokenType":"PREFIX_ONLY"}
+{"translation":"you ","word":"ת","tokenType":"PREFIX","asSuffix":" of you"}
+*** Suffixes ***
+{"translation":"s","word":"ימ","tokenType":"SUFFIX_ONLY"}
+{"translation":"s","word":"ית","tokenType":"SUFFIX_ONLY"}
+{"translation":"s","word":"ות","tokenType":"SUFFIX_ONLY"}
+{"translation":" of him","word":"תו","tokenType":"SUFFIX_ONLY"}
+{"translation":"s of you","word":"תכ","tokenType":"SUFFIX_ONLY"}
+{"translation":"them","word":"המ","tokenType":"SUFFIX","asSuffix":" of them"}
+** {"translation":"them","word":"כמ","tokenType":"SUFFIX","asSuffix":" of y'all"}
+{"translation":"of us","word":"נו","tokenType":"SUFFIX","asSuffix":" of us"}
+{"translation":"it ","word":"ונ","tokenType":"PREFIX","asSuffix":" of it"}
+{"translation":"it ","word":"נה","tokenType":"PREFIX","asSuffix":" of it"}
+{"translation":"","word":"הו","tokenType":"SUFFIX_ONLY","asSuffix":" of it"}
+{"translation":" of you","word":"כ","tokenType":"SUFFIX_ONLY"}
+{"translation":"s of you","word":"יכ","tokenType":"SUFFIX_ONLY"}
+{"translation":"to him","word":"לו","tokenType":"PREFIX"}
+{"translation":" of him","word":"יו","tokenType":"SUFFIX_ONLY"}
+** Supp words
+{"translation":"in it","word":"בו"}
+{"translation":"to them","word":"להמ"}
+{"translation":"for yourself","word":"לכ"}
+{"translation":"to them","word":"לכמ"}
+{"translation":"for me","word":"לי"}
+{"translation":"in of you","word":"בכ"}

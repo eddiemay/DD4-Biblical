@@ -15,8 +15,4 @@ public final class Annotations {
   @BindingAnnotation
   @Retention(RetentionPolicy.RUNTIME)
   public @interface CommandmentsIndex {}
-
-  @BindingAnnotation
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface FetchInterlinearByVerse {}
 }

@@ -3863,7 +3863,7 @@
 {"strongsId":"H3863","root":"לוא","translation":"if"}
 {"strongsId":"H3864","root":"לבי","translation":"Libyans"}
 {"strongsId":"H3865","root":"לוד","translation":"Lud"}
-{"strongsId":"H3866","root":"לודיי","translation":"Ludim or Lydians"}
+{"strongsId":"H3866","root":"לודיי","translation":"Ludim"}
 {"strongsId":"H3867","root":"לוה","translation":"join"}
 {"strongsId":"H3868","root":"לוז","translation":"froward"}
 {"strongsId":"H3869","root":"לוז","translation":"hazel"}

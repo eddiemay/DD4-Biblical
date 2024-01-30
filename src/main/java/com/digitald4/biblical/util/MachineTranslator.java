@@ -1,5 +1,6 @@
 package com.digitald4.biblical.util;
 
+import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -55,7 +56,7 @@ public class MachineTranslator {
     SubToken subToken = new SubToken().setWord(word);
     ImmutableList<TokenWord> options = tokenWordsByWord.get(word);
     if (options.isEmpty()) {
-      return subToken.setTranslation(word);
+      return subToken.setTranslation("[UNK]");
     }
 
     TokenWord option = options.size() == 1 ? options.get(0) : options.stream()
@@ -86,7 +87,7 @@ public class MachineTranslator {
 
   public ImmutableList<Interlinear> translate(String text) {
     return translate(
-        stream(text.split(" "))
+        stream(removePunctuation(text).split(" "))
             .map(word -> new Interlinear().setBook("").setWord(word).setConstantsOnly(toConstantsOnly(word)))
             .collect(toImmutableList()));
   }

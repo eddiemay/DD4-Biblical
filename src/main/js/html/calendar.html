@@ -21,60 +21,56 @@
         </ul>
       </div>
 
-      <div class="no-margin">
-        <table class="calendar">
-          <thead>
-          <tr>
-            <th scope="col" class="black-cell"><span class="success"></span></th>
-            <th scope="col">Day 1</th>
-            <th scope="col">Day 2</th>
-            <th scope="col">Day 3</th>
-            <th scope="col">Day 4</th>
-            <th scope="col">Day 5</th>
-            <th scope="col">Day 6</th>
-            <th scope="col">Shabbat</th>
+    <div class="no-margin">
+      <table class="calendar">
+        <thead>
+        <tr>
+          <th scope="col" class="black-cell"><span class="success"></span></th>
+          <th scope="col">Day 1</th>
+          <th scope="col">Day 2</th>
+          <th scope="col">Day 3</th>
+          <th scope="col">Day 4</th>
+          <th scope="col">Day 5</th>
+          <th scope="col">Day 6</th>
+          <th scope="col">Shabbat</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr data-ng-repeat="week in $ctrl.weeks">
+            <th scope="row">{{week.weekOfYear}}</th>
+            <td data-ng-repeat="day in week.days" data-ng-class="day.classes">
+              <a class="day">{{day.day}}</a>
+              <ul class="dot-events with-children-tip">
+                <a class="reference-day">{{day.date.getDate() | date:'MMM dd'}}</a>
+                <li data-ng-repeat="notification in day.notifications" class="{{notification.color}}" title="{{notification.title}}">
+                  <a href="#{{notification.entity}}/{{notification.entityId}}">{{notification.title}}</a>
+                </li>
+              </ul>
+              <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.showCreateEventDialog(day.date)" class="add-event">Add</a>
+              <a href="" data-ng-if="day.holyDay" class="holyday-title" data-ng-click="$ctrl.showViewEventDialog(day.holyDay)">{{day.holyDay.title}}</a>
+              <ul class="events">
+                <li data-ng-repeat="event in day.biblicalEvents">
+                  <a href="" data-ng-click="$ctrl.showViewEventDialog(event)">
+                    <div class="biblical" data-ng-class="{'has-error': event.year==4001}">{{event.title}}</div>
+                  </a>
+                </li>
+              </ul>
+            </td>
           </tr>
-          </thead>
-          <tbody>
-            <tr data-ng-repeat="week in $ctrl.weeks">
-              <th scope="row">{{week.weekOfYear}}</th>
-              <td data-ng-repeat="day in week.days" data-ng-class="day.classes">
-                <a class="day">{{day.day}}</a>
-                <ul class="dot-events with-children-tip">
-                  <a class="reference-day">{{day.date.getDate() | date:'MMM dd'}}</a>
-                  <li data-ng-repeat="notification in day.notifications" class="{{notification.color}}" title="{{notification.title}}">
-                    <a href="#{{notification.entity}}/{{notification.entityId}}">{{notification.title}}</a>
-                  </li>
-                </ul>
-                <a href="" data-ng-if="appCtrl.isUserLoggedIn()" data-ng-click="$ctrl.showCreateEventDialog(day.date)" class="add-event">Add</a>
-                <a href="" data-ng-if="day.holyDay" class="holyday-title" data-ng-click="$ctrl.showViewEventDialog(day.holyDay)">{{day.holyDay.title}}</a>
-                <ul class="events">
-                  <li data-ng-repeat="event in day.biblicalEvents">
-                    <a href="" data-ng-click="$ctrl.showViewEventDialog(event)">
-                      <div class="biblical" data-ng-class="{'has-error': event.year==4001}">{{event.title}}</div>
-                    </a>
-                  </li>
-                </ul>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <ul class="message no-margin">
-        <li>{{$ctrl.biblicalEvents.length}} Biblical events found</li>
-        <li> Show:
-          <input type="checkbox" data-ng-model="$ctrl.showBiblicalEvents"
-                 data-ng-change="$ctrl.setView('showBiblicalEvents')">Biblical Events
-          <input type="checkbox" data-ng-model="$ctrl.showImages"
-                 data-ng-change="$ctrl.setView('showImages')">Images
-          <input type="checkbox" data-ng-model="$ctrl.showFeastDays"
-                 data-ng-change="$ctrl.setView('showFeastDays')">Feast Days
-        </li>
-      </ul>
+        </tbody>
+      </table>
     </div>
-    <a href="https://drive.google.com/file/d/1sc4Zs6X8i_gH0c0zDZFy30hY2KyWf8h0/view" target="_blank">
-      2022 Printable Calendar
-    </a>
+    <ul class="message no-margin">
+      <li>{{$ctrl.biblicalEvents.length}} Biblical events found</li>
+      <li> Show:
+        <input type="checkbox" data-ng-model="$ctrl.showBiblicalEvents"
+               data-ng-change="$ctrl.setView('showBiblicalEvents')">Biblical Events
+        <input type="checkbox" data-ng-model="$ctrl.showImages"
+               data-ng-change="$ctrl.setView('showImages')">Images
+        <input type="checkbox" data-ng-model="$ctrl.showFeastDays"
+               data-ng-change="$ctrl.setView('showFeastDays')">Feast Days
+      </li>
+    </ul>
   </div>
 
   <!-- Month selection dialog start -->

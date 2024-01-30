@@ -223,7 +223,7 @@
 {"strongsId":"H0369","root":"אינ","translation":"except"}
 {"strongsId":"H0369","root":"IF","translation":"except"}
 {"strongsId":"H0370","root":"אינ","translation":"except"}
-{"strongsId":"H0370","root":"IF","translation":"except"}
+{"strongsId":"H0370","root":"IF","translation":"except"}x
 {"strongsId":"H0371","root":"אינ","translation":"except"}
 {"strongsId":"H0371","root":"IF","translation":"except"}
 {"strongsId":"H0374","root":"איפה","translation":"ephah"}
@@ -1369,7 +1369,7 @@
 {"strongsId":"H1890","root":"הבהב","translation":"offering"}
 {"strongsId":"H1891","root":"הבל","translation":"become vain"}
 {"strongsId":"H1892","root":"הבל","translation":"vanity"}
-{"strongsId":"H1894","root":"הבנ","translation":"ebony"}
+** {"strongsId":"H1894","root":"הבנ","translation":"ebony"}
 {"strongsId":"H1895","root":"הבר","translation":"astrologer"}
 {"strongsId":"H1897","root":"הגה","translation":"meditate"}
 {"strongsId":"H1898","root":"הגה","translation":"take away"}
@@ -1640,6 +1640,7 @@
 {"strongsId":"H2199","root":"זעק","translation":"cry"}
 {"strongsId":"H2200","root":"זעק","translation":"cry"}
 {"strongsId":"H2201","root":"זעק","translation":"cry"}
+{"strongsId":"H2202","root":"זפרנה","translation":"Zeprona"}
 {"strongsId":"H2203","root":"זפת","translation":"pitch"}
 {"strongsId":"H2204","root":"זקנ","translation":"old"}
 {"strongsId":"H2205","root":"זקנ","translation":"elder"}
@@ -4400,7 +4401,6 @@
 {"strongsId":"H5696","root":"עגול","translation":"round"}
 {"strongsId":"H5697","root":"עגלה","translation":"heifer"}
 {"strongsId":"H5699","root":"עגלה","translation":"cart"}
-{"strongsId":"H5703","root":"עד","translation":"ever"}
 {"strongsId":"H5703","root":"IN.THIS.WAY","translation":"ever"}
 {"strongsId":"H5704","root":"עד","translation":"ever"}
 {"strongsId":"H5704","root":"IN.THIS.WAY","translation":"ever"}
@@ -4432,6 +4432,7 @@
 {"strongsId":"H5746","root":"עוג","translation":"bake"}
 {"strongsId":"H5748","root":"עוגב","translation":"organ"}
 {"strongsId":"H5749","root":"עוד","translation":"testify"}
+{"strongsId":"H5750","root":"עד","translation":"ever"}
 {"strongsId":"H5750","root":"עוד","translation":"again"}
 {"strongsId":"H5751","root":"עוד","translation":"again"}
 {"strongsId":"H5753","root":"עוה","translation":"iniquity"}
@@ -6837,226 +6838,3 @@
 {"strongsId":"H8671","root":"תשיעי","translation":"ninth"}
 {"strongsId":"H8672","root":"תשע","translation":"nine"}
 {"strongsId":"H8673","root":"תשע","translation":"nine"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אוה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אוננ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אהרונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"בבל","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עיבל","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עובל","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ריבלה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"בסמת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מבסמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"תבערה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"בעור","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צבעונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עברונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עברונה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"רגב","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"הגג","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מגוג","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גדגד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גודגודה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גדעונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גיחונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גרר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גרא","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גרנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גרשונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גושנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גשור","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גתר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"דדנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"דודנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סדומ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"דנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"דישונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"דותנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"הב","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אוהד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יהודה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"המ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"היממ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יהצ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"הרנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זבולונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זוז","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זילפה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זמזומ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זעונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זיפרונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זרד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חובה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נחבי","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חברונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חגלה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חז","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חנוכ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מחלת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חוילה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גחמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חמדנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חמול","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חצצונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חצרונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חירה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חרמונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נחור","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נחשונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מהיטב","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יטבה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"טור","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מטרד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לטוש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מידד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אכד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כדר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כנענ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כסד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כיסלונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חפר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כוש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כית","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לבנונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לוד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לאה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לו","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לוטנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סלכה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"למ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"למכ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לק","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פלשת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"לשע","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מודד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מכי","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אמול","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"תמנע","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מופ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מרר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ממרא","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"גומר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נמרוד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מושה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מוש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כמוש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נב","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נפג","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נגב","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נדב","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כנז","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"זימרנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ענר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מנשה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נע","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נועה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סיונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סבא","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פיסגה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סיחונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סכה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סניר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שימרונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סרי","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מסרקה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"משרקה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"סיתר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עדה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עזנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עי","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מעכה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עכרנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"תדעל","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עילמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עלמונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עםונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נעמה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ענה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עיננ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עסו","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עסק","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עציונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עוצ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עצמונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ער","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ערנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ערק","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פעור","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פדה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פואה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פוט","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שפטנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פל","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פלוא","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"מכפלה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פלת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פונונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פינונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פסח","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פעו","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פועה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אופיר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פארנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עפרונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פרת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פתור","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"פישונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נפיש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"נפתוח","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ריפת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"אצבונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צדד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צידונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צוחר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צלמונה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צוענ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צוער","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"צפ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ציפיונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"בוצרה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"קדר","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"דיקלה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"קיננ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"קנת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עקנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"קנז","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"קורח","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יקשנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"קהת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ריבקה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ארוד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ירדנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עירד","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"תרח","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"רמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ארמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ראומה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"רהמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"כרנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ריסה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"רפכ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"משא","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שבנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שוה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שוח","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שוחמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שלפ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שימעונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"שפמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"ישורונ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"תימא","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יתרנ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"תירס","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"יתת","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עמורה","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עוש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חוש","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"עושמ","translation":"n/a"}
-{"strongsId":"[FOUND IN NHMES ONLY]","root":"חושמ","translation":"n/a"}

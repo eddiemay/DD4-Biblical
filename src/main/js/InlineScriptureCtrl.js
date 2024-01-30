@@ -6,7 +6,8 @@ com.digitald4.biblical.InlineScriptureCtrl = function(scriptureService, globalDa
 
 com.digitald4.biblical.InlineScriptureCtrl.prototype.refresh = function() {
   this.loading = true;
-  var request = {reference: this.ref, version: this.version || this.globalData.scriptureVersion};
+  var request = {reference: this.ref, lang: this.language,
+      version: this.version || this.globalData.scriptureVersion};
 
   this.scriptureService.scriptures(request, response => {
     var scriptures = processScriptures(response.items)

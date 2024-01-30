@@ -16,6 +16,22 @@ button.big {
 	font-size: 1.75em;
 }
 
+/* Containers
+----------------------------------------------------------------------------------------------------*/
+.container_12 {
+	width: 100%;
+	margin-left: 0%;
+	margin-right: 0%;
+}
+
+/**************** Mobile block ****************/
+.block-content {
+	padding: 0.167em;
+}
+.block-border {
+	padding: 0.167em;
+}
+
 /* Apple's generic lists patterns customization */
 /* http: //developer.apple.com/safari/library/samplecode/iPhoneListPatterns/ */
 ul.edgeToEdge {
@@ -316,7 +332,7 @@ header {
 
 /******************* Content ********************/
 article {
-	padding: 0.833em;
+	padding: 0em;
 	font-weight: normal;
 	}
 	article > .no-margin {

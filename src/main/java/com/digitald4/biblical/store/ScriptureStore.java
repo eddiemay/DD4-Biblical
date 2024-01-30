@@ -15,7 +15,6 @@ import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.AuditScripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.model.ScriptureVersion;
-import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureFetcher;
@@ -31,14 +30,12 @@ import com.digitald4.common.storage.Query.OrderBy;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.SearchableStoreImpl;
-import com.digitald4.common.util.Calculate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -98,6 +95,32 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     int startVerse = verseRange.getStartVerse();
     int endVerse = verseRange.getEndVerse();
 
+    if (ScriptureVersion.INTERLINEAR.equalsIgnoreCase(version) || ScriptureVersion.INTERLINEAR.equalsIgnoreCase(language)) {
+      // Check to see if this book supports Interlinear.
+      ScriptureVersion scriptureVersion = bibleBookStore
+          .getOrFallback(ScriptureVersion.INTERLINEAR, language, verseRange.getBook(), false);
+      if (scriptureVersion == null) {
+        return ImmutableList.of();
+      }
+
+      if (ScriptureVersion.INTERLINEAR.equals(scriptureVersion.getVersion())) {
+        ImmutableMap<Integer, String> dssReferences = !book.equals(BibleBook.ISAIAH)
+            ? ImmutableMap.of()
+            : list(new LanguageRequest("DSS", Language.HEBREW, false), book, chapter, startVerse,
+                endVerse)
+                .getItems().stream()
+                .collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
+
+        return interlinearStore.getInterlinear(verseRange).stream()
+            .peek(machineTranslator::translate)
+            .collect(groupingBy(Interlinear::getVerse)).values().stream()
+            .map(InterlinearScripture::new)
+            .peek(s -> InterlinearStore.fillDss(s, dssReferences.get(s.getVerse())))
+            .sorted(comparing(Scripture::getVerse))
+            .collect(toImmutableList());
+      }
+    }
+
     HashMap<String, String> verseMap = new HashMap<>();
     return expandSelection(version, language, verseRange.getBook())
         .stream()
@@ -105,10 +128,9 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
           if ("Audit".equals(languageRequest.getVersion())) {
             return IntStream.range(startVerse, endVerse + 1)
                 .mapToObj(
-                    verse -> createAuditScripture(book, chapter, verse,
+                    verse -> AuditScripture.of(book, chapter, verse,
                         verseMap.getOrDefault("DSS-" + verse, ""),
-                        verseMap.getOrDefault(String.valueOf(verse), "")))
-                .filter(Objects::nonNull);
+                        verseMap.getOrDefault(String.valueOf(verse), "")));
           } else if (Language.HEBREW.equals(languageRequest.getLanguage())) {
             // if we find Hebrew, index it in case we are going to be doing an Audit.
             return list(languageRequest, book, chapter, startVerse, endVerse).getItems().stream()
@@ -119,35 +141,11 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
             return list(new LanguageRequest(version, Language.HEBREW, false), book, chapter, startVerse, endVerse)
                 .getItems().stream()
                 .peek(s -> s.setLanguage(Language.HEBREW_ANCIENT).setText(toAncient(s.getText())));
-          } else if (Language.INTERLINEAR.equals(languageRequest.getLanguage())) {
-            ImmutableMap<Integer, String> dssReferences = !book.equals(BibleBook.ISAIAH)
-                ? ImmutableMap.of()
-                : list(new LanguageRequest("DSS", Language.HEBREW, false), book, chapter, startVerse, endVerse)
-                    .getItems().stream().collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
-
-            return interlinearStore.getInterlinear(verseRange).stream()
-                .peek(machineTranslator::translate)
-                .collect(groupingBy(Interlinear::getVerse)).values().stream()
-                .map(InterlinearScripture::new)
-                .peek(s -> InterlinearStore.fillDss(s, dssReferences.get(s.getVerse())));
           }
           return list(languageRequest, book, chapter, startVerse, endVerse).getItems().stream();
         })
         .sorted(comparing(Scripture::getVerse))
         .collect(toImmutableList());
-  }
-
-  private static AuditScripture createAuditScripture(
-      String book, int chapter, int verse, String original, String revised) {
-    if (original.isEmpty() && revised.isEmpty()) {
-      return null;
-    }
-
-    original = HebrewConverter.removePunctuation(original);
-    revised = HebrewConverter.removePunctuation(revised);
-
-    return new AuditScripture(book, chapter, verse,
-        Calculate.getDiffHtml(original, revised), Calculate.LD(original, revised));
   }
 
   private static ImmutableList<LanguageRequest> expandSelection(

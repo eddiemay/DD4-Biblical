@@ -96,7 +96,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDefs = function(stro
   if (this.strongsId == undefined) {return;}
   this.lexicon = {id: this.strongsId, word: 'Loading...', strongsDefinition: '', rootWord: ''};
   this.lexiconService.get(this.strongsId, lexicon => {this.lexicon = lexicon});
-  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
+  this.setDialogStyle();
   this.dialogShown = 'LEXICON';
 }
 
@@ -109,7 +109,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.nextStrongsDefs = function() {
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(interlinear, page) {
-  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
+  this.setDialogStyle();
   this.interlinear = interlinear;
   this.references = undefined;
   var matchCriteria =
@@ -124,7 +124,8 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(inte
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showScroll = function(scripture) {
-  this.dialogStyle = {top: this.window.visualViewport.pageTop - 20};
+  this.canvasReference = scripture.reference;
+  this.setDialogStyle();
   const canvas = document.getElementById("scrollview");
   this.dialogShown = 'SCROLL_VIEW';
   if (!canvas.getContext) {
@@ -132,11 +133,16 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showScroll = function(scripture
     return;
   }
   const ctx = canvas.getContext("2d");
+  this.canvasTitle = 'Dead Sea Scrolls Viewer - ' + scripture.reference;
 
   this.scriptureService.getScrollCoords(scripture, scrollData => {
     this.canvasWidth = DSS_ISA_COLUMN_INFO[scrollData.columns[0]].width * 3.7445;
     this.drawScroll(ctx, scrollData);
   });
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showDSSAudit = function() {
+  this.canvasShowAudit = !this.canvasShowAudit;
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.drawScroll = function(ctx, scrollData) {
@@ -251,8 +257,12 @@ printBaseWidth = function(ctx) {
   }
 }
 
+com.digitald4.biblical.ReadTheWordCtrl.prototype.setDialogStyle = function() {
+  this.dialogStyle = this.dialogStyle || {top: this.window.visualViewport.pageTop - 20};
+}
+
 com.digitald4.biblical.ReadTheWordCtrl.prototype.closeDialog = function() {
-  this.dialogShown = undefined;
+  this.dialogShown = this.dialogStyle = undefined;
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.searchAndReplace = function(preview) {

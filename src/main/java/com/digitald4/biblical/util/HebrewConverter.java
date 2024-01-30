@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.toList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HebrewConverter {
   enum AlefBet {
@@ -113,14 +114,23 @@ public class HebrewConverter {
               .collect(toImmutableMap(AlefBet::finalModern, AlefBet::ancient)))
       .build();
 
-  public static String removePunctuation(String hebrew) {
-    hebrew = hebrew
-        .replaceAll("־", " ").replaceAll("׀ ", "").replaceAll("‸", "").replaceAll("\\.", "")
-        .replaceAll("\\[", "").replaceAll("]", "").replaceAll("\\(", "").replaceAll("\\)", "");
-    if (hebrew.indexOf("׃") > 0) {
-      hebrew = hebrew.substring(0, hebrew.indexOf("׃")).trim();
-    }
-    return hebrew;
+  public static String removeGarbage(String text) {
+    return text.chars()
+        .filter(c -> c != '\u202A' && c != '\u202C' && c != '\u202D' && c != '\u200D')
+        .mapToObj(c -> String.valueOf((char) c)).collect(joining());
+  }
+
+  public static String removePunctuation(String text) {
+    AtomicBoolean foundEnd = new AtomicBoolean();
+    return removeGarbage(text).replaceAll("׀ ", "").chars()
+        .map(c -> c == '־' ? ' ' : c)
+        .peek(c -> {
+          if (c == '׃') {
+            foundEnd.set(true);
+          }
+        })
+        .filter(c -> c != '׀' && c != '[' && c != ']' && c != '(' && c != ')' && c != '‸' && c != '.' && !foundEnd.get())
+        .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
   }
 
   public static String removePunctuation(StringBuilder hebrew) {
@@ -155,15 +165,42 @@ public class HebrewConverter {
   }
 
   public static String toConstantsOnly(String text) {
-    return removePunctuation(text).chars().filter(c -> (c < 1425 || c > 1479) && c != '\u202A' && c != '\u202C')
+    return removePunctuation(text).chars()
+        .filter(c -> c < 1425 || c > 1479)
         .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
+  }
+
+  public static String toFullHebrew(String text) {
+    StringBuilder output = new StringBuilder();
+    int[] letters = removePunctuation(text).chars().toArray();
+    for (int l = 0; l < letters.length; l++) {
+      char c = (char) letters[l];
+      if ((c == '\u05BB' || c == '\u05B9') && letters[l - 1] != 'ו' && letters[l + 1] != 'ו') {
+        output.append('ו');
+      } else if (c == '\u05B4' && letters[l - 1] != 'י' && letters[l + 1] != 'י') {
+        // output.append('י');
+      }
+
+      if ((c < 1425 || c > 1479) && c != '\u202A' && c != '\u202C' && c != '\u200D') {
+        output.append(c);
+      }
+    }
+    return output.toString();
   }
 
   public static String toConstantsOnly(StringBuilder text) {
     return toConstantsOnly(text.toString());
   }
 
-  public static String unfinalize(String word) {
+  public static String unfinalize(String text) {
+    return stream(text.split(" ")).map(HebrewConverter::unfinalizeWord).collect(joining(" "));
+  }
+
+  public static String unfinalizeWord(String word) {
+    if (word.length() == 0) {
+      return word;
+    }
+
     int lastIndex = word.length() - 1;
     switch (word.charAt(lastIndex)) {
       case 'ך': return word.substring(0, lastIndex) + 'כ';
@@ -175,7 +212,11 @@ public class HebrewConverter {
     return word;
   }
 
-  public static String finalize(String word) {
+  public static String finalize(String text) {
+    return stream(text.split(" ")).map(HebrewConverter::finalizeWord).collect(joining(" "));
+  }
+
+  public static String finalizeWord(String word) {
     int lastIndex = word.length() - 1;
     switch (word.charAt(lastIndex)) {
       case 'כ': return word.substring(0, lastIndex) + 'ך';

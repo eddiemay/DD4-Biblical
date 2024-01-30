@@ -1,8 +1,12 @@
 package com.digitald4.biblical.model;
 
+import static com.google.common.collect.Streams.stream;
+
+import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;
+import com.digitald4.common.util.Calculate;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
@@ -109,9 +113,12 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
   public static class AuditScripture extends Scripture {
     private final int ld;
+    private final double percentMatch;
 
-    public AuditScripture(String book, int chapter, int verse, String text, int ld) {
+    public AuditScripture(
+        String book, int chapter, int verse, String text, int ld, double percentMatch) {
       this.ld = ld;
+      this.percentMatch = percentMatch;
       setVersion("Audit");
       setBook(book);
       setChapter(chapter);
@@ -120,13 +127,29 @@ public class Scripture extends ModelObject<String> implements Searchable {
       setLanguage(Language.HEBREW);
     }
 
+    public static AuditScripture of(
+        String book, int chapter, int verse, String original, String revised) {
+
+      original = HebrewConverter.removePunctuation(original);
+      revised = HebrewConverter.removePunctuation(revised);
+
+      int ld = Calculate.LD(original, revised);
+      double length = Math.max(original.length(), revised.length());
+      return new AuditScripture(book, chapter, verse,
+          Calculate.getDiffHtml(original, revised), ld, (length - ld) / length);
+    }
+
     public int getLd() {
       return ld;
     }
 
+    public double getPercentMatch() {
+      return percentMatch;
+    }
+
     @Override
     public String toString() {
-      return super.toString() + " LD: " + ld;
+      return super.toString() + " LD: " + ld + " Percent Match: " + percentMatch;
     }
   }
 
@@ -135,9 +158,11 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
     public InterlinearScripture(Iterable<Interlinear> interlinears) {
       this.interlinears = ImmutableList.copyOf(interlinears);
-      setLanguage(Language.INTERLINEAR);
+      String strongsId = stream(interlinears).map(Interlinear::getStrongsId)
+          .filter(Objects::nonNull).findAny().orElse("");
+      setLanguage(strongsId.startsWith("G") ? Language.GREEK : Language.HEBREW);
       Interlinear interlinear = interlinears.iterator().next();
-      setVersion(interlinear.getVersion());
+      setVersion(ScriptureVersion.INTERLINEAR);
       setBook(interlinear.getBook());
       setChapter(interlinear.getChapter());
       setVerse(interlinear.getVerse());

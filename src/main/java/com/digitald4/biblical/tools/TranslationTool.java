@@ -12,10 +12,12 @@ import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Constants;
+import com.digitald4.biblical.util.InterlinearFetcher;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
+import com.digitald4.biblical.util.ScriptureFetcherBibleHub;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
@@ -25,10 +27,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class TranslationTool {
   private final ImmutableSet.Builder<Interlinear> hasTranslationDiff = ImmutableSet.builder();
@@ -40,10 +40,14 @@ public class TranslationTool {
     this.interlinearStore = interlinearStore;
   }
 
-  public void printTranslation(String reference) {
+  public void translateAndPrint(String reference) {
     machineTranslator.translate(interlinearStore.getInterlinear(reference)).stream()
         .collect(toImmutableListMultimap(Interlinear::reference, identity())).asMap()
         .forEach(this::printTranslation);
+  }
+
+  public void translateAndPrint(String reference, String hebrew) {
+    printTranslation(reference, machineTranslator.translate(hebrew));
   }
 
   public void printTranslation(String reference, Collection<Interlinear> translated) {
@@ -65,6 +69,8 @@ public class TranslationTool {
             .collect(joining(" ")));
     hasTranslationDiff.addAll(
         translated.stream()
+            .filter(i -> i.getConstantsOnly().length() > 1)
+            .filter(i -> i.getChapter() > 0)
             .filter(
                 i -> i.getSubTokens().stream().map(SubToken::getStrongsId)
                     .noneMatch(s -> Objects.equals(s, i.getStrongsId())))
@@ -100,23 +106,40 @@ public class TranslationTool {
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
-    LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector, true);
+    InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(
-        () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), lexiconFetcher);
+        () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
 
     DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
+    LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
 
     TranslationTool translationTool = new TranslationTool(machineTranslator, interlinearStore);
-    // translationTool.printTranslation("Gen 1:1-2:3");
-    // translationTool.printTranslation("Isa 9:6, Psa 83:18, Gen 14:18,16:3,19:8,19:12");
-    translationTool.printTranslation("Exo 20");
-    // translationTool.printTranslation("Lev 23");
+    // translationTool.translateAndPrint("Gen 1:1-2:3");
+    // translationTool.translateAndPrint("Isa 9:6, Psa 83:18, Gen 14:18,16:3,19:8,19:12");
+    translationTool.translateAndPrint("Isa 1-66");
+    /* translationTool.translateAndPrint("Exo 20");
+    translationTool.translateAndPrint("Lev 23");
+    translationTool.translateAndPrint("Dan 8:11");
+    translationTool.translateAndPrint("Gen 10:1");
+    translationTool.translateAndPrint("Isa 9:6");
+    translationTool.translateAndPrint("Isa 9:6 (WLCO)",
+        "כי־ילד ילד־לנו בן נתן־לנו ותהי המשרה על־שכמו ויקרא שמו פלא יועץ אל גבור אביעד שר־שלום");
+    translationTool.translateAndPrint("Isa 9:6 (DSS)",
+        "כי ילד יולד לנו בן נתן לנו ותהי המשורה על שכמו וקרא שמו פלא יועץ אל גבור אבי עד שר השלום");
+    translationTool.translateAndPrint("Jub 1:1",
+        "אלה דברי חלוקת הימים על פי התורה והעדות לתולדות השנים לשבועיהן וליובליהן כל ימי השמים על הארץ כאשר דבר אל משה בהר סיני:\n"
+            + "ויהי בשנה הראשונה לצאת בני ישראל מארץ מצרים בחודש השלישי בשישה עשר בו וידבר ה' אל משה לאמור:");
+    translationTool.translateAndPrint("Jub 1:2",
+        "עלה אלי פה ההרה ואתנה לך את שתי לוחות האבן והתורה והמצווה אשר כתבתי להורותם:"); */
+    translationTool.translateAndPrint("Jub 6:45",
+        "וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה");
 
     System.out.println(
         "\nIndex, Hebrew, KJV Translation, StrongsId, Strongs Hebrew, StrongsIds, Breakdown, MT");
-    translationTool.hasTranslationDiff.build() // .stream()
+    translationTool.hasTranslationDiff.build().stream()
         // .sorted(Comparator.comparing(Interlinear::getId))
+        .filter(i -> i.getSubTokens().get(0).getTranslation().equals("[UNK]"))
         .forEach(i -> System.out.printf("%s, %s, %s, %s, %s, %s, %s, %s\n",
             i.getId(), i.getConstantsOnly(), i.getTranslation(), i.getStrongsId(),
             i.getStrongsId() == null ? null : lexiconStore.get(i.getStrongsId()).getConstantsOnly(),

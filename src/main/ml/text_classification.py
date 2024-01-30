@@ -15,7 +15,8 @@ print(tf.__version__)
 url = "https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz"
 
 dataset = tf.keras.utils.get_file(
-  "aclImdb_v1", url, untar=True, cache_dir='.', cache_subdir='')
+  "aclImdb_v1", url, extract=True, cache_dir='.',
+  cache_subdir='../../../data/ml')
 
 dataset_dir = os.path.join(os.path.dirname(dataset), 'aclImdb')
 
@@ -35,7 +36,7 @@ batch_size = 32
 seed = 42
 
 raw_train_ds = tf.keras.utils.text_dataset_from_directory(
-  'aclImdb/train',
+  train_dir,
   batch_size=batch_size,
   validation_split=0.2,
   subset='training',
@@ -50,14 +51,14 @@ print("Label 0 corresponds to", raw_train_ds.class_names[0])
 print("Label 1 corresponds to", raw_train_ds.class_names[1])
 
 raw_val_ds = tf.keras.utils.text_dataset_from_directory(
-  'aclImdb/train',
+  train_dir,
   batch_size=batch_size,
   validation_split=0.2,
   subset='validation',
   seed=seed)
 
 raw_test_ds = tf.keras.utils.text_dataset_from_directory(
-  'aclImdb/test',
+  os.path.join(dataset_dir, 'test'),
   batch_size=batch_size)
 
 max_features = 10000
@@ -112,9 +113,9 @@ model = tf.keras.Sequential([
 
 model.summary()
 
-model.compile(loss=losses.BinaryCrossentropy(from_logits=True),
-              optimizer='adam',
-              metrics=tf.metrics.BinaryAccuracy(threshold=0.0))
+model.compile(
+  loss=losses.BinaryCrossentropy(from_logits=True),
+  optimizer='adam', metrics=tf.metrics.BinaryAccuracy(threshold=0.0))
 
 epochs = 10
 history = model.fit(
@@ -182,29 +183,15 @@ export_model = tf.keras.Sequential([
 ])
 
 export_model.compile(
-  loss=losses.BinaryCrossentropy(from_logits=False), optimizer="adam", metrics=['accuracy']
+  loss=losses.BinaryCrossentropy(from_logits=False),
+  optimizer="adam", metrics=['accuracy']
 )
 
 # Test it with `raw_test_ds`, which yields raw strings
 loss, accuracy = export_model.evaluate(raw_test_ds)
 print(accuracy)
 
-examples = [
-  "The movie was great!",
-  "The movie was okay.",
-  "The movie was terrible..."
-]
-
-print(export_model.predict(examples))
-
 # Let's check:
 # np.testing.assert_allclose(model.predict(examples), export_model.predict(examples))
 
 export_model.save('text_classification')
-
-reloaded = tf.keras.models.load_model('text_classification')
-
-print(reloaded.predict(examples))
-
-# Let's check:
-# np.testing.assert_allclose(model.predict(examples), reloaded.predict(examples))
