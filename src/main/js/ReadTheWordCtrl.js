@@ -1,12 +1,14 @@
-com.digitald4.biblical.ReadTheWordCtrl =
-    function($location, $window, globalData, bookService, lexiconService, scriptureService) {
+com.digitald4.biblical.ReadTheWordCtrl = function($location, $window, globalData,
+    bookService, interlinearService, lexiconService, scriptureService, tokenWordService) {
   this.locationProvider = $location;
   this.window = $window;
   this.globalData = globalData;
   this.globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.bookService = bookService;
+  this.interlinearService = interlinearService;
   this.lexiconService = lexiconService;
   this.scriptureService = scriptureService;
+  this.tokenWordService = tokenWordService;
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.language = $location.search()['lang'];
@@ -91,36 +93,56 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(versio
       version: version || this.globalData.scriptureVersion, lang: this.globalData.language};
 }
 
-com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDefs = function(strongsId) {
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDef = function(strongsId) {
   this.strongsId = strongsId || this.strongsId;
   if (this.strongsId == undefined) {return;}
   this.lexicon = {id: this.strongsId, word: 'Loading...', strongsDefinition: '', rootWord: ''};
+  this.lexiconTranslations = [{translation: 'Loading...'}];
   this.lexiconService.get(this.strongsId, lexicon => {this.lexicon = lexicon});
+  this.tokenWordService.getTranslations(
+      this.strongsId, translations => {this.lexiconTranslations = translations.items});
+  this.addTokenWord = {strongsId: strongsId, word: '', translation: ''};
   this.setDialogStyle();
   this.dialogShown = 'LEXICON';
 }
 
-com.digitald4.biblical.ReadTheWordCtrl.prototype.prevStrongsDefs = function() {
-  this.showStrongsDefs(this.strongsId.substring(0, 1) + (parseInt(this.strongsId.substring(1)) - 1));
+com.digitald4.biblical.ReadTheWordCtrl.prototype.prevStrongsDef = function() {
+  this.showStrongsDef(this.strongsId.substring(0, 1) + (parseInt(this.strongsId.substring(1)) - 1));
 }
 
-com.digitald4.biblical.ReadTheWordCtrl.prototype.nextStrongsDefs = function() {
-  this.showStrongsDefs(this.strongsId.substring(0, 1) + (parseInt(this.strongsId.substring(1)) + 1));
+com.digitald4.biblical.ReadTheWordCtrl.prototype.nextStrongsDef = function() {
+  this.showStrongsDef(this.strongsId.substring(0, 1) + (parseInt(this.strongsId.substring(1)) + 1));
 }
 
-com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(interlinear, page) {
+com.digitald4.biblical.ReadTheWordCtrl.prototype.addTranslation = function() {
+  this.tokenWordService.create(this.addTokenWord, tokenWord => {
+    this.lexiconTranslations.push(tokenWord);
+    this.addTokenWord.word = '';
+    this.addTokenWord.translation = '';
+  });
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.fillReferenceCount = function() {
+  this.lexiconService.fillReferenceCount(this.strongsId, referenceCount => {
+    this.lexicon.referenceCount = referenceCount;
+  });
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefDialog = function(interlinear) {
   this.setDialogStyle();
   this.interlinear = interlinear;
   this.references = undefined;
-  var matchCriteria =
-      (this.globalData.matchStrongs ? 4 : 0) +
-      (this.globalData.matchWord ? 2 : 0) +
-      (this.globalData.matchConstantsOnly ? 1 : 0);
-  var request = {interlinearId: interlinear.id, matchCriteria: matchCriteria, pageToken: page};
-  this.lexiconService.getReferences(request, response => {
+  this.dialogShown = 'REFERENCES';
+}
+
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(page) {
+  var request = {pageToken: page};
+  if (this.globalData.matchStrongs) request.strongsId = this.interlinear.strongsId;
+  if (this.globalData.matchWord) request.word = this.interlinear.word;
+  if (this.globalData.matchConstantsOnly) request.hebrewWord = this.interlinear.constantsOnly;
+  this.interlinearService.getReferences(request, response => {
     this.references = processPagination(response);
   });
-  this.dialogShown = 'REFERENCES';
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showScroll = function(scripture) {

@@ -1,5 +1,6 @@
 package com.digitald4.biblical.store;
 
+import static com.digitald4.biblical.model.ScriptureVersion.INTERLINEAR;
 import static com.digitald4.biblical.util.Language.EN;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -10,13 +11,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.BibleBook;
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.AuditScripture;
-import com.digitald4.biblical.model.ScriptureVersion;
+import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
+import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
+import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.storage.DAO;
@@ -39,6 +44,8 @@ public class ScriptureStoreTest {
   @Mock private final DAO dao = mock(DAO.class);
   @Mock private final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   @Mock private final ScriptureFetcher scriptureFetcher = mock(ScriptureFetcher.class);
+  @Mock private final InterlinearStore interlinearStore = mock(InterlinearStore.class);
+  @Mock private final MachineTranslator machineTranslator = mock(MachineTranslator.class);
 
   private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
@@ -48,8 +55,8 @@ public class ScriptureStoreTest {
 
   @Before
   public void setup() {
-    scriptureStore = new ScriptureStore(() -> dao,
-        searchIndexer, bibleBookStore, scriptureRefProcessor, scriptureFetcher, null, null);
+    scriptureStore = new ScriptureStore(() -> dao, searchIndexer, bibleBookStore,
+        scriptureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).then(
         i -> getScriptures(i.getArgument(1)));
@@ -195,15 +202,64 @@ public class ScriptureStoreTest {
   }
 
   @Test
+  public void getScriptures_interlinear() {
+    ImmutableList<Interlinear> interlinears = ImmutableList.of(
+        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H7225").setWord("בְּרֵאשִׁ֖ית"),
+        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H1254").setWord("בָּרָ֣א"),
+        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H0430").setWord("אֱלֹהִ֑ים"));
+    when(interlinearStore.getInterlinear(any(VerseRange.class))).thenReturn(interlinears);
+    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Gen 1:1").getItems())
+        .containsExactly(new InterlinearScripture(interlinears));
+    /* assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Gen 5:17-19").getItems())
+        .containsExactly(
+            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(17),
+            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(18),
+            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(19)); */
+  }
+
+  @Test
   public void getScriptures_interlinearNotSupported() {
-    assertThat(scriptureStore.getScriptures(ScriptureVersion.INTERLINEAR, "en", "Jasher 1:1").getItems())
+    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jasher 1:1").getItems())
         .containsExactly(
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
-    assertThat(scriptureStore.getScriptures(ScriptureVersion.INTERLINEAR, "en", "Jasher 5:17-19").getItems())
+    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jasher 5:17-19").getItems())
         .containsExactly(
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(19).setText("[Fetched OXFORD From Web]"));
+  }
+
+  @Test
+  public void getScriptures_interlinear_derived() {
+    ImmutableList<Interlinear> interlinears = ImmutableList.of(
+        createInterlinear("Jub", 6, 45, 1, "וכל", null),
+        createInterlinear("Jub", 6, 45, 2, "הימים", null),
+        createInterlinear("Jub", 6, 45, 3, "אשר", null),
+        createInterlinear("Jub", 6, 45, 4, "נועדו", null),
+        createInterlinear("Jub", 6, 45, 5, "הם", null),
+        createInterlinear("Jub", 6, 45, 6, "שתים", null),
+        createInterlinear("Jub", 6, 45, 7, "וחמישים", null),
+        createInterlinear("Jub", 6, 45, 8, "שבתות", null),
+        createInterlinear("Jub", 6, 45, 9, "ימים", null),
+        createInterlinear("Jub", 6, 45, 10, "עד", null),
+        createInterlinear("Jub", 6, 45, 11, "מלאת", null),
+        createInterlinear("Jub", 6, 45, 12, "שנה", null),
+        createInterlinear("Jub", 6, 45, 13, "תמימה:", null));
+
+    when(dao.list(eq(Scripture.class), any(Query.List.class))).thenReturn(
+        QueryResult.of(
+            ImmutableList.of(
+                new Scripture().setBook("Jub").setChapter(6).setVerse(45)
+                    .setText("וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה:")),
+            1, null));
+
+    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jub 6:45").getItems())
+        .containsExactly(new InterlinearScripture(interlinears));
+    /* assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Gen 5:17-19").getItems())
+        .containsExactly(
+            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(17),
+            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(18),
+            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(19)); */
   }
 
   @Test
@@ -273,5 +329,12 @@ public class ScriptureStoreTest {
             "And I will feed them on My holy mountain, and I will be their Shepherd, and I will be closer to them than a garment is to their skin."),
         new Scripture().setVersion("CCC").setLanguage("en").setBook("Apocryphon of Ezekiel").setChapter(5).setVerse(3).setText(
             "They will call Me, and I will say, Behold, here I am. And if they cross, they will not slip,” says the Lord."));
+  }
+
+  public static Interlinear createInterlinear(
+      String book, int chapter, int verse, int index, String word, String strongsId) {
+    return new Interlinear().setBook(book).setChapter(chapter).setVerse(verse)
+        .setIndex(index).setWord(word).setStrongsId(strongsId)
+        .setConstantsOnly(HebrewConverter.toConstantsOnly(word));
   }
 }

@@ -1314,7 +1314,7 @@
 {"strongsId":"H1314","root":"בשמ","translation":"spice"}
 {"strongsId":"H1315","root":"בשמת","translation":"Bashemath"}
 {"strongsId":"H1316","root":"בשנ","translation":"Bashan"}
-{"strongsId":"H1317","root":"בשנה","translation":"shame"}
+** {"strongsId":"H1317","root":"בשנה","translation":"shame"}
 {"strongsId":"H1318","root":"בשס","translation":"treading"}
 {"strongsId":"H1319","root":"בשר","translation":"tidings"}
 {"strongsId":"H1320","root":"בשר","translation":"flesh"}

@@ -50,9 +50,9 @@ public class LexiconTool {
   private final static String API_URL = BASE_URL + "_api";
   private final static String API_VERSION = "v1";
   private final static String URL = "%s/%s?startIndex=%d&endIndex=%d&lang=%s";
-  private final static String INTER_REINDEX_URL = "%s/reindexInterlinear?book=%s&chapter=%d";
+  private final static String INTER_REINDEX_URL = "%s/reindex?book=%s&chapter=%d";
   private final static String INTER_MIGRATE_URL = "%s/migrateInterlinear?book=%s&chapter=%d";
-  private final static String INTER_DELETE_URL = "%s/deleteInterlinear?book=%s&chapter=%d";
+  private final static String INTER_DELETE_URL = "%s/deleteInterlinear?version=%s&book=%s&chapter=%d";
   private final static String INTER_FETCH_URL = "%s/search?lang=interlinear&searchText=%s+%d:1";
   private final APIConnector apiConnector;
   private final LexiconStore lexiconStore;
@@ -104,21 +104,24 @@ public class LexiconTool {
   }
 
   public void reindexInterlinear(String book, int chapter) {
-    String baseUrl = apiConnector.formatUrl("lexicons");
+    String baseUrl = apiConnector.formatUrl("interlinears");
     System.out.printf("Reindexing: %s %d...\n", book, chapter);
     apiConnector.sendGet(String.format(INTER_REINDEX_URL, baseUrl, book, chapter));
   }
 
   public void migrateInterlinear(String bibleBook, int chapter) {
-    String baseUrl = apiConnector.formatUrl("lexicons");
+    String baseUrl = apiConnector.formatUrl("interlinears");
     System.out.printf("Migrating: %s %d...\n", bibleBook, chapter);
     apiConnector.sendGet(String.format(INTER_MIGRATE_URL, baseUrl, bibleBook, chapter));
   }
 
-  public int deleteInterlinear(String book, int chapter) {
-    String baseUrl = apiConnector.formatUrl("lexicons");
-    System.out.printf("Deleting: %s %d...\n", book, chapter);
-    return Integer.parseInt(apiConnector.sendGet(String.format(INTER_DELETE_URL, baseUrl, book, chapter)).trim());
+  public int deleteInterlinear(String version, String book, int chapter) {
+    String baseUrl = apiConnector.formatUrl("interlinears");
+    System.out.printf("Deleting: %s %s %d...", version, book, chapter);
+    int deleted = Integer.parseInt(
+        apiConnector.sendGet(String.format(INTER_DELETE_URL, baseUrl, version, book, chapter)).trim());
+    System.out.println(deleted + " records");
+    return deleted;
   }
 
   public void printInterlinear(String scripture) {
@@ -392,15 +395,18 @@ public class LexiconTool {
     // IntStream.range(51, 151).forEach(chapter -> lexiconTool.reindexInterlinear("Psa", chapter));
     // lexiconTool.reindexInterlinear("Jer", 31);
 
-    Stream.of(bibleBookStore.get("Isa"), bibleBookStore.get("Ezra"))
+    Stream.of(bibleBookStore.get("Psa"))
     /* bibleBookStore.getAllBooks().stream()
         .filter(b -> b.getNumber() > 20 && b.getNumber() < 40
             && !b.name().equals("Daniel") && !b.name().equals("Isaiah")
-            && !b.name().equals("Jeremiah") && !b.name().equals("Ezekiel")) */
+            && !b.name().equals("Jeremiah") && !b.name().equals("Ezekiel")
+            && !b.name().equals("Esther") && !b.name().equals("Ruth")) */
         .forEach(book -> {
+          String name = book.name();
           int end = book.getChapterCount() + 1;
-          range(1, end).forEach(c -> lexiconTool.deleteInterlinear(book.name(), c));
-          range(1, end).forEach(c -> lexiconTool.reindexInterlinear(book.name(), c));
+          System.out.printf("%d records deleted from %s\n",
+              range(1, end).map(c -> lexiconTool.deleteInterlinear("WLC", name, c)).sum(), name);
+          // range(1, end).forEach(c -> lexiconTool.reindexInterlinear(name, c));
         });
 
     /* System.out.println("Total records deleted: " + Stream

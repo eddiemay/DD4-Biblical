@@ -1,7 +1,7 @@
 *** Prefixes ***
 {"translation":"I ","word":"א","tokenType":"PREFIX_ONLY"}
 {"translation":"in ","word":"ב","tokenType":"PREFIX_ONLY"}
-{"translation":"the ","word":"ה","tokenType":"PREFIX","asSuffix":" it"}
+{"translation":"the ","word":"ה","tokenType":"PREFIX","asSuffix":""}
 {"translation":"and ","word":"ו","tokenType":"PREFIX","asSuffix":" of him"}
 {"translation":"he ","word":"י","tokenType":"PREFIX","asSuffix":"s of"}
 {"translation":"like ","word":"כ","tokenType":"PREFIX","asSuffix":" of you"}
@@ -19,7 +19,7 @@
 {"translation":"them","word":"המ","tokenType":"SUFFIX","asSuffix":" of them"}
 ** {"translation":"them","word":"כמ","tokenType":"SUFFIX","asSuffix":" of y'all"}
 {"translation":"of us","word":"נו","tokenType":"SUFFIX","asSuffix":" of us"}
-{"translation":"it ","word":"ונ","tokenType":"PREFIX","asSuffix":" of it"}
+{"translation":"and we ","word":"ונ","tokenType":"PREFIX","asSuffix":" of it"}
 {"translation":"it ","word":"נה","tokenType":"PREFIX","asSuffix":" of it"}
 {"translation":"","word":"הו","tokenType":"SUFFIX_ONLY","asSuffix":" of it"}
 {"translation":" of you","word":"כ","tokenType":"SUFFIX_ONLY"}

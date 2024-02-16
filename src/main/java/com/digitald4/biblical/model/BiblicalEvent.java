@@ -288,7 +288,7 @@ public class BiblicalEvent extends ModelObject<Long> {
               throw new DD4StorageException("Unknown duration: " + value, DD4StorageException.ErrorCode.BAD_REQUEST);
           }
         } while (matcher.find());
-      } else {
+      } else if (!value.isEmpty()) {
         setYears(Integer.parseInt(value));
       }
 

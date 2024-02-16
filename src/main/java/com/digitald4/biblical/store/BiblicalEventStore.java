@@ -23,7 +23,8 @@ import java.util.function.UnaryOperator;
 public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
   private final ScriptureMarkupProcessor scriptureMarkupProcessor;
   @Inject
-  public BiblicalEventStore(Provider<DAO> daoProvider, ScriptureMarkupProcessor scriptureMarkupProcessor) {
+  public BiblicalEventStore(
+      Provider<DAO> daoProvider, ScriptureMarkupProcessor scriptureMarkupProcessor) {
     super(BiblicalEvent.class, daoProvider);
     this.scriptureMarkupProcessor = scriptureMarkupProcessor;
   }

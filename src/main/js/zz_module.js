@@ -64,6 +64,14 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .service('holyDayService', function(apiConnector) {
     return new com.digitald4.common.JSONService('holyDay', apiConnector);
   })
+  .service('interlinearService', function(apiConnector) {
+    var interlinearService = new com.digitald4.common.JSONService('interlinear', apiConnector);
+    interlinearService.getReferences = function(request, success, error) {
+      return interlinearService.sendRequest(
+          {action: 'getReferences', params: request}, success, error);
+    }
+    return interlinearService;
+  })
   .service('lessonService', function(apiConnector) {
     var lessonService = new com.digitald4.common.JSONService('lesson', apiConnector);
     lessonService.listLessons = function(allowDraft, success, error) {
@@ -76,8 +84,9 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   })
   .service('lexiconService', function(apiConnector) {
     var lexiconService = new com.digitald4.common.JSONService('lexicon', apiConnector);
-    lexiconService.getReferences = function(request, success, error) {
-      return lexiconService.sendRequest({action: 'getReferences', params: request}, success, error);
+    lexiconService.fillReferenceCount = function(strongsId, success, error) {
+      return lexiconService.sendRequest(
+          {action: 'fillReferenceCount', params: {strongsId: strongsId}}, success, error);
     }
     return lexiconService;
   })
@@ -114,6 +123,9 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     // scriptureService = new ScriptureServiceInMemoryImpl();
     return scriptureService;
   })
+  .service('sunRiseSetService', function(apiConnector) {
+    return new com.digitald4.common.JSONService('sunRiseSet', apiConnector)
+  })
   .service('timelineService', function(apiConnector) {
     var timelineService = new com.digitald4.common.JSONService('timeline', apiConnector);
     var events = {items: [
@@ -140,8 +152,13 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     }
     return timelineService;
   })
-  .service('sunRiseSetService', function(apiConnector) {
-    return new com.digitald4.common.JSONService('sunRiseSet', apiConnector)
+  .service('tokenWordService', function(apiConnector) {
+    var tokenWordService = new com.digitald4.common.JSONService('tokenWord', apiConnector);
+    tokenWordService.getTranslations = function(strongsId, success, error) {
+      return tokenWordService.sendRequest(
+          {action: 'getTranslations', params: {strongsId: strongsId}}, success, error);
+    }
+    return tokenWordService;
   })
   .controller('biblicalCtrl', com.digitald4.biblical.BiblicalCtrl)
   .directive('biblicalCalendar', ['$compile', function($compile) {

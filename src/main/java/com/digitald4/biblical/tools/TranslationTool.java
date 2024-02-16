@@ -1,57 +1,65 @@
 package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
+import com.digitald4.biblical.model.Scripture.InterlinearScripture;
+import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
+import com.digitald4.biblical.store.ScriptureStore;
+import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Constants;
+import com.digitald4.biblical.util.HebrewTokenizer;
 import com.digitald4.biblical.util.InterlinearFetcher;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
+import com.digitald4.biblical.util.ScriptureFetcher;
+import com.digitald4.biblical.util.ScriptureFetcherBibleGateway;
 import com.digitald4.biblical.util.ScriptureFetcherBibleHub;
+import com.digitald4.biblical.util.ScriptureFetcherJWOrg;
+import com.digitald4.biblical.util.ScriptureFetcherKJV1611;
+import com.digitald4.biblical.util.ScriptureFetcherOneOff;
+import com.digitald4.biblical.util.ScriptureFetcherPseudepigrapha;
+import com.digitald4.biblical.util.ScriptureFetcherRouter;
+import com.digitald4.biblical.util.ScriptureFetcherSefariaOrg;
+import com.digitald4.biblical.util.ScriptureFetcherStepBibleOrg;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOFileBasedImpl;
+import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Collection;
 import java.util.Objects;
 
 public class TranslationTool {
   private final ImmutableSet.Builder<Interlinear> hasTranslationDiff = ImmutableSet.builder();
-  private final MachineTranslator machineTranslator;
-  private final InterlinearStore interlinearStore;
+  private final ScriptureStore scriptureStore;
 
-  public TranslationTool(MachineTranslator machineTranslator, InterlinearStore interlinearStore) {
-    this.machineTranslator = machineTranslator;
-    this.interlinearStore = interlinearStore;
+  public TranslationTool(ScriptureStore scriptureStore) {
+    this.scriptureStore = scriptureStore;
   }
 
   public void translateAndPrint(String reference) {
-    machineTranslator.translate(interlinearStore.getInterlinear(reference)).stream()
-        .collect(toImmutableListMultimap(Interlinear::reference, identity())).asMap()
+    scriptureStore.getScriptures("WLC", ScriptureVersion.INTERLINEAR, reference).getItems().stream()
+        .map(s -> (InterlinearScripture) s)
         .forEach(this::printTranslation);
   }
 
-  public void translateAndPrint(String reference, String hebrew) {
-    printTranslation(reference, machineTranslator.translate(hebrew));
-  }
-
-  public void printTranslation(String reference, Collection<Interlinear> translated) {
-    System.out.println("\n" + reference);
+  public void printTranslation(InterlinearScripture scripture) {
+    System.out.println("\n" + scripture.reference());
+    ImmutableList<Interlinear> translated = scripture.getInterlinears();
     System.out.println(translated.stream().map(Interlinear::getStrongsId).collect(joining(" ")));
     System.out.println(translated.stream()
         .map(i -> i.getSubTokens().stream()
@@ -70,10 +78,9 @@ public class TranslationTool {
     hasTranslationDiff.addAll(
         translated.stream()
             .filter(i -> i.getConstantsOnly().length() > 1)
-            .filter(i -> i.getChapter() > 0)
-            .filter(
-                i -> i.getSubTokens().stream().map(SubToken::getStrongsId)
-                    .noneMatch(s -> Objects.equals(s, i.getStrongsId())))
+            .filter(i ->
+                i.getSubTokens().stream().map(SubToken::getStrongsId).noneMatch(s -> Objects.equals(s, i.getStrongsId()))
+                    || i.getSubTokens().get(0).getTranslation().equals("[UNK]"))
             .collect(toImmutableList()));
   }
 
@@ -100,8 +107,9 @@ public class TranslationTool {
   }
 
   public static void main(String[] args) {
-    MachineTranslator machineTranslator = new MachineTranslator(TranslationTool::tokenWordProvider);
     DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
+    DAOFileBasedImpl scriptureDao = new DAOFileBasedImpl("data/scripture.db").loadFromFile();
+    DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
     StaticDataDAO staticDataDAO = new StaticDataDAO();
@@ -109,12 +117,29 @@ public class TranslationTool {
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(
         () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
+    ScriptureReferenceProcessor scriputureRefProcessor =
+        new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
+    ScriptureFetcher scriptureFetcher = new ScriptureFetcherRouter(
+        new ScriptureFetcherBibleGateway(apiConnector),
+        new ScriptureFetcherBibleHub(apiConnector),
+        new ScriptureFetcherJWOrg(apiConnector),
+        new ScriptureFetcherKJV1611(apiConnector),
+        new ScriptureFetcherOneOff(apiConnector),
+        new ScriptureFetcherPseudepigrapha(apiConnector),
+        new ScriptureFetcherSefariaOrg(apiConnector),
+        new ScriptureFetcherStepBibleOrg(apiConnector));
 
     DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
+    TokenWordStore tokenWordStore =
+        new TokenWordStore(() -> inMemoryDao, TranslationTool::tokenWordProvider, lexiconStore);
+    MachineTranslator machineTranslator =
+        new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
+    ScriptureStore scriptureStore = new ScriptureStore(() -> scriptureDao, null, bibleBookStore,
+        scriputureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
-    TranslationTool translationTool = new TranslationTool(machineTranslator, interlinearStore);
+    TranslationTool translationTool = new TranslationTool(scriptureStore);
     // translationTool.translateAndPrint("Gen 1:1-2:3");
     // translationTool.translateAndPrint("Isa 9:6, Psa 83:18, Gen 14:18,16:3,19:8,19:12");
     translationTool.translateAndPrint("Isa 1-66");
@@ -132,8 +157,7 @@ public class TranslationTool {
             + "ויהי בשנה הראשונה לצאת בני ישראל מארץ מצרים בחודש השלישי בשישה עשר בו וידבר ה' אל משה לאמור:");
     translationTool.translateAndPrint("Jub 1:2",
         "עלה אלי פה ההרה ואתנה לך את שתי לוחות האבן והתורה והמצווה אשר כתבתי להורותם:"); */
-    translationTool.translateAndPrint("Jub 6:45",
-        "וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה");
+    translationTool.translateAndPrint("Jub 6:45-46");
 
     System.out.println(
         "\nIndex, Hebrew, KJV Translation, StrongsId, Strongs Hebrew, StrongsIds, Breakdown, MT");

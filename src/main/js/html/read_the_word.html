@@ -104,12 +104,12 @@
                         </div>
                         <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
                           <tr><td class="strongs" data-ng-class="interlinear.highlight">
-                            <a href="" data-ng-click="$ctrl.showStrongsDefs(interlinear.strongsId)">
+                            <a href="" data-ng-click="$ctrl.showStrongsDef(interlinear.strongsId)">
                               {{interlinear.strongsId || '-'}}
                             </a>
                           </td></tr>
                           <tr><td class="translit">
-                            <a href="" data-ng-click="$ctrl.showStrongsRefs(interlinear)">
+                            <a href="" data-ng-click="$ctrl.showStrongsRefDialog(interlinear)">
                               {{interlinear.transliteration}}
                             </a>
                           </td></tr>
@@ -121,7 +121,7 @@
                           <tr><td class="strongsnt">{{interlinear.morphology}}</td></tr>
                           <tr><td class="strongs" data-ng-class="interlinear.highlight">
                             <span data-ng-repeat="subToken in interlinear.subTokens">
-                              <a href="" data-ng-click="$ctrl.showStrongsDefs(subToken.strongsId)">
+                              <a href="" data-ng-click="$ctrl.showStrongsDef(subToken.strongsId)">
                                 {{subToken.strongsId || '&nbsp;'}}
                               </a>
                             </span>
@@ -240,15 +240,36 @@
           </ol>
         </div>
         <div class="columns">
+          <h3>Strong's Reference Count</h3>
+          <p>{{$ctrl.lexicon.referenceCount}}</p>
+          <button data-ng-if="!$ctrl.lexicon.referenceCount"
+                  data-ng-click="$ctrl.fillReferenceCount()">Fill Reference Count</button>
+        </div>
+        <div class="columns">
+          <h3>Spelling Variants</h3>
+          <ul>
+            <li data-ng-repeat="translation in $ctrl.lexiconTranslations">
+              {{translation.word}} {{translation.translation}}
+            </li>
+          </ul>
+          <div data-ng-if="appCtrl.isUserLoggedIn()">
+            <label>Word</label>
+            <input type="text" data-ng-model="$ctrl.addTokenWord.word">
+            <label>Translation</label>
+            <input type="text" data-ng-model="$ctrl.addTokenWord.translation">
+            <button data-ng-click="$ctrl.addTranslation()">Add</button>
+          </div>
+        </div>
+        <div class="columns">
           <h3>Dictionary Aids</h3>
           <p>{{$ctrl.lexicon.dictionaryAid}}</p>
         </div>
         <div class="columns">
           <div class="colx3-left">
-            <button class="float-left" data-ng-click="$ctrl.prevStrongsDefs()">Previous</button>
+            <button class="float-left" data-ng-click="$ctrl.prevStrongsDef()">Previous</button>
           </div>
           <div class="colx3-center">
-            <button class="float-center" data-ng-click="$ctrl.nextStrongsDefs()">Next</button>
+            <button class="float-center" data-ng-click="$ctrl.nextStrongsDef()">Next</button>
           </div>
         </div>
         <div class="columns">
@@ -256,7 +277,7 @@
             <input data-ng-model="$ctrl.strongsId" class="full-width"/>
           </div>
           <div class="colx3-center">
-            <button data-ng-click="$ctrl.showStrongsDefs()">Show</button>
+            <button data-ng-click="$ctrl.showStrongsDef()">Show</button>
           </div>
           <div class="colx3-right">
             <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
@@ -282,13 +303,12 @@
         <fieldset>
           <h4>Match Criteria</h4>
           <span>
-            <span><input type="checkbox" data-ng-model="$ctrl.globalData.matchStrongs"
-                         data-ng-change="$ctrl.showStrongsRefs($ctrl.interlinear)"/>Strong's</span>
-            <span><input type="checkbox" data-ng-model="$ctrl.globalData.matchWord"
-                         data-ng-change="$ctrl.showStrongsRefs($ctrl.interlinear)"/>Word</span>
+            <span><input type="checkbox" data-ng-model="$ctrl.globalData.matchStrongs"/>Strong's</span>
+            <span><input type="checkbox" data-ng-model="$ctrl.globalData.matchWord"/>Word</span>
             <span>
-              <input type="checkbox" data-ng-model="$ctrl.globalData.matchConstantsOnly"
-                     data-ng-change="$ctrl.showStrongsRefs($ctrl.interlinear)"/>Hebrew Letters</span>
+              <input type="checkbox" data-ng-model="$ctrl.globalData.matchConstantsOnly"/>Hebrew Letters
+            </span>
+            <span><button data-ng-click="$ctrl.showStrongsRefs()">show</button></span>
           </span>
         </fieldset>
         <div data-ng-repeat="reference in $ctrl.references.items">
@@ -301,7 +321,7 @@
         </div>
         <fieldset>
           <span data-ng-repeat="page in $ctrl.references.pages">
-            <button data-ng-click="$ctrl.showStrongsRefs($ctrl.interlinear, page)"
+            <button data-ng-click="$ctrl.showStrongsRefs(page)"
                     data-ng-disabled="page == $ctrl.references.pageToken">{{page}}</button>
           </span>
         </fieldset>

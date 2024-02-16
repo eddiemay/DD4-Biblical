@@ -242,7 +242,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
     assertThat(interlinears.get(0).getMorphology()).isEqualTo("Adv");
   }
 
-  private static Interlinear createInterlinear(String book, int chapter, int verse,
+  public static Interlinear createInterlinear(String book, int chapter, int verse,
       int index, String word, String transliteration, String strongsId, String translation) {
     return new Interlinear().setBook(book).setChapter(chapter).setVerse(verse)
         .setIndex(index).setWord(word).setTransliteration(transliteration).setStrongsId(strongsId)

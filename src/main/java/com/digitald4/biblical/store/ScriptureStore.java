@@ -1,10 +1,14 @@
 package com.digitald4.biblical.store;
 
+import static com.digitald4.biblical.model.ScriptureVersion.INTERLINEAR;
+import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
+import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.common.storage.Query.forList;
 import static com.digitald4.biblical.util.HebrewConverter.toAncient;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.Arrays.stream;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
@@ -36,6 +40,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -95,23 +100,28 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     int startVerse = verseRange.getStartVerse();
     int endVerse = verseRange.getEndVerse();
 
-    if (ScriptureVersion.INTERLINEAR.equalsIgnoreCase(version) || ScriptureVersion.INTERLINEAR.equalsIgnoreCase(language)) {
-      // Check to see if this book supports Interlinear.
-      ScriptureVersion scriptureVersion = bibleBookStore
-          .getOrFallback(ScriptureVersion.INTERLINEAR, language, verseRange.getBook(), false);
-      if (scriptureVersion == null) {
-        return ImmutableList.of();
-      }
+    if (INTERLINEAR.equalsIgnoreCase(version) || INTERLINEAR.equalsIgnoreCase(language)) {
+      ImmutableMap<Integer, String> dssReferences = !book.equals(BibleBook.ISAIAH)
+          ? ImmutableMap.of()
+          : list(new LanguageRequest("DSS", Language.HEBREW, false), book, chapter, startVerse, endVerse)
+              .getItems().stream()
+              .collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
 
-      if (ScriptureVersion.INTERLINEAR.equals(scriptureVersion.getVersion())) {
-        ImmutableMap<Integer, String> dssReferences = !book.equals(BibleBook.ISAIAH)
-            ? ImmutableMap.of()
-            : list(new LanguageRequest("DSS", Language.HEBREW, false), book, chapter, startVerse,
-                endVerse)
-                .getItems().stream()
-                .collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
+      ImmutableList<Interlinear> interlinears = verseRange.getBook().getNumber() < 67
+          ? interlinearStore.getInterlinear(verseRange)
+          : list(new LanguageRequest("Sefaria", Language.HEBREW, false), book, chapter, startVerse, endVerse)
+              .getItems().stream()
+              .flatMap(s -> {
+                AtomicInteger index = new AtomicInteger();
+                return stream(s.getText().toString().split(" "))
+                    .map(w -> new Interlinear().setBook(s.getBook()).setChapter(s.getChapter())
+                        .setVerse(s.getVerse()).setIndex(index.incrementAndGet())
+                        .setWord(w).setConstantsOnly(toConstantsOnly(w)));
+              })
+              .collect(toImmutableList());
 
-        return interlinearStore.getInterlinear(verseRange).stream()
+      if (!interlinears.isEmpty()) {
+        return interlinears.stream()
             .peek(machineTranslator::translate)
             .collect(groupingBy(Interlinear::getVerse)).values().stream()
             .map(InterlinearScripture::new)

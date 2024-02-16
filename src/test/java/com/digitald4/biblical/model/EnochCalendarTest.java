@@ -41,36 +41,6 @@ public class EnochCalendarTest {
   }
 
   @Test @Ignore
-  public void getDate_eventDate() {
-    DateTime start = DateTime.parse("1981-02-08T04:15:00.00Z");
-
-    EnochCalendar enochCalendar = new EnochCalendar(start);
-
-    assertEquals(enochCalendar.getDate(1, -1), enochCalendar.getDate(EventDate.LAST_DAY_OF_LAST_YEAR));
-    assertEquals(enochCalendar.getDate(1, 1), enochCalendar.getDate(EventDate.FIRST_DAY_OF_YEAR));
-    assertEquals(enochCalendar.getDate(1, 14), enochCalendar.getDate(EventDate.PASSOVER));
-    assertEquals(enochCalendar.getDate(7, 1), enochCalendar.getDate(EventDate.FEAST_OF_TRUMPETS));
-    assertEquals(enochCalendar.getDate(7, 10), enochCalendar.getDate(EventDate.DAY_OF_ATONEMENT));
-    assertEquals(enochCalendar.getDate(9, 25), enochCalendar.getDate(EventDate.FEAST_OF_DECICATION));
-    assertEquals(enochCalendar.getDate(12, 31), enochCalendar.getDate(EventDate.LAST_DAY_OF_YEAR));
-  }
-
-  @Test @Ignore
-  public void getDate_eventDate2021() {
-    DateTime start = DateTime.parse("2021-03-21T06:52:00.00Z");
-
-    EnochCalendar enochCalendar = new EnochCalendar(start);
-
-    assertEquals(start, enochCalendar.getDate(EventDate.FIRST_DAY_OF_YEAR));
-    assertEquals(DateTime.parse("2021-03-20T06:52:00.00Z"), enochCalendar.getDate(EventDate.LAST_DAY_OF_LAST_YEAR));
-    assertEquals(DateTime.parse("2021-04-03T06:52:00.00Z"), enochCalendar.getDate(EventDate.PASSOVER));
-    assertEquals(DateTime.parse("2021-09-19T06:52:00.00Z"), enochCalendar.getDate(EventDate.FEAST_OF_TRUMPETS));
-    assertEquals(DateTime.parse("2021-09-28T06:52:00.00Z"), enochCalendar.getDate(EventDate.DAY_OF_ATONEMENT));
-    assertEquals(DateTime.parse("2021-12-12T06:52:00.00Z"), enochCalendar.getDate(EventDate.FEAST_OF_DECICATION));
-    assertEquals(DateTime.parse("2022-03-19T06:52:00.00Z"), enochCalendar.getDate(EventDate.LAST_DAY_OF_YEAR));
-  }
-
-  @Test @Ignore
   public void getAbibOne() {
     int year = 1600;
     DateTime rollingDate = new DateTime(1600, 3, 19, 4, 0);

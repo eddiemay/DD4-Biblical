@@ -5,17 +5,22 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
+import com.digitald4.biblical.store.LexiconStore;
+import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
+import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 public class MachineTranslatorTest {
+  private static final DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
+  private static final LexiconStore lexiconStore = new LexiconStore(() -> inMemoryDao, null);
   private static final ImmutableList<TokenWord> TOKEN_WORDS = ImmutableList.of(
       new TokenWord().setRoot("ב").setTranslation("in ").setTokenType(TokenType.PREFIX_ONLY),
-      new TokenWord().setRoot("ה").setTranslation("the ").setWithSuffix("").setTokenType(TokenType.PREFIX),
+      new TokenWord().setRoot("ה").setTranslation("the ").setAsSuffix("").setTokenType(TokenType.PREFIX),
       new TokenWord().setRoot("ו").setTranslation("and ").setTokenType(TokenType.PREFIX),
-      new TokenWord().setRoot("י").setTranslation("he ").setTokenType(TokenType.PREFIX).setWithSuffix("of me"),
+      new TokenWord().setRoot("י").setTranslation("he ").setTokenType(TokenType.PREFIX).setAsSuffix("of me"),
       new TokenWord().setRoot("ימ").setTranslation("s").setTokenType(TokenType.SUFFIX_ONLY),
       new TokenWord().setRoot("ת").setTranslation("you ").setTokenType(TokenType.PREFIX),
       new TokenWord().setRoot("ש").setTranslation("that which ").setTokenType(TokenType.PREFIX_ONLY),
@@ -28,7 +33,10 @@ public class MachineTranslatorTest {
       new TokenWord().setRoot("יע").setTranslation("shovel").setStrongsId("H3257"),
       new TokenWord().setRoot("עש").setTranslation("made").setStrongsId("H6213"));
 
-  private final MachineTranslator machineTranslator = new MachineTranslator(() -> TOKEN_WORDS);
+  private final TokenWordStore tokenWordStore =
+      new TokenWordStore(() -> inMemoryDao, () -> TOKEN_WORDS, lexiconStore);
+  private final MachineTranslator machineTranslator =
+      new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
 
   @Test
   public void tokenize_inBeginning() {

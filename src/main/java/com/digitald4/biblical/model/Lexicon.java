@@ -22,6 +22,7 @@ public class Lexicon extends ModelObject<String> {
   private ImmutableList<Node> outline;
   private StringBuilder strongsDefinition;
   private String translation;
+  private Integer referenceCount;
 
   public Lexicon setId(String id) {
     switch (id.length()) {
@@ -177,6 +178,15 @@ public class Lexicon extends ModelObject<String> {
 
   public Lexicon setTranslation(String translation) {
     this.translation = translation;
+    return this;
+  }
+
+  public Integer getReferenceCount() {
+    return referenceCount;
+  }
+
+  public Lexicon setReferenceCount(Integer referenceCount) {
+    this.referenceCount = referenceCount;
     return this;
   }
 

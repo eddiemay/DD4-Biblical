@@ -22,15 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
     namespace = @ApiNamespace(
         ownerDomain = "biblical.digitald4.com",
         ownerName = "biblical.digitald4.com"
-    ),
-    // [START_EXCLUDE]
-    issuers = {
-        @ApiIssuer(
-            name = "firebase",
-            issuer = "https://securetoken.google.com/biblical",
-            jwksUri = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com")
-    }
-    // [END_EXCLUDE]
+    )
 )
 public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   private final ScriptureStore scriptureStore;

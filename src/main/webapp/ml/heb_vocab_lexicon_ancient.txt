@@ -891,8 +891,8 @@
 {"strongsId":"H1311","root":"בשל","translation":"sodden"}
 {"strongsId":"H1313","root":"בשמ","translation":"spice"}
 {"strongsId":"H1314","root":"בוסמ","translation":"spice"}
-{"strongsId":"H1317","root":"בשנ","translation":"shame"}
-{"strongsId":"H1317","root":"בשנה","translation":"shame"}
+** {"strongsId":"H1317","root":"בשנ","translation":"shame"}
+** {"strongsId":"H1317","root":"בשנה","translation":"shame"}
 {"strongsId":"H1318","root":"בשס","translation":"tread"}
 {"strongsId":"H1319","root":"בסר","translation":"tidings"}
 {"strongsId":"H1319","root":"בשר","translation":"tidings"}

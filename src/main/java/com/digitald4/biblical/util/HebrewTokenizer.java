@@ -2,33 +2,25 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
-import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
-import static java.util.function.Function.identity;
 
 import com.digitald4.biblical.model.AncientLexicon;
 import com.digitald4.biblical.model.Lexicon;
+import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
 import java.util.Objects;
+import javax.inject.Inject;
 import org.json.JSONObject;
 
 public class HebrewTokenizer {
-  public static final String UNKNOWN_WORD_DEFAULT = "[UNK]";
   private enum SearchState {PREFIX, WORD_MATCH_STRONGS, WORD, SUFFIX};
-  private final ImmutableListMultimap<String, TokenWord> tokenMap;
-  private final ImmutableList<String> unknownReturn;
+  private final TokenWordStore tokenWordStore;
 
-  public HebrewTokenizer(Iterable<TokenWord> tokenList, String unknownWord) {
-    tokenMap = stream(tokenList).collect(toImmutableListMultimap(TokenWord::getRoot, identity()));
-    this.unknownReturn = unknownWord == null ? null : ImmutableList.of(unknownWord);
-  }
-
-  public HebrewTokenizer(Iterable<TokenWord> tokenList) {
-    this(tokenList, null);
+  @Inject
+  public HebrewTokenizer(TokenWordStore tokenWordStore) {
+    this.tokenWordStore = tokenWordStore;
   }
 
   public ImmutableList<ImmutableList<String>> tokenize(String sentence) {
@@ -38,7 +30,7 @@ public class HebrewTokenizer {
   public ImmutableList<String> tokenizeWord(String word) {
     ImmutableList<String> tokenized = tokenizeWord(word, null, SearchState.WORD);
     if (tokenized.isEmpty()) {
-      return unknownReturn == null ? ImmutableList.of(word) : unknownReturn;
+      return ImmutableList.of(word);
     }
 
     return tokenized;
@@ -58,7 +50,7 @@ public class HebrewTokenizer {
     for (int len = strLen; len > 0; len--) {
       for (int start = 0; start + len <= strLen; start++) {
         String subword = word.substring(start, start + len);
-        ImmutableList<TokenWord> options = tokenMap.get(subword);
+        ImmutableList<TokenWord> options = tokenWordStore.getOptions(subword);
         if (!options.isEmpty() && hasGoodOption(state, options, strongsId)) {
           ImmutableList<String> pretokens;
           if (start > 0) {
@@ -107,35 +99,47 @@ public class HebrewTokenizer {
   }
 
   public static class TokenWord {
-    private String root;
+    private String word;
     private String strongsId;
     private String translation;
-    private String withSuffix;
+    private String asSuffix;
     enum TokenType {PREFIX, PREFIX_ONLY, SUFFIX, SUFFIX_ONLY, WORD, WHOLE_WORD_ONLY}
     private TokenType tokenType;
 
-    public String getRoot() {
-      return root;
+    public String getId() {
+      return word + (strongsId == null ? "" : "-" + strongsId);
     }
 
-    public TokenWord setRoot(String root) {
-      this.root = root;
+    public TokenWord setId(String id) {
       return this;
     }
 
     @Deprecated
-    public String getWord() {
+    private String getRoot() {
       return null;
     }
 
     @Deprecated
+    public TokenWord setRoot(String root) {
+      this.word = root;
+      return this;
+    }
+
+    public String getWord() {
+      return word;
+    }
+
     public TokenWord setWord(String word) {
-      this.root = word;
+      this.word = word;
       return this;
     }
 
     public String getStrongsId() {
       return strongsId;
+    }
+
+    public String strongsId() {
+      return strongsId == null ? "" : strongsId;
     }
 
     public TokenWord setStrongsId(String strongsId) {
@@ -152,28 +156,28 @@ public class HebrewTokenizer {
       return this;
     }
 
-    public String getWithSuffix() {
-      return withSuffix;
-    }
-
-    public TokenWord setWithSuffix(String withSuffix) {
-      this.withSuffix = withSuffix;
-      return this;
-    }
-
     @Deprecated
-    public String getAsSuffix() {
+    public String getWithSuffix() {
       return null;
     }
 
     @Deprecated
-    public TokenWord setAsSuffix(String withSuffix) {
-      this.withSuffix = withSuffix;
+    private TokenWord setWithSuffix(String withSuffix) {
+      this.asSuffix = withSuffix;
+      return this;
+    }
+
+    public String getAsSuffix() {
+      return asSuffix;
+    }
+
+    public TokenWord setAsSuffix(String asSuffix) {
+      this.asSuffix = asSuffix;
       return this;
     }
 
     public String asSuffix() {
-      return withSuffix == null ? translation : withSuffix;
+      return asSuffix == null ? translation : asSuffix;
     }
 
     public TokenType getTokenType() {
@@ -192,7 +196,17 @@ public class HebrewTokenizer {
     @Override
     public String toString() {
       return String.format(
-          "%s,%s,%s%s", root, translation, strongsId, withSuffix == null ? "" : "," + withSuffix);
+          "%s,%s,%s%s", word, translation, strongsId, asSuffix == null ? "" : "," + asSuffix);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof TokenWord && getId().equals(((TokenWord) obj).getId());
+    }
+
+    @Override
+    public int hashCode() {
+      return getId().hashCode();
     }
 
     public TokenWord copy() {

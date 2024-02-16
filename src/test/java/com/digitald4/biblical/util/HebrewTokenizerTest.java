@@ -2,17 +2,21 @@ package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.digitald4.biblical.store.LexiconStore;
+import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
+import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class HebrewTokenizerTest {
-
+  private static final DAOInMemoryImpl inMemoryImpl = new DAOInMemoryImpl();
+  private static final LexiconStore lexiconStore = new LexiconStore(() -> inMemoryImpl, null);
   private static final HebrewTokenizer tokenizer = new HebrewTokenizer(
-      ImmutableSet.of(
+      new TokenWordStore(() -> inMemoryImpl, () -> ImmutableSet.of(
           new TokenWord().setRoot("ב").setTokenType(TokenType.PREFIX_ONLY),
           new TokenWord().setRoot("ה").setTokenType(TokenType.PREFIX),
           new TokenWord().setRoot("ו").setTokenType(TokenType.PREFIX),
@@ -43,7 +47,7 @@ public class HebrewTokenizerTest {
           new TokenWord().setRoot("ויהי"),
           new TokenWord().setRoot("עש"),
           new TokenWord().setRoot("בכ").setStrongsId("H0123"),
-          new TokenWord().setRoot("יע")));
+          new TokenWord().setRoot("יע")), lexiconStore));
 
   @Test
   public void tokenize_inBeginning() {

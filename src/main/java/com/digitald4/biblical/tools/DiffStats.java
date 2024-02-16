@@ -238,8 +238,8 @@ public class DiffStats {
     Map<String, Long> wordCounts = totalWords.stream().collect(groupingBy(identity(), counting()));
     System.out.printf("%d unique %s words\n", wordCounts.size(), version);
 
-    wordCounts.entrySet().stream().sorted(Entry.comparingByValue(reverseOrder()))
-        .limit(21).forEach(System.out::println);
+    wordCounts.entrySet().stream().sorted(Entry.comparingByValue(reverseOrder())).limit(21)
+        .forEach(System.out::println);
 
     System.out.println("Root words: " + bpeTokenizer.getTokens().subList(0, 100));
   }
@@ -465,7 +465,7 @@ public class DiffStats {
             new ScriptureFetcherPseudepigrapha(apiConnector),
             new ScriptureFetcherSefariaOrg(apiConnector),
             new ScriptureFetcherStepBibleOrg(apiConnector)),
-        interlinearStore, new MachineTranslator(null) {
+        interlinearStore, new MachineTranslator(null, null) {
           @Override
           public Interlinear translate(Interlinear interlinear) {
             return interlinear;

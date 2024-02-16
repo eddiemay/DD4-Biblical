@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Interlinear {
   // Id values
+  private String version;
   private String book;
   private int chapter;
   private int verse;
@@ -32,17 +33,19 @@ public class Interlinear {
   private List<SubToken> subTokens;
 
   public String getId() {
-    return String.format(
-        "%s-%d-%d-%d", getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
+    return String.format("%s%s-%d-%d-%d",
+        version == null ? "" : version + "-",
+        getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
   }
 
   @Deprecated
   public String getVersion() {
-    return  null;
+    return  version;
   }
 
   @Deprecated
   public Interlinear setVersion(String version) {
+    this.version = version;
     return this;
   }
 

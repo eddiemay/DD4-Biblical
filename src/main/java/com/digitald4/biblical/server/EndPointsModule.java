@@ -5,6 +5,7 @@ import static java.util.Arrays.stream;
 
 import com.digitald4.biblical.model.HighScore;
 import com.digitald4.biblical.store.SearchIndexImpl;
+import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.*;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.model.BasicUser;
@@ -53,18 +54,19 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 
 		bind(new TypeLiteral<Store<HighScore, Long>>(){})
 				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
-		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){});
+		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){}).asEagerSingleton();
 
 		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
 
-		bind(SearchIndexer.class).to(SearchIndexImpl.class);
-		bind(ScriptureFetcher.class).to(ScriptureFetcherRouter.class);
-		bind(LexiconFetcher.class).to(LexiconFetcherBlueLetterImpl.class);
-		bind(InterlinearFetcher.class).to(ScriptureFetcherBibleHub.class);
-		bind(ScriptureReferenceProcessor.class).to(ScriptureReferenceProcessorSplitImpl.class);
-		bind(SunTimeUtil.class).to(SunTimeUtilSunriseSunsetOrg.class);
+		bind(SearchIndexer.class).to(SearchIndexImpl.class).asEagerSingleton();
+		bind(ScriptureFetcher.class).to(ScriptureFetcherRouter.class).asEagerSingleton();
+		bind(LexiconFetcher.class).to(LexiconFetcherBlueLetterImpl.class).asEagerSingleton();
+		bind(InterlinearFetcher.class).to(ScriptureFetcherBibleHub.class).asEagerSingleton();
+		bind(ScriptureReferenceProcessor.class).to(ScriptureReferenceProcessorSplitImpl.class).asEagerSingleton();
+		bind(SunTimeUtil.class).to(SunTimeUtilSunriseSunsetOrg.class).asEagerSingleton();
+		bind(TokenWordStore.class).asEagerSingleton();
 
-		bind(UserService.class).to(new TypeLiteral<UserService<BasicUser>>(){});
+		bind(UserService.class).to(new TypeLiteral<UserService<BasicUser>>(){}).asEagerSingleton();
 
 		configureEndpoints(
 				getApiUrlPattern(),
@@ -78,9 +80,11 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CommandmentService.class,
 						FileService.class,
 						HighScoreService.class,
+						InterlinearService.class,
 						LexiconService.class,
 						LessonService.class,
-						ScriptureService.class));
+						ScriptureService.class,
+						TokenWordService.class));
 	}
 
 	@Provides

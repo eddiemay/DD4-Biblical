@@ -125,11 +125,12 @@ public class HebrewConverter {
     return removeGarbage(text).replaceAll("׀ ", "").chars()
         .map(c -> c == '־' ? ' ' : c)
         .peek(c -> {
-          if (c == '׃') {
+          if (c == '׃' || c == ':') {
             foundEnd.set(true);
           }
         })
-        .filter(c -> c != '׀' && c != '[' && c != ']' && c != '(' && c != ')' && c != '‸' && c != '.' && !foundEnd.get())
+        .filter(c -> c != '׀' && c != '[' && c != ']' && c != '(' && c != ')' && c != '‸'
+            && c != ',' && c != '.' && !foundEnd.get())
         .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
   }
 

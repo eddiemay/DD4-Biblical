@@ -30,20 +30,19 @@ import javax.inject.Provider;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
 
 public class InterlinearStore extends GenericStore<Interlinear, String> {
-  private final ScriptureReferenceProcessor scriptureReferenceProcessor;
+  private final ScriptureReferenceProcessor scriptureRefProcessor;
   private final InterlinearFetcher interlinearFetcher;
 
   @Inject
   public InterlinearStore(Provider<DAO> daoProvider,
-      ScriptureReferenceProcessor scriptureReferenceProcessor,
-      InterlinearFetcher interlinearFetcher) {
+      ScriptureReferenceProcessor scriptureRefProcessor, InterlinearFetcher interlinearFetcher) {
     super(Interlinear.class, daoProvider);
-    this.scriptureReferenceProcessor = scriptureReferenceProcessor;
+    this.scriptureRefProcessor = scriptureRefProcessor;
     this.interlinearFetcher = interlinearFetcher;
   }
 
   public ImmutableList<Interlinear> getInterlinear(String scriptureReference) {
-    return scriptureReferenceProcessor.computeVerseRanges(scriptureReference).stream()
+    return scriptureRefProcessor.computeVerseRanges(scriptureReference).stream()
         .flatMap(vr -> getInterlinear(vr).stream())
         .collect(toImmutableList());
   }

@@ -7,12 +7,15 @@ import static java.util.stream.Collectors.joining;
 import com.digitald4.biblical.model.Interlinear.SubToken;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
+import com.digitald4.biblical.store.LexiconStore;
+import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.tools.TranslationTool;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOFileBasedImpl;
+import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
@@ -23,6 +26,8 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 public class MachineTranslationIntegrationTest {
+  private static final DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
+  private static final LexiconStore lexiconStore = new LexiconStore(() -> inMemoryDao, null);
   private final DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
   private final APIConnector apiConnector =
       new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
@@ -32,8 +37,10 @@ public class MachineTranslationIntegrationTest {
   private final InterlinearStore interlinearStore = new InterlinearStore(
       () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
 
+  private final TokenWordStore tokenWordStore =
+      new TokenWordStore(() -> inMemoryDao, TranslationTool::tokenWordProvider, lexiconStore);
   private final MachineTranslator machineTranslator =
-      new MachineTranslator(TranslationTool::tokenWordProvider);
+      new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
 
   @Test
   public void translate7Days() {
@@ -66,17 +73,17 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:21 and he created Mighty Ones you the dragons the greats and you all soul the live the tread of you which abound the waters to kind of them and you all bird wing to kind of it and he saw Mighty Ones for good",
         "Genesis 1:22 and he bless them Mighty Ones to said increase and multiply and fill of him you the waters in seas and the bird let multiply in earth",
         "Genesis 1:23 and there came to be evening and there came to be morning day fifth",
-        "Genesis 1:24 and he said Mighty Ones you bring out the earth soul live to kind it beast and creeping and his life earth to kind it and there came to be so",
-        "Genesis 1:25 and he made Mighty Ones you live of you the earth to kind it and you the beast to kind it and you all creeping the land to kind of it and he saw Mighty Ones for good",
+        "Genesis 1:24 and he said Mighty Ones you bring out the earth soul live to kind beast and creeping and his life earth to kind and there came to be so",
+        "Genesis 1:25 and he made Mighty Ones you live of you the earth to kind and you the beast to kind and you all creeping the land to kind of it and he saw Mighty Ones for good",
         "Genesis 1:26 and he said Mighty Ones we made man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the earth and in all the creeping the tread upon the earth",
-        "Genesis 1:27 and he created Mighty Ones you the man in image of him in image Mighty Ones created you of him male and female created them",
+        "Genesis 1:27 and he created Mighty Ones you the man in image of him in image Mighty Ones created him male and female created them",
         "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the earth and subdue and rule in fish the sea and in bird the heavens and in all live the tread of you upon the earth",
-        "Genesis 1:29 and he said Mighty Ones behold give of yous of to them you all herb sow seed which upon face all the earth and you all the tree which in it fruit tree sow seed to them let there be it to food",
+        "Genesis 1:29 and he said Mighty Ones behold give of yous of to them you all herb sow seed which upon face all the earth and you all the tree which in it fruit tree sow seed to them let there be to food",
         "Genesis 1:30 and to all live of you the earth and to all bird the heavens and to all that move upon the earth which in it soul live you all green herb to food and there came to be so",
         "Genesis 1:31 and he saw Mighty Ones you all which made and behold good very and there came to be evening and there came to be morning day the sixth",
         "Genesis 2:1 and he completed the heavens and the earth and all hosts",
-        "Genesis 2:2 and he completed Mighty Ones in day the seventh work of him which made and he shabbat in day the seventh from all work of him which made",
-        "Genesis 2:3 and he bless Mighty Ones you day the seventh and he sanctify you of him for in it shabbat from all work of him which created Mighty Ones to accomplish"
+        "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which made and he shabbat in day the seventh from all work of him which made",
+        "Genesis 2:3 and he bless Mighty Ones you day the seventh and he sanctify him for in it shabbat from all work of him which created Mighty Ones to accomplish"
     );
   }
 
@@ -87,7 +94,7 @@ public class MachineTranslationIntegrationTest {
     assertThat(translations).containsExactly(
         "Isa 9:6 for child beget to of us son given to of us and you will be the government upon shoulder of him and he call name of him wonderful counselor God mighty I in he forever prince peace",
         "Psa 83:18 and know of him for you are name of you יהוה to alone of you high upon all the earth",
-        "Exo 12:11 and like this you eat of him you of him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eat of yous you of him in haste passover he to יהוה",
+        "Exo 12:11 and like this you eat of him him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eat of yous him in haste passover he to יהוה",
         "Gen 10:1 and these generations of you sons of Noah Shem Ham and Japheth and born of him to them sons after the flood"
     );
   }
