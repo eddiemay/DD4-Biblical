@@ -73,6 +73,16 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
   }
 
   @Test
+  public void fetchSep() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/test/java/com/digitald4/biblical/util/data/biblehub_sep_exodus_12.htm"));
+
+    assertThat(scriptureStore.getScriptures("SEP", Language.EN, "Exodus 12:40").getItems()).containsExactly(
+        new Scripture().setVersion("SEP").setLanguage("en").setBook("Exodus").setChapter(12).setVerse(40)
+            .setText("And the sojourning of the children of Israel, while they sojourned in the land of Egypt and the land of Chanaan, was four hundred and thirty years."));
+  }
+
+  @Test
   public void fetchInterlinear() throws Exception {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent(

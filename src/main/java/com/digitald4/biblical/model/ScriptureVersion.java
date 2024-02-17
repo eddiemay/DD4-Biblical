@@ -31,7 +31,7 @@ public class ScriptureVersion {
           ImmutableSet.of("Additional Apocrypha", "New Testament Apocrypha")),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.of("Canon", "OT Additions", "Deuterocanon")),
-      new ScriptureVersion("Brenton's Septuagint", "SEP", 75, "OT"),
+      new ScriptureVersion("Brenton's Septuagint", "SEP", 75, "OT"), // Support for Septuagint.
       new ScriptureVersion("Westminster Leningrad Codex - Consonants Only", "WLCO", 80,
           ImmutableSet.of("OT"), Language.HEBREW),
       new ScriptureVersion("Westminster Leningrad Codex", "WLC", 80,

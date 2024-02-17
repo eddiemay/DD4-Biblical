@@ -2,7 +2,7 @@ com.digitald4.biblical.BiblicalCtrl = function($location, apiConnector, globalDa
   apiConnector.baseUrl = 'https://dd4-biblical.appspot.com/';
   globalData.runningLocal = $location.host() == 'localhost';
   this.globalData = globalData;
-  this.globalData.scriptureVersions = ['ISR', 'RSKJ', 'NRSV', 'NWT', 'KJV1611', 'Sefaria'];
+  this.globalData.scriptureVersions = ['ISR', 'RSKJ', 'NRSV', 'NWT', 'KJV1611', 'Sefaria', 'SEP'];
   this.globalData.languages = [{name: 'English', code: 'en'},
       {name: 'Interlaced', code: 'interlaced'}, {name: 'Interlinear', code: 'interlinear'},
       {name: 'Hebrew', code: 'he'}, {name: 'Ancient Hebrew', code: 'he-A'}, {name: 'Greek', code: 'gk'}];
