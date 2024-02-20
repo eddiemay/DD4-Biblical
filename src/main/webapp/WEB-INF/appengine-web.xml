@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-    <runtime>java8</runtime>
-    <threadsafe>true</threadsafe>
+    <runtime>java17</runtime>
+    <app-engine-apis>true</app-engine-apis>
     <instance-class>B1</instance-class>
     <basic-scaling>
         <max-instances>4</max-instances>
@@ -13,7 +13,7 @@
 
     <!-- [START env_variables] -->
     <env-variables>
-        <env-var name="ENDPOINTS_SERVICE_NAME" value="${endpoints.project.id}.appspot.com" />
+        <env-var name="ENDPOINTS_SERVICE_NAME" value="${endpoints.project.id}.appspot.com"/>
     </env-variables>
     <!-- [END env_variables] -->
 </appengine-web-app>
