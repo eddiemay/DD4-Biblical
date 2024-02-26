@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 public class BiblicalEvent extends ModelObject<Long> {
   private static final Pattern DURATION_PATTERN = Pattern.compile("(-?\\d+)([ymd])");
+  private static final Pattern SCRIPTURE_PATTERN = Pattern.compile("<inline-scripture ref=\"(.+)\"");
   private static final int ONE_BCE = 3960;
 
   private String title;
@@ -205,6 +206,11 @@ public class BiblicalEvent extends ModelObject<Long> {
       era = "CE";
     }
     return String.format("%d%s", eraYear, showEra ? era : "");
+  }
+
+  public String referenceScriptures() {
+    Matcher matcher = SCRIPTURE_PATTERN.matcher(getSummary());
+    return (matcher.find()) ? matcher.group(1) : null;
   }
 
   public static class Dependency {

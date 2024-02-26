@@ -25,6 +25,7 @@ com.digitald4.biblical.CalendarCtrl =
   this.showFeastDays = $location.search()['showFeastDays'] != false;
   this.hebrewDate = year ? new HebrewDate(year, month, 1) : HebrewDate.fromDate(new Date());
   this.hebrewDate = this.hebrewDate.addDays(1 - this.hebrewDate.getDay());
+  this.year = this.hebrewDate.getYear();
   this.refresh();
 }
 
@@ -137,7 +138,7 @@ com.digitald4.biblical.CalendarCtrl.prototype.setView = function(prop) {
 
 com.digitald4.biblical.CalendarCtrl.prototype.selectMonth = function() {
   this.setMonth(this.monthSelection.year, this.monthSelection.month);
-	this.closeDialog();
+  this.closeDialog();
 }
 
 com.digitald4.biblical.CalendarCtrl.prototype.showViewEventDialog = function(event) {
