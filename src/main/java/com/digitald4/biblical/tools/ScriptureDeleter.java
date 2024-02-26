@@ -49,7 +49,7 @@ public class ScriptureDeleter {
     }
 
     APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken(idToken);
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> dao);
     new ScriptureDeleter(

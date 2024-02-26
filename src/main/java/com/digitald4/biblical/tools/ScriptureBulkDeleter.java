@@ -103,7 +103,7 @@ public class ScriptureBulkDeleter {
       }
     }
     APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken(idToken);
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
     new ScriptureBulkDeleter(apiConnector, dao).deleteDepcreatedVersions();
         // .delete(args.length < 1 || args[0].isEmpty() ? null : BibleBook.get(args[0]));

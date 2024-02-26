@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFetcher {
   private static final String CHAPTER_URL = "https://biblehub.com/%s/%s/%d.htm";
   private static final String INTERLINEAR_PAGE_URL = "https://biblehub.com/interlinear/%s/%d.htm";
+  private static final String SEP_INTERLINEAR_PAGE_URL = "https://biblehub.com/interlinear/apostolic/%s/%d.htm";
   private static final String REF_TEXT = "reftext";
   private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)(.+)");
   private static final Pattern VERSE_CLS_PATTERN = Pattern.compile("([\\d\\w]+)-(\\d+)-(\\d+)");
@@ -40,6 +41,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
   public ScriptureFetcherBibleHub(APIConnector apiConnector) {
     this.apiConnector = apiConnector;
   }
+
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     if (version.startsWith("WLC")) {
@@ -185,8 +187,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
     AtomicReference<Interlinear> strongIdOwner = new AtomicReference<>();
     try {
       return doc.getElementsByClass("chap").first().getElementsByTag("table").stream()
-          .filter(table ->
-              table.hasAttr("border") && table.hasAttr("cellspacing") && table.hasAttr("cellpadding"))
+          .filter(table -> table.hasAttr("border") && table.hasAttr("cellspacing") && table.hasAttr("cellpadding"))
           .flatMap(vTable -> vTable.getElementsByClass(hebrew ? "tablefloatheb" : "tablefloat").stream())
           .map(iTable -> {
             Element verseElem = iTable.getElementsByClass(hebrew ? "refheb" : "refmain").first();
@@ -202,14 +203,12 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
             }
             String strongsId = getStrongsId(strongsElem.getElementsByTag("a").first());
             String transliteration = iTable.getElementsByClass("translit").last().text();
-            String word =
-                removeGarbage(iTable.getElementsByClass(hebrew ? "hebrew" : "greek").last().text());
+            String word = removeGarbage(iTable.getElementsByClass(hebrew ? "hebrew" : "greek").last().text());
             if (word.endsWith("׃")) {
               word = word.substring(0, word.length() - 1);
             }
             String translation = iTable.getElementsByClass("eng").last().text();
-            String morphology =
-                iTable.getElementsByClass(hebrew ? "strongsnt" : "strongsnt2").last().text();
+            String morphology = iTable.getElementsByClass(hebrew ? "strongsnt" : "strongsnt2").last().text();
 
             // Get rid of the last item if it doesn't have a translation, this is normally the
             // marker of end of a paragraph or end of a chapter.
@@ -236,8 +235,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
                 .setMorphology(morphology)
                 .setTranslation(translation);
 
-            if (strongsId == null && "-".equals(translation) && morphology.isEmpty()
-                && strongIdOwner.get() == null) {
+            if (strongsId == null && "-".equals(translation) && morphology.isEmpty() && strongIdOwner.get() == null) {
               strongIdOwner.set(interlinear);
             }
 

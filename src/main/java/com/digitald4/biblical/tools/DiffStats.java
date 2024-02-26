@@ -439,7 +439,7 @@ public class DiffStats {
   public static void main(String[] args) throws IOException {
     long startTime = System.currentTimeMillis();
     APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken("39284720");
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOFileBasedImpl dao = new DAOFileBasedImpl(DB_FILE).loadFromFile();
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
@@ -477,8 +477,8 @@ public class DiffStats {
     DiffStats statsProcessor = new DiffStats(scriptureStore, interlinearStore);
 
     statsProcessor.processAndPrint(
-        new DiffConfig("DSS", Language.HEBREW, ScriptureVersion.INTERLINEAR, Language.HEBREW, HebrewProcessing.IGNORE_PUN,
-            HebrewProcessing.TO_FULL_HEBREW, HebrewProcessing.UNFINALIZE));
+        new DiffConfig("DSS", Language.HEBREW, ScriptureVersion.INTERLINEAR, Language.HEBREW,
+            HebrewProcessing.IGNORE_PUN, HebrewProcessing.TO_FULL_HEBREW, HebrewProcessing.UNFINALIZE));
 
     // statsProcessor.printWordStats("WLCO");
     // statsProcessor.printWordStats("DSS");

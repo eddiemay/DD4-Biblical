@@ -348,8 +348,7 @@ public class LexiconTool {
   }
 
   public static void main(String[] args) throws IOException {
-    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50);
-    apiConnector.setIdToken("716656750");
+    APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50).loadIdToken();
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);

@@ -9,6 +9,7 @@ import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.*;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.model.BasicUser;
+import com.digitald4.common.model.Company;
 import com.digitald4.common.model.User;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.server.service.BasicUserService;
@@ -41,9 +42,9 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 	public void configureServlets() {
 		super.configureServlets();
 
-		bind(Duration.class).annotatedWith(Annotations.SessionDuration.class)
-				.toInstance(Duration.ofHours(8));
+		bind(Duration.class).annotatedWith(Annotations.SessionDuration.class).toInstance(Duration.ofHours(8));
 		bind(Boolean.class).annotatedWith(Annotations.SessionCacheEnabled.class).toInstance(false);
+		bind(Company.class).toInstance(new Company().setName("Mackabee Ministries"));
 
 		ProviderThreadLocalImpl<BasicUser> userProvider = new ProviderThreadLocalImpl<>();
 		bind(User.class).toProvider(userProvider);
@@ -83,6 +84,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						InterlinearService.class,
 						LexiconService.class,
 						LessonService.class,
+						ReportService.class,
 						ScriptureService.class,
 						TokenWordService.class));
 	}

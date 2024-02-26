@@ -34,7 +34,7 @@ public class ScripturePrinter {
       }
     }
     APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).setIdToken(idToken);
+        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAO dao = useApi ? new DAOApiImpl(apiConnector)
         : new DAOTestingImpl(new ChangeTracker(null, null, new SearchIndexer() {
             @Override
