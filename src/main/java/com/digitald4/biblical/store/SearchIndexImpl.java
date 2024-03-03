@@ -58,12 +58,10 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
         .addField(Field.newBuilder().setName("verse").setNumber(scripture.getVerse()))
         .addField(Field.newBuilder().setName("version").setAtom(scripture.getVersion()))
         .addField(Field.newBuilder().setName("language").setAtom(scripture.getLanguage()))
-        .addField(
-            Field.newBuilder().setName("versionNum").setNumber(scriptureVersion.getVersionNum()))
+        .addField(Field.newBuilder().setName("versionNum").setNumber(scriptureVersion.getVersionNum()))
         .addField(Field.newBuilder().setName("text").setHTML(scripture.getText().toString()))
         .addField(Field.newBuilder().setName("bookTags").setText(bibleBook.getTags()))
-        .addField(
-            Field.newBuilder().setName("bookAltNames").setText(String.join(",", bibleBook.getAltNames())))
+        .addField(Field.newBuilder().setName("bookAltNames").setText(String.join(",", bibleBook.getAltNames())))
         .build();
   }
 
@@ -82,13 +80,9 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
         .addField(Field.newBuilder().setName("chapter").setNumber(firstDeclared.getChapter()))
         .addField(Field.newBuilder().setName("verse").setNumber(firstDeclared.getStartVerse()))
         .addField(Field.newBuilder().setName("scriptureText").setText(
-            scriptureStore.get()
-                .getScripturesTextAllVersions(Language.EN, commandment.getScriptures())))
-        .addField(Field.newBuilder().setName("bookTags").setText(
-            bibleBooks.stream()
-                .flatMap(bibleBook -> stream(bibleBook.getTags().split(",")))
-                .distinct()
-                .collect(joining(","))))
+            scriptureStore.get().getScripturesTextAllVersions(Language.EN, commandment.getScriptures())))
+        .addField(Field.newBuilder().setName("bookTags").setText(bibleBooks.stream()
+            .flatMap(bibleBook -> stream(bibleBook.getTags().split(","))).distinct().collect(joining(","))))
         .addField(Field.newBuilder().setName("bookAltNames").setText(
             bibleBooks.stream().flatMap(bibleBook -> bibleBook.getAltNames().stream()).collect(joining(","))))
         .build();
@@ -96,18 +90,9 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
 
   @Override
   protected Index computeIndex(Class<?> c) {
-    if (c == Scripture.class) {
-      return SearchServiceFactory.getSearchService()
-          .getIndex(IndexSpec.newBuilder().setName("scripture-index").build());
-    }
+    return c == Scripture.class
+        ? SearchServiceFactory.getSearchService().getIndex(IndexSpec.newBuilder().setName("scripture-index").build())
+        : super.computeIndex(c);
 
-    return super.computeIndex(c);
   }
-/* public Commandment fromDocument(Document document) {
-    return new Commandment()
-        .setId(Long.parseLong(document.getId()))
-        .setSummary(document.getOnlyField("summary").getText())
-        .setScriptures(document.getOnlyField("scriptures").getText())
-        .setTags(document.getOnlyField("tags").getText());
-  } */
 }

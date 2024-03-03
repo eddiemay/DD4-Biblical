@@ -25,8 +25,7 @@ public class LessonService extends EntityServiceImpl<LessonVersion, Long> {
   private final LessonVersionStore lessonVersionStore;
 
   @Inject
-  LessonService(
-      LessonStore lessonStore, LessonVersionStore lessonVersionStore, LoginResolver loginResolver) {
+  LessonService(LessonStore lessonStore, LessonVersionStore lessonVersionStore, LoginResolver loginResolver) {
     super(lessonVersionStore, loginResolver);
     this.lessonStore = lessonStore;
     this.lessonVersionStore = lessonVersionStore;
@@ -42,8 +41,8 @@ public class LessonService extends EntityServiceImpl<LessonVersion, Long> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "latest")
-  public LessonVersion getLatest(
-      @Named("id") long lessonId, @Named("allowDraft") boolean allowDraft) throws ServiceException {
+  public LessonVersion getLatest(@Named("id") long lessonId, @Named("allowDraft") boolean allowDraft)
+      throws ServiceException {
     try {
       return lessonVersionStore.getLatest(lessonId, allowDraft);
     } catch (DD4StorageException e) {

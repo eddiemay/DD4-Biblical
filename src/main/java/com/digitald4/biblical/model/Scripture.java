@@ -51,7 +51,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
   }
 
   public Scripture setBook(String book) {
-    this.book = book;
+    this.book = BibleBook.EPISTLE_OF_ARISTEAS.equals(book) ? BibleBook.LETTER_OF_ARISTEAS : book;
     return this;
   }
 
@@ -107,16 +107,15 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
   @Override
   public String toString() {
-    return String.format("(%s:%s%s) %s %d:%d %s", version, language,
-        location == null ? "" : ":" + location, book, chapter, verse, text);
+    return String.format("(%s:%s%s) %s %d:%d %s",
+        version, language, location == null ? "" : ":" + location, book, chapter, verse, text);
   }
 
   public static class AuditScripture extends Scripture {
     private final int ld;
     private final double percentMatch;
 
-    public AuditScripture(
-        String book, int chapter, int verse, String text, int ld, double percentMatch) {
+    public AuditScripture(String book, int chapter, int verse, String text, int ld, double percentMatch) {
       this.ld = ld;
       this.percentMatch = percentMatch;
       setVersion("Audit");
@@ -127,9 +126,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
       setLanguage(Language.HEBREW);
     }
 
-    public static AuditScripture of(
-        String book, int chapter, int verse, String original, String revised) {
-
+    public static AuditScripture of(String book, int chapter, int verse, String original, String revised) {
       original = HebrewConverter.removePunctuation(original);
       revised = HebrewConverter.removePunctuation(revised);
 
@@ -158,8 +155,8 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
     public InterlinearScripture(Iterable<Interlinear> interlinears) {
       this.interlinears = ImmutableList.copyOf(interlinears);
-      String strongsId = stream(interlinears).map(Interlinear::getStrongsId)
-          .filter(Objects::nonNull).findAny().orElse("");
+      String strongsId =
+          stream(interlinears).map(Interlinear::getStrongsId).filter(Objects::nonNull).findAny().orElse("");
       setLanguage(strongsId.startsWith("G") ? Language.GREEK : Language.HEBREW);
       Interlinear interlinear = interlinears.iterator().next();
       setVersion(ScriptureVersion.INTERLINEAR);

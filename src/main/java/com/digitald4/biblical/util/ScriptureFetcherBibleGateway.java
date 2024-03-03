@@ -57,10 +57,8 @@ public class ScriptureFetcherBibleGateway implements ScriptureFetcher {
     return wrapper.getElementsByClass("text").stream()
         .map(element -> {
           int verse = element.classNames().stream()
-              .map(VERSE_CLS_PATTERN::matcher)
-              .filter(Matcher::matches)
-              .map(matcher -> Integer.parseInt(matcher.group(3))).findFirst()
-              .orElse(0);
+              .map(VERSE_CLS_PATTERN::matcher).filter(Matcher::matches)
+              .map(matcher -> Integer.parseInt(matcher.group(3))).findFirst().orElse(0);
           if (verse == 0) {
             return null;
           }

@@ -56,10 +56,6 @@ public class ScriptureFetcherStepBibleOrg implements ScriptureFetcher {
 
   private static String formatBookForUrl(BibleBook book, int chapter) {
     String bookName = book.name().replace(" ", "");
-    if (book.getChapterCount() == 1) {
-      return bookName;
-    }
-
-    return bookName + "." + chapter;
+    return book.getChapterCount() == 1 ? bookName : bookName + "." + chapter;
   }
 }

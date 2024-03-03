@@ -36,4 +36,10 @@ public class EventDate {
   public int getWeekOfYear() {
     return (getDayOfYear() - 1) / 7 + 1;
   }
+
+  public static EventDate fromDayOfYear(int dayOfYear) {
+    int month = (int) Math.ceil(dayOfYear / 30.334);
+    int day = dayOfYear - (int) Math.floor((month - 1) * 30.334);
+    return new EventDate(month, day);
+  }
 }

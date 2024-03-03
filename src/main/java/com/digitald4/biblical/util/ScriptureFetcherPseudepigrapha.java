@@ -256,7 +256,6 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
            } else if (text.startsWith("And all angels")) {
              return "4 " + text;
            }
-
            return text;
         })
         .map(text -> {

@@ -30,8 +30,7 @@ public class TokenWordStore extends GenericStore<TokenWord, String> {
   private volatile ImmutableListMultimap<String, TokenWord> tokenWordsByStrongsId;
 
   @Inject
-  public TokenWordStore(Provider<DAO> dao, Provider<Iterable<TokenWord>> tokenWordsProvider,
-      LexiconStore lexiconStore) {
+  public TokenWordStore(Provider<DAO> dao, Provider<Iterable<TokenWord>> tokenWordsProvider, LexiconStore lexiconStore) {
     super(TokenWord.class, dao);
     this.tokenWordsProvider = tokenWordsProvider;
     this.lexiconStore = lexiconStore;
@@ -49,8 +48,7 @@ public class TokenWordStore extends GenericStore<TokenWord, String> {
     tokenWordsByWord = Stream
         .concat(list(Query.forList()).getItems().stream(), stream(tokenWordsProvider.get()))
         .flatMap(tw -> tw.getWord().endsWith("ה")
-            ? Stream.of(tw.copy().setWord(tw.getWord().substring(0, tw.getWord().length() - 1)), tw)
-            : Stream.of(tw))
+            ? Stream.of(tw.copy().setWord(tw.getWord().substring(0, tw.getWord().length() - 1)), tw) : Stream.of(tw))
         .distinct()
         .sorted(comparing(TokenWord::getWord)
             .thenComparing(tw -> countsByStrongsId.getOrDefault(tw.getStrongsId(), 0), reverseOrder()))

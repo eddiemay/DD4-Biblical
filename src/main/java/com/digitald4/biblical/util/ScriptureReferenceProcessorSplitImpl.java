@@ -2,6 +2,7 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.common.exception.DD4StorageException.ErrorCode.BAD_REQUEST;
 import static java.lang.Integer.parseInt;
+import static java.util.stream.IntStream.range;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
@@ -10,7 +11,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 import javax.inject.Inject;
 
 public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceProcessor {
@@ -77,8 +77,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
           chapter = parseInt(subMatcher.group(1));
           int endChapter = parseInt(subMatcher.group(3));
           verseRanges.add(new VerseRange(book, chapter, parseInt(subMatcher.group(2)), 400));
-          IntStream.range(chapter + 1, endChapter)
-              .forEach(chap -> verseRanges.add(new VerseRange(book, chap, 1, 400)));
+          range(chapter + 1, endChapter).forEach(chap -> verseRanges.add(new VerseRange(book, chap, 1, 400)));
           chapter = endChapter;
           verseRanges.add(new VerseRange(book, chapter, 1, parseInt(subMatcher.group(4))));
           continue;
@@ -88,8 +87,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
         if (subMatcher.find()) {
           int endChapter = parseInt(subMatcher.group(2));
           verseRanges.add(new VerseRange(book, chapter, parseInt(subMatcher.group(1)), 400));
-          IntStream.range(chapter + 1, endChapter)
-              .forEach(chap -> verseRanges.add(new VerseRange(book, chap, 1, 400)));
+          range(chapter + 1, endChapter).forEach(chap -> verseRanges.add(new VerseRange(book, chap, 1, 400)));
           chapter = endChapter;
           verseRanges.add(new VerseRange(book, chapter, 1, parseInt(subMatcher.group(3))));
           continue;
@@ -123,8 +121,7 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
             verseRanges.add(new VerseRange(book, 1, chapter, endChapter));
             chapter = 1;
           } else {
-            IntStream.range(chapter, endChapter + 1)
-                .forEach(chap -> verseRanges.add(new VerseRange(book, chap, 1, 400)));
+            range(chapter, endChapter + 1).forEach(chap -> verseRanges.add(new VerseRange(book, chap, 1, 400)));
             chapter = endChapter;
           }
           continue;

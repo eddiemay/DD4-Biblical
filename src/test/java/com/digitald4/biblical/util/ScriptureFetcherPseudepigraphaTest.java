@@ -25,52 +25,50 @@ public class ScriptureFetcherPseudepigraphaTest extends ScriptureFetcherTest {
   @Test
   public void fetchJubilees() {
     when(apiConnector.sendGet(anyString())).thenReturn(
-        "<html><head>\n" +
-            "<title>Jubilees 6</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<h3><a href=\"index.htm\">The Book of Jubilees</a></h3>\n" +
-            "<blockquote><em>\n" +
-            "Sacrifice of Noah, 1-3 (cf. Gen. vii.20-2). God's convenant with Noah, eating of blood forbidden,\n" +
-            "4-10 (cf. Gen. ix. 1-17). Moses bidden to renew this law against the eating of blood, 11-14.\n" +
-            "Bow set in the clouds for a sign, 15-16. Feast of weeks instituted, history of its observances, 17-22.\n" +
-            "Feast of the new moons, 23-8. Division of the year into 364 days, 29-38.\n" +
-            "</em></blockquote>\n" +
-            "<p>[Chapter 6]</p>\n" +
-            "<ol>\n" +
-            "<li>And on the new moon of the third month he went forth from the ark, and built an altar\n" +
-            "\n" +
-            "on \n" +
-            "\n" +
-            "    that mountain.  </li>"+
-            "<li>And he made atonement for the earth, and took a kid and made atonement by its blood for all the guilt of " +
-            "the earth; for everything that had been on it had been destroyed, save those that were in the ark with Noah.</li>" +
-            "<li>And he placed the fat thereof on the altar, and he took an ox, and a goat, and a sheep and kids, and salt, and a turtle-dove, and the young of a dove,\n" +
-            "and placed a burnt sacrifice on the altar, and poured thereon an offering mingled with oil, and\n" +
-            "sprinkled wine and strewed frankincense over everything, and caused a goodly savour to arise,\n" +
-            "acceptable before the Lord.</li>" +
-            "<li>And the Lord smelt the goodly savour, and He made a covenant with him that\n there should not be any more a " +
-            "flood to destroy the earth; that all the days of the earth seed-time\n and harvest should never cease; cold and " +
-            "heat, and summer and winter, and day and night should\n not change their order, nor cease for ever.  </li>" +
-            " <li>'And you, increase ye and multiply upon the\n earth, and become many upon it, and be a blessing upon it.  " +
-            "The fear of you and the dread of you I\n will\n inspire in everything that is on earth and in the sea.  </li>" +
-            "</ol>\n" +
-            "<hr>\n" +
-            "Chapter: <a href=\"1.htm\">1</a> | <a href=\"2.htm\">2</a> | <a href=\"3.htm\">3</a> | \n" +
-            "<a href=\"4.htm\">4</a> | <a href=\"5.htm\">5</a> | <a href=\"6.htm\">6</a> | <a href=\"7.htm\">7</a> | \n" +
-            "<a href=\"8.htm\">8</a> | <a href=\"9.htm\">9</a> | <a href=\"10.htm\">10</a> | <a href=\"11.htm\">11</a> | <a href=\"12.htm\">12</a> | <a href=\"13.htm\">13</a> | \n" +
-            "<a href=\"14.htm\">14</a> | <a href=\"15.htm\">15</a> | <a href=\"16.htm\">16</a> | <a href=\"17.htm\">17</a> | <a href=\"18.htm\">18</a> | <a href=\"19.htm\">19</a> | \n" +
-            "<a href=\"20.htm\">20</a> | <a href=\"21.htm\">21</a> | <a href=\"22.htm\">22</a> | <a href=\"23.htm\">23</a> | <a href=\"24.htm\">24</a> | <a href=\"25.htm\">25</a> | \n" +
-            "<a href=\"26.htm\">26</a> | <a href=\"27.htm\">27</a> | <a href=\"28.htm\">28</a> | <a href=\"29.htm\">29</a> | <a href=\"30.htm\">30</a> | <a href=\"31.htm\">31</a> | \n" +
-            "<a href=\"32.htm\">32</a> | <a href=\"33.htm\">33</a> | <a href=\"34.htm\">34</a> | <a href=\"35.htm\">35</a> | <a href=\"36.htm\">36</a> | <a href=\"37.htm\">37</a> | \n" +
-            "<a href=\"38.htm\">38</a> | <a href=\"39.htm\">39</a> | <a href=\"40.htm\">40</a> | <a href=\"41.htm\">41</a> | <a href=\"42.htm\">42</a> | <a href=\"43.htm\">43</a> | \n" +
-            "<a href=\"44.htm\">44</a> | <a href=\"45.htm\">45</a> | <a href=\"46.htm\">46</a> | <a href=\"47.htm\">47</a> | <a href=\"48.htm\">48</a> | <a href=\"49.htm\">49</a> | \n" +
-            "<a href=\"50.htm\">50</a> \n" +
-            "<hr>\n" +
-            "<b>From <a href=\"../index.html\">The Apocrypha and Pseudepigrapha of the Old Testament</a><br>\n" +
-            "by R.H. Charles, Oxford:  Clarendon Press, 1913<br>\n" +
-            "Scanned and Edited by Joshua Williams, Northwest Nazarene College</b>\n" +
-            "</body></html>");
+        """
+            <html><head>
+            <title>Jubilees 6</title>
+            </head>
+            <body>
+            <h3><a href="index.htm">The Book of Jubilees</a></h3>
+            <blockquote><em>
+            Sacrifice of Noah, 1-3 (cf. Gen. vii.20-2). God's convenant with Noah, eating of blood forbidden,
+            4-10 (cf. Gen. ix. 1-17). Moses bidden to renew this law against the eating of blood, 11-14.
+            Bow set in the clouds for a sign, 15-16. Feast of weeks instituted, history of its observances, 17-22.
+            Feast of the new moons, 23-8. Division of the year into 364 days, 29-38.
+            </em></blockquote>
+            <p>[Chapter 6]</p>
+            <ol>
+            <li>And on the new moon of the third month he went forth from the ark, and built an altar
+
+            on\s
+
+                that mountain.  </li><li>And he made atonement for the earth, and took a kid and made atonement by its blood for all the guilt of the earth; for everything that had been on it had been destroyed, save those that were in the ark with Noah.</li><li>And he placed the fat thereof on the altar, and he took an ox, and a goat, and a sheep and kids, and salt, and a turtle-dove, and the young of a dove,
+            and placed a burnt sacrifice on the altar, and poured thereon an offering mingled with oil, and
+            sprinkled wine and strewed frankincense over everything, and caused a goodly savour to arise,
+            acceptable before the Lord.</li><li>And the Lord smelt the goodly savour, and He made a covenant with him that
+             there should not be any more a flood to destroy the earth; that all the days of the earth seed-time
+             and harvest should never cease; cold and heat, and summer and winter, and day and night should
+             not change their order, nor cease for ever.  </li> <li>'And you, increase ye and multiply upon the
+             earth, and become many upon it, and be a blessing upon it.  The fear of you and the dread of you I
+             will
+             inspire in everything that is on earth and in the sea.  </li></ol>
+            <hr>
+            Chapter: <a href="1.htm">1</a> | <a href="2.htm">2</a> | <a href="3.htm">3</a> |\s
+            <a href="4.htm">4</a> | <a href="5.htm">5</a> | <a href="6.htm">6</a> | <a href="7.htm">7</a> |\s
+            <a href="8.htm">8</a> | <a href="9.htm">9</a> | <a href="10.htm">10</a> | <a href="11.htm">11</a> | <a href="12.htm">12</a> | <a href="13.htm">13</a> |\s
+            <a href="14.htm">14</a> | <a href="15.htm">15</a> | <a href="16.htm">16</a> | <a href="17.htm">17</a> | <a href="18.htm">18</a> | <a href="19.htm">19</a> |\s
+            <a href="20.htm">20</a> | <a href="21.htm">21</a> | <a href="22.htm">22</a> | <a href="23.htm">23</a> | <a href="24.htm">24</a> | <a href="25.htm">25</a> |\s
+            <a href="26.htm">26</a> | <a href="27.htm">27</a> | <a href="28.htm">28</a> | <a href="29.htm">29</a> | <a href="30.htm">30</a> | <a href="31.htm">31</a> |\s
+            <a href="32.htm">32</a> | <a href="33.htm">33</a> | <a href="34.htm">34</a> | <a href="35.htm">35</a> | <a href="36.htm">36</a> | <a href="37.htm">37</a> |\s
+            <a href="38.htm">38</a> | <a href="39.htm">39</a> | <a href="40.htm">40</a> | <a href="41.htm">41</a> | <a href="42.htm">42</a> | <a href="43.htm">43</a> |\s
+            <a href="44.htm">44</a> | <a href="45.htm">45</a> | <a href="46.htm">46</a> | <a href="47.htm">47</a> | <a href="48.htm">48</a> | <a href="49.htm">49</a> |\s
+            <a href="50.htm">50</a>\s
+            <hr>
+            <b>From <a href="../index.html">The Apocrypha and Pseudepigrapha of the Old Testament</a><br>
+            by R.H. Charles, Oxford:  Clarendon Press, 1913<br>
+            Scanned and Edited by Joshua Williams, Northwest Nazarene College</b>
+            </body></html>""");
 
     assertThat(scriptureStore.getScriptures("OXFORD", EN, "JUBILEES 6").getItems()).containsExactly(
         new Scripture().setVersion("OXFORD").setBook("Jubilees").setChapter(6).setVerse(1).setText(

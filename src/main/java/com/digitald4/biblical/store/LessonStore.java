@@ -31,8 +31,7 @@ public class LessonStore extends GenericStore<Lesson, Long> {
   private LessonVersion updateLatest(LessonVersion lessonVersion) {
     update(lessonVersion.getLessonId(), lesson -> {
       if (lessonVersion.isPublished()) {
-        lesson.setTitle(lessonVersion.getTitle())
-            .setLatestPublishedVersionId(lessonVersion.getId());
+        lesson.setTitle(lessonVersion.getTitle()).setLatestPublishedVersionId(lessonVersion.getId());
       }
       return lesson.setLatestVersionId(lessonVersion.getId());
     });
@@ -92,13 +91,10 @@ public class LessonStore extends GenericStore<Lesson, Long> {
     protected Iterable<LessonVersion> preprocess(Iterable<LessonVersion> items, boolean isCreate) {
       return super.preprocess(
           stream(items)
-              .peek(
-                  lessonVersion ->
-                      lessonVersion
-                          .setThemeText(
-                              markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
-                          .setContent(
-                              markupProcessor.replaceScriptures(lessonVersion.getContent())))
+              .peek(lessonVersion ->
+                  lessonVersion
+                      .setThemeText(markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
+                      .setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
               .collect(toImmutableList()),
           isCreate);
     }

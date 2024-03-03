@@ -21,8 +21,7 @@ public class CommandmentStore extends SearchableStoreImpl<Commandment, Long> {
 
   @Inject
   public CommandmentStore(
-      Provider<DAO> daoProvider, SearchIndexer searchIndexer,
-      ScriptureReferenceProcessor scriptureRefProcessor, ScriptureStore scriptureStore) {
+      Provider<DAO> daoProvider, SearchIndexer searchIndexer, ScriptureReferenceProcessor scriptureRefProcessor) {
     super(Commandment.class, daoProvider);
     this.searchIndexer = searchIndexer;
     this.scriptureRefProcessor = scriptureRefProcessor;
@@ -42,7 +41,6 @@ public class CommandmentStore extends SearchableStoreImpl<Commandment, Long> {
   }
 
   private Commandment fixTags(Commandment commandment) {
-    return commandment
-        .setTags(stream(commandment.getTags().split(",")).map(String::trim).collect(joining(" ")));
+    return commandment.setTags(stream(commandment.getTags().split(",")).map(String::trim).collect(joining(" ")));
   }
 }

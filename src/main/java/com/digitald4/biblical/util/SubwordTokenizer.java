@@ -59,8 +59,7 @@ public class SubwordTokenizer {
             postTokens = ImmutableList.of();
           }
 
-          return ImmutableList.<String>builder()
-              .addAll(pretokens).add(subword).addAll(postTokens).build();
+          return ImmutableList.<String>builder().addAll(pretokens).add(subword).addAll(postTokens).build();
         }
       }
     }

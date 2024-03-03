@@ -77,8 +77,7 @@ public class ScriptureServiceTest {
                     .setText("Remember the sabbath day, keep it holy.")),
             null, null));
 
-    QueryResult<Scripture> result =
-        scriptureService.search("Genesis 2:3, Exodus 20:8", "ISR", EN, null, 200, 1);
+    QueryResult<Scripture> result = scriptureService.search("Genesis 2:3, Exodus 20:8", "ISR", EN, null, 200, 1);
 
     assertThat(result.getTotalSize()).isEqualTo(2);
   }

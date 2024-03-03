@@ -51,8 +51,7 @@ public class InterlinearService extends EntityServiceImpl<Interlinear, String> {
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
       return new AtomicInteger(
-          interlinearStore.create(
-              interlinearFetcher.fetchInterlinear(bibleBookStore.get(book), chapter)).size());
+          interlinearStore.create(interlinearFetcher.fetchInterlinear(bibleBookStore.get(book), chapter)).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     } catch (Exception e) {
@@ -64,8 +63,7 @@ public class InterlinearService extends EntityServiceImpl<Interlinear, String> {
   public AtomicInteger migrateInterlinear(
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
-      return new AtomicInteger(
-          interlinearStore.create(interlinearStore.getInterlinear(book + " " + chapter)).size());
+      return new AtomicInteger(interlinearStore.create(interlinearStore.getInterlinear(book + " " + chapter)).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     } catch (Exception e) {
@@ -77,11 +75,9 @@ public class InterlinearService extends EntityServiceImpl<Interlinear, String> {
   public AtomicInteger deleteInterlinear(@Named("version") String version,
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
-      return new AtomicInteger(
-          interlinearStore.delete(
-              interlinearStore
-                  .list(Query.forList(Filter.of("version", version), Filter.of("book", book), Filter.of("chapter", chapter)))
-                  .getItems().stream().map(Interlinear::getId).collect(toImmutableList())));
+      return new AtomicInteger(interlinearStore.delete(interlinearStore
+          .list(Query.forList(Filter.of("version", version), Filter.of("book", book), Filter.of("chapter", chapter)))
+          .getItems().stream().map(Interlinear::getId).collect(toImmutableList())));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     } catch (Exception e) {

@@ -43,12 +43,11 @@ public interface ScriptureReferenceProcessor {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof VerseRange)) {
+      if (!(obj instanceof VerseRange other)) {
         return false;
       }
-      VerseRange other = (VerseRange) obj;
-      return book.equals(other.book) &&
-          chapter == other.chapter && startVerse == other.startVerse && endVerse == other.endVerse;
+      return book.equals(other.book) && chapter == other.chapter
+          && startVerse == other.startVerse && endVerse == other.endVerse;
     }
   }
 

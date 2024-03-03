@@ -14,8 +14,7 @@ public class BibleBook {
   public static final String WISDOM_OF_SOLOMON = "Wisdom of Solomon";
   public static final String MACCABEES_1 = "1 Maccabees";
   public static final String MACCABEES_2 = "2 Maccabees";
-  public static final String TESTAMENTS_OF_THE_TWELVE_PATRIARCHS =
-      "Testaments of the Twelve Patriarchs";
+  public static final String TESTAMENTS_OF_THE_TWELVE_PATRIARCHS = "Testaments of the Twelve Patriarchs";
   public static final String SUSANNA = "Susanna";
   public static final String JUBILEES = "Jubilees";
   public static final String ENOCH = "Enoch";
@@ -33,6 +32,11 @@ public class BibleBook {
   public static final String BARUCH_2 = "2 Baruch";
   public static final String CLEMENT_1 = "1 Clement";
   public static final String ODES_OF_PEACE = "Odes of Peace";
+  @Deprecated
+  public static final String EPISTLE_OF_ARISTEAS = "Epistle of Aristeas";
+  public static final String LETTER_OF_ARISTEAS = "Letter of Aristeas";
+  public static final String MEGILLAT_ANTIOCHUS = "Megillat Antiochus";
+  public static final String PRAYER_OF_MANESSEH = "Prayer of Manasseh";
 
   // Abbreviations help provided by: https://www.logos.com/bible-book-abbreviations
   // Hebrew names provided by: https://headcoverings-by-devorah.com/HebrewBibleNames.html,

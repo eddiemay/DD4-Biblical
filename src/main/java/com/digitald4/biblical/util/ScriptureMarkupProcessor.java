@@ -28,10 +28,6 @@ public class ScriptureMarkupProcessor {
   }
 
   public StringBuilder replaceScriptures(StringBuilder content) {
-    if (content == null) {
-      return null;
-    }
-
-    return new StringBuilder(replaceScriptures(content.toString()));
+    return content == null ? null : new StringBuilder(replaceScriptures(content.toString()));
   }
 }

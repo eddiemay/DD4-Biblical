@@ -29,11 +29,7 @@ public class HebrewTokenizer {
 
   public ImmutableList<String> tokenizeWord(String word) {
     ImmutableList<String> tokenized = tokenizeWord(word, null, SearchState.WORD);
-    if (tokenized.isEmpty()) {
-      return ImmutableList.of(word);
-    }
-
-    return tokenized;
+    return tokenized.isEmpty() ? ImmutableList.of(word) : tokenized;
   }
 
   public ImmutableList<String> tokenizeWord(String word, String strongsId) {
@@ -72,8 +68,7 @@ public class HebrewTokenizer {
             postTokens = ImmutableList.of();
           }
 
-          return ImmutableList.<String>builder()
-              .addAll(pretokens).add(subword).addAll(postTokens).build();
+          return ImmutableList.<String>builder().addAll(pretokens).add(subword).addAll(postTokens).build();
         }
       }
     }
@@ -82,20 +77,16 @@ public class HebrewTokenizer {
   }
 
   public static boolean hasGoodOption(SearchState state, ImmutableList<TokenWord> options, String strongsId) {
-    switch (state) {
-      case WORD_MATCH_STRONGS:
-        return options.stream().anyMatch(
-            o -> o.tokenType() == TokenType.WORD && Objects.equals(strongsId, o.getStrongsId()));
-      case WORD: return options.stream().anyMatch(o -> o.tokenType() == TokenType.WORD);
-      case PREFIX:
-        return options.stream().map(TokenWord::tokenType)
-            .anyMatch(tt -> tt == TokenType.PREFIX || tt == TokenType.PREFIX_ONLY);
-      case SUFFIX:
-        return options.stream().anyMatch(o ->
-            o.getTokenType() == TokenType.SUFFIX || o.getTokenType() == TokenType.SUFFIX_ONLY
-                || o.getTokenType() == TokenType.PREFIX && o.asSuffix() != null);
-    }
-    throw new IllegalArgumentException("How did we get here?");
+    return switch (state) {
+      case WORD_MATCH_STRONGS -> options.stream().anyMatch(
+          o -> o.tokenType() == TokenType.WORD && Objects.equals(strongsId, o.getStrongsId()));
+      case WORD -> options.stream().anyMatch(o -> o.tokenType() == TokenType.WORD);
+      case PREFIX -> options.stream().map(TokenWord::tokenType)
+          .anyMatch(tt -> tt == TokenType.PREFIX || tt == TokenType.PREFIX_ONLY);
+      case SUFFIX -> options.stream().anyMatch(o ->
+          o.getTokenType() == TokenType.SUFFIX || o.getTokenType() == TokenType.SUFFIX_ONLY
+              || o.getTokenType() == TokenType.PREFIX && o.asSuffix() != null);
+    };
   }
 
   public static class TokenWord {
@@ -195,8 +186,7 @@ public class HebrewTokenizer {
 
     @Override
     public String toString() {
-      return String.format(
-          "%s,%s,%s%s", word, translation, strongsId, asSuffix == null ? "" : "," + asSuffix);
+      return String.format("%s,%s,%s%s", word, translation, strongsId, asSuffix == null ? "" : "," + asSuffix);
     }
 
     @Override

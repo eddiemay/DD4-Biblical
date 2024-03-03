@@ -35,8 +35,7 @@ public class BibleBookStore extends GenericStore<BibleBook, String> {
     getAllBooks();
     BibleBook book = byName.get(collapseName(name));
     if (book == null) {
-      throw new DD4StorageException(
-          "Unknown Bible book: " + name, DD4StorageException.ErrorCode.BAD_REQUEST);
+      throw new DD4StorageException("Unknown Bible book: " + name, DD4StorageException.ErrorCode.BAD_REQUEST);
     }
 
     return book;
@@ -100,8 +99,7 @@ public class BibleBookStore extends GenericStore<BibleBook, String> {
         && (lang == null || scriptureVersion.getSupportedLanguages().contains(lang));
   }
 
-  public ScriptureVersion getOrFallback(
-      String version, String lang, BibleBook book, boolean required) {
+  public ScriptureVersion getOrFallback(String version, String lang, BibleBook book, boolean required) {
     ScriptureVersion scriptureVersion = ScriptureVersion.get(version);
     if (scriptureVersion == null) {
       throw new DD4StorageException("Unknown scripture version: " + version, ErrorCode.BAD_REQUEST);
@@ -109,15 +107,12 @@ public class BibleBookStore extends GenericStore<BibleBook, String> {
       return scriptureVersion;
     }
 
-    Optional<ScriptureVersion> fallback =
-        ScriptureVersion.BY_VERSION.values().stream()
-            .filter(sv -> meetsCriteria(sv.getVersion(), book, lang)).findFirst();
+    Optional<ScriptureVersion> fallback = ScriptureVersion.BY_VERSION.values().stream()
+        .filter(sv -> meetsCriteria(sv.getVersion(), book, lang)).findFirst();
 
     return required
-        ? fallback.orElseThrow(
-            () -> new DD4StorageException(
-                "No source found for book: " + book + " in language: " + lang,
-                ErrorCode.BAD_REQUEST))
+        ? fallback.orElseThrow(() -> new DD4StorageException(
+            "No source found for book: " + book + " in language: " + lang, ErrorCode.BAD_REQUEST))
         : fallback.orElse(null);
   }
 }

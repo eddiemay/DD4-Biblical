@@ -40,8 +40,7 @@ public class HighScoreService {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "create")
   public AtomicInteger create(HighScore highScore) throws ServiceException {
-    ImmutableList<HighScore> allScores =
-        list(highScore.getGame(), highScore.getConfig(), 0, 0).getItems();
+    ImmutableList<HighScore> allScores = list(highScore.getGame(), highScore.getConfig(), 0, 0).getItems();
     store.create(highScore.setIpAddress(requestProvider.get().getRemoteAddr()));
     int rank = 0;
     for (; rank < allScores.size(); rank++) {

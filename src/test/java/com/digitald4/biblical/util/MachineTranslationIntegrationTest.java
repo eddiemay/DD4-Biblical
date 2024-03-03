@@ -29,13 +29,12 @@ public class MachineTranslationIntegrationTest {
   private static final DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
   private static final LexiconStore lexiconStore = new LexiconStore(() -> inMemoryDao, null);
   private final DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
-  private final APIConnector apiConnector =
-      new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
+  private final APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
   private final StaticDataDAO staticDataDAO = new StaticDataDAO();
   private final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
   private final InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
-  private final InterlinearStore interlinearStore = new InterlinearStore(
-      () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
+  private final InterlinearStore interlinearStore =
+      new InterlinearStore(() -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
 
   private final TokenWordStore tokenWordStore =
       new TokenWordStore(() -> inMemoryDao, TranslationTool::tokenWordProvider, lexiconStore);

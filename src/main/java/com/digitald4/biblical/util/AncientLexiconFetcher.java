@@ -63,14 +63,11 @@ public class AncientLexiconFetcher {
 
   private static void setProperty(AncientLexicon ancientLexicon, String prop, String value) {
     switch (prop) {
-      case "Translation": ancientLexicon.setTranslation(value); break;
-      case "Definition": ancientLexicon.setDefinition(value); break;
-      case "Strong's Hebrew #":
-      case "Strong's Aramaic #": ancientLexicon.addStrongIds(
-          stream(value.split(", ")).map(id -> id.toUpperCase().replaceAll("\\.", ""))
-              .collect(toImmutableSet())); break;
-      case "KJV Translations":
-        ancientLexicon.setKjvTranslations(ImmutableSet.copyOf(value.split(", "))); break;
+      case "Translation" -> ancientLexicon.setTranslation(value);
+      case "Definition" -> ancientLexicon.setDefinition(value);
+      case "Strong's Hebrew #", "Strong's Aramaic #" -> ancientLexicon.addStrongIds(
+          stream(value.split(", ")).map(id -> id.toUpperCase().replaceAll("\\.", "")).collect(toImmutableSet()));
+      case "KJV Translations" -> ancientLexicon.setKjvTranslations(ImmutableSet.copyOf(value.split(", ")));
     }
   }
 }

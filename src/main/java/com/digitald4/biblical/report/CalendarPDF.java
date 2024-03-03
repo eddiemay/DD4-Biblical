@@ -179,10 +179,21 @@ public class CalendarPDF extends PDFReport {
     PdfPTable datatable = new PdfPTable(3);
     datatable.setWidthPercentage(100);
 
+    Paragraph holyBody = new Paragraph();
+    holyBody.setFont(getFont("arialuni.ttf", BaseFont.IDENTITY_H, true, 9));
+    HolyDay.HOLY_DAYS.stream().filter(hd -> hd.getStart() == null || hd.getStart().getMonth() < 13).forEach(hd -> {
+      String startDate = hd.getStart() == null ? "" : hd.getStart().getMonth() + "/" + hd.getStart().getDay();
+      String endDate = hd.getEnd() == null ? "" : "-" + hd.getEnd().getMonth() + "/" + hd.getEnd().getDay();
+      holyBody.add(new Phrase(
+          String.format("%s%s - %s - %s %s\n", startDate, endDate, replaceHebrew(hd.getTitle()), hd.getReferences(), hd.getSummary()),
+          getFont("arialuni.ttf", BaseFont.IDENTITY_H, true, 9)));
+    });
+    datatable.addCell(new PdfPCell(holyBody));
+
     ImmutableList<BiblicalEvent> events =
         eventMap.entries().stream().map(Map.Entry::getValue).collect(toImmutableList());
 
-    int batchSize = 19;
+    int batchSize = 18;
     int batches = (int) Math.ceil(events.size() / (batchSize * 1.0));
     for (int batch = 0; batch < batches; batch++) {
       Paragraph cellBody = new Paragraph();
@@ -226,10 +237,10 @@ public class CalendarPDF extends PDFReport {
   public static void main(String[] args) throws Exception {
     DAOFileBasedImpl fileDAO = new DAOFileBasedImpl("data/biblical-events.db").loadFromFile();
 
-    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
+    /* APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAO apiDAO = new DAOApiImpl(apiConnector);
     fileDAO.create(new BiblicalEventStore(() -> apiDAO, null).list(Query.forList(Filter.of("Day", ">", 0))).getItems());
-    fileDAO.saveToFile();
+    fileDAO.saveToFile(); */
 
     Company company = new Company().setName("Mackabee Ministries");
     BiblicalEventStore biblicalEventStore = new BiblicalEventStore(() -> fileDAO, null);

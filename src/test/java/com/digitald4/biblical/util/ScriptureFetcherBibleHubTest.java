@@ -25,7 +25,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
   @Test
   public void fetch() {
     when(apiConnector.sendGet(anyString())).thenReturn(
-        "<html></body>" +
+        "<html></body>\n" +
             "<div id=\"topheading\"><a href=\"../psalms/116.htm\" title=\"Psalm 116\">◄</a> " +
             "Psalm 117 <a href=\"../psalms/118.htm\" title=\"Psalm 118\">►</a></div>" +
             "<div class=\"chap\">" +

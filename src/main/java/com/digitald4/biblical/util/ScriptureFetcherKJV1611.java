@@ -35,13 +35,12 @@ public class ScriptureFetcherKJV1611 implements ScriptureFetcher {
 
     return wrappers.get(0).getElementsByTag("p").stream()
         .filter(p -> p.getElementsByTag("span").size() > 0)
-        .map(
-            p -> new Scripture()
-                .setVersion(version)
-                .setBook(book.name())
-                .setChapter(chapter)
-                .setVerse(Integer.parseInt(p.getElementsByTag("span").get(0).ownText()))
-                .setText(new StringBuilder(p.ownText().trim())))
+        .map(p -> new Scripture()
+            .setVersion(version)
+            .setBook(book.name())
+            .setChapter(chapter)
+            .setVerse(Integer.parseInt(p.getElementsByTag("span").get(0).ownText()))
+            .setText(new StringBuilder(p.ownText().trim())))
         .collect(toImmutableList());
   }
 

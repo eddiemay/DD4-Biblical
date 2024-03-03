@@ -16,9 +16,6 @@ public class LexiconStore extends GenericStore<Lexicon, String> {
 
   @Override
   public Lexicon get(String strongsId) {
-    if (strongsId == null) {
-      return null;
-    }
-    return super.get(HebrewConverter.toStrongsId(strongsId));
+    return strongsId == null ? null : super.get(HebrewConverter.toStrongsId(strongsId));
   }
 }

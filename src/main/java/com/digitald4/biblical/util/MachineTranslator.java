@@ -81,12 +81,10 @@ public class MachineTranslator {
 
     return translate(
         stream(scripture.getText().toString().split(" "))
-            .map(
-                word ->
-                    new Interlinear()
-                        .setBook(scripture.getBook())
-                        .setChapter(scripture.getChapter()).setVerse(scripture.getVerse())
-                        .setWord(word).setConstantsOnly(toConstantsOnly(word)))
+            .map(word -> new Interlinear()
+                .setBook(scripture.getBook())
+                .setChapter(scripture.getChapter()).setVerse(scripture.getVerse())
+                .setWord(word).setConstantsOnly(toConstantsOnly(word)))
             .collect(toImmutableList()));
   }
 }

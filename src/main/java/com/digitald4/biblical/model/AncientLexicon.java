@@ -70,8 +70,7 @@ public class AncientLexicon {
       return setStrongIds(strongIds);
     }
 
-    this.strongIds =
-        ImmutableSet.<String>builder().addAll(this.strongIds).addAll(strongIds).build();
+    this.strongIds = ImmutableSet.<String>builder().addAll(this.strongIds).addAll(strongIds).build();
     return this;
   }
 

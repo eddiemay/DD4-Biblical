@@ -13,9 +13,7 @@ public class Lesson implements HasModificationTimes {
   private Instant deletionTime;
 
   public static Lesson create(LessonVersion lessonVersion) {
-    return new Lesson()
-        .setId(lessonVersion.getLessonId())
-        .setTitle(lessonVersion.getTitle());
+    return new Lesson().setId(lessonVersion.getLessonId()).setTitle(lessonVersion.getTitle());
   }
 
   public long getId() {

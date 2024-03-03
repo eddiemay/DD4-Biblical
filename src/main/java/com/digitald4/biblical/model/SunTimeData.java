@@ -14,8 +14,8 @@ public class SunTimeData {
   private final DateTime twilightEnd;
   private final DateTime solarNoon;
 
-  public SunTimeData(
-      DateTime date, DateTime twilightStart, DateTime sunrise, DateTime sunset, DateTime twilightEnd, DateTime solarNoon) {
+  public SunTimeData(DateTime date, DateTime twilightStart, DateTime sunrise, DateTime sunset, DateTime twilightEnd,
+                     DateTime solarNoon) {
     this.date = date;
     this.twilightStart = twilightStart;
     this.sunrise = sunrise;

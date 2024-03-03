@@ -34,13 +34,12 @@ public class ScriptureFetcherBibleCom  implements ScriptureFetcher {
     }
 
     return wrappers.get(0).getElementsByClass("verse").stream()
-        .map(
-            verse -> new Scripture()
-                .setVersion(version)
-                .setBook(book.name())
-                .setChapter(chapter)
-                .setVerse(Integer.parseInt(verse.getElementsByClass("label").get(0).ownText()))
-                .setText(new StringBuilder(ScriptureFetcher.trim(verse.getElementsByClass("content").get(0).text()))))
+        .map(verse -> new Scripture()
+            .setVersion(version)
+            .setBook(book.name())
+            .setChapter(chapter)
+            .setVerse(Integer.parseInt(verse.getElementsByClass("label").get(0).ownText()))
+            .setText(new StringBuilder(ScriptureFetcher.trim(verse.getElementsByClass("content").get(0).text()))))
         .collect(toImmutableList());
   }
 

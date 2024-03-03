@@ -197,8 +197,8 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   }
 
   public int migrate(String version, String language, String book, int chapter) {
-    Query.List query = Query.forList().setFilters(
-        Filter.of("version", version), Filter.of("book", book), Filter.of("chapter", chapter));
+    Query.List query = Query.forList()
+        .setFilters(Filter.of("version", version), Filter.of("book", book), Filter.of("chapter", chapter));
     if (language != null) {
       query.addFilter(Filter.of("language", language));
     }

@@ -54,8 +54,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
   }
 
   public synchronized ImmutableList<Scripture> fetchOther(String version, BibleBook book, int chapter) {
-    String url =
-        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
+    String url = String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements chaps = doc.getElementsByClass("chap");
@@ -72,26 +71,23 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
               .setVersion(version)
               .setBook(book.name())
               .setChapter(chapter)
-              .setVerse(
-                  Integer.parseInt(sc.getElementsByClass(REF_TEXT).get(0).getElementsByTag("b").text()))
+              .setVerse(Integer.parseInt(sc.getElementsByClass(REF_TEXT).get(0).getElementsByTag("b").text()))
               .setText(getText(sc.text())))
           .collect(toImmutableList());
     }
 
     return chap.getElementsByClass(REF_TEXT).stream()
-        .map(
-            reftext -> new Scripture()
-                .setVersion(version)
-                .setBook(book.name())
-                .setChapter(chapter)
-                .setVerse(Integer.parseInt(reftext.getElementsByTag("b").text()))
-                .setText(getText(reftext)))
+        .map(reftext -> new Scripture()
+            .setVersion(version)
+            .setBook(book.name())
+            .setChapter(chapter)
+            .setVerse(Integer.parseInt(reftext.getElementsByTag("b").text()))
+            .setText(getText(reftext)))
         .collect(toImmutableList());
   }
 
   public synchronized ImmutableList<Scripture> fetchWLC(String version, BibleBook book, int chapter) {
-    String url =
-        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
+    String url = String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
     Elements scs = doc.getElementsByClass("spcl");
     if (scs.size() == 0) {
@@ -113,8 +109,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
   }
 
   public synchronized ImmutableList<Scripture> fetchNestle(String version, BibleBook book, int chapter) {
-    String url =
-        String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
+    String url = String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
     Elements spans = doc.getElementsByClass("chap").first().getElementsByClass("greek");
     if (spans.size() == 0) {
@@ -165,13 +160,12 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
         .collect(groupingBy(Pair::getLeft))
         .entrySet()
         .stream()
-        .map(
-            entry -> new Scripture()
-                .setVersion(version)
-                .setBook(book)
-                .setChapter(chapter)
-                .setVerse(entry.getKey())
-                .setText(getText(entry.getValue().stream().map(Pair::getRight).collect(toImmutableList()))))
+        .map(entry -> new Scripture()
+            .setVersion(version)
+            .setBook(book)
+            .setChapter(chapter)
+            .setVerse(entry.getKey())
+            .setText(getText(entry.getValue().stream().map(Pair::getRight).collect(toImmutableList()))))
         .sorted(comparing(Scripture::getVerse))
         .collect(toImmutableList());
   }
@@ -249,8 +243,8 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
   }
 
   private static String getStrongsId(Element strongsLink) {
-    return strongsLink == null ? null : toStrongsId(
-        (strongsLink.attr("href").contains("/hebrew") ? "H" : "G") + strongsLink.text());
+    return strongsLink == null ? null
+        : toStrongsId((strongsLink.attr("href").contains("/hebrew") ? "H" : "G") + strongsLink.text());
   }
 
   public static String formatBookForUrl(String book) {
@@ -276,8 +270,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
     StringBuilder builder = new StringBuilder();
     Node next = reftext.nextSibling();
     while (next != null) {
-      if (next instanceof Element) {
-        Element element = (Element) next;
+      if (next instanceof Element element) {
         if (element.tagName().equals("p") || element.tagName().equals("span") && element.hasClass("reftext")) {
           break;
         }

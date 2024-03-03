@@ -88,13 +88,12 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .map(Element::text)
         .map(String::trim)
         .filter(text -> !text.isEmpty())
-        .map(
-            text -> new Scripture()
-                .setVersion(version)
-                .setBook(book.name())
-                .setChapter(1)
-                .setVerse(verse.incrementAndGet())
-                .setText(text))
+        .map(text -> new Scripture()
+            .setVersion(version)
+            .setBook(book.name())
+            .setChapter(1)
+            .setVerse(verse.incrementAndGet())
+            .setText(text))
         .collect(toImmutableList());
   }
 
@@ -160,13 +159,12 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                   text = chapterMatcher.group(1).trim();
                 }
 
-                builder.add(
-                    new Scripture()
-                        .setVersion(version)
-                        .setBook(book.name())
-                        .setChapter(chapter.get())
-                        .setVerse(verse)
-                        .setText(new StringBuilder(text)));
+                builder.add(new Scripture()
+                    .setVersion(version)
+                    .setBook(book.name())
+                    .setChapter(chapter.get())
+                    .setVerse(verse)
+                    .setText(new StringBuilder(text)));
               }
 
               return builder.build().stream();
@@ -176,8 +174,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
   private synchronized ImmutableList<Scripture> fetchGiants(String version, BibleBook book) {
     final Pattern versePattern = Pattern.compile("(\\d+) ([^<]+)");
-    String htmlResult =
-        apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");
+    String htmlResult = apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements blockquotes = doc.getElementsByTag("blockquote").get(1).getElementsByTag("blockquote");
     if (blockquotes.size() == 0) {
@@ -221,19 +218,17 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     AtomicInteger verse = new AtomicInteger();
     return paragraphs.stream()
         .filter(p -> p.hasClass("indent") || p.hasClass("noindent"))
-        .peek(
-            p -> p.getElementsByTag("a").stream()
-                .filter(a -> isNumber.matcher(a.text()).find())
-                .forEach(Element::remove))
+        .peek(p -> p.getElementsByTag("a").stream()
+            .filter(a -> isNumber.matcher(a.text()).find())
+            .forEach(Element::remove))
         .map(Element::text)
         .map(ScriptureFetcher::trim)
-        .map(
-            text -> new Scripture()
-                  .setVersion(version)
-                  .setBook(book.name())
-                  .setChapter(chapter)
-                  .setVerse(verse.incrementAndGet())
-                  .setText(new StringBuilder(text)))
+        .map(text -> new Scripture()
+            .setVersion(version)
+            .setBook(book.name())
+            .setChapter(chapter)
+            .setVerse(verse.incrementAndGet())
+            .setText(new StringBuilder(text)))
         .collect(toImmutableList());
   }
 
@@ -268,8 +263,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  private synchronized ImmutableList<Scripture> fetchGadTheSeer(
-      String version, BibleBook book, int chapter) {
+  private synchronized ImmutableList<Scripture> fetchGadTheSeer(String version, BibleBook book, int chapter) {
     Pattern chapterPattern = Pattern.compile("(\\d+)\\. ([\\w’,\\- ]+)");
     Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
     Pattern referencePattern = Pattern.compile("(\\w+) (\\d+):(\\d+)");
@@ -314,14 +308,13 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       while (matcher.find()) {
         String text = matcher.group(2).trim().replaceAll("\n", "");
         if (!text.isEmpty()) {
-          scriptures.add(
-              new Scripture()
-                  .setVersion(version)
-                  .setBook(book.name())
-                  .setLanguage("en")
-                  .setChapter(chapter)
-                  .setVerse(Integer.parseInt(matcher.group(1)))
-                  .setText(text));
+          scriptures.add(new Scripture()
+              .setVersion(version)
+              .setBook(book.name())
+              .setLanguage("en")
+              .setChapter(chapter)
+              .setVerse(Integer.parseInt(matcher.group(1)))
+              .setText(text));
         }
       }
       return scriptures.build();
@@ -331,11 +324,9 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     }
   }
 
-  public synchronized ImmutableList<Scripture> fetchLivesOfTheProphets(
-      String version, BibleBook book) {
+  public synchronized ImmutableList<Scripture> fetchLivesOfTheProphets(String version, BibleBook book) {
     final Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
-    String htmlResult =
-        apiConnector.sendGet("http://dd4-biblical.appspot.com/books/lives_of_the_prophets.html");
+    String htmlResult = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/lives_of_the_prophets.html");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements divs = doc.getElementsByTag("div");
     if (divs.size() == 0) {
@@ -352,13 +343,12 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
           Matcher matcher = versePattern.matcher(text);
           ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
           while (matcher.find()) {
-            scriptures.add(
-                new Scripture()
-                    .setVersion(version)
-                    .setBook(book.name())
-                    .setChapter(chapter.get())
-                    .setVerse(Integer.parseInt(matcher.group(1)))
-                    .setText(new StringBuilder(matcher.group(2).trim())));
+            scriptures.add(new Scripture()
+                .setVersion(version)
+                .setBook(book.name())
+                .setChapter(chapter.get())
+                .setVerse(Integer.parseInt(matcher.group(1)))
+                .setText(new StringBuilder(matcher.group(2).trim())));
           }
           return scriptures.build().stream();
         })
@@ -371,13 +361,12 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     Matcher matcher = versePattern.matcher(text);
     ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
     while (matcher.find()) {
-      scriptures.add(
-          new Scripture()
-              .setVersion(version)
-              .setBook(book.name())
-              .setChapter(Integer.parseInt(matcher.group(1)))
-              .setVerse(Integer.parseInt(matcher.group(2)))
-              .setText(matcher.group(3).trim()));
+      scriptures.add(new Scripture()
+          .setVersion(version)
+          .setBook(book.name())
+          .setChapter(Integer.parseInt(matcher.group(1)))
+          .setVerse(Integer.parseInt(matcher.group(2)))
+          .setText(matcher.group(3).trim()));
     }
 
     return scriptures.build();
@@ -389,13 +378,12 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     Matcher matcher = versePattern.matcher(text);
     ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
     while (matcher.find()) {
-      scriptures.add(
-          new Scripture()
-              .setVersion(version)
-              .setBook(book.name())
-              .setChapter(Integer.parseInt(matcher.group(1)))
-              .setVerse(Integer.parseInt(matcher.group(2)))
-              .setText(matcher.group(3).trim()));
+      scriptures.add(new Scripture()
+          .setVersion(version)
+          .setBook(book.name())
+          .setChapter(Integer.parseInt(matcher.group(1)))
+          .setVerse(Integer.parseInt(matcher.group(2)))
+          .setText(matcher.group(3).trim()));
     }
 
     return scriptures.build();
@@ -413,13 +401,12 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         int chapter = Integer.parseInt(matcher.group(1));
         Matcher verseMatcher = versePattern.matcher(matcher.group(2));
         while (verseMatcher.find()) {
-          scriptures.add(
-              new Scripture()
-                  .setVersion(version)
-                  .setBook(book.name())
-                  .setChapter(chapter)
-                  .setVerse(Integer.parseInt(verseMatcher.group(1)))
-                  .setText(verseMatcher.group(2).trim()));
+          scriptures.add(new Scripture()
+              .setVersion(version)
+              .setBook(book.name())
+              .setChapter(chapter)
+              .setVerse(Integer.parseInt(verseMatcher.group(1)))
+              .setText(verseMatcher.group(2).trim()));
         }
       }
     }
@@ -456,8 +443,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         col = rangeMatcher.group(1);
         chapterStart = Integer.parseInt(rangeMatcher.group(2));
         verseStart = Integer.parseInt(rangeMatcher.group(3));
-        chapterEnd =
-            rangeMatcher.groupCount() == 5 ? Integer.parseInt(rangeMatcher.group(4)) : chapterStart;
+        chapterEnd = rangeMatcher.groupCount() == 5 ? Integer.parseInt(rangeMatcher.group(4)) : chapterStart;
         verseEnd = rangeMatcher.groupCount() == 5
             ? Integer.parseInt(rangeMatcher.group(5)) : Integer.parseInt(rangeMatcher.group(4));
         chapter = chapterStart;

@@ -3,6 +3,7 @@ package com.digitald4.biblical.server;
 import static com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl.processScriptureReferences;
 import static com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl.processStrongsReferences;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
 
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.InterlinearStore;
@@ -17,7 +18,6 @@ import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 import javax.inject.Inject;
 
 @Api(
@@ -46,12 +46,8 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   public AtomicInteger reindex(@Named("startIndex") int startIndex, @Named("endIndex") int endIndex,
       @Named("language") @DefaultValue("H") String language) throws ServiceException {
     try {
-        return new AtomicInteger(
-            getStore().create(
-              IntStream.range(startIndex, endIndex)
-                  .mapToObj(id -> language + id)
-                  .map(lexiconFetcher::getLexicon)
-                  .collect(toImmutableList())).size());
+        return new AtomicInteger(getStore().create(range(startIndex, endIndex)
+            .mapToObj(id -> language + id).map(lexiconFetcher::getLexicon).collect(toImmutableList())).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -65,11 +61,8 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
       return new AtomicInteger(
           getStore().create(
               getStore()
-                  .get(
-                      IntStream.range(startIndex, endIndex)
-                          .mapToObj(id -> lang + id)
-                          .collect(toImmutableList()))
-                  .stream()
+                  .get(range(startIndex, endIndex).mapToObj(id -> lang + id).collect(toImmutableList()))
+                  .getItems().stream()
                   .map(LexiconService::processReferences)
                   .collect(toImmutableList())).size());
     } catch (DD4StorageException e) {
@@ -78,14 +71,12 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "fillReferenceCount")
-  public AtomicInteger fillReferenceCount(
-      @Named("strongsId") String strongsId) throws ServiceException {
+  public AtomicInteger fillReferenceCount(@Named("strongsId") String strongsId) throws ServiceException {
     try {
       String id = HebrewConverter.toStrongsId(strongsId);
       int referenceCount = getStore()
           .update(id, lexicon ->
-              lexicon.setReferenceCount(
-                  interlinearStore.getMatchingReferences(id, null, null, 5, 1).getTotalSize()))
+              lexicon.setReferenceCount(interlinearStore.getMatchingReferences(id, null, null, 5, 1).getTotalSize()))
           .getReferenceCount();
       tokenWordStore.reset();
       return new AtomicInteger(referenceCount);
@@ -103,7 +94,6 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
     return lexicon
         .setRootWord(processStrongsReferences(lexicon.getRootWord()))
         .setStrongsDefinition(
-            processScriptureReferences(
-                processStrongsReferences(lexicon.getStrongsDefinition().toString())));
+            processScriptureReferences(processStrongsReferences(lexicon.getStrongsDefinition().toString())));
   }
 }

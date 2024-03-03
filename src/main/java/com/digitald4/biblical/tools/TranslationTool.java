@@ -62,8 +62,7 @@ public class TranslationTool {
     ImmutableList<Interlinear> translated = scripture.getInterlinears();
     System.out.println(translated.stream().map(Interlinear::getStrongsId).collect(joining(" ")));
     System.out.println(translated.stream()
-        .map(i -> i.getSubTokens().stream()
-            .map(SubToken::getStrongsId).filter(Objects::nonNull).collect(joining(".")))
+        .map(i -> i.getSubTokens().stream().map(SubToken::getStrongsId).filter(Objects::nonNull).collect(joining(".")))
         .collect(joining(" ")));
     System.out.println(translated.stream().map(Interlinear::getTranslation).collect(joining(" ")));
     System.out.println(translated.stream().map(Interlinear::getConstantsOnly).collect(joining(" ")));
@@ -85,9 +84,7 @@ public class TranslationTool {
   }
 
   public static ImmutableList<TokenWord> tokenWordProvider() {
-    return Constants.VOCAB_FILES.stream()
-        .flatMap(file -> loadFromFile(file).stream())
-        .collect(toImmutableList());
+    return Constants.VOCAB_FILES.stream().flatMap(file -> loadFromFile(file).stream()).collect(toImmutableList());
   }
 
   public static ImmutableList<TokenWord> loadFromFile(String filename) {
@@ -117,8 +114,7 @@ public class TranslationTool {
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(
         () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
-    ScriptureReferenceProcessor scriputureRefProcessor =
-        new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
+    ScriptureReferenceProcessor scriputureRefProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     ScriptureFetcher scriptureFetcher = new ScriptureFetcherRouter(
         new ScriptureFetcherBibleGateway(apiConnector),
         new ScriptureFetcherBibleHub(apiConnector),
@@ -134,8 +130,7 @@ public class TranslationTool {
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
     TokenWordStore tokenWordStore =
         new TokenWordStore(() -> inMemoryDao, TranslationTool::tokenWordProvider, lexiconStore);
-    MachineTranslator machineTranslator =
-        new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
+    MachineTranslator machineTranslator = new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
     ScriptureStore scriptureStore = new ScriptureStore(() -> scriptureDao, null, bibleBookStore,
         scriputureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
@@ -159,8 +154,7 @@ public class TranslationTool {
         "עלה אלי פה ההרה ואתנה לך את שתי לוחות האבן והתורה והמצווה אשר כתבתי להורותם:"); */
     translationTool.translateAndPrint("Jub 6:45-46");
 
-    System.out.println(
-        "\nIndex, Hebrew, KJV Translation, StrongsId, Strongs Hebrew, StrongsIds, Breakdown, MT");
+    System.out.println("\nIndex, Hebrew, KJV Translation, StrongsId, Strongs Hebrew, StrongsIds, Breakdown, MT");
     translationTool.hasTranslationDiff.build().stream()
         // .sorted(Comparator.comparing(Interlinear::getId))
         .filter(i -> i.getSubTokens().get(0).getTranslation().equals("[UNK]"))

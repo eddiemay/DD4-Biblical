@@ -42,27 +42,15 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
   }
 
   private ScriptureFetcher getFetcher(String version) {
-    switch (version) {
-      case "NKJV":
-      case "NRSV":
-      case "RSV":
-      case "WYC":
-        return bibleGateway;
-      case "NWT":
-        return jwOrg;
-      case "KJV1611":
-        return kjv1611;
-      case "DSS":
-      case "CCC":
-        return oneOff;
-      case "OXFORD":
-        return pseudepigrapha;
-      case "Sefaria":
-        return sefariaOrg;
-      case "RSKJ":
-        return stepBibleOrg;
-      default:
-        return bibleHub;
-    }
+    return switch (version) {
+      case "NKJV", "NRSV", "RSV", "WYC" -> bibleGateway;
+      case "NWT" -> jwOrg;
+      case "KJV1611" -> kjv1611;
+      case "DSS", "CCC" -> oneOff;
+      case "OXFORD" -> pseudepigrapha;
+      case "Sefaria" -> sefariaOrg;
+      case "RSKJ" -> stepBibleOrg;
+      default -> bibleHub;
+    };
   }
 }

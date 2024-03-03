@@ -36,8 +36,8 @@ public class CalendarValidatorTest {
   public void validate_goodDay() {
     when(calendar.getDate(3, 31)).thenReturn(JUNE_21TH);
 
-    CalendarValidationResults results =
-        calendarValidator.validate(calendar, ImmutableList.of(DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS));
+    CalendarValidationResults results = calendarValidator.validate(
+        calendar, ImmutableList.of(DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS));
 
     assertEquals(0, results.getErrors().size());
     assertEquals(0, results.getWarnings().size());
@@ -48,8 +48,8 @@ public class CalendarValidatorTest {
   public void validate_badDay() {
     when(calendar.getDate(3, 31)).thenReturn(JULY_22TH);
 
-    CalendarValidationResults results =
-        calendarValidator.validate(calendar, ImmutableList.of(DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS));
+    CalendarValidationResults results = calendarValidator.validate(
+        calendar, ImmutableList.of(DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS));
 
     assertEquals(1, results.getErrors().size());
     assertEquals(0, results.getWarnings().size());
@@ -60,7 +60,8 @@ public class CalendarValidatorTest {
   public void singleValidate_goodDay() {
     when(calendar.getDate(3, 31)).thenReturn(JUNE_21TH);
 
-    CalendarValidationResult result = calendarValidator.validate(calendar, DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS);
+    CalendarValidationResult result = calendarValidator.validate(
+        calendar, DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS);
 
     assertEquals(CalendarValidationResult.Type.MATCHING, result.getType());
   }
@@ -69,7 +70,8 @@ public class CalendarValidatorTest {
   public void singleValidate_badDay() {
     when(calendar.getDate(3, 31)).thenReturn(JULY_22TH);
 
-    CalendarValidationResult result = calendarValidator.validate(calendar, DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS);
+    CalendarValidationResult result = calendarValidator.validate(
+        calendar, DayLengthCalendarRule.LAST_DAY_OF_THIRD_MONTH_TWELVE_PARTS);
 
     assertEquals(CalendarValidationResult.Type.ERROR, result.getType());
   }

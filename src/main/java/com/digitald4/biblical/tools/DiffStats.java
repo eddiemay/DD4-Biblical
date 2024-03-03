@@ -123,12 +123,10 @@ public class DiffStats {
     });
 
     System.out.println("Added Characters:");
-    added.entrySet().stream()
-        .sorted(comparing(e -> e.getValue().get())).forEach(System.out::println);
+    added.entrySet().stream().sorted(comparing(e -> e.getValue().get())).forEach(System.out::println);
 
     System.out.println("\nRemoved Characters:");
-    removed.entrySet().stream()
-        .sorted(comparing(e -> e.getValue().get())).forEach(System.out::println);
+    removed.entrySet().stream().sorted(comparing(e -> e.getValue().get())).forEach(System.out::println);
 
     System.out.println("\nPercent Match:");
     stats.stream().sorted(comparing(ScriptureDiffStats::getPercentMatch)).forEach(
@@ -139,8 +137,7 @@ public class DiffStats {
         .forEach(s -> System.out.printf("%s %d:%d %d\n", s.book, s.chapter, s.verse, s.ld));
 
     System.out.println("\nLDs:");
-    ImmutableList<Integer> lds =
-        stats.stream().map(ScriptureDiffStats::getLd).sorted().collect(toImmutableList());
+    ImmutableList<Integer> lds = stats.stream().map(ScriptureDiffStats::getLd).sorted().collect(toImmutableList());
     System.out.println(lds.stream().map(String::valueOf).collect(joining(",")));
 
     int sum = lds.stream().mapToInt(ld -> ld).sum();
@@ -311,9 +308,8 @@ public class DiffStats {
               .forEach(i -> {
                 try {
                   String word = i.getValue().get(0).getWord();
-                  bw.write(
-                      String.format(",%s,%s,%s,%s,%s,%d", i.getKey(), word, toFullHebrew(word),
-                          getDssWord(i.getValue()), createLink(i.getValue()), i.getValue().size()));
+                  bw.write(String.format(",%s,%s,%s,%s,%s,%d", i.getKey(), word, toFullHebrew(word),
+                      getDssWord(i.getValue()), createLink(i.getValue()), i.getValue().size()));
                 } catch (IOException ioe) {
                   throw new RuntimeException(ioe);
                 }
@@ -363,9 +359,7 @@ public class DiffStats {
         totalConstantsLd.addAndGet(ldConstantsOnly);
         totalFullLd.addAndGet(ldFullHebrew);
         totalMLLd.addAndGet(ldMlWord);
-        bw2.write(
-            String.format(
-                "\n%s,%s,%s,%d,%s", i.getId(), word, cleanDss, ldConstantsOnly, constantsOnly));
+        bw2.write(String.format("\n%s,%s,%s,%d,%s", i.getId(), word, cleanDss, ldConstantsOnly, constantsOnly));
         bw.write(
             String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
                 i.getId(), sanitize(i.getStrongsId()), word, sanitize(i.getTransliteration()),
@@ -430,24 +424,19 @@ public class DiffStats {
   public void fillDssWords() {
     IntStream.range(1, 67).boxed()
         .flatMap(c ->
-            scriptureStore.getScriptures(ScriptureVersion.INTERLINEAR, Language.EN, "Isa " + c)
-                .getItems().stream())
-        .forEach(scripture ->
-            interlinearStore.create(((InterlinearScripture) scripture).getInterlinears()));
+            scriptureStore.getScriptures(ScriptureVersion.INTERLINEAR, Language.EN, "Isa " + c).getItems().stream())
+        .forEach(scripture -> interlinearStore.create(((InterlinearScripture) scripture).getInterlinears()));
   }
 
   public static void main(String[] args) throws IOException {
     long startTime = System.currentTimeMillis();
-    APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
+    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOFileBasedImpl dao = new DAOFileBasedImpl(DB_FILE).loadFromFile();
     StaticDataDAO staticDataDAO = new StaticDataDAO();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
-    ScriptureReferenceProcessor referenceProcessor =
-        new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
+    ScriptureReferenceProcessor referenceProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
-    InterlinearStore interlinearStore =
-        new InterlinearStore(() -> dao, referenceProcessor, interlinearFetcher);
+    InterlinearStore interlinearStore = new InterlinearStore(() -> dao, referenceProcessor, interlinearFetcher);
     /* IntStream.range(1, 67).forEach(c -> interlinearStore
         .delete(interlinearStore.getInterlinear("Isa " + c).stream().map(Interlinear::getId).collect(
             Collectors.toList()))); */

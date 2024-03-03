@@ -203,14 +203,14 @@ public class HebrewConverter {
     }
 
     int lastIndex = word.length() - 1;
-    switch (word.charAt(lastIndex)) {
-      case 'ך': return word.substring(0, lastIndex) + 'כ';
-      case 'ם': return word.substring(0, lastIndex) + 'מ';
-      case 'ן': return word.substring(0, lastIndex) + 'נ';
-      case 'ף': return word.substring(0, lastIndex) + 'פ';
-      case 'ץ': return word.substring(0, lastIndex) + 'צ';
-    }
-    return word;
+    return switch (word.charAt(lastIndex)) {
+      case 'ך' -> word.substring(0, lastIndex) + 'כ';
+      case 'ם' -> word.substring(0, lastIndex) + 'מ';
+      case 'ן' -> word.substring(0, lastIndex) + 'נ';
+      case 'ף' -> word.substring(0, lastIndex) + 'פ';
+      case 'ץ' -> word.substring(0, lastIndex) + 'צ';
+      default -> word;
+    };
   }
 
   public static String finalize(String text) {
@@ -219,24 +219,24 @@ public class HebrewConverter {
 
   public static String finalizeWord(String word) {
     int lastIndex = word.length() - 1;
-    switch (word.charAt(lastIndex)) {
-      case 'כ': return word.substring(0, lastIndex) + 'ך';
-      case 'מ': return word.substring(0, lastIndex) + 'ם';
-      case 'נ': return word.substring(0, lastIndex) + 'ן';
-      case 'פ': return word.substring(0, lastIndex) + 'ף';
-      case 'צ': return word.substring(0, lastIndex) + 'ץ';
-    }
-    return word;
+    return switch (word.charAt(lastIndex)) {
+      case 'כ' -> word.substring(0, lastIndex) + 'ך';
+      case 'מ' -> word.substring(0, lastIndex) + 'ם';
+      case 'נ' -> word.substring(0, lastIndex) + 'ן';
+      case 'פ' -> word.substring(0, lastIndex) + 'ף';
+      case 'צ' -> word.substring(0, lastIndex) + 'ץ';
+      default -> word;
+    };
   }
 
   public static String toStrongsId(String strongsRef) {
     if (strongsRef == null) return null;
 
-    switch (strongsRef.length()) {
-      case 2: return strongsRef.charAt(0) + "000" + strongsRef.substring(1);
-      case 3: return strongsRef.charAt(0) + "00" + strongsRef.substring(1);
-      case 4: return strongsRef.charAt(0) + "0" + strongsRef.substring(1);
-    }
-    return strongsRef;
+    return switch (strongsRef.length()) {
+      case 2 -> strongsRef.charAt(0) + "000" + strongsRef.substring(1);
+      case 3 -> strongsRef.charAt(0) + "00" + strongsRef.substring(1);
+      case 4 -> strongsRef.charAt(0) + "0" + strongsRef.substring(1);
+      default -> strongsRef;
+    };
   }
 }

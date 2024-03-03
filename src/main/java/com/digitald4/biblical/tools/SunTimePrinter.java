@@ -51,13 +51,9 @@ public class SunTimePrinter {
     System.out.printf("Longest Twilight Day: %s%n", getOutput(longestTwilightDay));
     System.out.printf("Shortest Twilight Day: %s%n", getOutput(shortestTwilightDay));
     System.out.printf("%n Closest Sun days to equal:%n%s",
-        closestSunDaysToEqual.build().stream()
-            .map(SunTimePrinter::getOutput)
-            .collect(Collectors.joining("\n")));
+        closestSunDaysToEqual.build().stream().map(SunTimePrinter::getOutput).collect(Collectors.joining("\n")));
     System.out.printf("%n Closest Twilight days to equal:%n%s",
-        closestTwilightDaysToEqual.build().stream()
-            .map(SunTimePrinter::getOutput)
-            .collect(Collectors.joining("\n")));
+        closestTwilightDaysToEqual.build().stream().map(SunTimePrinter::getOutput).collect(Collectors.joining("\n")));
   }
 
   private static String getOutput(SunTimeData sunTimeData) {

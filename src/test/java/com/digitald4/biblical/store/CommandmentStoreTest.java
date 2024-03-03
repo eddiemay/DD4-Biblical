@@ -19,7 +19,6 @@ public class CommandmentStoreTest {
 
   @Mock private final DAO dao = mock(DAO.class);
   @Mock private final SearchIndexer searchIndexer = mock(SearchIndexer.class);
-  @Mock private final ScriptureStore scriptureStore = mock(ScriptureStore.class);
   private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
 
@@ -29,8 +28,7 @@ public class CommandmentStoreTest {
 
   @Before
   public void setup() {
-    commandmentStore =
-        new CommandmentStore(() -> dao, searchIndexer, scriptureRefProcessor, scriptureStore);
+    commandmentStore = new CommandmentStore(() -> dao, searchIndexer, scriptureRefProcessor);
 
     when(dao.create(any(Commandment.class))).thenAnswer(i -> i.getArgument(0));
   }
@@ -38,9 +36,8 @@ public class CommandmentStoreTest {
   @Test
   public void create_verifiesScriptureFormat() {
     try {
-      commandmentStore.create(
-          new Commandment()
-              .setSummary("Keep the Sabbath").setScriptures("Tiffin 36U").setTags("ten commandments,worship, sabbath"));
+      commandmentStore.create(new Commandment()
+          .setSummary("Keep the Sabbath").setScriptures("Tiffin 36U").setTags("ten commandments,worship, sabbath"));
       fail("Should not have got here");
     } catch (Exception e) {
       assertThat(e).hasMessageThat().contains("Unknown Bible book: Tiffin");
@@ -51,9 +48,8 @@ public class CommandmentStoreTest {
 
   @Test
   public void preprocess_replacesTags() {
-    Commandment commandment = commandmentStore.create(
-        new Commandment()
-            .setSummary("Keep the Sabbath").setScriptures("Exo 20:8").setTags("ten commandments,worship, sabbath"));
+    Commandment commandment = commandmentStore.create(new Commandment()
+        .setSummary("Keep the Sabbath").setScriptures("Exo 20:8").setTags("ten commandments,worship, sabbath"));
 
     assertThat(commandment.getTags()).isEqualTo("ten commandments worship sabbath");
   }

@@ -1,39 +1,35 @@
 package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.Arrays.stream;
+import static java.util.stream.IntStream.range;
 
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
-import com.digitald4.common.storage.DAOApiImpl;
 import com.google.common.collect.ImmutableSet;
 
-import java.util.Arrays;
-import java.util.stream.IntStream;
-
 public class ScriptureReindexer {
-  private final static String URL = "%s/reindex?version=%s&book=%s&chapter=%d&lang=en";
+  private final static String URL = "%s/scriptures?reference=%s%%20%d:1&version=%s";
   private final APIConnector apiConnector;
   private final BibleBookStore bibleBookStore;
 
-  public ScriptureReindexer(APIConnector apiConnector) {
+  public ScriptureReindexer(APIConnector apiConnector, BibleBookStore bibleBookStore) {
     this.apiConnector = apiConnector;
-    DAOApiImpl daoApi = new DAOApiImpl(apiConnector);
-    bibleBookStore = new BibleBookStore(() -> daoApi);
+    this.bibleBookStore = bibleBookStore;
   }
 
   public void reindex(String version, ImmutableSet<String> books) {
     String baseUrl = apiConnector.formatUrl("scriptures");
 
     bibleBookStore.getBibleBooks(version).stream()
-        .filter(
-            book -> books.isEmpty() || books.contains(book.name())
-                || book.getAltNames().stream().anyMatch(books::contains))
+        .filter(b -> books.isEmpty() || books.contains(b.name()) || b.getAltNames().stream().anyMatch(books::contains))
         .forEach(book -> {
           System.out.printf("\n%s %d =>", book.name(), book.getChapterCount());
-          IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
+          range(1, book.getChapterCount() + 1).forEach(chapter -> {
             System.out.printf(" %d", chapter);
-            apiConnector.sendGet(String.format(URL, baseUrl, version, book, chapter));
+            apiConnector.sendGet(String.format(URL, baseUrl, book, chapter, version));
           });
         });
     System.out.println();
@@ -45,9 +41,11 @@ public class ScriptureReindexer {
       System.exit(1);
     }
 
-    new ScriptureReindexer(new APIConnector(Constants.API_URL, Constants.API_VERSION, 100)).reindex(
-        args[0],
-        Arrays.stream(args)
-            .skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));
+    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
+    StaticDataDAO staticDataDAO = new StaticDataDAO();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+
+    new ScriptureReindexer(apiConnector, bibleBookStore).reindex(
+        args[0], stream(args).skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));
   }
 }

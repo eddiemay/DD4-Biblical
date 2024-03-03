@@ -25,12 +25,12 @@ public class Lexicon extends ModelObject<String> {
   private Integer referenceCount;
 
   public Lexicon setId(String id) {
-    switch (id.length()) {
-      case 2: id = id.charAt(0) + "000" + id.substring(1); break;
-      case 3: id = id.charAt(0) + "00" + id.substring(1); break;
-      case 4: id = id.charAt(0) + "0" + id.substring(1);  break;
-    }
-    super.setId(id);
+    super.setId(switch (id.length()) {
+      case 2 -> id.charAt(0) + "000" + id.substring(1);
+      case 3 -> id.charAt(0) + "00" + id.substring(1);
+      case 4 -> id.charAt(0) + "0" + id.substring(1);
+      default -> id;
+    });
     return this;
   }
 
@@ -211,8 +211,7 @@ public class Lexicon extends ModelObject<String> {
   }
 
   public String toString() {
-    return String.format(
-        "Strong's %s - %s - %s - %s - %s - %s - %s - %s - %s - %s",
+    return String.format("Strong's %s - %s - %s - %s - %s - %s - %s - %s - %s - %s",
         getId(), getWord(), getConstantsOnly(), getTransliteration(), getPronunciation(),
         getPartOfSpeech(), getRootWord(), getDictionaryAid(), getTranslationCounts(), getOutline());
   }
@@ -270,5 +269,4 @@ public class Lexicon extends ModelObject<String> {
       return getValue() + (getChildren() == null ? "" : getChildren());
     }
   }
-
 }

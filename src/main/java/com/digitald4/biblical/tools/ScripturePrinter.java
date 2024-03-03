@@ -33,8 +33,7 @@ public class ScripturePrinter {
         default: reference = args[a];
       }
     }
-    APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
+    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAO dao = useApi ? new DAOApiImpl(apiConnector)
         : new DAOTestingImpl(new ChangeTracker(null, null, new SearchIndexer() {
             @Override
@@ -64,7 +63,6 @@ public class ScripturePrinter {
             new ScriptureFetcherStepBibleOrg(apiConnector)),
         null, null);
 
-    scriptureStore.getScriptures(version, language, reference).getItems()
-        .forEach(System.out::println);
+    scriptureStore.getScriptures(version, language, reference).getItems().forEach(System.out::println);
   }
 }

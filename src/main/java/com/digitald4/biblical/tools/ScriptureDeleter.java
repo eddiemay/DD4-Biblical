@@ -21,16 +21,14 @@ public class ScriptureDeleter {
   }
 
   public void preview(String searchText) throws IOException {
-    QueryResult<Scripture> result =
-        scriptureStore.search(Query.forSearch(searchText).setPageSize(1000));
+    QueryResult<Scripture> result = scriptureStore.search(Query.forSearch(searchText).setPageSize(1000));
     result.getItems().forEach(System.out::println);
     System.out.printf("\nFound %d items to delete\n", result.getItems().size());
     if (result.getTotalSize() > 0) {
       System.out.println("Proceed with deletion? y/N");
       int read = System.in.read();
       if (read == 'Y' || read == 'y') {
-        scriptureStore.delete(
-            result.getItems().stream().map(Scripture::getId).collect(toImmutableList()));
+        scriptureStore.delete(result.getItems().stream().map(Scripture::getId).collect(toImmutableList()));
       }
     }
   }
@@ -48,8 +46,7 @@ public class ScriptureDeleter {
       idToken = args[1];
     }
 
-    APIConnector apiConnector =
-        new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
+    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOApiImpl dao = new DAOApiImpl(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> dao);
     new ScriptureDeleter(

@@ -26,8 +26,7 @@ public class ScriptureFetcherJWOrg implements ScriptureFetcher {
     this.apiConnector = apiConnector;
   }
 
-  public synchronized ImmutableList<Scripture> fetch(
-      String version, String language, BibleBook book, int chapter) {
+  public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
     String htmlResult = apiConnector.sendGet(String.format(URL, formatBookForUrl(book.name()), chapter));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements verses = doc.getElementsByClass("verse");
@@ -43,13 +42,12 @@ public class ScriptureFetcherJWOrg implements ScriptureFetcher {
           verse.getElementsByClass("verseNum").forEach(Element::remove);
           verse.getElementsByClass("footnoteLink").forEach(Element::remove);
         })
-        .map(
-            verse -> new Scripture()
-                .setVersion(version)
-                .setBook(book.name())
-                .setChapter(chapter)
-                .setVerse(Integer.parseInt(verse.id().substring(verse.id().length() - 3)))
-                .setText(new StringBuilder(ScriptureFetcher.trim(verse.text()))))
+        .map(verse -> new Scripture()
+            .setVersion(version)
+            .setBook(book.name())
+            .setChapter(chapter)
+            .setVerse(Integer.parseInt(verse.id().substring(verse.id().length() - 3)))
+            .setText(new StringBuilder(ScriptureFetcher.trim(verse.text()))))
         .collect(toImmutableList());
   }
 

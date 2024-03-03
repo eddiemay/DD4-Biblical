@@ -83,8 +83,7 @@ public class LexiconTool {
   public void migrateLexicon(String language, int startIndex, int endIndex) {
     String baseUrl = apiConnector.formatUrl("lexicons");
     System.out.printf("Migrating: %s%d-%s%d...\n", language, startIndex, language, endIndex);
-    apiConnector.sendGet(
-        String.format(URL, baseUrl, "migrateLexicon", startIndex, endIndex, language));
+    apiConnector.sendGet(String.format(URL, baseUrl, "migrateLexicon", startIndex, endIndex, language));
   }
 
   private void reindexInterlinear(String startBook, String endBook) {
@@ -93,8 +92,7 @@ public class LexiconTool {
     bibleBookStore.getAllBooks().stream()
         .filter(book -> book.getNumber() >= start.getNumber() && book.getNumber() <= stop.getNumber())
         .forEach(book ->
-            range(1, book.getChapterCount() + 1)
-                .forEach(chapter -> reindexInterlinear(book.name(), chapter)));
+            range(1, book.getChapterCount() + 1).forEach(chapter -> reindexInterlinear(book.name(), chapter)));
   }
 
   public void fetchInterlinear(BibleBook bibleBook, int chapter) {
@@ -118,8 +116,8 @@ public class LexiconTool {
   public int deleteInterlinear(String version, String book, int chapter) {
     String baseUrl = apiConnector.formatUrl("interlinears");
     System.out.printf("Deleting: %s %s %d...", version, book, chapter);
-    int deleted = Integer.parseInt(
-        apiConnector.sendGet(String.format(INTER_DELETE_URL, baseUrl, version, book, chapter)).trim());
+    int deleted =
+        Integer.parseInt(apiConnector.sendGet(String.format(INTER_DELETE_URL, baseUrl, version, book, chapter)).trim());
     System.out.println(deleted + " records");
     return deleted;
   }
@@ -129,14 +127,13 @@ public class LexiconTool {
     interlinearFetcher.fetchInterlinear(new BibleBook().setName("Ezra"), 10)
     //interlinearStore.getInterlinear(scripture)
         .forEach(inter -> {
-          String script =
-              String.format("%s %d:%d", inter.getBook(), inter.getChapter(), inter.getVerse());
+          String script = String.format("%s %d:%d", inter.getBook(), inter.getChapter(), inter.getVerse());
           if (!script.equals(currentScripture.get())) {
             System.out.println("\n" + script);
             currentScripture.set(script);
           }
-          System.out.printf("%s | %s | %s | %s\n", inter.getWord(),
-              inter.getTransliteration(), inter.getTranslation(), inter.getStrongsId());
+          System.out.printf("%s | %s | %s | %s\n",
+              inter.getWord(), inter.getTransliteration(), inter.getTranslation(), inter.getStrongsId());
         });
   }
 
@@ -188,8 +185,7 @@ public class LexiconTool {
       JSONArray resultArray = queryResult.getJSONArray("items");
       results.addAll(
           range(0, resultArray.length())
-              .mapToObj(x ->
-                  JSONUtil.toObject(Interlinear.class, resultArray.getJSONObject(x).toString()))
+              .mapToObj(x -> JSONUtil.toObject(Interlinear.class, resultArray.getJSONObject(x).toString()))
               .collect(toImmutableList()));
     }
 
@@ -201,10 +197,8 @@ public class LexiconTool {
   }
 
   private void outputResults(String name, Iterable<Interlinear> results) throws IOException {
-    BufferedWriter bw =
-        new BufferedWriter(new FileWriter(String.format("data/references-%s.csv", name)));
-    bw.write(
-        "Scripture,Word,Strong's Id,Hebrew Only,Translation,Prior Morph,Morph,Post Morph,Link,Hebrew,KJV\n");
+    BufferedWriter bw = new BufferedWriter(new FileWriter(String.format("data/references-%s.csv", name)));
+    bw.write("Scripture,Word,Strong's Id,Hebrew Only,Translation,Prior Morph,Morph,Post Morph,Link,Hebrew,KJV\n");
     for (Interlinear result : results) {
       ImmutableList<Interlinear> interlinears = interlinearStore.getInterlinear(result.reference());
       int index = result.getIndex();
@@ -226,8 +220,7 @@ public class LexiconTool {
   }
 
   private static String getMorphology(ImmutableList<Interlinear> interlinears, int index) {
-    return (index < 1 || index >= interlinears.size())
-        ? "" : getMorphology(interlinears.get(index - 1));
+    return (index < 1 || index >= interlinears.size()) ? "" : getMorphology(interlinears.get(index - 1));
   }
 
   private static String getMorphology(Interlinear interlinear) {
@@ -354,10 +347,8 @@ public class LexiconTool {
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
-    ScriptureReferenceProcessor referenceProcessor =
-        new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
-    InterlinearStore interlinearStore =
-        new InterlinearStore(() -> fileDao, referenceProcessor, interlinearFetcher);
+    ScriptureReferenceProcessor referenceProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
+    InterlinearStore interlinearStore = new InterlinearStore(() -> fileDao, referenceProcessor, interlinearFetcher);
     DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
     AncientLexiconFetcher ancientLexiconFetcher = new AncientLexiconFetcher(apiConnector);

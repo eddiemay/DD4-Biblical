@@ -36,26 +36,21 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
     System.out.println("Fetching: " + strongsId);
     String htmlResult = apiConnector.sendGet(String.format(URL, strongsId));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
-    String modern = doc.getElementsByClass("lexTitle" + (strongsId.startsWith("H") ? "Hb" : "GK"))
-        .first().text().trim();
+    String modern = doc.getElementsByClass("lexTitle" + (strongsId.startsWith("H") ? "Hb" : "GK")).first().text().trim();
 
     return new Lexicon()
         .setId(strongsId)
         .setWord(modern)
         .setConstantsOnly(HebrewConverter.toConstantsOnly(modern))
-        .setTransliteration(doc.getElementById("lexTrans")
-            .getElementsByClass("small-text-right").first().text().trim())
-        .setPronunciation(doc.getElementById("lexPro")
-            .getElementsByClass("small-text-right").first().ownText().trim())
-        .setPartOfSpeech(doc.getElementById("lexPart")
-            .getElementsByClass("small-text-right").first().text().trim())
+        .setTransliteration(doc.getElementById("lexTrans").getElementsByClass("small-text-right").first().text().trim())
+        .setPronunciation(doc.getElementById("lexPro").getElementsByClass("small-text-right").first().ownText().trim())
+        .setPartOfSpeech(doc.getElementById("lexPart").getElementsByClass("small-text-right").first().text().trim())
         .setRootWord(processRootText(doc.getElementById("lexRoot")))
         .setDictionaryAid(getDictionaryAid(doc.getElementById("lexDict")))
         .setTranslationCounts(parseTranslationCounts(doc.getElementById("lexCount")))
         .setStrongsDefinition(
             processScriptureReferences(
-                processStrongsReferences(
-                    doc.getElementsByClass("lexStrongsDef").first().text().trim())))
+                processStrongsReferences(doc.getElementsByClass("lexStrongsDef").first().text().trim())))
         .setBrownDriverBriggs(getText(doc.getElementById("BDBTayersLexBlock")))
         .setOutline(parseOutline(doc.getElementById("outlineBiblical")))
         .setBriggsReferences(getBriggsReferences(doc.getElementsByClass("scriptureIndex").first()));
@@ -115,8 +110,8 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
   }
 
   private static String processRootText(Element element) {
-    return element == null ? null : processStrongsReferences(
-        element.children().first().children().first().children().get(1).text().trim());
+    return element == null ? null
+        : processStrongsReferences(element.children().first().children().first().children().get(1).text().trim());
   }
 
   public static String processStrongsReferences(String rootText) {
@@ -125,9 +120,7 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
       while (matcher.find()) {
         String rootRef = matcher.group(1);
         rootText = rootText.replace(rootRef,
-            String.format(
-                "<a href=\"\" data-ng-click=\"$ctrl.showStrongsDefs('%s')\">%s</a>", rootRef,
-                rootRef));
+            String.format("<a href=\"\" data-ng-click=\"$ctrl.showStrongsDefs('%s')\">%s</a>", rootRef, rootRef));
       }
     }
 

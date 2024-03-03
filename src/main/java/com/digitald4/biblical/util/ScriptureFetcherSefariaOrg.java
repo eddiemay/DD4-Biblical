@@ -27,28 +27,25 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
-    String bookName = book.name().replace(" ", "_");
-
-    if (book.name().equals(BibleBook.MACCABEES_1)) {
-      return fetch(version, book, chapter, "The_Book_of_Maccabees_I");
-    } else if (book.name().equals(BibleBook.MACCABEES_2)) {
-      return fetch(version, book, chapter, "The_Book_of_Maccabees_II");
-    } else if (book.name().equals(BibleBook.SUSANNA)) {
-      return fetch(version, book, chapter, "The_Book_of_Susanna");
-    } else if (book.name().equals(BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS)) {
-      return fetchTestamentsOfTheTwelve(version, book, chapter);
-    }
-
-    return fetch(version, book, chapter, String.format("Book_of_%s", bookName));
+    return switch (book.name()) {
+      case BibleBook.MACCABEES_1 -> fetch(version, book, chapter, "The_Book_of_Maccabees_I");
+      case BibleBook.MACCABEES_2 -> fetch(version, book, chapter, "The_Book_of_Maccabees_II");
+      case BibleBook.SUSANNA -> fetch(version, book, chapter, "The_Book_of_Susanna");
+      case BibleBook.TESTAMENTS_OF_THE_TWELVE_PATRIARCHS -> fetchTestamentsOfTheTwelve(version, book, chapter);
+      case BibleBook.SIRACH -> fetch(version, book, chapter, "Ben_Sira");
+      case BibleBook.LETTER_OF_ARISTEAS -> fetch(version, book, chapter, "Letter_of_Aristeas");
+      case BibleBook.MEGILLAT_ANTIOCHUS -> fetch(version, book, chapter, "Megillat_Antiochus");
+      case BibleBook.PRAYER_OF_MANESSEH -> fetch(version, book, chapter, "Prayer_of_Manasseh");
+      case BibleBook.WISDOM_OF_SOLOMON -> fetch(version, book, chapter, "The_Wisdom_of_Solomon");
+      default -> fetch(version, book, chapter, String.format("Book_of_%s", book.name().replace(" ", "_")));
+    };
   }
 
-  private synchronized ImmutableList<Scripture> fetch(
-      String version, BibleBook book, int chapter, String sefariaBookName) {
+  private synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter, String sefariaName) {
     ImmutableList.Builder<Scripture> result = ImmutableList.builder();
-    String url = String.format(URL_TEMPLATE, sefariaBookName, chapter).replaceAll(",", "%2C");
-    // System.out.println("Fetching: " + url + "\n");
-    JSONObject json =
-        new JSONObject(apiConnector.sendGet(url));
+    String url = String.format(URL_TEMPLATE, sefariaName, chapter).replaceAll(",", "%2C");
+    System.out.println("Fetching: " + url + "\n");
+    JSONObject json = new JSONObject(apiConnector.sendGet(url));
 
     JSONArray english = json.getJSONArray("text");
     for (int i = 0; i < english.length(); i++) {
@@ -79,32 +76,30 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
 
   private synchronized ImmutableList<Scripture> fetchTestamentsOfTheTwelve(
       String version, BibleBook book, int chapter) {
-    PatriarchSubBook patriarch;
-    switch (chapter) {
-      case 1: patriarch = new PatriarchSubBook("Reuben", "First_born", "Leah", 7); break;
-      case 2: patriarch = new PatriarchSubBook("Simeon", "Second", "Leah", 9); break;
-      case 3: patriarch = new PatriarchSubBook("Levi", "Third", "Leah", 19); break;
-      case 4: patriarch = new PatriarchSubBook("Judah", "Fourth", "Leah", 26); break;
-      case 5: patriarch = new PatriarchSubBook("Issachar", "Fifth", "Leah", 7); break;
-      case 6: patriarch = new PatriarchSubBook("Zebulun", "Sixth", "Leah", 10); break;
-      case 7: patriarch = new PatriarchSubBook("Dan", "Seventh", "Bilhah", 7); break;
-      case 8: patriarch = new PatriarchSubBook("Naphtali", "Eighth", "Bilhah", 9); break;
-      case 9: patriarch = new PatriarchSubBook("Gad", "Ninth", "Zilpah", 8); break;
-      case 10: patriarch = new PatriarchSubBook("Asher", "Tenth", "Zilpah", 8); break;
-      case 11: patriarch = new PatriarchSubBook("Joseph", "Eleventh", "Rachel", 20); break;
-      case 12: patriarch = new PatriarchSubBook("Benjamin", "Twelfth", "Rachel", 12); break;
-      default: throw new DD4StorageException("Chapter out of bounds for " + book.name());
-    }
+    PatriarchSubBook patriarch = switch (chapter) {
+      case 1 -> new PatriarchSubBook("Reuben", "First_born", "Leah", 7);
+      case 2 -> new PatriarchSubBook("Simeon", "Second", "Leah", 9);
+      case 3 -> new PatriarchSubBook("Levi", "Third", "Leah", 19);
+      case 4 -> new PatriarchSubBook("Judah", "Fourth", "Leah", 26);
+      case 5 -> new PatriarchSubBook("Issachar", "Fifth", "Leah", 7);
+      case 6 -> new PatriarchSubBook("Zebulun", "Sixth", "Leah", 10);
+      case 7 -> new PatriarchSubBook("Dan", "Seventh", "Bilhah", 7);
+      case 8 -> new PatriarchSubBook("Naphtali", "Eighth", "Bilhah", 9);
+      case 9 -> new PatriarchSubBook("Gad", "Ninth", "Zilpah", 8);
+      case 10 -> new PatriarchSubBook("Asher", "Tenth", "Zilpah", 8);
+      case 11 -> new PatriarchSubBook("Joseph", "Eleventh", "Rachel", 20);
+      case 12 -> new PatriarchSubBook("Benjamin", "Twelfth", "Rachel", 12);
+      default -> throw new DD4StorageException("Chapter out of bounds for " + book.name());
+    };
 
     AtomicInteger enVerse = new AtomicInteger();
     AtomicInteger heVerse = new AtomicInteger();
     return IntStream.range(1, patriarch.chapters + 1)
         .boxed()
         .flatMap(c -> fetch(version, book, c, patriarch.getBookName()).stream())
-        .peek(s ->
-            s.setChapter(chapter)
-            .setVerse(
-                s.getLanguage().equals("en") ? enVerse.incrementAndGet() : heVerse.incrementAndGet()))
+        .peek(s -> s
+            .setChapter(chapter)
+            .setVerse(s.getLanguage().equals("en") ? enVerse.incrementAndGet() : heVerse.incrementAndGet()))
         .collect(toImmutableList());
   }
 

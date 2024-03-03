@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Arrays.stream;
 
 import com.digitald4.biblical.model.HighScore;
+import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.*;
@@ -59,6 +60,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 
 		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
 
+		bind(BibleBookStore.class).asEagerSingleton();
 		bind(SearchIndexer.class).to(SearchIndexImpl.class).asEagerSingleton();
 		bind(ScriptureFetcher.class).to(ScriptureFetcherRouter.class).asEagerSingleton();
 		bind(LexiconFetcher.class).to(LexiconFetcherBlueLetterImpl.class).asEagerSingleton();

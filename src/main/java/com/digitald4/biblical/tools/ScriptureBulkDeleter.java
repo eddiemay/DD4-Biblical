@@ -39,8 +39,7 @@ public class ScriptureBulkDeleter {
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
             int verses = Integer.parseInt(
                 apiConnector.sendGet(
-                    String.format(
-                        VERSE_COUNT_URL, booksBaseUrl, "Sefaria", "en", book, chapter)).trim());
+                    String.format(VERSE_COUNT_URL, booksBaseUrl, "Sefaria", "en", book, chapter)).trim());
             System.out.printf("\n  %d:%d", chapter, verses);
             if (verses == 0) {
               return;
@@ -57,8 +56,7 @@ public class ScriptureBulkDeleter {
                                 verse ->
                                     Stream.of("en", "he").map(language ->
                                         String
-                                            .format(ID_FORMAT,
-                                                version, language, bookName, chapter, verse)
+                                            .format(ID_FORMAT, version, language, bookName, chapter, verse)
                                             .replaceAll(" ", "_")))
                             .peek(System.out::println)
                             .collect(toImmutableList())));
@@ -78,12 +76,9 @@ public class ScriptureBulkDeleter {
           while (queryResult.getTotalSize() > 0) {
             System.out.printf("Deleting %d to %d of %d\n", (d + 1), d + queryResult.getItems().size(), queryResult.getTotalSize());
             d += dao.delete(
-                Scripture.class,
-                queryResult.getItems().stream().map(Scripture::getId).collect(toImmutableList()));
-            queryResult =
-                dao.list(Scripture.class, Query.forList().addFilter(Filter.of("version", version)));
+                Scripture.class, queryResult.getItems().stream().map(Scripture::getId).collect(toImmutableList()));
+            queryResult = dao.list(Scripture.class, Query.forList().addFilter(Filter.of("version", version)));
           }
-
         });
     return this;
   }
@@ -97,9 +92,9 @@ public class ScriptureBulkDeleter {
         break;
       }
       switch (args[a]) {
-        case "--version": version = args[++a]; break;
-        case "--language": language = args[++a]; break;
-        case "--idToken": idToken = args[++a]; break;
+        case "--version" -> version = args[++a];
+        case "--language" -> language = args[++a];
+        case "--idToken" -> idToken = args[++a];
       }
     }
     APIConnector apiConnector =

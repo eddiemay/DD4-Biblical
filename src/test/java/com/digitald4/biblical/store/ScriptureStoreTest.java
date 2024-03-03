@@ -66,9 +66,8 @@ public class ScriptureStoreTest {
   }
 
   private static QueryResult<Scripture> getScriptures(Query.List query) {
-    ImmutableMap<String, Object> filterValueByColumnOp =
-        query.getFilters().stream().collect(
-            toImmutableMap(filter -> filter.getColumn() + filter.getOperator(), Filter::getVal));
+    ImmutableMap<String, Object> filterValueByColumnOp = query.getFilters().stream()
+        .collect(toImmutableMap(filter -> filter.getColumn() + filter.getOperator(), Filter::getVal));
     BibleBook book = bibleBookStore.get((String) filterValueByColumnOp.get("book="));
     int chapter = (Integer) filterValueByColumnOp.get("chapter=");
     int startVerse = (Integer) filterValueByColumnOp.get("verse>=");
@@ -92,9 +91,8 @@ public class ScriptureStoreTest {
   private static ImmutableList<Scripture> fetchFromWeb(
       String version, String language, BibleBook book, int chapter) {
     return IntStream.range(1, 38)
-        .mapToObj(
-            verse ->
-                createScripture(version, language, book.name(), chapter, verse, "[Fetched " + version + " From Web]"))
+        .mapToObj(verse ->
+            createScripture(version, language, book.name(), chapter, verse, "[Fetched " + version + " From Web]"))
         .collect(toImmutableList());
   }
 

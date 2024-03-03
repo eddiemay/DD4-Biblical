@@ -80,20 +80,16 @@ public class InterlinearStore extends GenericStore<Interlinear, String> {
           list(Query.forList(Filter.of("constantsOnly", hebrewWord))).getItems().stream());
     } else if (strongsId != null && word != null) {
       resultsStream = list(
-          Query.forList(
-              Filter.of("strongsId", strongsId), Filter.of("word", word))).getItems().stream();
+          Query.forList(Filter.of("strongsId", strongsId), Filter.of("word", word))).getItems().stream();
     } else if (strongsId != null && hebrewWord != null) {
       resultsStream = list(
-          Query.forList(
-              Filter.of("strongsId", strongsId), 
-              Filter.of("constantsOnly", hebrewWord))).getItems().stream();
+          Query.forList(Filter.of("strongsId", strongsId), Filter.of("constantsOnly", hebrewWord))).getItems().stream();
     } else if (strongsId != null) {
       resultsStream = list(Query.forList(Filter.of("strongsId", strongsId))).getItems().stream();
     } else if (word != null) {
       resultsStream = list(Query.forList(Filter.of("word", word))).getItems().stream();
     } else {
-      resultsStream =
-          list(Query.forList(Filter.of("constantsOnly", hebrewWord))).getItems().stream();
+      resultsStream = list(Query.forList(Filter.of("constantsOnly", hebrewWord))).getItems().stream();
     }
 
     ImmutableSet<Interlinear> results = resultsStream

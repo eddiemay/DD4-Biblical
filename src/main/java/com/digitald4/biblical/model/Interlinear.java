@@ -34,8 +34,7 @@ public class Interlinear {
 
   public String getId() {
     return String.format("%s%s-%d-%d-%d",
-        version == null ? "" : version + "-",
-        getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
+        version == null ? "" : version + "-", getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
   }
 
   @Deprecated
