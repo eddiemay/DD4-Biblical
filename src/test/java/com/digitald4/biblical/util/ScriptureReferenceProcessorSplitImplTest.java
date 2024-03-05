@@ -2,14 +2,14 @@ package com.digitald4.biblical.util;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class ScriptureReferenceProcessorSplitImplTest {
-  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
-  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private static final BibleBook GENESIS = bibleBookStore.get("Genesis");
   private static final BibleBook KINGS_2 = bibleBookStore.get("2 Kings");
   private static final BibleBook PSALMS = bibleBookStore.get("Psalms");

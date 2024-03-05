@@ -6,7 +6,7 @@ from matplotlib import pyplot
 # print(tf.__version__)
 
 batch_size = 64  # Batch size for training.
-epochs = 100  # Number of epochs to train for.
+epochs = 97  # Number of epochs to train for.
 latent_dim = 128  # Latent dimensionality of the encoding space.
 num_samples = 20000  # Number of samples to train on.
 # Path to the data txt file on disk.
@@ -20,12 +20,12 @@ target_characters = set()
 with open(data_path, "r", encoding="utf-8") as f:
   lines = f.read().split("\n")
 for line in lines[1:]:
-  _, input_text, target_text, ld, constantsOnly = line.split(",")
-  # target_text = constantsOnly
+  _, input_text, target_text, constantsOnly, ld, diff = line.split(",")
+  target_text = constantsOnly
   ld = int(ld)
   # We use "tab" as the "start sequence" character
   # for the targets, and " " as "end sequence" character.
-  if (ld < 2 and len(input_texts) < num_samples):
+  if (ld < 1 and len(input_texts) < num_samples):
     target_text = "\t" + target_text + " "
     input_texts.append(input_text)
     target_texts.append(target_text)

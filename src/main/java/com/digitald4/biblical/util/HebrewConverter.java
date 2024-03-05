@@ -201,8 +201,10 @@ public class HebrewConverter {
     if (word.length() == 0) {
       return word;
     }
+    return
+        word.replaceAll("ך", "כ").replaceAll("ם", "מ").replaceAll("ן", "נ").replaceAll("ף", "פ").replaceAll("ץ", "צ");
 
-    int lastIndex = word.length() - 1;
+    /* int lastIndex = word.length() - 1;
     return switch (word.charAt(lastIndex)) {
       case 'ך' -> word.substring(0, lastIndex) + 'כ';
       case 'ם' -> word.substring(0, lastIndex) + 'מ';
@@ -210,7 +212,7 @@ public class HebrewConverter {
       case 'ף' -> word.substring(0, lastIndex) + 'פ';
       case 'ץ' -> word.substring(0, lastIndex) + 'צ';
       default -> word;
-    };
+    }; */
   }
 
   public static String finalize(String text) {

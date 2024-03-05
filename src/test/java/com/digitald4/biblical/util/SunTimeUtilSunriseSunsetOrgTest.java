@@ -10,11 +10,9 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-
 import java.time.Duration;
 
 public class SunTimeUtilSunriseSunsetOrgTest {
-
   @Mock private final APIConnector apiConnector = mock(APIConnector.class);
   private SunTimeUtilSunriseSunsetOrg suntimeUtil;
 
@@ -100,8 +98,7 @@ public class SunTimeUtilSunriseSunsetOrgTest {
     assertEquals(Duration.parse("PT13H47M58S"), sunTimeData.getDayLength());
     assertEquals(11, sunTimeData.getDayParts());
 
-    verify(apiConnector, times(1))
-        .sendGet("https://sunrise-sunset.org/search?location=jerusalem&year=2021&month=8#calendar");
+    verify(apiConnector).sendGet("https://sunrise-sunset.org/search?location=jerusalem&year=2021&month=8#calendar");
   }
 
   @Test

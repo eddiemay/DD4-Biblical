@@ -9,10 +9,10 @@ import static org.mockito.Mockito.when;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.model.BasicUser;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SessionStore;
@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 public class ScriptureServiceTest {
-  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
-  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private static final ScriptureReferenceProcessor scriptureRefProcessor =
       new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
   @Mock private final SessionStore<BasicUser> sessionStore = mock(SessionStore.class);

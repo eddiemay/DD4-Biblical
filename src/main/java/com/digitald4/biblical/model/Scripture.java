@@ -51,7 +51,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
   }
 
   public Scripture setBook(String book) {
-    this.book = BibleBook.EPISTLE_OF_ARISTEAS.equals(book) ? BibleBook.LETTER_OF_ARISTEAS : book;
+    this.book =  book;
     return this;
   }
 

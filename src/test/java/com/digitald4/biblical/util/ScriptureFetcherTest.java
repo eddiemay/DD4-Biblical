@@ -4,9 +4,9 @@ import static org.mockito.Mockito.mock;
 
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.ChangeTracker;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
 import java.io.BufferedReader;
@@ -18,8 +18,8 @@ public class ScriptureFetcherTest {
   @Mock protected final APIConnector apiConnector = mock(APIConnector.class);
   @Mock final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   protected ScriptureStore scriptureStore;
-  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
-  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
   @Before
   public void setup() {

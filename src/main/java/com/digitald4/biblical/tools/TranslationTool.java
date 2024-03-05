@@ -12,7 +12,6 @@ import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.TokenWordStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.biblical.util.HebrewTokenizer;
 import com.digitald4.biblical.util.InterlinearFetcher;
@@ -35,6 +34,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOFileBasedImpl;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
@@ -109,8 +109,8 @@ public class TranslationTool {
     DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
-    StaticDataDAO staticDataDAO = new StaticDataDAO();
-    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(
         () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);

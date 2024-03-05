@@ -15,7 +15,6 @@ import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.AuditScripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.MachineTranslator;
@@ -24,11 +23,8 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.storage.DAO;
-import com.digitald4.common.storage.Query;
+import com.digitald4.common.storage.*;
 import com.digitald4.common.storage.Query.Filter;
-import com.digitald4.common.storage.QueryResult;
-import com.digitald4.common.storage.SearchIndexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -47,8 +43,8 @@ public class ScriptureStoreTest {
   @Mock private final InterlinearStore interlinearStore = mock(InterlinearStore.class);
   @Mock private final MachineTranslator machineTranslator = mock(MachineTranslator.class);
 
-  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
-  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private final ScriptureReferenceProcessor scriptureRefProcessor =
       new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
   private ScriptureStore scriptureStore;
@@ -58,8 +54,7 @@ public class ScriptureStoreTest {
     scriptureStore = new ScriptureStore(() -> dao, searchIndexer, bibleBookStore,
         scriptureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
-    when(dao.list(eq(Scripture.class), any(Query.List.class))).then(
-        i -> getScriptures(i.getArgument(1)));
+    when(dao.list(eq(Scripture.class), any(Query.List.class))).then(i -> getScriptures(i.getArgument(1)));
     when(dao.create(anyCollectionOf(Scripture.class))).then(i -> i.getArgument(0));
     when(scriptureFetcher.fetch(anyString(), anyString(), any(BibleBook.class), anyInt())).then(i ->
         fetchFromWeb(i.getArgument(0), i.getArgument(1), i.getArgument(2), i.getArgument(3)));

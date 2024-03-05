@@ -32,8 +32,6 @@ public class BibleBook {
   public static final String BARUCH_2 = "2 Baruch";
   public static final String CLEMENT_1 = "1 Clement";
   public static final String ODES_OF_PEACE = "Odes of Peace";
-  @Deprecated
-  public static final String EPISTLE_OF_ARISTEAS = "Epistle of Aristeas";
   public static final String LETTER_OF_ARISTEAS = "Letter of Aristeas";
   public static final String MEGILLAT_ANTIOCHUS = "Megillat Antiochus";
   public static final String PRAYER_OF_MANESSEH = "Prayer of Manasseh";
@@ -46,7 +44,7 @@ public class BibleBook {
   private int number;
   private String tags;
   private int chapterCount;
-  private ImmutableSet<String> altNames;
+  private ImmutableSet<String> altNames = ImmutableSet.of();
   private Boolean unreleased;
   private StringBuilder description;
 

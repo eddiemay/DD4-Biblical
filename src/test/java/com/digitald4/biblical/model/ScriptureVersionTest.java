@@ -3,12 +3,13 @@ package com.digitald4.biblical.model;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.digitald4.biblical.store.BibleBookStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import org.junit.Test;
 
 public class ScriptureVersionTest {
-  private static final StaticDataDAO staticDataDAO = new StaticDataDAO();
-  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();;
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
+
   @Test
   public void correctBookCounts() {
     assertThat(bibleBookStore.getBibleBooks("ISR")).hasSize(66);

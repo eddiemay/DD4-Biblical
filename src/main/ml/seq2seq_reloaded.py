@@ -115,26 +115,6 @@ def decode_sequence(input_seq):
     states_value = [h, c]
   return decoded_sentence
 
-examples = [
-  ["חֲזוֹן֙", "חזון"],
-  ["יְשַֽׁעְיָ֣הוּ", "ישעיהו"],
-  ["בֶן־", "בן"],
-  ["וִירוּשָׁלִָ֑ם", "וירושלים"],
-  ["עֻזִּיָּ֧הוּ", "עוזיה"],
-  ["יֻלַּד־", "יולד"],
-  ["מִ֤י", "מיא"],
-  ["אֱלֹהֵ֖ינוּ", "אלוהינו"],
-  ["לֹא־", "לוא"]
-]
-
-for example in examples:
-  # Take one sequence (part of the training set) for trying out decoding.
-  decoded_sentence = decode_sequence(encode_input(example[0]))
-  print("-")
-  print("Input  :", example[0])
-  print("Target :", example[1])
-  print("Decoded:", decoded_sentence)
-
 with open(os.path.join(data_path, "isa-word-map.csv"), "r", encoding="utf-8") as f:
   lines = f.read().split("\n")
 with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="utf-8") as f:
@@ -150,10 +130,11 @@ with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="
   noFixNeeded = 0
   correctNoChange = 0
   falseChange = 0
+
   for line in lines[1:]:
-    id, input, target, ld, constantsOnly = line.split(",")
+    id, input, target, constantsOnly, ld, diff = line.split(",")
     ld = int(ld)
-    if (ld < 2 and processed < 100):
+    if (ld < 1 and processed < 100):
       decoded = decode_sequence(encode_input(input)).strip()
       f.write("{0},{1},{2},{3}\n".format(id, input, target, decoded))
       processed += 1

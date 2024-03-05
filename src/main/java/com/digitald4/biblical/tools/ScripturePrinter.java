@@ -1,20 +1,24 @@
 package com.digitald4.biblical.tools;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.*;
 import com.digitald4.common.model.Searchable;
 import com.digitald4.common.server.APIConnector;
-import com.digitald4.common.storage.ChangeTracker;
-import com.digitald4.common.storage.DAO;
-import com.digitald4.common.storage.DAOApiImpl;
+import com.digitald4.common.storage.*;
 import com.digitald4.common.storage.Query.Search;
-import com.digitald4.common.storage.QueryResult;
-import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.testing.DAOTestingImpl;
+import com.digitald4.common.util.JSONUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.stream.IntStream;
 
 public class ScripturePrinter {
+  private final static String BOOK_URL = "%s/books?includeUnreleased=true";
   public static void main(String[] args) {
     String version = "ISR";
     String language = "interlaced";
@@ -26,11 +30,11 @@ public class ScripturePrinter {
         break;
       }
       switch (args[a]) {
-        case "--version": version = args[++a]; break;
-        case "--language": language = args[++a]; break;
-        case "--useApi": useApi = true; break;
-        case "--idToken": idToken = args[++a]; break;
-        default: reference = args[a];
+        case "--version" -> version = args[++a];
+        case "--language" -> language = args[++a];
+        case "--useApi" -> useApi = true;
+        case "--idToken" -> idToken = args[++a];
+        default -> reference = args[a];
       }
     }
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
@@ -47,8 +51,9 @@ public class ScripturePrinter {
             @Override
             public <T extends Searchable> void removeIndex(Class<T> aClass, Iterable<?> iterable) {}
           }, null));
-    StaticDataDAO staticDataDAO = new StaticDataDAO();
-    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
+    refreshBooks(apiConnector, daoFileDB);
     ScriptureStore scriptureStore = new ScriptureStore(
         () -> dao, null, bibleBookStore,
         new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
@@ -64,5 +69,16 @@ public class ScripturePrinter {
         null, null);
 
     scriptureStore.getScriptures(version, language, reference).getItems().forEach(System.out::println);
+  }
+
+  private static void refreshBooks(APIConnector apiConnector, DAOFileDBImpl daoFileDB) {
+    String baseUrl = apiConnector.formatUrl("books");
+    JSONArray array = new JSONObject(apiConnector.sendGet(String.format(BOOK_URL, baseUrl))).getJSONArray("items");
+    daoFileDB.create(
+        IntStream.range(0, array.length())
+            .mapToObj(i -> JSONUtil.toObject(BibleBook.class, array.getJSONObject(i)))
+            .peek(System.out::println)
+            .collect(toImmutableList()));
+    daoFileDB.saveFiles();
   }
 }

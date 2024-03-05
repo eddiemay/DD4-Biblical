@@ -2,9 +2,9 @@ package com.digitald4.biblical.tools;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.DAOFileDBImpl;
 
 import java.util.stream.IntStream;
 
@@ -45,8 +45,8 @@ public class ScriptureFetcher {
     }
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-    StaticDataDAO staticDataDAO = new StaticDataDAO();
-    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
     new ScriptureFetcher(apiConnector, bibleBookStore).fetch(
         args[0],

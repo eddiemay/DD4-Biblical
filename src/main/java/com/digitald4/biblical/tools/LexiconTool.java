@@ -14,7 +14,6 @@ import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.AncientLexiconFetcher;
 import com.digitald4.biblical.util.BPETokenizer;
 import com.digitald4.biblical.util.Constants;
@@ -29,6 +28,7 @@ import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOApiImpl;
 import com.digitald4.common.storage.DAOFileBasedImpl;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.util.JSONUtil;
@@ -56,18 +56,16 @@ public class LexiconTool {
   private final static String INTER_FETCH_URL = "%s/search?lang=interlinear&searchText=%s+%d:1";
   private final APIConnector apiConnector;
   private final LexiconStore lexiconStore;
-  private final LexiconFetcher lexiconFetcher;
   private final InterlinearStore interlinearStore;
   private final InterlinearFetcher interlinearFetcher;
   private final BibleBookStore bibleBookStore;
   private final AncientLexiconFetcher ancientLexiconFetcher;
 
-  LexiconTool(APIConnector apiConnector, LexiconStore lexiconStore, LexiconFetcher lexiconFetcher,
-      InterlinearStore interlinearStore, InterlinearFetcher interlinearFetcher,
-      BibleBookStore bibleBookStore, AncientLexiconFetcher ancientLexiconFetcher) {
+  LexiconTool(APIConnector apiConnector, LexiconStore lexiconStore, InterlinearStore interlinearStore,
+              InterlinearFetcher interlinearFetcher, BibleBookStore bibleBookStore,
+              AncientLexiconFetcher ancientLexiconFetcher) {
     this.apiConnector = apiConnector;
     this.lexiconStore = lexiconStore;
-    this.lexiconFetcher = lexiconFetcher;
     this.interlinearStore = interlinearStore;
     this.interlinearFetcher = interlinearFetcher;
     this.bibleBookStore = bibleBookStore;
@@ -176,8 +174,7 @@ public class LexiconTool {
         .collect(joining(" "));
   }
 
-  private ImmutableSet<Interlinear> getReferences(String type, String... values)
-      throws IOException {
+  private ImmutableSet<Interlinear> getReferences(String type, String... values) throws IOException {
     ImmutableSet.Builder<Interlinear> results = ImmutableSet.builder();
     for (String value : values) {
       JSONObject queryResult = new JSONObject(readData(type, value));
@@ -342,25 +339,24 @@ public class LexiconTool {
 
   public static void main(String[] args) throws IOException {
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50).loadIdToken();
-    StaticDataDAO staticDataDAO = new StaticDataDAO();
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
     DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
-    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     ScriptureReferenceProcessor referenceProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     InterlinearStore interlinearStore = new InterlinearStore(() -> fileDao, referenceProcessor, interlinearFetcher);
     DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
     LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
     AncientLexiconFetcher ancientLexiconFetcher = new AncientLexiconFetcher(apiConnector);
-    LexiconTool lexiconTool = new LexiconTool(apiConnector, lexiconStore, lexiconFetcher,
-        interlinearStore, interlinearFetcher, bibleBookStore, ancientLexiconFetcher);
+    LexiconTool lexiconTool = new LexiconTool(
+        apiConnector, lexiconStore, interlinearStore, interlinearFetcher, bibleBookStore, ancientLexiconFetcher);
     lexiconTool.printInterlinear("Judges 21");
 
     // System.out.println(lexiconStore.get("H997"));
 
     findRoots(lexiconTool.getReferences("strongsId", "H410", "H426", "H430", "H433"));
     findRoots(lexiconTool.getReferences("strongsId", "H175"));
-
 
     int batchSize = 100;
     // range(0, 7000 / 100)

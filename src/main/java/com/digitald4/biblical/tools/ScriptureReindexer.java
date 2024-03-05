@@ -5,9 +5,9 @@ import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 
 import com.digitald4.biblical.store.BibleBookStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import com.google.common.collect.ImmutableSet;
 
 public class ScriptureReindexer {
@@ -42,8 +42,8 @@ public class ScriptureReindexer {
     }
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-    StaticDataDAO staticDataDAO = new StaticDataDAO();
-    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
     new ScriptureReindexer(apiConnector, bibleBookStore).reindex(
         args[0], stream(args).skip(1).filter(a -> !a.isEmpty()).peek(System.out::println).collect(toImmutableSet()));

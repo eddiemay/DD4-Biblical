@@ -24,7 +24,6 @@ import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.ScriptureStore;
-import com.digitald4.biblical.store.testing.StaticDataDAO;
 import com.digitald4.biblical.tools.DiffStats.DiffConfig.HebrewProcessing;
 import com.digitald4.biblical.util.BPETokenizer;
 import com.digitald4.biblical.util.Constants;
@@ -48,6 +47,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOFileBasedImpl;
+import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.util.Calculate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -189,14 +189,13 @@ public class DiffStats {
     }
     bw.newLine();
 
-    bw.write(
-        String.format("%d,%d,%d,%d,%d,%d",
-            stats.size(),
-            stats.stream().filter(s -> !s.dss.isEmpty()).count(),
-            stats.stream().filter(s -> !s.wlco.isEmpty()).count(),
-            sum,
-            stats.stream().filter(s -> !s.lettersRemoved.isEmpty()).count(),
-            stats.stream().filter(s -> !s.lettersAdded.isEmpty()).count()));
+    bw.write(String.format("%d,%d,%d,%d,%d,%d",
+        stats.size(),
+        stats.stream().filter(s -> !s.dss.isEmpty()).count(),
+        stats.stream().filter(s -> !s.wlco.isEmpty()).count(),
+        sum,
+        stats.stream().filter(s -> !s.lettersRemoved.isEmpty()).count(),
+        stats.stream().filter(s -> !s.lettersAdded.isEmpty()).count()));
 
     for (char l = 'א'; l <= 'ת'; l++) {
       bw.write("," + removed.getOrDefault(l, new AtomicLong()));
@@ -206,9 +205,8 @@ public class DiffStats {
     }
     bw.newLine();
     for (ScriptureDiffStats s : stats) {
-      bw.write(
-          String.format("%s %d:%d,%s,%s,%d,%s,%s",
-              s.book, s.chapter, s.verse, s.dss, s.wlco, s.ld, s.removed, s.added));
+      bw.write(String.format("%s %d:%d,%s,%s,%d,%s,%s",
+          s.book, s.chapter, s.verse, s.dss, s.wlco, s.ld, s.removed, s.added));
       for (char l = 'א'; l <= 'ת'; l++) {
         bw.write("," + s.lettersRemoved.getOrDefault(l, 0L));
       }
@@ -337,36 +335,36 @@ public class DiffStats {
     }
     BufferedWriter bw = new BufferedWriter(new FileWriter("data/isa-interlinear.csv"));
     BufferedWriter bw2 = new BufferedWriter(new FileWriter("data/isa-word-map.csv"));
-    bw.write("Id,Strong's Id,MT Word,Transliteration,Constants Only,Full Hebrew,ML Word,DSS Word,"
-        + "Constants LD,Full LD,Full Improv,ML Improv,Translation,Word Type,Link\n");
-    bw2.write("Id,MT Word,DSS Word,LD,Constants Only");
+    bw.write("Id,Strong's Id,MT Word,DSS Word,Constants,Full Hebrew,ML Word,Constants LD,Full LD,ML LD,"
+        + "Full Improv,ML Improv,Constants Diff,Transliteration,Translation,Word Type,Link\n");
+    bw2.write("Id,MT Word,DSS Word,Constants,LD,Diff");
     AtomicInteger totalConstantsLd = new AtomicInteger();
     AtomicInteger totalFullLd = new AtomicInteger();
     AtomicInteger totalMLLd = new AtomicInteger();
     allInterlinears.forEach(i -> {
       try {
-        String word = removeGarbage(i.getWord());
+        String word = unfinalize(removeGarbage(i.getWord()));
+        String dss = unfinalize(removeGarbage(i.getDss() == null ? "" : i.getDss()));
         String constantsOnly = toConstantsOnly(word);
-        String fullHebrew = unfinalize(toFullHebrew(word));
-        String dss = i.getDss();
-        if (dss == null) dss = "";
-        String cleanDss = removeGarbage(dss);
-        dss = unfinalize(cleanDss);
+        String fullHebrew = toFullHebrew(word);
         String mlWord = unfinalize(mlWords.getOrDefault(i.getId(), constantsOnly));
-        int ldConstantsOnly = Calculate.LD(dss, unfinalize(constantsOnly));
+        int ldConstants = Calculate.LD(dss, constantsOnly);
         int ldFullHebrew = Calculate.LD(dss, fullHebrew);
         int ldMlWord = Calculate.LD(dss, mlWord);
-        totalConstantsLd.addAndGet(ldConstantsOnly);
+        totalConstantsLd.addAndGet(ldConstants);
         totalFullLd.addAndGet(ldFullHebrew);
         totalMLLd.addAndGet(ldMlWord);
-        bw2.write(String.format("\n%s,%s,%s,%d,%s", i.getId(), word, cleanDss, ldConstantsOnly, constantsOnly));
+        String diff = Calculate.getDiff(constantsOnly, dss).stream()
+            .filter(d -> d.operation != Operation.EQUAL)
+            .map(d -> String.format("%s%s", d.operation == Operation.INSERT ? "+" : "-", d.text))
+            .collect(joining(""));
+        bw2.write(String.format("\n%s,%s,%s,%s,%d,%s", i.getId(), word, dss, constantsOnly, ldConstants, diff));
         bw.write(
-            String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
-                i.getId(), sanitize(i.getStrongsId()), word, sanitize(i.getTransliteration()),
-                unfinalize(constantsOnly), fullHebrew, dss, mlWord,
-                format(ldConstantsOnly), format(ldFullHebrew), format(ldMlWord),
-                format(ldConstantsOnly - ldFullHebrew), format(ldConstantsOnly - ldMlWord),
-                i.getTranslation(), sanitize(i.getMorphology()),
+            String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                i.getId(), sanitize(i.getStrongsId()), word, dss, constantsOnly, fullHebrew, mlWord,
+                format(ldConstants), format(ldFullHebrew), format(ldMlWord),
+                format(ldConstants - ldFullHebrew), format(ldConstants - ldMlWord), diff,
+                sanitize(i.getTransliteration()), i.getTranslation(), sanitize(i.getMorphology()),
                 createLink(ImmutableList.of(i))));
       } catch (IOException ioe) {
         throw new RuntimeException(ioe);
@@ -432,8 +430,8 @@ public class DiffStats {
     long startTime = System.currentTimeMillis();
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOFileBasedImpl dao = new DAOFileBasedImpl(DB_FILE).loadFromFile();
-    StaticDataDAO staticDataDAO = new StaticDataDAO();
-    BibleBookStore bibleBookStore = new BibleBookStore(() -> staticDataDAO);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     ScriptureReferenceProcessor referenceProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(() -> dao, referenceProcessor, interlinearFetcher);
