@@ -3,10 +3,12 @@ import keras
 import os
 from matplotlib import pyplot
 
+from src.main.ml.global_functions import Interlinear
+
 # print(tf.__version__)
 
 batch_size = 64  # Batch size for training.
-epochs = 97  # Number of epochs to train for.
+epochs = 80  # Number of epochs to train for.
 latent_dim = 128  # Latent dimensionality of the encoding space.
 num_samples = 20000  # Number of samples to train on.
 # Path to the data txt file on disk.
@@ -20,20 +22,18 @@ target_characters = set()
 with open(data_path, "r", encoding="utf-8") as f:
   lines = f.read().split("\n")
 for line in lines[1:]:
-  _, input_text, target_text, constantsOnly, ld, diff = line.split(",")
-  target_text = constantsOnly
-  ld = int(ld)
+  i = Interlinear(line)
   # We use "tab" as the "start sequence" character
   # for the targets, and " " as "end sequence" character.
-  if (ld < 1 and len(input_texts) < num_samples):
-    target_text = "\t" + target_text + " "
-    input_texts.append(input_text)
+  if len(input_texts) < num_samples and i.is_candidate():
+    target_text = "\t" + i.target() + " "
+    input_texts.append(i.input())
     target_texts.append(target_text)
     for char in target_text:
       if char not in target_characters:
         target_characters.add(char)
 
-  for char in input_text:
+  for char in i.input():
     if char not in input_characters:
       input_characters.add(char)
 

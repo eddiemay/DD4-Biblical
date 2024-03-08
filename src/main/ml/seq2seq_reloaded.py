@@ -1,6 +1,11 @@
-import numpy as np
 import keras
+import numpy as np
 import os
+import time
+
+from src.main.ml.global_functions import Interlinear
+
+start_time = time.perf_counter()
 
 '''
 Number of samples: 10000
@@ -35,13 +40,13 @@ decoder_state_input_c = keras.Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 decoder_lstm = model.layers[3]
 decoder_outputs, state_h_dec, state_c_dec = decoder_lstm(
-  decoder_inputs, initial_state=decoder_states_inputs
+    decoder_inputs, initial_state=decoder_states_inputs
 )
 decoder_states = [state_h_dec, state_c_dec]
 decoder_dense = model.layers[4]
 decoder_outputs = decoder_dense(decoder_outputs)
 decoder_model = keras.Model(
-  [decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states
+    [decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states
 )
 num_encoder_tokens = encoder_inputs.shape[2]
 num_decoder_tokens = decoder_inputs.shape[2]
@@ -52,12 +57,13 @@ print("Max sequence length for outputs:", max_decoder_seq_length)
 
 # Load the target tokens from file
 with open("target_tokens.txt", "r", encoding="utf-8") as f:
-  target_characters = f.read().split("\n")
+    target_characters = f.read().split("\n")
 target_characters = target_characters[: len(target_characters) - 1]
 
 # Load the target tokens from file
 with open("input_tokens.txt", "r", encoding="utf-8") as f:
-  input_characters = f.read().split("\n")
+    input_characters = f.read().split("\n")
+
 input_characters = input_characters[: len(input_characters) - 1]
 
 print("Input characters length: ", len(input_characters))
@@ -70,99 +76,95 @@ reverse_input_char_index = dict((i, char) for char, i in input_token_index.items
 target_token_index = dict([(char, i) for i, char in enumerate(target_characters)])
 reverse_target_char_index = dict((i, char) for char, i in target_token_index.items())
 
+
 def encode_input(input_text):
-  input_seq = np.zeros(
-    (1, max_encoder_seq_length, num_encoder_tokens),
-    dtype="float32",
-  )
-  for t, char in enumerate(input_text):
-    input_seq[0, t, input_token_index[char]] = 1.0
-  input_seq[0, t + 1 :, input_token_index[" "]] = 1.0
-  return input_seq
+    input_seq = np.zeros((1, max_encoder_seq_length, num_encoder_tokens), dtype="float32")
+    for t, char in enumerate(input_text):
+        input_seq[0, t, input_token_index[char]] = 1.0
+    input_seq[0, t + 1:, input_token_index[" "]] = 1.0
+    return input_seq
+
 
 def decode_sequence(input_seq):
-  # Encode the input as state vectors.
-  states_value = encoder_model.predict(input_seq, verbose=0)
+    # Encode the input as state vectors.
+    states_value = encoder_model.predict(input_seq, verbose=0)
 
-  # Generate empty target sequence of length 1.
-  target_seq = np.zeros((1, 1, num_decoder_tokens))
-  # Populate the first character of target sequence with the start character.
-  target_seq[0, 0, target_token_index["\t"]] = 1.0
-
-  # Sampling loop for a batch of sequences
-  # (to simplify, here we assume a batch of size 1).
-  stop_condition = False
-  decoded_sentence = ""
-  while not stop_condition:
-    output_tokens, h, c = decoder_model.predict(
-      [target_seq] + states_value, verbose=0
-    )
-
-    # Sample a token
-    sampled_token_index = np.argmax(output_tokens[0, -1, :])
-    sampled_char = reverse_target_char_index[sampled_token_index]
-    decoded_sentence += sampled_char
-
-    # Exit condition: either hit max length or find stop character.
-    if sampled_char == " " or len(decoded_sentence) > max_decoder_seq_length:
-      stop_condition = True
-
-    # Update the target sequence (of length 1).
+    # Generate empty target sequence of length 1.
     target_seq = np.zeros((1, 1, num_decoder_tokens))
-    target_seq[0, 0, sampled_token_index] = 1.0
+    # Populate the first character of target sequence with the start character.
+    target_seq[0, 0, target_token_index["\t"]] = 1.0
 
-    # Update states
-    states_value = [h, c]
-  return decoded_sentence
+    # Sampling loop for a batch of sequences
+    # (to simplify, here we assume a batch of size 1).
+    stop_condition = False
+    decoded_sentence = ""
+    while not stop_condition:
+        output_tokens, h, c = decoder_model.predict([target_seq] + states_value, verbose=0)
+
+        # Sample a token
+        sampled_token_index = np.argmax(output_tokens[0, -1, :])
+        sampled_char = reverse_target_char_index[sampled_token_index]
+        decoded_sentence += sampled_char
+
+        # Exit condition: either hit max length or find stop character.
+        if sampled_char == " " or len(decoded_sentence) > max_decoder_seq_length:
+            stop_condition = True
+
+        # Update the target sequence (of length 1).
+        target_seq = np.zeros((1, 1, num_decoder_tokens))
+        target_seq[0, 0, sampled_token_index] = 1.0
+
+        # Update states
+        states_value = [h, c]
+    return decoded_sentence
+
 
 with open(os.path.join(data_path, "isa-word-map.csv"), "r", encoding="utf-8") as f:
-  lines = f.read().split("\n")
+    lines = f.read().split("\n")
 with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="utf-8") as f:
-  f.write("Id,MT Word,DSS Word,ML Word\n")
-  processed = 0
-  missmatches = 0
+    f.write("Id,MT Word,DSS Word,ML Word\n")
+    processed = 0
+    missmatches = 0
 
-  needfixing = 0
-  fixed = 0
-  fixedNotAttempted = 0
-  nonSuccessFix = 0
+    needfixing = 0
+    fixed = 0
+    fixedNotAttempted = 0
+    nonSuccessFix = 0
 
-  noFixNeeded = 0
-  correctNoChange = 0
-  falseChange = 0
+    noFixNeeded = 0
+    correctNoChange = 0
+    falseChange = 0
 
-  for line in lines[1:]:
-    id, input, target, constantsOnly, ld, diff = line.split(",")
-    ld = int(ld)
-    if (ld < 1 and processed < 100):
-      decoded = decode_sequence(encode_input(input)).strip()
-      f.write("{0},{1},{2},{3}\n".format(id, input, target, decoded))
-      processed += 1
-      print(id)
-      print("Input  :", input)
-      print("Target :", target)
-      print("Decoded:", decoded)
-      if (target != constantsOnly):
-        needfixing += 1
-        if (target == decoded):
-          fixed += 1
-        elif (constantsOnly == decoded):
-          fixedNotAttempted += 1
-        else:
-          nonSuccessFix += 1
-      if (target == constantsOnly):
-        noFixNeeded += 1
-        if (target == decoded):
-          correctNoChange += 1
-        else:
-          falseChange += 1
-      if (target != decoded):
-        missmatches += 1
-        print("missmatch!")
+    for line in lines[1:]:
+        i = Interlinear(line)
+        if processed < 200 and i.is_candidate():
+            i.decoded = decode_sequence(encode_input(i.input())).strip()
+            f.write(i.to_csv())
+            processed += 1
+            print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}".format(i.id, i.input(), i.target(), i.decoded))
+            if i.target() != i.constantsOnly:
+                needfixing += 1
+                if i.target() == i.decoded:
+                    fixed += 1
+                elif i.constantsOnly == i.decoded:
+                    fixedNotAttempted += 1
+                else:
+                    nonSuccessFix += 1
+            if i.target() == i.constantsOnly:
+                noFixNeeded += 1
+                if i.target() == i.decoded:
+                    correctNoChange += 1
+                else:
+                    falseChange += 1
+            if i.target() != i.decoded:
+                missmatches += 1
+                print("missmatch!")
 
-  print("Matching on {0} out of {1}".format(processed - missmatches, processed))
-  print("Fixed {0} out of {1}".format(fixed, needfixing))
-  print("Non fix attempted {0} out of {1}".format(fixedNotAttempted, needfixing))
-  print("Non success fix {0} out of {1}".format(nonSuccessFix, needfixing))
-  print("Remove Nikkuds correctly {0} out of {1}".format(correctNoChange, noFixNeeded))
-  print("Broke {0} out of {1}".format(falseChange, noFixNeeded))
+print("\nMatching on {0} out of {1}".format(processed - missmatches, processed))
+print("Fixed {0} out of {1}".format(fixed, needfixing))
+print("Non fix attempted {0} out of {1}".format(fixedNotAttempted, needfixing))
+print("Non success fix {0} out of {1}".format(nonSuccessFix, needfixing))
+print("Remove Nikkuds correctly {0} out of {1}".format(correctNoChange, noFixNeeded))
+print("Broke {0} out of {1}".format(falseChange, noFixNeeded))
+
+print("\nProgram finished in {} seconds".format(time.perf_counter() - start_time))

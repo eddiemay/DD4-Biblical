@@ -1,6 +1,7 @@
 package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
@@ -15,15 +16,12 @@ import com.digitald4.common.util.JSONUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.stream.IntStream;
-
 public class ScripturePrinter {
   private final static String BOOK_URL = "%s/books?includeUnreleased=true";
   public static void main(String[] args) {
     String version = "ISR";
     String language = "interlaced";
     String reference = "Gen 2:2";
-    String idToken = null;
     boolean useApi = false;
     for (int a = 0; a < args.length; a++) {
       if (args[a].isEmpty()) {
@@ -33,7 +31,6 @@ public class ScripturePrinter {
         case "--version" -> version = args[++a];
         case "--language" -> language = args[++a];
         case "--useApi" -> useApi = true;
-        case "--idToken" -> idToken = args[++a];
         default -> reference = args[a];
       }
     }
@@ -53,7 +50,7 @@ public class ScripturePrinter {
           }, null));
     DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
-    refreshBooks(apiConnector, daoFileDB);
+    // refreshBooks(apiConnector, daoFileDB);
     ScriptureStore scriptureStore = new ScriptureStore(
         () -> dao, null, bibleBookStore,
         new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
@@ -75,7 +72,7 @@ public class ScripturePrinter {
     String baseUrl = apiConnector.formatUrl("books");
     JSONArray array = new JSONObject(apiConnector.sendGet(String.format(BOOK_URL, baseUrl))).getJSONArray("items");
     daoFileDB.create(
-        IntStream.range(0, array.length())
+        range(0, array.length())
             .mapToObj(i -> JSONUtil.toObject(BibleBook.class, array.getJSONObject(i)))
             .peek(System.out::println)
             .collect(toImmutableList()));
