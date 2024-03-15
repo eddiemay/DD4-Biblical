@@ -321,8 +321,9 @@
         </div>
         <fieldset>
           <span data-ng-repeat="page in $ctrl.references.pages">
-            <button data-ng-click="$ctrl.showStrongsRefs(page)"
-                    data-ng-disabled="page == $ctrl.references.pageToken">{{page}}</button>
+            <button data-ng-click="$ctrl.showStrongsRefs(page)" data-ng-disabled="page == $ctrl.references.pageToken">
+              {{page}}
+            </button>
           </span>
         </fieldset>
         <div class="columns">

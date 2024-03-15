@@ -37,11 +37,11 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
     return;
   }
   var request = {
-    'searchText': this.reference.value,
-    'version': this.globalData.scriptureVersion,
-    'lang': this.language,
-    'pageSize': 50,
-    'pageToken': this.pageToken};
+    searchText: this.reference.value,
+    version: this.globalData.scriptureVersion,
+    lang: this.language,
+    pageSize: 50,
+    pageToken: this.pageToken};
   this.scriptureService.search(request, response => {
     if (response.resultType == 'GET') {
       this.processScriptureResult(response);

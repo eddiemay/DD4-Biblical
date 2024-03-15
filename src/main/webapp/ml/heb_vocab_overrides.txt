@@ -33,7 +33,9 @@
 {"strongsId":"H0646","root":"אפד","translation":"ephod"}
 {"strongsId":"H0758","root":"ארמ","translation":"Aram"}
 {"strongsId":"H0779","root":"ארור","translation":"cursed"}
+{"strongsId":"H0802","root":"אשה","translation":"woman"}
 {"strongsId":"H0802","root":"אשת","translation":"wife"}
+{"strongsId":"H0802","root":"נשימ","translation":"wives"}
 {"strongsId":"H0804","root":"אשור","translation":"Asshur"}
 {"strongsId":"H0834","root":"אשר","translation":"which"}
 {"strongsId":"H0835","root":"אשר","translation":"happy"}

@@ -3,7 +3,9 @@ import numpy as np
 import os
 import time
 
-from src.main.ml.global_functions import Interlinear
+from multiprocessing import Pool
+from seq2seq import Interlinear
+
 
 start_time = time.perf_counter()
 
@@ -24,36 +26,23 @@ max_decoder_seq_length = 17
 # Restore the model and construct the encoder and decoder.
 model = keras.models.load_model("seq2seq_model")
 
-print(model.summary())
-
 encoder_inputs = model.input[0]  # input_1
 encoder_outputs, state_h_enc, state_c_enc = model.layers[2].output  # lstm_1
 encoder_states = [state_h_enc, state_c_enc]
 encoder_model = keras.Model(encoder_inputs, encoder_states)
-
-print("encoder_inputs: ", encoder_inputs.name)
-print("encoder_outputs: ", encoder_outputs.name)
 
 decoder_inputs = model.input[1]  # input_2
 decoder_state_input_h = keras.Input(shape=(latent_dim,))
 decoder_state_input_c = keras.Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 decoder_lstm = model.layers[3]
-decoder_outputs, state_h_dec, state_c_dec = decoder_lstm(
-    decoder_inputs, initial_state=decoder_states_inputs
-)
+decoder_outputs, state_h_dec, state_c_dec = decoder_lstm(decoder_inputs, initial_state=decoder_states_inputs)
 decoder_states = [state_h_dec, state_c_dec]
 decoder_dense = model.layers[4]
 decoder_outputs = decoder_dense(decoder_outputs)
-decoder_model = keras.Model(
-    [decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states
-)
+decoder_model = keras.Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
 num_encoder_tokens = encoder_inputs.shape[2]
 num_decoder_tokens = decoder_inputs.shape[2]
-print("Number of unique input tokens:", num_encoder_tokens)
-print("Number of unique output tokens:", num_decoder_tokens)
-print("Max sequence length for inputs:", max_encoder_seq_length)
-print("Max sequence length for outputs:", max_decoder_seq_length)
 
 # Load the target tokens from file
 with open("target_tokens.txt", "r", encoding="utf-8") as f:
@@ -66,16 +55,12 @@ with open("input_tokens.txt", "r", encoding="utf-8") as f:
 
 input_characters = input_characters[: len(input_characters) - 1]
 
-print("Input characters length: ", len(input_characters))
-print("Target characters length: ", len(target_characters))
-
 # Reverse-lookup token index to decode sequences back to
 # something readable.
 input_token_index = dict([(char, i) for i, char in enumerate(input_characters)])
 reverse_input_char_index = dict((i, char) for char, i in input_token_index.items())
 target_token_index = dict([(char, i) for i, char in enumerate(target_characters)])
 reverse_target_char_index = dict((i, char) for char, i in target_token_index.items())
-
 
 def encode_input(input_text):
     input_seq = np.zeros((1, max_encoder_seq_length, num_encoder_tokens), dtype="float32")
@@ -119,29 +104,54 @@ def decode_sequence(input_seq):
     return decoded_sentence
 
 
-with open(os.path.join(data_path, "isa-word-map.csv"), "r", encoding="utf-8") as f:
-    lines = f.read().split("\n")
-with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="utf-8") as f:
-    f.write("Id,MT Word,DSS Word,ML Word\n")
-    processed = 0
-    missmatches = 0
+def decode_interlinear(i):
+    i.decoded = decode_sequence(encode_input(i.input())).strip()
+    # print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}{4}".format(i.id, i.input(), i.target(), i.decoded, "" if i.target() == i.decoded else "\nmissmatch!"))
+    return i
 
-    needfixing = 0
-    fixed = 0
-    fixedNotAttempted = 0
-    nonSuccessFix = 0
 
-    noFixNeeded = 0
-    correctNoChange = 0
-    falseChange = 0
+if __name__ == '__main__':
+    print(model.summary())
+    print("encoder_inputs: ", encoder_inputs.name)
+    print("encoder_outputs: ", encoder_outputs.name)
+    print("Number of unique input tokens:", num_encoder_tokens)
+    print("Number of unique output tokens:", num_decoder_tokens)
+    print("Max sequence length for inputs:", max_encoder_seq_length)
+    print("Max sequence length for outputs:", max_decoder_seq_length)
+    print("Input characters length: ", len(input_characters))
+    print("Target characters length: ", len(target_characters))
 
-    for line in lines[1:]:
-        i = Interlinear(line)
-        if processed < 200 and i.is_candidate():
-            i.decoded = decode_sequence(encode_input(i.input())).strip()
+    candidates = []
+    processed = []
+    with open(os.path.join(data_path, "isa-word-map.csv"), "r", encoding="utf-8") as f:
+        lines = f.read().split("\n")
+        for line in lines[1:]:
+            i = Interlinear(line)
+            if candidates.__len__() < 1000 and i.is_candidate():
+                candidates.append(i)
+
+    #for i in candidates:
+     #   processed.append(decode_interlinear(i))
+    with Pool() as pool:
+        processed = pool.map(decode_interlinear, candidates)
+
+    # Process stats and write results out ot file.
+    with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="utf-8") as f:
+        missmatches = 0
+
+        needfixing = 0
+        fixed = 0
+        fixedNotAttempted = 0
+        nonSuccessFix = 0
+
+        noFixNeeded = 0
+        correctNoChange = 0
+        falseChange = 0
+
+        f.write("Id,MT Word,DSS Word,ML Word\n")
+        for i in processed:
             f.write(i.to_csv())
-            processed += 1
-            print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}".format(i.id, i.input(), i.target(), i.decoded))
+            print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}{4}".format(i.id, i.input(), i.target(), i.decoded, "" if i.target() == i.decoded else "\nmissmatch!"))
             if i.target() != i.constantsOnly:
                 needfixing += 1
                 if i.target() == i.decoded:
@@ -158,13 +168,12 @@ with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="
                     falseChange += 1
             if i.target() != i.decoded:
                 missmatches += 1
-                print("missmatch!")
 
-print("\nMatching on {0} out of {1}".format(processed - missmatches, processed))
-print("Fixed {0} out of {1}".format(fixed, needfixing))
-print("Non fix attempted {0} out of {1}".format(fixedNotAttempted, needfixing))
-print("Non success fix {0} out of {1}".format(nonSuccessFix, needfixing))
-print("Remove Nikkuds correctly {0} out of {1}".format(correctNoChange, noFixNeeded))
-print("Broke {0} out of {1}".format(falseChange, noFixNeeded))
+    print("\nMatching on {0} out of {1}".format(processed.__len__() - missmatches, processed.__len__()))
+    print("Fixed {0} out of {1}".format(fixed, needfixing))
+    print("Non fix attempted {0} out of {1}".format(fixedNotAttempted, needfixing))
+    print("Non success fix {0} out of {1}".format(nonSuccessFix, needfixing))
+    print("Remove Nikkuds correctly {0} out of {1}".format(correctNoChange, noFixNeeded))
+    print("Broke {0} out of {1}".format(falseChange, noFixNeeded))
 
-print("\nProgram finished in {} seconds".format(time.perf_counter() - start_time))
+    print("\nProgram finished in {} seconds".format(time.perf_counter() - start_time))

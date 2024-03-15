@@ -4,10 +4,8 @@ import matplotlib.pyplot as plt
 import os
 import tensorflow as tf
 
-from tensorflow.keras import layers
-from tensorflow.keras import losses
-
-from src.main.ml.global_functions import custom_standardization
+from tensorflow.keras import layers, losses
+from text_classification import custom_standardization
 
 print(tf.__version__)
 

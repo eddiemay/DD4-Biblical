@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from src.main.ml.global_functions import custom_standardization
+from text_classification import custom_standardization
 
 print(tf.__version__)
 
