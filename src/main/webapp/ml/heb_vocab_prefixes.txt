@@ -9,14 +9,15 @@
 {"translation":"from ","word":"מ","tokenType":"PREFIX","asSuffix":"s"}
 {"translation":"we ","word":"נ","tokenType":"PREFIX","asSuffix":" us"}
 {"translation":"that which ","word":"ש","tokenType":"PREFIX_ONLY"}
-{"translation":"you ","word":"ת","tokenType":"PREFIX","asSuffix":" of you"}
+{"translation":"you ","word":"ת","tokenType":"PREFIX","asSuffix":"s"}
 *** Suffixes ***
 {"translation":"s","word":"ימ","tokenType":"SUFFIX_ONLY"}
 {"translation":"s","word":"ית","tokenType":"SUFFIX_ONLY"}
 {"translation":"s","word":"ות","tokenType":"SUFFIX_ONLY"}
-{"translation":" of him","word":"תו","tokenType":"SUFFIX_ONLY"}
+{"translation":"s of him","word":"תו","tokenType":"SUFFIX_ONLY"}
 {"translation":"s of you","word":"תכ","tokenType":"SUFFIX_ONLY"}
 {"translation":"them","word":"המ","tokenType":"SUFFIX","asSuffix":" of them"}
+{"translation":"them","word":"תמ","tokenType":"SUFFIX","asSuffix":"s"}
 ** {"translation":"them","word":"כמ","tokenType":"SUFFIX","asSuffix":" of y'all"}
 {"translation":"of us","word":"נו","tokenType":"SUFFIX","asSuffix":" of us"}
 {"translation":"and we ","word":"ונ","tokenType":"PREFIX","asSuffix":" of it"}

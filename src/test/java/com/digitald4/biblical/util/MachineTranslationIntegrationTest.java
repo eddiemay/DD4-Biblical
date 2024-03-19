@@ -56,23 +56,23 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:11 and he said Mighty Ones you spring the earth grass herb from sowing seed tree fruit made fruit to kind of him which seed of him in it upon the earth and there came to be so",
         "Genesis 1:12 and you bring out the earth grass herb from sowing seed to kind of it and tree made fruit which seed of him in it to kind of it and he saw Mighty Ones for good",
         "Genesis 1:13 and there came to be evening and there came to be morning day third",
-        "Genesis 1:14 and he said Mighty Ones let there be lumination of you in firmament the heavens to the separation between the day and between the night and let it be to sign of you and to feasts and to days and years",
-        "Genesis 1:15 and let it be to lumination of you in firmament the heavens to shine upon the earth and there came to be so",
-        "Genesis 1:16 and he made Mighty Ones you two the lumination of you the greats you the lumination the great to dominate of you the day and you the lumination the small to dominate of you the night and you the stars",
+        "Genesis 1:14 and he said Mighty Ones let there be lights in firmament the heavens to the separation between the day and between the night and let it be to signs and to feasts and to days and years",
+        "Genesis 1:15 and let it be to lights in firmament the heavens to shine upon the earth and there came to be so",
+        "Genesis 1:16 and he made Mighty Ones you two the lights the greats you the light the great to dominates the day and you the light the small to dominates the night and you the stars",
         "Genesis 1:17 and he set them Mighty Ones in firmament the heavens to shine upon the earth",
         "Genesis 1:18 and to rule in day and in night and to the separation between the light and between the darkness and he saw Mighty Ones for good",
         "Genesis 1:19 and there came to be evening and there came to be morning day fourth",
         "Genesis 1:20 and he said Mighty Ones let abound the waters creeping soul live and bird he fly upon the earth upon face firmament the heavens",
-        "Genesis 1:21 and he created Mighty Ones you the dragons the greats and you all soul the live the tread of you which abound the waters to kind of them and you all bird wing to kind of it and he saw Mighty Ones for good",
+        "Genesis 1:21 and he created Mighty Ones you the dragons the greats and you all soul the live the treads which abound the waters to kind of them and you all bird wing to kind of it and he saw Mighty Ones for good",
         "Genesis 1:22 and he bless them Mighty Ones to said increase and multiply and fill of him you the waters in seas and the bird let multiply in earth",
         "Genesis 1:23 and there came to be evening and there came to be morning day fifth",
         "Genesis 1:24 and he said Mighty Ones you bring out the earth soul live to kind beast and creeping and his life earth to kind and there came to be so",
-        "Genesis 1:25 and he made Mighty Ones you live of you the earth to kind and you the beast to kind and you all creeping the land to kind of it and he saw Mighty Ones for good",
+        "Genesis 1:25 and he made Mighty Ones you lives the earth to kind and you the beast to kind and you all creeping the land to kind of it and he saw Mighty Ones for good",
         "Genesis 1:26 and he said Mighty Ones we made man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the earth and in all the creeping the tread upon the earth",
         "Genesis 1:27 and he created Mighty Ones you the man in image of him in image Mighty Ones created him male and female created them",
-        "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the earth and subdue and rule in fish the sea and in bird the heavens and in all live the tread of you upon the earth",
-        "Genesis 1:29 and he said Mighty Ones behold give of yous of to them you all herb sow seed which upon face all the earth and you all the tree which in it fruit tree sow seed to them let there be to food",
-        "Genesis 1:30 and to all live of you the earth and to all bird the heavens and to all that move upon the earth which in it soul live you all green herb to food and there came to be so",
+        "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the earth and subdue and rule in fish the sea and in bird the heavens and in all live the treads upon the earth",
+        "Genesis 1:29 and he said Mighty Ones behold gives of to them you all herb sow seed which upon face all the earth and you all the tree which in it fruit tree sow seed to them let there be to food",
+        "Genesis 1:30 and to all lives the earth and to all bird the heavens and to all that move upon the earth which in it soul live you all green herb to food and there came to be so",
         "Genesis 1:31 and he saw Mighty Ones you all which made and behold good very and there came to be evening and there came to be morning day the sixth",
         "Genesis 2:1 and he completed the heavens and the earth and all hosts",
         "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which made and he shabbat in day the seventh from all work of him which made",
@@ -87,8 +87,8 @@ public class MachineTranslationIntegrationTest {
     assertThat(translations).containsExactly(
         "Isa 9:6 for child beget to of us son given to of us and you will be the government upon shoulder of him and he call name of him wonderful counselor God mighty I in he forever prince peace",
         "Psa 83:18 and know of him for you are name of you יהוה to alone of you high upon all the earth",
-        "Exo 12:11 and like this you eat of him him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eat of yous him in haste passover he to יהוה",
-        "Gen 10:1 and these generations of you sons of Noah Shem Ham and Japheth and born of him to them sons after the flood"
+        "Exo 12:11 and like this you eat of him him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eats him in haste passover he to יהוה",
+        "Gen 10:1 and these generations sons of Noah Shem Ham and Japheth and born of him to them sons after the flood"
     );
   }
 

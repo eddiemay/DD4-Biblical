@@ -204,9 +204,8 @@
 {"strongsId":"H3956","root":"לשנ","translation":"language"}
 {"strongsId":"H3966","root":"מאד","translation":"very"}
 {"strongsId":"H3967","root":"מאות","translation":"hundred"}
-{"strongsId":"H3974","root":"מאר","translation":"lumination"}
-{"strongsId":"H3974","root":"מאור","translation":"lumination"}
-** {"strongsId":"H3974","root":"מאר","translation":"luminary"}
+{"strongsId":"H3974","root":"מאר","translation":"light"}
+{"strongsId":"H3974","root":"מאור","translation":"light"}
 {"strongsId":"H4084","root":"מדינית","translation":"Midianitess"}
 {"strongsId":"H4107","root":"מהול","translation":"mixed"}
 {"strongsId":"H4131","root":"מוטט","translation":"shaken"}
@@ -276,6 +275,7 @@
 {"strongsId":"H5377","root":"שיא","translation":"deceived"}
 {"strongsId":"H5414","root":"נת","translation":"give"}
 {"strongsId":"H5414","root":"נתנ","translation":"given"}
+{"strongsId":"H5414","root":"נתת","translation":"give"}
 {"strongsId":"H5414","root":"תנ","translation":"set"}
 {"strongsId":"H5414","root":"תננ","translation":"give"}
 {"strongsId":"H5414","root":"תת","translation":"give"}
@@ -451,6 +451,7 @@
 {"strongsId":"H8346","root":"ששימ","translation":"sixty"}
 {"strongsId":"H8346","root":"שישימ","translation":"sixty"}
 {"strongsId":"H8414","root":"תהו","translation":"formless"}
+{"strongsId":"H8435","root":"תולדה","translation":"generation"}
 {"strongsId":"H8449","root":"תר","translation":"turtledove"}
 {"strongsId":"H8478","root":"תחת","translation":"under"}
 {"strongsId":"H8591","root":"תעתע","translation":"deceiver"}
