@@ -1,8 +1,10 @@
 package com.digitald4.biblical.model;
 
 import com.digitald4.biblical.util.HebrewConverter;
+import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.storage.Annotations.NonIndexed;
+import com.digitald4.common.util.FormatText;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableList;
 
@@ -57,7 +59,7 @@ public class Lexicon extends ModelObject<String> {
   }
 
   public Lexicon setConstantsOnly(String constantsOnly) {
-    this.constantsOnly = constantsOnly;
+    this.constantsOnly = FormatText.removeAccents(constantsOnly);
     return this;
   }
 
@@ -102,7 +104,7 @@ public class Lexicon extends ModelObject<String> {
   }
 
   public Lexicon setRootWord(String rootWord) {
-    this.rootWord = rootWord;
+    this.rootWord = LexiconFetcherBlueLetterImpl.processStrongsReferences(rootWord);
     return this;
   }
 
@@ -144,7 +146,8 @@ public class Lexicon extends ModelObject<String> {
   }
 
   public Lexicon setStrongsDefinition(String strongsDefinition) {
-    return setStrongsDefinition(new StringBuilder(strongsDefinition));
+    return setStrongsDefinition(
+        new StringBuilder(LexiconFetcherBlueLetterImpl.processStrongsReferences(strongsDefinition)));
   }
 
   @Deprecated

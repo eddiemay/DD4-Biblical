@@ -1,5 +1,5 @@
 com.digitald4.biblical.BiblicalCtrl = function($location, apiConnector, globalData) {
-  apiConnector.baseUrl = 'https://dd4-biblical.appspot.com/';
+  if ($location.host() == 'localhost') apiConnector.baseUrl = 'https://dd4-biblical.appspot.com/';
   globalData.runningLocal = $location.host() == 'localhost';
   this.globalData = globalData;
   this.globalData.scriptureVersions = ['ISR', 'RSKJ', 'NRSV', 'NWT', 'KJV1611', 'Sefaria', 'SEP'];

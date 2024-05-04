@@ -23,10 +23,7 @@ import javax.inject.Inject;
 @Api(
     name = "lexicons",
     version = "v1",
-    namespace = @ApiNamespace(
-        ownerDomain = "biblical.digitald4.com",
-        ownerName = "biblical.digitald4.com"
-    )
+    namespace = @ApiNamespace(ownerDomain = "biblical.digitald4.com", ownerName = "biblical.digitald4.com")
 )
 public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   private final LexiconFetcher lexiconFetcher;
@@ -74,12 +71,13 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
   public AtomicInteger fillReferenceCount(@Named("strongsId") String strongsId) throws ServiceException {
     try {
       String id = HebrewConverter.toStrongsId(strongsId);
-      int referenceCount = getStore()
-          .update(id, lexicon ->
-              lexicon.setReferenceCount(interlinearStore.getMatchingReferences(id, null, null, 5, 1).getTotalSize()))
-          .getReferenceCount();
-      tokenWordStore.reset();
-      return new AtomicInteger(referenceCount);
+      Lexicon lexicon = getStore().get(id);
+      if (lexicon.getReferenceCount() == null) {
+        lexicon = getStore().update(
+            id, l -> l.setReferenceCount(interlinearStore.getMatchingReferences(id, null, null, 5, 1).getTotalSize()));
+        tokenWordStore.reset();
+      }
+      return new AtomicInteger(lexicon.getReferenceCount());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

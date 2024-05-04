@@ -29,8 +29,4 @@
 {"translation":" of him","word":"יו","tokenType":"SUFFIX_ONLY"}
 ** Supp words
 {"translation":"in it","word":"בו"}
-{"translation":"to them","word":"להמ"}
-{"translation":"for yourself","word":"לכ"}
-{"translation":"to them","word":"לכמ"}
 {"translation":"for me","word":"לי"}
-{"translation":"in of you","word":"בכ"}

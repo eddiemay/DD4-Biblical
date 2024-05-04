@@ -73,16 +73,13 @@ if __name__ == "__main__":
     target_token_index = dict([(char, i) for i, char in enumerate(target_characters)])
 
     encoder_input_data = np.zeros(
-        (len(input_texts), max_encoder_seq_length, num_encoder_tokens),
-        dtype="float32",
+        (len(input_texts), max_encoder_seq_length, num_encoder_tokens), dtype="float32",
     )
     decoder_input_data = np.zeros(
-        (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
-        dtype="float32",
+        (len(input_texts), max_decoder_seq_length, num_decoder_tokens), dtype="float32",
     )
     decoder_target_data = np.zeros(
-        (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
-        dtype="float32",
+        (len(input_texts), max_decoder_seq_length, num_decoder_tokens), dtype="float32",
     )
 
     for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):

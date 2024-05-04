@@ -64,6 +64,8 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = functi
       script.showChapter = true;
     }
     script.dir = script.language == 'he' ? 'rtl' : 'ltr';
+    script.tableAlign = script.language == 'he' ? 'right' : 'left';
+    script.tableFloat = script.language == 'he' ? 'tablefloatheb' : 'tablefloat';
     if (this.highlight != undefined && script.interlinears) {
       for (const interlinear of script.interlinears) {
         interlinear.highlight = interlinear.strongsId == this.highlight ? 'diff-delete' : undefined;
@@ -99,8 +101,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDef = function(stron
   this.lexicon = {id: this.strongsId, word: 'Loading...', strongsDefinition: '', rootWord: ''};
   this.lexiconTranslations = [{translation: 'Loading...'}];
   this.lexiconService.get(this.strongsId, lexicon => {this.lexicon = lexicon});
-  this.tokenWordService.getTranslations(
-      this.strongsId, translations => {this.lexiconTranslations = translations.items});
+  this.tokenWordService.getTranslations(this.strongsId, response => {this.lexiconTranslations = response.items});
   this.addTokenWord = {strongsId: strongsId, word: '', translation: ''};
   this.setDialogStyle();
   this.dialogShown = 'LEXICON';

@@ -1,0 +1,55 @@
+{"translation":"","word":"ν","tokenType":"SUFFIX_ONLY"}
+{"strongsId":"G0281","translation":"truly","word":"αμην"}
+{"strongsId":"G0305","translation":"he went up","word":"ανεβη"}
+{"strongsId":"G0444","translation":"men","word":"ανθρωπους"}
+{"strongsId":"G0455","translation":"opening","word":"ανοιξας"}
+{"strongsId":"G0846","translation":"to him","word":"αυτω"}
+{"strongsId":"G0846","translation":"them","word":"αυτους"}
+{"strongsId":"G0846","translation":"them","word":"αυτων"}
+{"strongsId":"G0846","translation":"they","word":"αυτοι"}
+{"strongsId":"G0932","translation":"kingdom","word":"βασιλεια"}
+{"strongsId":"G1063","translation":"for","word":"γαρ"}
+{"strongsId":"G1096","translation":"come to pass","word":"γενηται"}
+{"strongsId":"G1161","translation":"then","word":"δε"}
+{"strongsId":"G1161","translation":"now","word":"δ’"}
+{"strongsId":"G1321","translation":"teaching","word":"διδαξη"}
+{"strongsId":"G1321","translation":"taught","word":"εδιδασκεν"}
+{"strongsId":"G1510","translation":"to be","word":"εστιν"}
+{"strongsId":"G1520","translation":"one","word":"μιαν"}
+{"strongsId":"G1646","translation":"least","word":"ελαχιστων"}
+{"strongsId":"G1785","translation":"commandments","word":"εντολων"}
+{"strongsId":"G2064","translation":"I have come","word":"ηλθον"}
+{"strongsId":"G2523","translation":"having sat down","word":"καθισαντος"}
+{"strongsId":"G2564","translation":"is called","word":"κληθησεται"}
+{"strongsId":"G2647","translation":"to abolish","word":"καταλυσαι"}
+{"strongsId":"G2816","translation":"will inherit","word":"κληρονομησουσιν"}
+{"strongsId":"G3004","translation":"saying","word":"λεγων"}
+{"strongsId":"G3089","translation":"shall break","word":"λυση"}
+{"strongsId":"G3101","translation":"disciples","word":"μαθηται"}
+{"strongsId":"G3107","translation":"blessed are","word":"μακάριοι"}
+{"strongsId":"G3543","translation":"think","word":"νομισητε"}
+{"strongsId":"G3551","translation":"law","word":"νομον"}
+{"strongsId":"G3551","translation":"law","word":"νομου"}
+{"strongsId":"G3588","translation":"the","word":"οι"}
+{"strongsId":"G3588","translation":"the","word":"το"}
+{"strongsId":"G3588","translation":"the","word":"τη"}
+{"strongsId":"G3588","translation":"to","word":"τω"}
+{"strongsId":"G3588","translation":"of the","word":"των"}
+{"strongsId":"G3588","translation":"their","word":"τους"}
+{"strongsId":"G3708","translation":"having seen","word":"ιδων"}
+{"strongsId":"G3739","translation":"whoever","word":"ος"}
+{"strongsId":"G3756","translation":"not","word":"ουκ"}
+{"strongsId":"G3772","translation":"heavens","word":"ουρανων"}
+{"strongsId":"G3794","translation":"crowds","word":"οχλους"}
+{"strongsId":"G3870","translation":"will be comforted","word":"παρακληθήσονται"}
+{"strongsId":"G3928","translation":"shall pass away","word":"παρελθη"}
+{"strongsId":"G3956","translation":"all things","word":"παντα"}
+{"strongsId":"G3996","translation":"morning","word":"πενθουντες"}
+{"strongsId":"G4137","translation":"to fulfill","word":"πληρωσαι"}
+{"strongsId":"G4151","translation":"spirit","word":"πνευματι"}
+{"strongsId":"G4160","translation":"shall keep","word":"ποιηση"}
+{"strongsId":"G4239","translation":"meek","word":"πραεις"}
+{"strongsId":"G4334","translation":"came","word":"προσηλθαν"}
+{"strongsId":"G4396","translation":"prophets","word":"προφητας"}
+{"strongsId":"G4434","translation":"poor","word":"πτωχοι"}
+{"strongsId":"G4750","translation":"mouth","word":"στομα"}

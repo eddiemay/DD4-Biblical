@@ -1,9 +1,11 @@
 package com.digitald4.biblical.server;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Arrays.stream;
 
 import com.digitald4.biblical.model.HighScore;
+import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.SearchIndexImpl;
 import com.digitald4.biblical.store.TokenWordStore;
@@ -32,6 +34,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 
 import java.time.Duration;
+import java.util.Map;
 
 public class EndPointsModule extends com.digitald4.common.server.EndPointsModule {
 
@@ -101,5 +104,17 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 				.filter(line -> !line.startsWith("*"))
 				.map(line -> JSONUtil.toObject(TokenWord.class, line))
 				.collect(toImmutableList());
+	}
+
+	@Provides
+	public static Map<String, Lexicon> lexiconProvider() {
+		APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
+		return stream(apiConnector.sendGet("http://dd4-biblical.appspot.com/ml/lexicon.csv").split("\n"))
+				.skip(1)
+				.map(line -> line.split(","))
+				.collect(toImmutableMap(values -> values[0], values -> new Lexicon().setId(values[0])
+						.setReferenceCount(Integer.parseInt(values[1]))
+						.setPartOfSpeech(values.length >= 3 ? values[2] : null)
+				));
 	}
 }

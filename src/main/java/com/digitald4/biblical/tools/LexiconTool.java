@@ -31,6 +31,7 @@ import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
+import com.digitald4.common.util.FormatText;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -41,7 +42,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -82,6 +82,15 @@ public class LexiconTool {
     String baseUrl = apiConnector.formatUrl("lexicons");
     System.out.printf("Migrating: %s%d-%s%d...\n", language, startIndex, language, endIndex);
     apiConnector.sendGet(String.format(URL, baseUrl, "migrateLexicon", startIndex, endIndex, language));
+  }
+
+  public int setLexiconReferenceCount(String strongsId) {
+    String baseUrl = apiConnector.formatUrl("lexicons");
+    System.out.printf("Setting reference count: %s...", strongsId);
+    int result = Integer.parseInt(
+        apiConnector.sendGet(String.format("%s/fillReferenceCount?strongsId=%s", baseUrl, strongsId)).trim());
+    System.out.println(result);
+    return result;
   }
 
   private void reindexInterlinear(String startBook, String endBook) {
@@ -222,27 +231,26 @@ public class LexiconTool {
 
   private static String getMorphology(Interlinear interlinear) {
     String mprph = interlinear.getMorphology();
-    if (mprph == null) {
-      return "";
-    }
-
-    return mprph.replaceAll(",", "|");
+    return mprph == null ? "" : mprph.replaceAll(",", "|");
   }
 
-  private ImmutableList<Lexicon> getLexicons(int batch) {
+  private ImmutableList<Lexicon> getLexicons(String lang, int batch) {
     int start = batch * 1000;
     int end = (batch + 1) * 1000;
     Query.List query = Query.forList(
-        Filter.of("strongsId", ">=", String.format("H%04d", start)),
-        Filter.of("strongsId", "<", String.format("H%04d", end)));
+        Filter.of("strongsId", ">=", String.format("%s%04d", lang, start)),
+        Filter.of("strongsId", "<", String.format("%s%04d", lang, end)));
     query.setPageSize(1000);
 
     ImmutableList<Lexicon> lexicons = lexiconStore.list(query).getItems();
     if (lexicons.isEmpty()) {
-      System.out.printf("fetching lexicons: H%d -> H%d\n",start, end);
+      System.out.printf("fetching lexicons: %s%d -> %s%d\n", lang, start, lang, end);
       DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
       LexiconStore apiStore = new LexiconStore(() -> apiDao, null);
-      lexicons = lexiconStore.create(apiStore.list(query).getItems());
+      lexicons = apiStore.list(query).getItems();
+      if (!lexicons.isEmpty()) {
+        lexicons = lexiconStore.create(apiStore.list(query).getItems());
+      }
     }
 
     return lexicons;
@@ -252,17 +260,19 @@ public class LexiconTool {
     return ancientLexiconFetcher.fetch(batch);
   }
 
-  private void outputLexiconJSON() throws IOException {
+  private void outputLexiconStrongs(String lang) throws IOException {
     ImmutableList<Lexicon> lexicons = range(0, 9).boxed()
-        .flatMap(batch -> getLexicons(batch).stream())
+        .flatMap(batch -> getLexicons(lang, batch).stream())
         .collect(toImmutableList());
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_lexicon_strongs.txt"))) {
+    String filename = String.format("src/main/webapp/ml/%s_vocab_lexicon_strongs.txt", "H".equals(lang) ? "heb" : "gk");
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
       lexicons.stream()
           .map(TokenWord::from)
           .sorted(comparing(TokenWord::getStrongsId))
           .map(JSONObject::new)
           .forEach(json -> {
             try {
+              json.remove("id");
               bw.write(json + "\n");
             } catch (IOException ioe) {
               throw new DD4StorageException("Error writing value: " + json, ioe);
@@ -317,9 +327,52 @@ public class LexiconTool {
     }
   }
 
+  public void refreshLexicons() {
+    DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
+    int batches = 9;
+    int batchSize = 1000;
+    ImmutableList<Lexicon> lexicons = range(8, batches)
+        .boxed()
+        .map(b -> Query
+            .forList(
+                Filter.of("strongsId", ">", String.format("H%04d", b * batchSize)),
+                Filter.of("strongsId", "<", String.format("H%04d", (b + 1) * batchSize + 1)))
+            .setLimit(batchSize))
+        .peek(System.out::println)
+        .flatMap(query -> apiDao.list(Lexicon.class, query).getItems().stream())
+        .collect(toImmutableList());
+
+    lexiconStore.create(lexicons);
+  }
+
+  public void outputReferenceCounts() {
+    int batches = 9;
+    int batchSize = 1000;
+    ImmutableList<Lexicon> lexicons = range(0, batches)
+        .boxed()
+        .map(b -> Query
+            .forList(
+                Filter.of("strongsId", ">", String.format("H%04d", b * batchSize)),
+                Filter.of("strongsId", "<", String.format("H%04d", (b + 1) * batchSize + 1)))
+            .setLimit(batchSize))
+        .peek(System.out::println)
+        .flatMap(query -> lexiconStore.list(query).getItems().stream())
+        .filter(lexicon -> lexicon.getReferenceCount() != null)
+        .sorted(comparing(Lexicon::getId))
+        .collect(toImmutableList());
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/lexicon.csv"))) {
+      bw.write("StrongsId,ReferenceCount,PartOfSpeech\n");
+      for (Lexicon lexicon : lexicons) {
+        bw.write(String.format("%s,%d,%s\n", lexicon.getId(), lexicon.getReferenceCount(), lexicon.getPartOfSpeech()));
+      }
+    } catch (IOException ioe) {
+      throw new DD4StorageException("Error outputting lexicon.csv", ioe);
+    }
+  }
+
   private void outputLexiconCSV() {
     System.out.println("[");
-    range(0, 9).boxed().flatMap(batch -> getLexicons(batch).stream())
+    range(0, 9).boxed().flatMap(batch -> getLexicons("H", batch).stream())
         .map(lexicon -> new JSONObject()
             .put("hebrew", lexicon.getConstantsOnly())
             .put("strongsId", lexicon.getId())
@@ -340,29 +393,37 @@ public class LexiconTool {
   public static void main(String[] args) throws IOException {
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50).loadIdToken();
     DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
-    DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
+    DAOFileBasedImpl interlinearDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     ScriptureReferenceProcessor referenceProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
-    InterlinearStore interlinearStore = new InterlinearStore(() -> fileDao, referenceProcessor, interlinearFetcher);
-    DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
-    LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
+    InterlinearStore interlinearStore =
+        new InterlinearStore(() -> interlinearDao, referenceProcessor, interlinearFetcher);
+    LexiconStore lexiconStore = new LexiconStore(() -> daoFileDB, lexiconFetcher);
     AncientLexiconFetcher ancientLexiconFetcher = new AncientLexiconFetcher(apiConnector);
     LexiconTool lexiconTool = new LexiconTool(
         apiConnector, lexiconStore, interlinearStore, interlinearFetcher, bibleBookStore, ancientLexiconFetcher);
     lexiconTool.printInterlinear("Judges 21");
+    lexiconTool.outputLexiconStrongs("G");
 
     // System.out.println(lexiconStore.get("H997"));
 
     findRoots(lexiconTool.getReferences("strongsId", "H410", "H426", "H430", "H433"));
     findRoots(lexiconTool.getReferences("strongsId", "H175"));
 
-    int batchSize = 100;
+    int batchSize = 1239;
+    int day = 7;
     // range(0, 7000 / 100)
         // .forEach(s -> lexiconTool.migrateLexicon("G", s * batchSize + 1, (s + 1) * batchSize + 1));
     // lexiconTool.migrateLexicon("G", 6090, 6091);
 
+    /* int total = range(batchSize * (day - 1) + 1, batchSize * day + 1).mapToObj(id -> "H" + id)
+       .mapToInt(lexiconTool::setLexiconReferenceCount).sum();
+    System.out.printf("Processed %d total references\n", total); */
+
+    // lexiconTool.refreshLexicons();
+    lexiconTool.outputReferenceCounts();
     // lexiconTool.outputLexiconJSON();
     // lexiconTool.outputAncientLexiconJSON();
     // outputLexiconOverridesJSON();
@@ -380,20 +441,6 @@ public class LexiconTool {
     // lexiconTool.reindexInterlinear("Eze", "Mal");
     // IntStream.range(51, 151).forEach(chapter -> lexiconTool.reindexInterlinear("Psa", chapter));
     // lexiconTool.reindexInterlinear("Jer", 31);
-
-    Stream.of(bibleBookStore.get("Psa"))
-    /* bibleBookStore.getAllBooks().stream()
-        .filter(b -> b.getNumber() > 20 && b.getNumber() < 40
-            && !b.name().equals("Daniel") && !b.name().equals("Isaiah")
-            && !b.name().equals("Jeremiah") && !b.name().equals("Ezekiel")
-            && !b.name().equals("Esther") && !b.name().equals("Ruth")) */
-        .forEach(book -> {
-          String name = book.name();
-          int end = book.getChapterCount() + 1;
-          System.out.printf("%d records deleted from %s\n",
-              range(1, end).map(c -> lexiconTool.deleteInterlinear("WLC", name, c)).sum(), name);
-          // range(1, end).forEach(c -> lexiconTool.reindexInterlinear(name, c));
-        });
 
     /* System.out.println("Total records deleted: " + Stream
         .of(bibleBookStore.get("Matt"), bibleBookStore.get("Luke"), bibleBookStore.get("John"),
@@ -440,7 +487,7 @@ public class LexiconTool {
             System.out.printf("%s %d %3.1f%%\n",
                 e.getKey(), e.getValue(), (e.getValue() * 100f / references.size()))); */
 
-    fileDao.saveToFile();
-    lexiconDAO.saveToFile();
+    interlinearDao.saveToFile();
+    daoFileDB.saveFiles();
   }
 }

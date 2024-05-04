@@ -2,6 +2,7 @@ package com.digitald4.biblical.model;
 
 import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.common.storage.Annotations.NonIndexed;
+import com.digitald4.common.util.FormatText;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableList;
 // This has to be List or the compiler throws an error for some reason during JSON parsing.
@@ -123,7 +124,7 @@ public class Interlinear {
   }
 
   public Interlinear setConstantsOnly(String constantsOnly) {
-    this.constantsOnly = constantsOnly;
+    this.constantsOnly = FormatText.removeAccents(constantsOnly);
     return this;
   }
 

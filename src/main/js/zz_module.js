@@ -53,11 +53,10 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     return new com.digitald4.common.JSONService('commandment', apiConnector)
   })
   .service('highScoreService', function(apiConnector) {
-    var highScoreService =
-        new com.digitald4.common.JSONService('highscore', apiConnector);
+    var highScoreService = new com.digitald4.common.JSONService('highscore', apiConnector);
     highScoreService.list = function(game, config, pageSize, pageToken, success, error) {
       highScoreService.sendRequest(
-        {action: 'list', params: {game: game, config: config, pageSize: 20}}, success, error);
+      		{action: 'list', params: {game: game, config: config, pageSize: 20}}, success, error);
     };
     return highScoreService;
   })
@@ -67,8 +66,7 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .service('interlinearService', function(apiConnector) {
     var interlinearService = new com.digitald4.common.JSONService('interlinear', apiConnector);
     interlinearService.getReferences = function(request, success, error) {
-      return interlinearService.sendRequest(
-          {action: 'getReferences', params: request}, success, error);
+      return interlinearService.sendRequest({action: 'getReferences', params: request}, success, error);
     }
     return interlinearService;
   })

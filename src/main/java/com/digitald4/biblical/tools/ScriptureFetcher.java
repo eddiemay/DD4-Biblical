@@ -6,6 +6,7 @@ import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOFileDBImpl;
 
+import java.util.Comparator;
 import java.util.stream.IntStream;
 
 public class ScriptureFetcher {
@@ -26,6 +27,7 @@ public class ScriptureFetcher {
     System.out.println("Endbook: " + endBook);
 
     bibleBookStore.getBibleBooks(version).stream()
+        .sorted(Comparator.comparing(BibleBook::getNumber))
         .filter(book -> startBook == null || book.getNumber() >= startBook.getNumber())
         .filter(book -> endBook == null || book.getNumber() <= endBook.getNumber())
         .forEach(book -> {

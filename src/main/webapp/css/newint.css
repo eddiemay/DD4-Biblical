@@ -916,17 +916,21 @@ position:fixed; right: 0px; bottom:0px;  z-index:1;
 
 }
 .accented {font-weight:700;}
-.eng
-
-
-{
+.eng{
 
     FONT-SIZE: 15px;
     COLOR: #d55500;
     LINE-HEIGHT: 23px;
     FONT-FAMILY: Arial, Helvetica, Sans-serif;
     TEXT-DECORATION: none;
+}
+.machine-translation{
 
+    FONT-SIZE: 15px;
+    COLOR: #11cb21;
+    LINE-HEIGHT: 23px;
+    FONT-FAMILY: Arial, Helvetica, Sans-serif;
+    TEXT-DECORATION: none;
 }
 .translit
 
@@ -1024,35 +1028,12 @@ position:fixed; right: 0px; bottom:0px;  z-index:1;
 
 
 
-.strongs
-
-
-
-{
-
-
-
+.strongs {
     FONT-SIZE: 12px;
-
-
-
     COLOR: #008ae6;
-
-
-
     LINE-HEIGHT: 14px;
-
-
     FONT-FAMILY: Arial, Helvetica, Sans-serif;
-
-
-
     TEXT-DECORATION: none;
-
-
-
-
-
 }
 
 .strongsnt

@@ -37,7 +37,8 @@ public class HebrewTokenizer {
       return ImmutableList.of();
     }
 
-    ImmutableList<String> tokenized = tokenizeWord(word, strongsId, SearchState.WORD_MATCH_STRONGS);
+    ImmutableList<String> tokenized =
+        tokenizeWord(word, strongsId, strongsId != null ? SearchState.WORD_MATCH_STRONGS : SearchState.WORD);
     return tokenized.isEmpty() ? tokenizeWord(word) : tokenized;
   }
 
@@ -78,14 +79,14 @@ public class HebrewTokenizer {
 
   public static boolean hasGoodOption(SearchState state, ImmutableList<TokenWord> options, String strongsId) {
     return switch (state) {
-      case WORD_MATCH_STRONGS -> options.stream().anyMatch(
-          o -> o.tokenType() == TokenType.WORD && Objects.equals(strongsId, o.getStrongsId()));
+      case WORD_MATCH_STRONGS -> options.stream().anyMatch(o ->
+          (o.tokenType() == TokenType.WORD || o.getTokenType() == TokenType.WORD_STRONGS_MATCH_ONLY)
+              && Objects.equals(strongsId, o.getStrongsId()));
       case WORD -> options.stream().anyMatch(o -> o.tokenType() == TokenType.WORD);
       case PREFIX -> options.stream().map(TokenWord::tokenType)
           .anyMatch(tt -> tt == TokenType.PREFIX || tt == TokenType.PREFIX_ONLY);
-      case SUFFIX -> options.stream().anyMatch(o ->
-          o.getTokenType() == TokenType.SUFFIX || o.getTokenType() == TokenType.SUFFIX_ONLY
-              || o.getTokenType() == TokenType.PREFIX && o.asSuffix() != null);
+      case SUFFIX -> options.stream().anyMatch(o -> o.getTokenType() == TokenType.SUFFIX
+          || o.getTokenType() == TokenType.SUFFIX_ONLY || o.getTokenType() == TokenType.PREFIX && o.asSuffix() != null);
     };
   }
 
@@ -94,7 +95,7 @@ public class HebrewTokenizer {
     private String strongsId;
     private String translation;
     private String asSuffix;
-    enum TokenType {PREFIX, PREFIX_ONLY, SUFFIX, SUFFIX_ONLY, WORD, WHOLE_WORD_ONLY}
+    public enum TokenType {PREFIX, PREFIX_ONLY, SUFFIX, SUFFIX_ONLY, WORD, WORD_STRONGS_MATCH_ONLY, DISABLED}
     private TokenType tokenType;
 
     public String getId() {

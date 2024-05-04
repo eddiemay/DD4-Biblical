@@ -71,7 +71,7 @@ public class LexiconFetcherBlueLetterImplTest {
                     new Node().setValue("strength, power"))));
 
     assertThat(lexicon.getStrongsDefinition().toString()).isEqualTo(
-            "אֵל ʼêl, ale; shortened from <a href=\"\" data-ng-click=\"$ctrl.showStrongsDefs('H352')\">H352</a>; strength; as adjective, mighty; especially the Almighty (but used also of any deity):—God (god), × goodly, × great, idol, might(-y one), power, strong. Compare names in '-el.'");
+            "אֵל ʼêl, ale; shortened from <a href=\"\" data-ng-click=\"$ctrl.showStrongsDef('H352')\">H352</a>; strength; as adjective, mighty; especially the Almighty (but used also of any deity):—God (god), × goodly, × great, idol, might(-y one), power, strong. Compare names in '-el.'");
     assertThat(lexicon.translation()).isEqualTo("God");
   }
 

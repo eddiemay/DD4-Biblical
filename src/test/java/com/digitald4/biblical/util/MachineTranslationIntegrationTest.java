@@ -5,35 +5,40 @@ import static com.google.common.truth.Truth.assertThat;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.Interlinear.SubToken;
+import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
-import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.tools.TranslationTool;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
-import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.google.common.collect.ImmutableList;
+
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 public class MachineTranslationIntegrationTest {
-  private static final DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
-  private static final LexiconStore lexiconStore = new LexiconStore(() -> inMemoryDao, null);
-  private final DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
-  private final APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
-  private final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();;
-  private final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
-  private final InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
-  private final InterlinearStore interlinearStore =
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
+  private static final APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
+  private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
+  private static final InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
+  private static final InterlinearStore interlinearStore =
       new InterlinearStore(() -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
 
-  private final TokenWordStore tokenWordStore =
-      new TokenWordStore(() -> inMemoryDao, TranslationTool::tokenWordProvider, lexiconStore);
-  private final MachineTranslator machineTranslator =
+  private static final TokenWordStore tokenWordStore =
+      new TokenWordStore(() -> daoFileDB, TranslationTool::tokenWordProvider, TranslationTool::lexiconProvider);
+  private static final MachineTranslator machineTranslator =
       new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
+
+  @AfterClass
+  public static void tearDown() {
+    fileDao.saveToFile();
+    daoFileDB.saveFiles();
+  }
 
   @Test
   public void translate7Days() {
@@ -43,7 +48,7 @@ public class MachineTranslationIntegrationTest {
         .collect(toImmutableList());
 
     assertThat(translations).containsExactly(
-        "Genesis 1:1 in beginning created Mighty Ones you the heavens and you the earth",
+        "Genesis 1:1 in beginning create Mighty Ones you the heavens and you the earth",
         "Genesis 1:2 and the earth was formless and void and darkness upon face deep and spirit Mighty Ones hovering upon face the waters",
         "Genesis 1:3 and he said Mighty Ones let there be light and there came to be light",
         "Genesis 1:4 and he saw Mighty Ones you the light for good and he separate Mighty Ones between the light and between the darkness",
@@ -63,20 +68,20 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:18 and to rule in day and in night and to the separation between the light and between the darkness and he saw Mighty Ones for good",
         "Genesis 1:19 and there came to be evening and there came to be morning day fourth",
         "Genesis 1:20 and he said Mighty Ones let abound the waters creeping soul live and bird he fly upon the earth upon face firmament the heavens",
-        "Genesis 1:21 and he created Mighty Ones you the dragons the greats and you all soul the live the treads which abound the waters to kind of them and you all bird wing to kind of it and he saw Mighty Ones for good",
+        "Genesis 1:21 and he create Mighty Ones you the dragons the greats and you all soul the live the treads which abound the waters to kind of them and you all bird wing to kind of it and he saw Mighty Ones for good",
         "Genesis 1:22 and he bless them Mighty Ones to said increase and multiply and fill of him you the waters in seas and the bird let multiply in earth",
         "Genesis 1:23 and there came to be evening and there came to be morning day fifth",
         "Genesis 1:24 and he said Mighty Ones you bring out the earth soul live to kind beast and creeping and his life earth to kind and there came to be so",
         "Genesis 1:25 and he made Mighty Ones you lives the earth to kind and you the beast to kind and you all creeping the land to kind of it and he saw Mighty Ones for good",
         "Genesis 1:26 and he said Mighty Ones we made man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the earth and in all the creeping the tread upon the earth",
-        "Genesis 1:27 and he created Mighty Ones you the man in image of him in image Mighty Ones created him male and female created them",
+        "Genesis 1:27 and he create Mighty Ones you the man in image of him in image Mighty Ones create him male and female create them",
         "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the earth and subdue and rule in fish the sea and in bird the heavens and in all live the treads upon the earth",
         "Genesis 1:29 and he said Mighty Ones behold gives of to them you all herb sow seed which upon face all the earth and you all the tree which in it fruit tree sow seed to them let there be to food",
         "Genesis 1:30 and to all lives the earth and to all bird the heavens and to all that move upon the earth which in it soul live you all green herb to food and there came to be so",
         "Genesis 1:31 and he saw Mighty Ones you all which made and behold good very and there came to be evening and there came to be morning day the sixth",
         "Genesis 2:1 and he completed the heavens and the earth and all hosts",
         "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which made and he shabbat in day the seventh from all work of him which made",
-        "Genesis 2:3 and he bless Mighty Ones you day the seventh and he sanctify him for in it shabbat from all work of him which created Mighty Ones to accomplish"
+        "Genesis 2:3 and he bless Mighty Ones you day the seventh and he sanctify him for in it shabbat from all work of him which create Mighty Ones to accomplish"
     );
   }
 
@@ -92,8 +97,75 @@ public class MachineTranslationIntegrationTest {
     );
   }
 
+  @Test
+  public void translateEccChapter12() {
+    ImmutableList<String> translations = IntStream.range(1, 15).mapToObj(v -> "Ecc 12:" + v)
+        .map(this::translate).collect(toImmutableList());
+    assertThat(translations).containsExactly(
+        "Ecc 12:1 and remember you creators of you in days of youths of you until which not he enter of him days of the evil and the reaching of him years which you said none for me beast desire",
+        "Ecc 12:2 until which not you darken the sun and the light and the moon and the stars and dwell of him the clouds after the rain",
+        "Ecc 12:3 in day that which he move of him keeps of the house and the you pervert of him mans of the army and cease of him the grinds for little of him and darken of him the saws in windows",
+        "Ecc 12:4 and shut of him doors in street in low voice the grinding and he up to voice the bird and he worship of him all daughters the song",
+        "Ecc 12:5 also from high fear of him and fears in way and he despise the almond and he burden the grasshopper and you bullock the desire for walk the man unto house ever of him and about of him in street the mourns",
+        "Ecc 12:6 until which not he far [UNK] sorrow the silver and Tirzah springs the gold and you break pitcher upon the fountain and we accept the wheel unto the pit",
+        "Ecc 12:7 and dwell the dust upon the earth like that which was and the spirit you return unto the Mighty Ones which given",
+        "Ecc 12:8 vanity vanitys said the preachers the all vanity",
+        "Ecc 12:9 and remain that which was preacher wise again teach knowledge you the people and give ear and search make straight proverbs the multiply",
+        "Ecc 12:10 seek preacher to find words of desire and like return uprightness words of truth",
+        "Ecc 12:11 words of wises like generationin  of uss and like nails planters mans of assembliess given of him from feed one",
+        "Ecc 12:12 and remain from they sons of the warn accomplish books the multiply none end and study the multiply wearys flesh",
+        "Ecc 12:13 flags word the all we hear you the Mighty Ones fear and you commandments of him guard for this all the man",
+        "Ecc 12:14 for you all work the Mighty Ones he enter in judgment upon all we hide if good and if evil"
+    );
+  }
+
+  @Test
+  public void translateMattChapter5() {
+    ImmutableList<String> translations = IntStream.range(17, 20).mapToObj(v -> "Matt 5:" + v)
+        .map(this::translate).collect(toImmutableList());
+    assertThat(translations).containsExactly(
+        "Matt 5:17 Not think that I have come to abolish the law or their prophets not I have come to abolish but to fulfill",
+        "Matt 5:18 truly for speak you till whosoever shall pass away which heaven also or earth jot by or one tittle no not shall pass away from his law till whosoever all things come to pass",
+        "Matt 5:19 Whoever if therefore shall break one of the commandments these of the least also teaching so their men least is called by the kingdom of the heavens whoever now whosoever shall keep also teaching this great is called by the kingdom of the heavens"
+    );
+  }
+
+  @Test
+  public void translateJubilees() {
+    assertThat(translate(new Scripture().setBook("Jubilees").setChapter(49).setVerse(2).setText("בלילה"))).isEqualTo(
+        "Jubilees 49:2 in night"
+    );
+  }
+
+  @Test
+  public void rawTranslation1() {
+    assertThat(translate(new Scripture().setBook("Jubilees").setChapter(6).setVerse(47).setText("אתה צו את בני ישראל ושמרו את השנים על פי המספר הזה ארבעה ושישים יום ושלוש מאות יום"))).isEqualTo(
+        "Jubilees 6:47 she command you sons of Yasharael and keep of him you the years upon mouth the number this four and sixty day and three hundred day"
+    );
+  }
+
+  @Test
+  public void rawTranslation2() {
+    assertThat(translate(new Scripture().setBook("Jubilees").setChapter(49).setVerse(1).setText("זכור את המצוה אשר נתן ה' לך על דבר הפסח לשמור אותו במועדו בארבעה עשר לחודש הראשון"))).isEqualTo(
+        "Jubilees 49:1 remember you the commandment which given Yah for yourself upon word the passover to guard sign of him in feast of him in four ten to month the first"
+    );
+  }
+
+  @Test
+  public void rawTranslation3() {
+    assertThat(translate(new Scripture().setBook("Jubilees").setChapter(49).setVerse(2).setText("כי תשחט אותו בין הערבים ויאכלו אותו בלילה ערב החמשה עשר מעת בא השמש"))).isEqualTo(
+        "Jubilees 49:2 for you kill sign of him between the evenings and he eat of him sign of him in night evening the five ten from time enter the sun"
+    );
+  }
+
   private String translate(String ref) {
     return ref + " " + machineTranslator.translate(interlinearStore.getInterlinear(ref)).stream()
+        .map(i -> i.getSubTokens().stream().map(SubToken::getTranslation).collect(joining()))
+        .collect(joining(" ")).trim();
+  }
+
+  private String translate(Scripture scripture) {
+    return scripture.reference() + " " + machineTranslator.translate(scripture).stream()
         .map(i -> i.getSubTokens().stream().map(SubToken::getTranslation).collect(joining()))
         .collect(joining(" ")).trim();
   }

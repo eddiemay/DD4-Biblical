@@ -92,7 +92,7 @@
             </p>
             <hr data-ng-if="script.version=='DSS' && script.language=='en'"/>
             <div data-ng-if="script.interlinears">
-              <div align="right" class="maintable2">
+              <div align="{{script.tableAlign}}" class="maintable2">
                 <table border="0" cellspacing="0" cellpadding="0" align="center">
                   <tr>
                     <td>
@@ -102,7 +102,7 @@
                             ({{script.version}}) {{script.book}} {{script.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
                           <a data-ng-if="script.book == 'Isaiah'" href="" data-ng-click="$ctrl.showScroll(script)" title="View Scroll">📜</a>
                         </div>
-                        <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
+                        <table data-ng-class="script.tableFloat" data-ng-repeat="interlinear in script.interlinears">
                           <tr><td class="strongs" data-ng-class="interlinear.highlight">
                             <a href="" data-ng-click="$ctrl.showStrongsDef(interlinear.strongsId)">
                               {{interlinear.strongsId || '-'}}
@@ -119,7 +119,7 @@
                           </tr>
                           <tr><td class="eng">{{interlinear.translation}}</td></tr>
                           <tr><td class="strongsnt">{{interlinear.morphology}}</td></tr>
-                          <tr><td class="strongs" data-ng-class="interlinear.highlight">
+                          <tr><td class="mt-strongs" data-ng-class="interlinear.highlight">
                             <span data-ng-repeat="subToken in interlinear.subTokens">
                               <a href="" data-ng-click="$ctrl.showStrongsDef(subToken.strongsId)">
                                 {{subToken.strongsId || '&nbsp;'}}
@@ -129,7 +129,7 @@
                           <tr><td class="hebrew">
                             <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.word}} </span>
                           </td></tr>
-                          <tr><td class="eng">
+                          <tr><td class="machine-translation">
                             <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.translation}}</span>
                           </td></tr>
                         </table>

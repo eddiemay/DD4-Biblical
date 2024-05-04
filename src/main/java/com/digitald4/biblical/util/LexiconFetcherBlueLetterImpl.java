@@ -115,13 +115,15 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
   }
 
   public static String processStrongsReferences(String rootText) {
-    if (!rootText.contains("showStrongsDefs")) {
+    if (!rootText.contains("showStrongsDef")) {
       Matcher matcher = STRONGS_REF_PATTERN.matcher(rootText);
       while (matcher.find()) {
         String rootRef = matcher.group(1);
         rootText = rootText.replace(rootRef,
-            String.format("<a href=\"\" data-ng-click=\"$ctrl.showStrongsDefs('%s')\">%s</a>", rootRef, rootRef));
+            String.format("<a href=\"\" data-ng-click=\"$ctrl.showStrongsDef('%s')\">%s</a>", rootRef, rootRef));
       }
+    } else if (rootText.contains("showStrongsDefs")) {
+      return rootText.replaceAll("showStrongsDefs", "showStrongsDef");
     }
 
     return rootText;

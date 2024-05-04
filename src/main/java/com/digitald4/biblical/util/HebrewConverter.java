@@ -156,6 +156,10 @@ public class HebrewConverter {
   }
 
   public static String toAncientRtl(String text) {
+    if (text.charAt(0) < 'א' || text.charAt(0) > 'ת') {
+      return null;
+    }
+
     List<String> ancient = removePunctuation(text).chars().mapToObj(c -> toAncient((char) c)).collect(toList());
     Collections.reverse(ancient);
     return String.join("", ancient);

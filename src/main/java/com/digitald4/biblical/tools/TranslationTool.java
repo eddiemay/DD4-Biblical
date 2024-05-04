@@ -1,10 +1,12 @@
 package com.digitald4.biblical.tools;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
+import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.store.BibleBookStore;
@@ -33,11 +35,10 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
-import com.digitald4.common.storage.DAOFileBasedImpl;
-import com.digitald4.common.storage.DAOFileDBImpl;
-import com.digitald4.common.storage.DAOInMemoryImpl;
+import com.digitald4.common.storage.*;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -84,36 +85,52 @@ public class TranslationTool {
   }
 
   public static ImmutableList<TokenWord> tokenWordProvider() {
-    return Constants.VOCAB_FILES.stream().flatMap(file -> loadFromFile(file).stream()).collect(toImmutableList());
+    return Constants.VOCAB_FILES.stream()
+        .flatMap(file -> loadFromFile(file).stream())
+        .collect(toImmutableList());
   }
 
-  public static ImmutableList<TokenWord> loadFromFile(String filename) {
-    String tokenFile = String.format("src/main/webapp/ml/%s", filename);
-    ImmutableList.Builder<TokenWord> tokenWords = ImmutableList.builder();
-    try (BufferedReader br = new BufferedReader(new FileReader(tokenFile))) {
+  public static ImmutableMap<String, Lexicon> lexiconProvider() {
+    return readFile("lexicon.csv").stream()
+        .skip(1)
+        .map(line -> line.split(","))
+        .collect(toImmutableMap(values -> values[0], values -> new Lexicon().setId(values[0])
+                .setReferenceCount(Integer.parseInt(values[1]))
+                .setPartOfSpeech(values.length >= 3 ? values[2] : null)
+        ));
+  }
+
+  public static ImmutableList<String> readFile(String filename) {
+    String file = String.format("src/main/webapp/ml/%s", filename);
+    ImmutableList.Builder<String> lines = ImmutableList.builder();
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String line;
       while ((line = br.readLine()) != null) {
-        if (line.length() > 0 && !line.startsWith("*")) {
-          tokenWords.add(JSONUtil.toObject(TokenWord.class, line));
+        if (line.length() > 0) {
+          lines.add(line);
         }
       }
     } catch (Exception ioe) {
-      throw new DD4StorageException("Error reading token file: " + tokenFile, ioe);
+      throw new DD4StorageException("Error reading file: " + file, ioe);
     }
-    return tokenWords.build();
+    return lines.build();
+  }
+
+  public static ImmutableList<TokenWord> loadFromFile(String filename) {
+    return readFile(filename).stream()
+        .filter(line -> !line.startsWith("*"))
+        .map(line -> JSONUtil.toObject(TokenWord.class, line))
+        .collect(toImmutableList());
   }
 
   public static void main(String[] args) {
-    DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
-    DAOFileBasedImpl scriptureDao = new DAOFileBasedImpl("data/scripture.db").loadFromFile();
-    DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(
-        () -> fileDao, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
+        () -> daoFileDB, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
     ScriptureReferenceProcessor scriputureRefProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     ScriptureFetcher scriptureFetcher = new ScriptureFetcherRouter(
         new ScriptureFetcherBibleGateway(apiConnector),
@@ -125,13 +142,12 @@ public class TranslationTool {
         new ScriptureFetcherSefariaOrg(apiConnector),
         new ScriptureFetcherStepBibleOrg(apiConnector));
 
-    DAOFileBasedImpl lexiconDAO = new DAOFileBasedImpl("data/lexicon.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
-    LexiconStore lexiconStore = new LexiconStore(() -> lexiconDAO, lexiconFetcher);
-    TokenWordStore tokenWordStore =
-        new TokenWordStore(() -> inMemoryDao, TranslationTool::tokenWordProvider, lexiconStore);
+    LexiconStore lexiconStore = new LexiconStore(() -> daoFileDB, lexiconFetcher);
+    TokenWordStore tokenWordStore = new TokenWordStore(
+        () -> daoFileDB, TranslationTool::tokenWordProvider, TranslationTool::lexiconProvider);
     MachineTranslator machineTranslator = new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
-    ScriptureStore scriptureStore = new ScriptureStore(() -> scriptureDao, null, bibleBookStore,
+    ScriptureStore scriptureStore = new ScriptureStore(() -> daoFileDB, null, bibleBookStore,
         scriputureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
     TranslationTool translationTool = new TranslationTool(scriptureStore);
@@ -170,6 +186,6 @@ public class TranslationTool {
             new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(9).setVerse(6).setText(
                 "כי ילד יולד לנו בן נתן לנו ותהי המשורה על שכמו וקרא שמו פלא יועץ אל גבור אבי עד שר השלום"))); */
 
-    fileDao.saveToFile();
+    daoFileDB.saveFiles();
   }
 }

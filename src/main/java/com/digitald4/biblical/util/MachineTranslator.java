@@ -80,7 +80,7 @@ public class MachineTranslator {
     }
 
     return translate(
-        stream(scripture.getText().toString().split(" "))
+        stream(removePunctuation(scripture.getText().toString()).split(" "))
             .map(word -> new Interlinear()
                 .setBook(scripture.getBook())
                 .setChapter(scripture.getChapter()).setVerse(scripture.getVerse())

@@ -2,19 +2,18 @@ package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class HebrewTokenizerTest {
   private static final DAOInMemoryImpl inMemoryImpl = new DAOInMemoryImpl();
-  private static final LexiconStore lexiconStore = new LexiconStore(() -> inMemoryImpl, null);
   private static final HebrewTokenizer tokenizer = new HebrewTokenizer(
       new TokenWordStore(() -> inMemoryImpl, () -> ImmutableSet.of(
           new TokenWord().setWord("ב").setTokenType(TokenType.PREFIX_ONLY),
@@ -47,7 +46,13 @@ public class HebrewTokenizerTest {
           new TokenWord().setWord("ויהי"),
           new TokenWord().setWord("עש"),
           new TokenWord().setWord("בכ").setStrongsId("H0123"),
-          new TokenWord().setWord("יע")), lexiconStore));
+          new TokenWord().setWord("יע"),
+          new TokenWord().setWord("ה'"),
+          new TokenWord().setWord("מצוה"),
+          new TokenWord().setWord("אשר"),
+          new TokenWord().setWord("נתן"),
+          new TokenWord().setWord("לך")),
+          ImmutableMap::of));
 
   @Test
   public void tokenize_inBeginning() {
@@ -116,4 +121,15 @@ public class HebrewTokenizerTest {
         ImmutableList.of("אור"));
   }
 
+  @Test
+  public void tokenize_Jub_49_1() {
+    assertThat(tokenizer.tokenize("זכור את המצוה אשר נתן ה' לך")).containsExactly(
+        ImmutableList.of("זכור"),
+        ImmutableList.of("את"),
+        ImmutableList.of("ה", "מצוה"),
+        ImmutableList.of("אשר"),
+        ImmutableList.of("נתן"),
+        ImmutableList.of("ה'"),
+        ImmutableList.of("לך"));
+  }
 }
