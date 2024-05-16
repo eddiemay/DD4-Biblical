@@ -1,7 +1,5 @@
+import time
 import urllib.request, json
-from transformers.utils import logging
-logging.set_verbosity_error()
-
 from sentence_transformers import SentenceTransformer
 from sentence_transformers import util
 
@@ -13,7 +11,7 @@ COMPARISON_VERSION = 'SEP' # Will use the Septuagint "SEP" version for most comp
 
 # The list of reference scriptures to compare, this will be used in a search that can parse a lot of different reference
 # types
-REFERENCES = 'Gen 1'
+REFERENCES = 'Exo 12-14'
 
 
 # Candidate helper class that holds a scripture, the comparison text and the resulting match score.
@@ -36,20 +34,9 @@ class Candidate:
     def __repr__(self):
         return str(self)
 
-def compare(model, candidate):
-    embeddings1 = model.encode(candidate.standardText, convert_to_tensor=True)
-    #print(embeddings1)
-    embeddings2 = model.encode(candidate.compareText, convert_to_tensor=True)
-    #print(embeddings2)
-
-    cosine_scores = util.cos_sim(embeddings1, embeddings2)
-    #print(cosine_scores)
-
-    candidate.score = cosine_scores[0][0]
-
 
 if __name__ == '__main__':
-
+    start_time = time.perf_counter()
     candidates = []
     candidateMap = {}
     # first connect to the api and get the standard translation
@@ -63,6 +50,7 @@ if __name__ == '__main__':
             candidates.append(candidate)
             candidateMap[candidate.reference()] = candidate
 
+    api_call_2_start = time.perf_counter()
     # Then fetch the comparison text
     with urllib.request.urlopen(SEARCH_URL.format(urllib.parse.quote(REFERENCES), COMPARISON_VERSION)) as url:
         response = json.load(url)
@@ -78,8 +66,26 @@ if __name__ == '__main__':
 
             candidate.compareText = result['text']
 
+    flatten_start = time.perf_counter()
+    standardTexts = []
+    compareTexts = []
+    for candidate in candidates:
+        standardTexts.append(candidate.standardText)
+        compareTexts.append(candidate.compareText)
+
+    model_load_start = time.perf_counter()
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    for candidate in candidates:
-        compare(model, candidate)
-        print(candidate)
+    process_start = time.perf_counter()
+    embeddings1 = model.encode(standardTexts, convert_to_tensor=True)
+    embeddings2 = model.encode(compareTexts, convert_to_tensor=True)
+    cosine_scores = util.cos_sim(embeddings1, embeddings2)
+
+    for i in range(len(candidates)):
+        candidates[i].score = cosine_scores[i][i]
+        print(candidates[i])
+
+    end_time = time.perf_counter()
+    print("\n Processed: {} verses\n".format(len(candidates)))
+    print("Total time: {} seconds\n\t1st Api Call: {} seconds\n\t2nd Api Call: {} seconds\n\tModel Load Time: {} seconds\n\tProcessing Time: {} seconds\n"
+          .format(end_time - start_time, api_call_2_start - start_time, model_load_start - api_call_2_start, process_start - model_load_start, end_time - process_start))
