@@ -5,7 +5,8 @@ com.digitald4.biblical.BiblicalCtrl = function($location, apiConnector, globalDa
   this.globalData.scriptureVersions = ['ISR', 'RSKJ', 'NRSV', 'NWT', 'KJV1611', 'Sefaria', 'SEP'];
   this.globalData.languages = [{name: 'English', code: 'en'},
       {name: 'Interlaced', code: 'interlaced'}, {name: 'Interlinear', code: 'interlinear'},
-      {name: 'Hebrew', code: 'he'}, {name: 'Ancient Hebrew', code: 'he-A'}, {name: 'Greek', code: 'gk'}];
+      {name: 'Hebrew', code: 'he'}, {name: 'Ancient Hebrew', code: 'he-A'},
+      {name: 'Greek', code: 'gk'}, {name: 'Geez', code: 'gez'}];
   globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion;
   globalData.language = $location.search()['lang'] || this.globalData.languages[0].code;
   globalData.matchConstantsOnly = true;

@@ -1,4 +1,4 @@
-# Egnlish to Spanish machine translation tutorial, taken
+# English to Spanish machine translation tutorial, taken
 # from https://keras.io/examples/nlp/neural_machine_translation_with_keras_nlp/
 import keras_nlp
 import pathlib

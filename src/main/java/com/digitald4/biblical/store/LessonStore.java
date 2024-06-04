@@ -83,7 +83,7 @@ public class LessonStore extends GenericStore<Lesson, Long> {
       }
 
       return latest.isPublished()
-          ? create(updater.apply(latest.setId(0).setPublished(false)))
+          ? create(updater.apply(latest.setId(0L).setPublished(false)))
           : lessonStore.updateLatest(super.update(latest.getId(), updater));
     }
 

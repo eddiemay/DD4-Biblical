@@ -23,7 +23,7 @@ public class ScriptureFetcherTest {
 
   @Before
   public void setup() {
-    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, searchIndexer, null));
+    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, null, searchIndexer, null));
     scriptureStore = new ScriptureStore(
         () -> dao, null, bibleBookStore,
         new ScriptureReferenceProcessorSplitImpl(bibleBookStore),

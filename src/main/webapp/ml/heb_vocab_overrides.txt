@@ -19,9 +19,9 @@
 {"strongsId":"H0400","root":"אוכל","translation":"food"}
 {"strongsId":"H0402","root":"אכלה","translation":"food"}
 {"strongsId":"H0426","root":"אלוה","translation":"Mighty One"}
-{"strongsId":"H0426","root":"אלהי","translation":"Mighty One"}
+{"strongsId":"H0426","root":"אלה","translation":"Mighty One"}
 {"strongsId":"H0430","root":"אלוה","translation":"Mighty One"}
-{"strongsId":"H0430","root":"אלהי","translation":"Mighty One"}
+{"strongsId":"H0430","root":"אלה","translation":"Mighty One"}
 {"strongsId":"H0430","root":"אלהימ","translation":"Mighty Ones"}
 {"strongsId":"H0433","root":"אלוה","translation":"Mighty One"}
 {"strongsId":"H0518","root":"אמ","translation":"if"}
@@ -69,6 +69,7 @@
 {"strongsId":"H0995","root":"בנ","translation":"understand"}
 {"strongsId":"H1004","root":"בת","translation":"house"}
 {"strongsId":"H1060","root":"בכר","translation":"firstborn"}
+{"strongsId":"H1061","root":"בכור","translation":"firstfruit"}
 {"strongsId":"H1098","root":"בליל","translation":"fodder","tokenType":"WORD_STRONGS_MATCH_ONLY"}
 {"strongsId":"H1121","root":"בני","translation":"sons of"}
 {"strongsId":"H1121","root":"בנימ","translation":"sons"}
@@ -95,6 +96,7 @@
 {"strongsId":"H1589","root":"גנוב","translation":"stolen"}
 {"strongsId":"H1639","root":"גרוע","translation":"diminished"}
 {"strongsId":"H1710","root":"דגת","translation":"fish"}
+{"strongsId":"H1730","root":"דד","translation":"beloved"}
 {"strongsId":"H1787","root":"דשונ","translation":"Dishon"}
 {"strongsId":"H1814","root":"דליק","translation":"pursue"}
 {"strongsId":"H1957","root":"הזה","translation":"this"}
@@ -232,6 +234,8 @@
 {"strongsId":"H4150","root":"מועד","translation":"appointed time"}
 {"strongsId":"H4151","root":"מועד","translation":"feast"}
 {"strongsId":"H4183","root":"מורשתי","translation":"Morasthite"}
+{"strongsId":"H4186","root":"מושב","translation":"dwelling"}
+{"strongsId":"H4186","root":"משב","translation":"dwelling"}
 {"strongsId":"H4191","root":"מת","translation":"die"}
 {"strongsId":"H4191","root":"מות","translation":"death"}
 {"strongsId":"H4191","root":"ומת","translation":"put death"}
@@ -446,6 +450,7 @@
 {"strongsId":"H7523","root":"רוצח","translation":"slayer"}
 {"strongsId":"H7533","root":"רצוצ","translation":"oppressed"}
 {"strongsId":"H7561","root":"רשיע","translation":"condemned"}
+{"strongsId":"H7637","root":"שביע","translation":"seventh"}
 {"strongsId":"H7710","root":"שדופ","translation":"blasted"}
 {"strongsId":"H7760","root":"סמ","translation":"put"}
 {"strongsId":"H7760","root":"שמ","translation":"put"}
@@ -453,6 +458,8 @@
 {"strongsId":"H7674","root":"שבת","translation":"shabbat"}
 {"strongsId":"H7675","root":"שבת","translation":"shabbat"}
 {"strongsId":"H7676","root":"שבת","translation":"shabbat"}
+{"strongsId":"H7677","root":"שבתונ","translation":"shabbat","tokenType":"DISABLED"}
+{"strongsId":"H7682","root":"שגיב","translation":"exalting"}
 {"strongsId":"H7782","root":"שפר","translation":"trumpet"}
 {"strongsId":"H7812","root":"שתח","translation":"worship"}
 {"strongsId":"H7919","root":"שכיל","translation":"understanding"}

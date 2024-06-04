@@ -1,20 +1,14 @@
 package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.ScriptureFetcherTest.getContent;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.Truth.assertThat;
-import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Lexicon;
-import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Lexicon.Node;
 import com.digitald4.biblical.model.Lexicon.TranslationCount;
-import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.server.APIConnector;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -47,6 +41,7 @@ public class LexiconFetcherBlueLetterImplTest {
             .setPartOfSpeech("masculine noun")
             .setRootWord("Shortened from אַיִל (<a href=\"\" data-ng-click=\"$ctrl.showStrongsDefs('H352')\">H352</a>)")
             .setDictionaryAid("TWOT Reference: 93a")
+            .setStrongsDefinition("אֵל ʼêl, ale; shortened from <a href=\"\" data-ng-click=\"$ctrl.showStrongsDef('H352')\">H352</a>; strength; as adjective, mighty; especially the Almighty (but used also of any deity):—God (god), × goodly, × great, idol, might(-y one), power, strong. Compare names in '-el.'")
             .setTranslationCounts(
                 ImmutableList.of(
                     new TranslationCount().setWord("God").setCount(213),
@@ -70,8 +65,6 @@ public class LexiconFetcherBlueLetterImplTest {
                     new Node().setValue("mighty things in nature"),
                     new Node().setValue("strength, power"))));
 
-    assertThat(lexicon.getStrongsDefinition().toString()).isEqualTo(
-            "אֵל ʼêl, ale; shortened from <a href=\"\" data-ng-click=\"$ctrl.showStrongsDef('H352')\">H352</a>; strength; as adjective, mighty; especially the Almighty (but used also of any deity):—God (god), × goodly, × great, idol, might(-y one), power, strong. Compare names in '-el.'");
     assertThat(lexicon.translation()).isEqualTo("God");
   }
 

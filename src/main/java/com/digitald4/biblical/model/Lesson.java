@@ -1,27 +1,18 @@
 package com.digitald4.biblical.model;
 
-import com.digitald4.common.model.HasModificationTimes;
-import java.time.Instant;
+import com.digitald4.common.model.ModelObjectModTime;
 
-public class Lesson implements HasModificationTimes {
-  private long id;
+public class Lesson extends ModelObjectModTime<Long> {
   private String title;
   private Long latestVersionId;
   private Long latestPublishedVersionId;
-  private Instant creationTime;
-  private Instant lastModifiedTime;
-  private Instant deletionTime;
 
   public static Lesson create(LessonVersion lessonVersion) {
     return new Lesson().setId(lessonVersion.getLessonId()).setTitle(lessonVersion.getTitle());
   }
 
-  public long getId() {
-    return id;
-  }
-
-  public Lesson setId(long id) {
-    this.id = id;
+  public Lesson setId(Long id) {
+    super.setId(id);
     return this;
   }
 
@@ -52,56 +43,15 @@ public class Lesson implements HasModificationTimes {
     return this;
   }
 
-  @Override
-  public Instant getCreationTime() {
-    return creationTime;
-  }
-
-  @Override
-  public Lesson setCreationTime(long millis) {
-    this.creationTime = Instant.ofEpochMilli(millis);
-    return this;
-  }
-
-  @Override
-  public Instant getLastModifiedTime() {
-    return lastModifiedTime;
-  }
-
-  @Override
-  public Lesson setLastModifiedTime(long millis) {
-    this.lastModifiedTime = Instant.ofEpochMilli(millis);
-    return this;
-  }
-
-  @Override
-  public Instant getDeletionTime() {
-    return deletionTime;
-  }
-
-  @Override
-  public Lesson setDeletionTime(long millis) {
-    this.deletionTime = Instant.ofEpochMilli(millis);
-    return this;
-  }
-
-  public static class LessonVersion implements HasModificationTimes {
-    private long id;
+  public static class LessonVersion extends ModelObjectModTime<Long> {
     private long lessonId;
     private String title;
     private String themeText;
     private StringBuilder content;
     private boolean published;
-    private Instant creationTime;
-    private Instant lastModifiedTime;
-    private Instant deletionTime;
 
-    public long getId() {
-      return id;
-    }
-
-    public LessonVersion setId(long id) {
-      this.id = id;
+    public LessonVersion setId(Long id) {
+      super.setId(id);
       return this;
     }
 
@@ -151,39 +101,6 @@ public class Lesson implements HasModificationTimes {
 
     public LessonVersion setPublished(boolean published) {
       this.published = published;
-      return this;
-    }
-
-    @Override
-    public Instant getCreationTime() {
-      return creationTime;
-    }
-
-    @Override
-    public LessonVersion setCreationTime(long millis) {
-      this.creationTime = Instant.ofEpochMilli(millis);
-      return this;
-    }
-
-    @Override
-    public Instant getLastModifiedTime() {
-      return lastModifiedTime;
-    }
-
-    @Override
-    public LessonVersion setLastModifiedTime(long millis) {
-      this.lastModifiedTime = Instant.ofEpochMilli(millis);
-      return this;
-    }
-
-    @Override
-    public Instant getDeletionTime() {
-      return deletionTime;
-    }
-
-    @Override
-    public LessonVersion setDeletionTime(long millis) {
-      this.deletionTime = Instant.ofEpochMilli(millis);
       return this;
     }
   }

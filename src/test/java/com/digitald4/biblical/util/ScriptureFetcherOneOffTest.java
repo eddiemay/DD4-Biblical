@@ -1,6 +1,7 @@
 package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.Language.EN;
+import static com.digitald4.biblical.util.Language.GEEZ;
 import static com.digitald4.biblical.util.Language.HEBREW;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.truth.Truth.assertThat;
@@ -421,8 +422,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
 
   @Test
   public void fetchIsaiahDSS_duplicates() throws Exception {
-    when(apiConnector.sendGet(anyString())).thenReturn(
-        getContent("src/main/webapp/books/isaiah_dss.txt"));
+    when(apiConnector.sendGet(anyString())).thenReturn(getContent("src/main/webapp/books/isaiah_dss.txt"));
 
     assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 16:14").getItems()).containsExactly(
         new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XIII-31").setChapter(16).setVerse(14).setText(
@@ -434,9 +434,18 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
         .stream()
         .collect(
             toImmutableMap(
-                s -> String.format("Isaiah-%d-%d", s.getChapter(), s.getVerse()),
-                s -> s.getText().toString()));
+                s -> String.format("Isaiah-%d-%d", s.getChapter(), s.getVerse()), s -> s.getText().toString()));
 
     assertThat(all).hasSize(1291);
+  }
+
+  @Test
+  public void fetchJubileesOpenSiddur_Geez() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/test/java/com/digitald4/biblical/util/data/opensiddur_org_jubilees_geez.html"));
+
+    assertThat(scriptureStore.getScriptures("SID", GEEZ, "Jub 2:9").getItems()).containsExactly(
+        new Scripture().setVersion("SID").setBook("Jubilees").setLanguage("gez").setChapter(2).setVerse(9).setText(
+            "ወወሀበ እግዚአብሔር ፀሐየ ለትእምርት ዐቢይ ዲበ ምድር ለመዋዕል ወለሰንበት ወለአውራኅ ወለበዓላት ወለዓመታት ወለሰንበታተ ዓመታት ወለኢዮቤልዉሳት ወለኵሉ ጊዜ ለዓመታት።"));
   }
 }

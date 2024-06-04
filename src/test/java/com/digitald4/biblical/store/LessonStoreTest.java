@@ -41,7 +41,7 @@ public class LessonStoreTest {
   @Before
   public void setup() {
     AtomicLong TIME = new AtomicLong(60000L);
-    dao = new DAOTestingImpl(new ChangeTracker(() -> dao, null, null, clock));
+    dao = new DAOTestingImpl(new ChangeTracker(() -> dao, null, null, null, clock));
     lessonStore = new LessonStore(() -> dao);
     versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore, SCRIPTURE_MARKUP_PROCESSOR);
     when(clock.millis()).thenAnswer(i -> TIME.incrementAndGet());

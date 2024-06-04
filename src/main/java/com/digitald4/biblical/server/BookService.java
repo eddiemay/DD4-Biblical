@@ -31,8 +31,7 @@ public class BookService extends EntityServiceImpl<BibleBook, String> {
   private final ScriptureStore scriptureStore;
 
   @Inject
-  BookService(
-      BibleBookStore bibleBookStore, LoginResolver loginResolver, ScriptureStore scriptureStore) {
+  BookService(BibleBookStore bibleBookStore, LoginResolver loginResolver, ScriptureStore scriptureStore) {
     super(bibleBookStore, loginResolver);
     this.scriptureStore = scriptureStore;
   }
@@ -55,15 +54,18 @@ public class BookService extends EntityServiceImpl<BibleBook, String> {
       @Named("version") @Nullable String version, @Named("language") @Nullable String language,
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
-      Query.List query =
-          Query.forList().setFilters(Filter.of("book", book), Filter.of("chapter", chapter));
+      Query.List query = Query.forList().setFilters(Filter.of("book", book), Filter.of("chapter", chapter));
       if (version != null) query.addFilter(Filter.of("version", version));
       if (language != null) query.addFilter(Filter.of("language", language));
       return new AtomicInteger(
-          scriptureStore.list(query).getItems().stream()
-              .mapToInt(Scripture::getVerse).max().orElse(0));
+          scriptureStore.list(query).getItems().stream().mapToInt(Scripture::getVerse).max().orElse(0));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
+  }
+
+  @Override
+  protected boolean requiresLogin(String method) {
+    return !"get".equals(method) && super.requiresLogin(method);
   }
 }

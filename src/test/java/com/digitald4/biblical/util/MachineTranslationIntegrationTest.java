@@ -83,17 +83,21 @@ public class MachineTranslationIntegrationTest {
         "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which made and he shabbat in day the seventh from all work of him which made",
         "Genesis 2:3 and he bless Mighty Ones you day the seventh and he sanctify him for in it shabbat from all work of him which create Mighty Ones to accomplish"
     );
-  }
+  } // נוח
 
   @Test
   public void translateChoiceFew() {
-    ImmutableList<String> translations = Stream.of("Isa 9:6", "Psa 83:18", "Exo 12:11", "Gen 10:1")
+    ImmutableList<String> translations = Stream
+        .of("Isa 9:6", "Psa 83:18", "Exo 12:11", "Gen 10:1", "Lev 25:4", "Exo 20:2", "Lev 23:14")
         .map(this::translate).collect(toImmutableList());
     assertThat(translations).containsExactly(
         "Isa 9:6 for child beget to of us son given to of us and you will be the government upon shoulder of him and he call name of him wonderful counselor God mighty I in he forever prince peace",
         "Psa 83:18 and know of him for you are name of you יהוה to alone of you high upon all the earth",
         "Exo 12:11 and like this you eat of him him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eats him in haste passover he to יהוה",
-        "Gen 10:1 and these generations sons of Noah Shem Ham and Japheth and born of him to them sons after the flood"
+        "Gen 10:1 and these generations sons of Noah Shem Ham and Japheth and born of him to them sons after the flood",
+        "Lev 25:4 and in year the sevenths shabbat shabbat of it let there be to earth shabbat to יהוה field of you not you sow and vineyard of you not you praise",
+        "Exo 20:2 I am יהוה Mighty Ones of you which the bring outss of you from earth Mizraim from house servants",
+        "Lev 23:14 and bread and corn and fruitful field not you eat of him until bone the day this until the brought of yous you offering Mighty Ones of yous statutes ever to generationss of yous in all dwellingss of yous"
     );
   }
 

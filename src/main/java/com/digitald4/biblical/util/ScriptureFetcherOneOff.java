@@ -1,5 +1,7 @@
 package com.digitald4.biblical.util;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.common.exception.DD4StorageException;
@@ -16,13 +18,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
-import javax.inject.Inject;
-
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import javax.inject.Inject;
 
 public class ScriptureFetcherOneOff implements ScriptureFetcher {
   private final APIConnector apiConnector;
@@ -66,6 +65,8 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetch1Clem(version, book);
     } else if (book.name().equals(BibleBook.ODES_OF_PEACE)) {
       return fetchOdesOfPeace(version, book);
+    } else if (book.name().equals(BibleBook.JUBILEES)) {
+      return fetchJubileesOpenSiddur(version, book, language);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -410,7 +411,6 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         }
       }
     }
-
     return scriptures.build();
   }
 
@@ -517,8 +517,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         .collect(toImmutableList());
   }
 
-  private synchronized ImmutableList<Scripture> fetchDSSIsaiahEn(
-      String version, BibleBook book, int chapter) {
+  private synchronized ImmutableList<Scripture> fetchDSSIsaiahEn(String version, BibleBook book, int chapter) {
     final String URL = "http://dss.collections.imj.org.il/api/get_translation?id=%d:%d&lang=en";
     ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
     for (int verse = 1; verse <= 38; verse++) {
@@ -534,7 +533,36 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                 .setText(json.getString("text")));
       }
     }
-
     return scriptures.build();
+  }
+
+  private synchronized ImmutableList<Scripture> fetchJubileesOpenSiddur(String version, BibleBook book, String lang) {
+    final Pattern versePattern = Pattern.compile("(\\d+):(\\d+)(\\W+)");
+    Document doc = Jsoup.parse(apiConnector.sendGet(
+        "https://opensiddur.org/readings-and-sourcetexts/festival-and-fast-day-readings/jewish-readings/shavuot-readings/sefer-hayovelim-jubilees-preserved-in-geez/").trim());
+    Elements divs = doc.getElementsByTag("div");
+    if (divs.size() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+    return divs.stream()
+        .filter(div -> div.attr("lang").equals(lang))
+        .map(Element::text)
+        .map(text -> text.replaceAll("&nbsp;", " "))
+        .flatMap(text -> {
+          ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
+          Matcher matcher = versePattern.matcher(text);
+          while (matcher.find()) {
+            scriptures.add(
+                new Scripture()
+                    .setVersion(version)
+                    .setLanguage(lang)
+                    .setBook(book.name())
+                    .setChapter(Integer.parseInt(matcher.group(1)))
+                    .setVerse(Integer.parseInt(matcher.group(2)))
+                    .setText(matcher.group(3).trim()));
+          }
+          return scriptures.build().stream();
+        })
+        .collect(toImmutableList());
   }
 }

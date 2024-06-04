@@ -28,5 +28,6 @@
 {"translation":"to him","word":"לו","tokenType":"PREFIX"}
 {"translation":" of him","word":"יו","tokenType":"SUFFIX_ONLY"}
 ** Supp words
+{"translation":"in","word":"בה"}
 {"translation":"in it","word":"בו"}
 {"translation":"for me","word":"לי"}

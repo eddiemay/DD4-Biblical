@@ -3,6 +3,7 @@ package com.digitald4.biblical.tools;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
 import static java.util.Comparator.comparing;
@@ -31,7 +32,6 @@ import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
-import com.digitald4.common.util.FormatText;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -41,7 +41,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -84,12 +86,12 @@ public class LexiconTool {
     apiConnector.sendGet(String.format(URL, baseUrl, "migrateLexicon", startIndex, endIndex, language));
   }
 
-  public int setLexiconReferenceCount(String strongsId) {
+  public int setReferenceCount(String strongsId) {
     String baseUrl = apiConnector.formatUrl("lexicons");
     System.out.printf("Setting reference count: %s...", strongsId);
     int result = Integer.parseInt(
         apiConnector.sendGet(String.format("%s/fillReferenceCount?strongsId=%s", baseUrl, strongsId)).trim());
-    System.out.println(result);
+    System.out.print(result);
     return result;
   }
 
@@ -404,35 +406,34 @@ public class LexiconTool {
     AncientLexiconFetcher ancientLexiconFetcher = new AncientLexiconFetcher(apiConnector);
     LexiconTool lexiconTool = new LexiconTool(
         apiConnector, lexiconStore, interlinearStore, interlinearFetcher, bibleBookStore, ancientLexiconFetcher);
-    lexiconTool.printInterlinear("Judges 21");
-    lexiconTool.outputLexiconStrongs("G");
+    // lexiconTool.printInterlinear("Judges 21");
+    // lexiconTool.outputLexiconStrongs("G");
 
     // System.out.println(lexiconStore.get("H997"));
 
-    findRoots(lexiconTool.getReferences("strongsId", "H410", "H426", "H430", "H433"));
-    findRoots(lexiconTool.getReferences("strongsId", "H175"));
+    // findRoots(lexiconTool.getReferences("strongsId", "H410", "H426", "H430", "H433"));
+    // findRoots(lexiconTool.getReferences("strongsId", "H175"));
 
-    int batchSize = 1239;
-    int day = 7;
-    // range(0, 7000 / 100)
-        // .forEach(s -> lexiconTool.migrateLexicon("G", s * batchSize + 1, (s + 1) * batchSize + 1));
+    int batchSize = 8674 / 18;
+    int day = 3;
+    range(0, 8674 / batchSize + 1)
+        .forEach(s -> lexiconTool.migrateLexicon("H", s * batchSize + 1, (s + 1) * batchSize + 1));
     // lexiconTool.migrateLexicon("G", 6090, 6091);
 
-    /* int total = range(batchSize * (day - 1) + 1, batchSize * day + 1).mapToObj(id -> "H" + id)
-       .mapToInt(lexiconTool::setLexiconReferenceCount).sum();
-    System.out.printf("Processed %d total references\n", total); */
+    /* AtomicInteger total = new AtomicInteger();
+    range(batchSize * (day - 1) + 1, batchSize * day + 1).mapToObj(id -> "G" + id)
+        .mapToInt(lexiconTool::setReferenceCount).forEach(c ->  System.out.printf(" Total: %d\n", total.addAndGet(c))); */
 
     // lexiconTool.refreshLexicons();
-    lexiconTool.outputReferenceCounts();
+    // lexiconTool.outputReferenceCounts();
     // lexiconTool.outputLexiconJSON();
     // lexiconTool.outputAncientLexiconJSON();
     // outputLexiconOverridesJSON();
     /* lexiconStore.list(Query.forList()).getItems().stream()
         .collect(groupingBy(Lexicon::getConstantsOnly)).entrySet().stream()
         .filter(e -> e.getValue().size() > 1)
-        .forEach(
-            e -> System.out.println(
-                e.getKey() + "=" + e.getValue().stream().map(l -> l.getId() + ":" + l.translation()).collect(joining(",")))); */
+        .forEach(e -> System.out.printf("%s=%s\n",
+            e.getKey(), e.getValue().stream().map(l -> l.getId() + ":" + l.translation()).collect(joining(",")))); */
 
     // Reindexed without chapter & verse: Gen-2Chr .
     // Reindexed correctly: Esra-Mal, -Psa, -Jer
@@ -442,11 +443,8 @@ public class LexiconTool {
     // IntStream.range(51, 151).forEach(chapter -> lexiconTool.reindexInterlinear("Psa", chapter));
     // lexiconTool.reindexInterlinear("Jer", 31);
 
-    /* System.out.println("Total records deleted: " + Stream
-        .of(bibleBookStore.get("Matt"), bibleBookStore.get("Luke"), bibleBookStore.get("John"),
-            bibleBookStore.get("Heb"), bibleBookStore.get("Rev"))
-        .flatMapToInt(book -> range(1, book.getChapterCount() + 1).map(c -> lexiconTool.deleteInterlinear(book.name(), c)))
-        .sum()); */
+    /* Stream.of("Philemon", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Rev").map(bibleBookStore::get)
+        .forEach(b -> range(1, b.getChapterCount() + 1).forEach(c -> lexiconTool.migrateInterlinear(b.name(), c))); */
 
     // lexiconFetcher.fetchInterlinear(bibleBookStore.get("Song of Solomon"), 1);
 

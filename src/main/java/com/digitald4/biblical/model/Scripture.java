@@ -117,7 +117,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
     public AuditScripture(String book, int chapter, int verse, String text, int ld, double percentMatch) {
       this.ld = ld;
-      this.percentMatch = percentMatch;
+      this.percentMatch = Double.isNaN(percentMatch) ? 0 : percentMatch;
       setVersion("Audit");
       setBook(book);
       setChapter(chapter);
@@ -131,9 +131,8 @@ public class Scripture extends ModelObject<String> implements Searchable {
       revised = HebrewConverter.removePunctuation(revised);
 
       int ld = Calculate.LD(original, revised);
-      double length = Math.max(original.length(), revised.length());
-      return new AuditScripture(book, chapter, verse,
-          Calculate.getDiffHtml(original, revised), ld, (length - ld) / length);
+      double len = Math.max(original.length(), revised.length());
+      return new AuditScripture(book, chapter, verse, Calculate.getDiffHtml(original, revised), ld, (len - ld) / len);
     }
 
     public int getLd() {

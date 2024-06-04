@@ -1,6 +1,10 @@
 com.digitald4.biblical.router = function($routeProvider) {
 	$routeProvider
-		.when('/home', {
+		.when('/', {
+			controller: com.digitald4.biblical.HomeCtrl,
+			controllerAs: 'homeCtrl',
+			templateUrl: 'js/html/home.html'
+		}).when('/home', {
 			controller: com.digitald4.biblical.HomeCtrl,
 			controllerAs: 'homeCtrl',
 			templateUrl: 'js/html/home.html'

@@ -6,9 +6,6 @@ import time
 from multiprocessing import Pool
 from seq2seq import Interlinear
 
-
-start_time = time.perf_counter()
-
 '''
 Number of samples: 10000
 Number of unique input tokens: 75
@@ -62,6 +59,7 @@ reverse_input_char_index = dict((i, char) for char, i in input_token_index.items
 target_token_index = dict([(char, i) for i, char in enumerate(target_characters)])
 reverse_target_char_index = dict((i, char) for char, i in target_token_index.items())
 
+
 def encode_input(input_text):
     input_seq = np.zeros((1, max_encoder_seq_length, num_encoder_tokens), dtype="float32")
     for t, char in enumerate(input_text):
@@ -111,6 +109,7 @@ def decode_interlinear(i):
 
 
 if __name__ == '__main__':
+    start_time = time.perf_counter()
     print(model.summary())
     print("encoder_inputs: ", encoder_inputs.name)
     print("encoder_outputs: ", encoder_outputs.name)

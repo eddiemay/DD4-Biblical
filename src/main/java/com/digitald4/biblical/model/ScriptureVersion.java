@@ -29,6 +29,7 @@ public class ScriptureVersion {
           Language.EN, Language.HEBREW),
       new ScriptureVersion("Covenant Christian Coalition", "CCC", 61,
           ImmutableSet.of("Additional Apocrypha", "New Testament Apocrypha")),
+      new ScriptureVersion("Open Siddur", "SID", 65, ImmutableSet.of("Jubilees"), Language.GEEZ),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.of("Canon", "OT Additions", "Deuterocanon")),
       new ScriptureVersion("Brenton's Septuagint", "SEP", 75, "OT"), // Support for Septuagint.

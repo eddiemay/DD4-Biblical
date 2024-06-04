@@ -1,5 +1,6 @@
 # Basic TensorFlow text classification example taken from
 # https://www.tensorflow.org/tutorials/keras/text_classification
+import keras
 import matplotlib.pyplot as plt
 import os
 import re
@@ -7,7 +8,6 @@ import shutil
 import string
 import tensorflow as tf
 
-from tensorflow import keras, RaggedTensor
 from keras import layers, losses
 
 

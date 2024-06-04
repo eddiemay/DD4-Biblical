@@ -1,9 +1,6 @@
 import idx2numpy
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
-
-print(tf.__version__)
 
 np.random.seed(7) # To make repeatable
 LEARNING_RATE = 0.01
