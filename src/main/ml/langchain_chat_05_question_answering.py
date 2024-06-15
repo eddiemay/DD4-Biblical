@@ -1,3 +1,4 @@
+import gradio
 from pprint import pprint
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import Chroma
@@ -13,7 +14,7 @@ vectordb = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding)
 
 print(vectordb._collection.count())
 
-question = "How old was Abraham when Ishmael was born?"
+question = "How many sons did Abraham have?"
 docs = vectordb.similarity_search(question, k=5)
 pprint(docs)
 
@@ -25,3 +26,19 @@ result = qa_chain({"query": question})
 
 pprint(result["result"])
 pprint(result["source_documents"])
+
+
+# chat interface
+def chat_function(question, history):
+    response = qa_chain({"query": question})
+    return response["result"]
+
+
+# Set up the Gradio chat interface
+iface = gradio.ChatInterface(
+    fn=chat_function,
+    title="Intelligent Search Assistant",
+    description="This interface uses the bible to answer your questions.",
+    theme="default")
+
+iface.launch(share=False)
