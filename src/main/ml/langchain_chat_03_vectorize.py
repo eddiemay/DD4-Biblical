@@ -1,3 +1,8 @@
+# pip install jq
+# pip install langchain_openai
+# pip install langchain_community
+# pip install chromadb
+
 import json
 import os
 from langchain_openai import OpenAIEmbeddings
@@ -95,7 +100,9 @@ def vectorize(books, version):
 
 
 if __name__ == '__main__':
-    # vectorize(["Gen", "Exo"], "RSKJ")
+    vectorize(["Gen", "Exo", "Lev", "Num", "Deut"], "RSKJ")
     database = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding)
-    results = database.similarity_search("How long was the sojourning to be?", k=7)
+    results = database.similarity_search("How long was the sojourning to be?", k=3)
+    pprint(results)
+    results = database.similarity_search("What does Genesis 2:3 say?", k=3)
     pprint(results)

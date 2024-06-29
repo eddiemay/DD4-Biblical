@@ -1,5 +1,9 @@
 # Basic TensorFlow text classification example taken from
 # https://www.tensorflow.org/tutorials/keras/text_classification
+
+# pip install tensorflow
+# pip install matplatlib
+
 import keras
 import matplotlib.pyplot as plt
 import os
@@ -7,7 +11,6 @@ import re
 import shutil
 import string
 import tensorflow as tf
-
 from keras import layers, losses
 
 
@@ -125,7 +128,7 @@ if __name__ == '__main__':
 
     model.compile(
       loss=losses.BinaryCrossentropy(from_logits=True),
-      optimizer='adam', metrics=tf.metrics.BinaryAccuracy(threshold=0.0))
+      optimizer='adam', metrics=tf.metrics.BinaryAccuracy())
 
     epochs = 10
     history = model.fit(

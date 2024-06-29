@@ -9,7 +9,9 @@ from langchain_openai import OpenAIEmbeddings
 
 llm_name = "gpt-4o"
 CHROMA_PATH = "chatbot/chroma/"
-template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Use three sentences maximum. Always say "thanks for asking!" at the end of the answer. 
+template = """Use the following pieces of context to answer the question at the end.
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+Thought review act
 {context}
 Question: {question}
 Helpful Answer:"""

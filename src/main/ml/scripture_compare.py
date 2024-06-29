@@ -1,3 +1,5 @@
+# pip install sentence_transformers
+
 import time
 import urllib.request, json
 from sentence_transformers import SentenceTransformer

@@ -1,3 +1,6 @@
+# pip install gradio
+# pip install sentence_transformers
+
 import gradio as gr
 import urllib.request, json
 from sentence_transformers import SentenceTransformer
