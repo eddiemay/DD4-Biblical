@@ -1,7 +1,4 @@
-# pip install jq
-# pip install langchain_openai
-# pip install langchain_community
-# pip install chromadb
+
 
 import json
 import os

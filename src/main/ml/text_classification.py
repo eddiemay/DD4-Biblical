@@ -1,9 +1,5 @@
 # Basic TensorFlow text classification example taken from
 # https://www.tensorflow.org/tutorials/keras/text_classification
-
-# pip install tensorflow
-# pip install matplatlib
-
 import keras
 import matplotlib.pyplot as plt
 import os

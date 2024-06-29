@@ -1,6 +1,3 @@
-# pip install transformers
-# pip install sentence_transformers
-
 from transformers.utils import logging
 logging.set_verbosity_error()
 
