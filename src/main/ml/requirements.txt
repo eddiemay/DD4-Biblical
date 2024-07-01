@@ -3,7 +3,6 @@ gradio
 jq
 langchain_openai
 langchain_community
-matlab
 sentence_transformers
 tensorflow
 tensorflow_text

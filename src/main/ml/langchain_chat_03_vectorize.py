@@ -1,5 +1,3 @@
-
-
 import json
 import os
 from langchain_openai import OpenAIEmbeddings

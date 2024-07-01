@@ -10,6 +10,7 @@ from langchain_openai import OpenAIEmbeddings
 llm_name = "gpt-4o"
 CHROMA_PATH = "chatbot/chroma/"
 template = """Use the following pieces of context to answer the question at the end.
+Use metadata to determine the bible book, chapter and verse.
 If you don't know the answer, just say that you don't know, don't try to make up an answer.
 Thought review act
 {context}
@@ -40,10 +41,14 @@ def chat_function(question, history):
 
 
 pprint(chat_function("How long did Jacob serve for Rachel?", ""))
+pprint(chat_function("In what source documents do we learn about clean animals?", ""))
+pprint(chat_function("What does source document Genesis 2:3 say?", ""))
 
 # Set up the Gradio chat interface
 iface = gradio.ChatInterface(
     fn=chat_function,
     title="Bible Search Assistant",
     description="This interface uses the bible to answer your questions.",
-    theme="default").launch(share=True)
+    theme="default")
+
+# iface.launch(share=True)
