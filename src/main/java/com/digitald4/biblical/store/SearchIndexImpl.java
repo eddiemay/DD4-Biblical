@@ -11,6 +11,7 @@ import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
+import com.digitald4.common.storage.DAOCloudDS.Context;
 import com.digitald4.common.storage.SearchIndexerAppEngineImpl;
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Field;
@@ -28,8 +29,9 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
   private final BibleBookStore bibleBookStore;
 
   @Inject
-  public SearchIndexImpl(ScriptureReferenceProcessor scriptureRefProcessor,
+  public SearchIndexImpl(Provider<Context> contextProvider, ScriptureReferenceProcessor scriptureRefProcessor,
       Provider<ScriptureStore> scriptureStore, BibleBookStore bibleBookStore) {
+    super(contextProvider);
     this.scriptureRefProcessor = scriptureRefProcessor;
     this.scriptureStore = scriptureStore;
     this.bibleBookStore = bibleBookStore;

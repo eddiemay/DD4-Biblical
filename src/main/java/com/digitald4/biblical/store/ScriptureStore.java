@@ -1,7 +1,6 @@
 package com.digitald4.biblical.store;
 
 import static com.digitald4.biblical.model.ScriptureVersion.INTERLINEAR;
-import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.common.storage.Query.forList;
 import static com.digitald4.biblical.util.HebrewConverter.toAncient;
@@ -28,12 +27,12 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.GenericStore;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.Query.OrderBy;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SearchIndexer;
-import com.digitald4.common.storage.SearchableStoreImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -47,7 +46,7 @@ import java.util.stream.IntStream;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
+public class ScriptureStore extends GenericStore<Scripture, String> {
   public static final String DEFAULT_ORDER_BY = "bookNum,chapter,verse,versionNum,version";
   private static final String SINGLE_CHAPTER = "%s %d";
 
@@ -303,7 +302,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     ScriptureVersion scriptureVersion =
         bibleBookStore.getOrFallback(version, language, bibleBook, languageRequest.isRequired());
     if (scriptureVersion == null) {
-      return QueryResult.of(ImmutableList.of(), 0, null);
+      return QueryResult.of(Scripture.class, ImmutableList.of(), 0, null);
     }
 
     version = scriptureVersion.getVersion();
@@ -334,7 +333,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
       }
       ImmutableList<Scripture> fetched =
           fetchFromWeb(version, language, bibleBook, chapter, startVerse, endVerse);
-      queryResult = QueryResult.of(fetched, fetched.size(), query);
+      queryResult = QueryResult.of(Scripture.class, fetched, fetched.size(), query);
     }
 
     return queryResult;
@@ -353,7 +352,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
 
     QueryResult<Scripture> queryResult = list(query);
 
-    return QueryResult.of(
+    return QueryResult.of(Scripture.class,
         queryResult.getItems().stream()
             .sorted(
                 comparing(Scripture::getVerse)
@@ -373,7 +372,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
   }
 
   public static class GetOrSearchResponse extends QueryResult<Scripture> {
-    private enum RESULT_TYPE {GET, SEARCH}
+    public enum RESULT_TYPE {GET, SEARCH}
     private final RESULT_TYPE resultType;
     private final String prevChapter;
     private final String nextChapter;
@@ -381,7 +380,7 @@ public class ScriptureStore extends SearchableStoreImpl<Scripture, String> {
     private GetOrSearchResponse(
         RESULT_TYPE resultType, Iterable<Scripture> scriptures, int totalSize, Query query,
         String prevChapter, String nextChapter) {
-      super(scriptures, totalSize, query);
+      super(Scripture.class, scriptures, totalSize, query);
       this.resultType = resultType;
       this.prevChapter = prevChapter;
       this.nextChapter = nextChapter;

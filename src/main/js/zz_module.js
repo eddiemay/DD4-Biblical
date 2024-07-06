@@ -95,9 +95,13 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     var scriptureService = new com.digitald4.common.JSONService('scripture', apiConnector);
     var dssByVerse;
     scriptureService.scriptures = function(reference, success, error) {
-      var request =
-          typeof(reference) == 'object' ? reference : {reference: reference, version: globalData.scriptureVersion};
+      var request = typeof(reference) == 'object'
+          ? reference : {reference: reference, version: globalData.scriptureVersion};
       scriptureService.sendRequest({action: 'scriptures', params: request}, success, error);
+    }
+    scriptureService.search = function(request, success, error) {
+      scriptureService.sendRequest({action: 'fetch', params: request},
+          response => success(processPagination(response)), error);
     }
     scriptureService.searchAndReplace = function(request, success, error) {
       scriptureService.sendRequest({action: 'searchAndReplace', method: 'POST', params: request},

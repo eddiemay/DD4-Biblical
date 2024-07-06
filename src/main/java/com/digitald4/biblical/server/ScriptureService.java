@@ -47,14 +47,11 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
     }
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "search")
-  public GetOrSearchResponse search(
-      @Named("searchText") String searchText, @Named("version") @Nullable String version,
-      @Named("lang") @Nullable String lang,
-      @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy,
-      @Named("pageSize") @DefaultValue("50") int pageSize,
-      @Named("pageToken") @DefaultValue("1") int pageToken)
-      throws ServiceException {
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "fetch")
+  public GetOrSearchResponse fetch(@Named("searchText") String searchText,
+      @Named("version") @Nullable String version, @Named("lang") @Nullable String lang,
+      @Named("pageSize") @DefaultValue("50") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken,
+      @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy) throws ServiceException {
     try {
       return scriptureReferenceProcessor.matchesPattern(searchText)
           ? scriptureStore.getScriptures(version, lang, searchText)

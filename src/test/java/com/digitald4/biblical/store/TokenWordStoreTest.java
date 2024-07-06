@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.util.HebrewTokenizer;
+import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.QueryResult;
 import com.google.common.collect.ImmutableList;
@@ -22,7 +23,8 @@ public class TokenWordStoreTest {
 
   @Before
   public void setup() {
-    when(dao.list(eq(HebrewTokenizer.TokenWord.class), any())).thenReturn(QueryResult.of(ImmutableList.of(), 0, null));
+    when(dao.list(eq(HebrewTokenizer.TokenWord.class), any())).thenReturn(
+        QueryResult.of(TokenWord.class, ImmutableList.of(), 0, null));
   }
 
   @Test

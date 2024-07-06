@@ -44,7 +44,6 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
   private synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter, String sefariaName) {
     ImmutableList.Builder<Scripture> result = ImmutableList.builder();
     String url = String.format(URL_TEMPLATE, sefariaName, chapter).replaceAll(",", "%2C");
-    System.out.println("Fetching: " + url + "\n");
     JSONObject json = new JSONObject(apiConnector.sendGet(url));
 
     JSONArray english = json.getJSONArray("text");

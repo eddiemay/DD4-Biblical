@@ -5,7 +5,6 @@ import com.digitald4.biblical.store.CommandmentStore;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.service.EntityServiceImpl;
 import com.digitald4.common.storage.LoginResolver;
-import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.QueryResult;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
@@ -29,16 +28,13 @@ public class CommandmentService extends EntityServiceImpl<Commandment, Long> {
     this.store = store;
   }
 
+  @Override // Overing this method because of the default order by.
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "search")
-  public QueryResult<Commandment> search(
-      @Named("searchText") String searchText, @DefaultValue("bookNum,chapter,verse") @Named("orderBy") String orderBy,
-      @Named("pageSize") @DefaultValue("50") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken)
-      throws ServiceException {
-    try {
-      return store.search(Query.forSearch(searchText, orderBy, pageSize, pageToken));
-    } catch (DD4StorageException e) {
-      throw new ServiceException(e.getErrorCode(), e);
-    }
+  public QueryResult<Commandment> search(@Named("searchText") String searchText,
+      @Named("pageSize") @DefaultValue("50") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken,
+      @DefaultValue("bookNum,chapter,verse") @Named("orderBy") String orderBy,
+      @Nullable @Named("idToken") String idToken) throws ServiceException {
+    return super.search(searchText, pageSize, pageToken, orderBy, idToken);
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")

@@ -37,7 +37,6 @@ public class AncientLexiconFetcher {
 
   public ImmutableList<AncientLexicon> fetch(int page) {
     String url = String.format(URL_TEMPLATE, PAGE_NAMES.get(page));
-    System.out.println("Fetching: " + url + "...");
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.htmlParser());
 

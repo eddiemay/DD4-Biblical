@@ -100,7 +100,7 @@ public class InterlinearStore extends GenericStore<Interlinear, String> {
                 .thenComparing(Interlinear::getVerse).thenComparing(Interlinear::getIndex))
         .collect(toImmutableSet());
 
-    return QueryResult.of(
+    return QueryResult.of(Interlinear.class,
         results.stream().skip(pageSize * (pageToken - 1)).limit(pageSize).collect(toImmutableList()),
         results.size(),
         Query.forList().setPageSize(pageSize).setPageToken(pageToken));

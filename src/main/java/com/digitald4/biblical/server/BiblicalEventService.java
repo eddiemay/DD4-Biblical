@@ -10,7 +10,6 @@ import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Api(
     name = "biblicalEvents",
@@ -53,16 +52,6 @@ public class BiblicalEventService extends EntityServiceBulkImpl<Long, BiblicalEv
     try {
       resolveLogin(idToken, true);
       return store.getAll();
-    } catch (DD4StorageException e) {
-      throw new ServiceException(e.getErrorCode(), e);
-    }
-  }
-
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrate")
-  public AtomicInteger migrate(@Nullable @Named("idToken") String idToken) throws ServiceException {
-    try {
-      resolveLogin(idToken, true);
-      return new AtomicInteger(store.migrate().size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

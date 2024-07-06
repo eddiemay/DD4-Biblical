@@ -72,10 +72,10 @@ public class ScriptureStoreTest {
     endVerse = Math.min(endVerse, 37);
 
     if (chapter != 23) {
-      return QueryResult.of(ImmutableList.of(), 0, query);
+      return QueryResult.of(Scripture.class, ImmutableList.of(), 0, query);
     }
 
-    return QueryResult.of(
+    return QueryResult.of(Scripture.class,
         IntStream.range(startVerse, endVerse + 1)
             .boxed()
             .flatMap(verse -> createScriptures(version, language, book.name(), chapter, verse, "[Scripture Placeholder]"))
@@ -240,7 +240,7 @@ public class ScriptureStoreTest {
         createInterlinear("Jub", 6, 45, 13, "תמימה:", null));
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).thenReturn(
-        QueryResult.of(
+        QueryResult.of(Scripture.class,
             ImmutableList.of(
                 new Scripture().setBook("Jub").setChapter(6).setVerse(45)
                     .setText("וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה:")),

@@ -3,7 +3,6 @@ package com.digitald4.biblical.tools;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
 import static java.util.Comparator.comparing;
@@ -41,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONArray;
@@ -106,7 +104,6 @@ public class LexiconTool {
 
   public void fetchInterlinear(BibleBook bibleBook, int chapter) {
     String baseUrl = apiConnector.formatUrl("scriptures");
-    System.out.printf("Fetching: %s %d:1...\n", bibleBook, chapter);
     apiConnector.sendGet(String.format(INTER_FETCH_URL, baseUrl, bibleBook, chapter));
   }
 
@@ -246,7 +243,6 @@ public class LexiconTool {
 
     ImmutableList<Lexicon> lexicons = lexiconStore.list(query).getItems();
     if (lexicons.isEmpty()) {
-      System.out.printf("fetching lexicons: %s%d -> %s%d\n", lang, start, lang, end);
       DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
       LexiconStore apiStore = new LexiconStore(() -> apiDao, null);
       lexicons = apiStore.list(query).getItems();

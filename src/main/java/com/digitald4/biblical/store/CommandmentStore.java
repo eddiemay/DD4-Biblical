@@ -7,15 +7,15 @@ import static java.util.stream.Collectors.joining;
 import com.digitald4.biblical.model.Commandment;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.GenericLongStore;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.SearchIndexer;
-import com.digitald4.common.storage.SearchableStoreImpl;
 import com.google.common.collect.Streams;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class CommandmentStore extends SearchableStoreImpl<Commandment, Long> {
+public class CommandmentStore extends GenericLongStore<Commandment> {
   private final SearchIndexer searchIndexer;
   private final ScriptureReferenceProcessor scriptureRefProcessor;
 

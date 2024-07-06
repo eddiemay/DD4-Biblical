@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 public class CommandmentStoreTest {
-
   @Mock private final DAO dao = mock(DAO.class);
   @Mock private final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
