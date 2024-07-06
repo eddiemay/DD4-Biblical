@@ -19,10 +19,7 @@ Helpful Answer:"""
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context", "question"],template=template)
 
 vectordb = Chroma(persist_directory=CHROMA_PATH, embedding_function=OpenAIEmbeddings())
-memory = ConversationBufferMemory(
-    memory_key="chat_history",
-    output_key="result",
-    return_messages=True)
+memory = ConversationBufferMemory(memory_key="chat_history", output_key="result", return_messages=True)
 
 qa_chain = RetrievalQA.from_chain_type(
     ChatOpenAI(model_name=llm_name, temperature=0),
