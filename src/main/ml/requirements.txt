@@ -1,0 +1,9 @@
+chromadb
+gradio
+jq
+langchain_openai
+langchain_community
+sentence_transformers
+tensorflow
+tensorflow_text
+transformers
