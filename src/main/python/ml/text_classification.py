@@ -24,7 +24,7 @@ if __name__ == '__main__':
     url = "https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz"
 
     dataset = tf.keras.utils.get_file(
-      "aclImdb_v1", url, extract=True, cache_dir='.',
+      "aclImdb_v1", url, extract=True, cache_dir='../../ml',
       cache_subdir='../../../data/ml')
 
     dataset_dir = os.path.join(os.path.dirname(dataset), 'aclImdb')

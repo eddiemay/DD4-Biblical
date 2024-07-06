@@ -12,7 +12,7 @@ print(tf.__version__)
 url = "https://storage.googleapis.com/download.tensorflow.org/data/stack_overflow_16k.tar.gz"
 
 dataset = tf.keras.utils.get_file(
-  "stack_overflow_16k", url, extract=True, cache_dir='.',
+  "stack_overflow_16k", url, extract=True, cache_dir='../../ml',
   cache_subdir='data/ml/stack_overflow')
 
 dataset_dir = os.path.join(os.path.dirname(dataset), '')

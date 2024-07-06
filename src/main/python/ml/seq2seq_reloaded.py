@@ -14,7 +14,7 @@ Max sequence length for inputs: 20
 Max sequence length for outputs: 17
 '''
 
-data_path = "../../../data"
+data_path = "../../../../data"
 latent_dim = 128  # Latent dimensionality of the encoding space.
 max_encoder_seq_length = 20
 max_decoder_seq_length = 17
