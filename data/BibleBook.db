@@ -1,0 +1,130 @@
+{"idString":"BibleBook-1 Chronicles","entity":{"number":13,"altNames":["1Ch","1Chr","1 Divrei HaYamim"],"chapterCount":29,"id":"1 Chronicles","tags":"Canon,OT,Historical,Chronicles,Chr"}}
+{"idString":"BibleBook-1 Clement","entity":{"number":121,"altNames":["1 Clem"],"chapterCount":65,"id":"1 Clement","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-1 Corinthians","entity":{"number":46,"altNames":["1Co","1Cor"],"chapterCount":16,"id":"1 Corinthians","tags":"Canon,NT,Letters,Corinthians,Cor"}}
+{"idString":"BibleBook-1 Esdras","entity":{"number":67,"altNames":["3 Ezra"],"chapterCount":9,"id":"1 Esdras","tags":"Apocrypha,Deuterocanon,Eastern,Esdras,Ezra"}}
+{"idString":"BibleBook-1 John","entity":{"number":62,"altNames":["1Jo","1Jn","1 Yochanan"],"chapterCount":5,"id":"1 John","tags":"Canon,NT,Letters.John"}}
+{"idString":"BibleBook-1 Kings","entity":{"number":11,"altNames":["1Ki","1 Kgs","1 Malachim"],"chapterCount":22,"id":"1 Kings","tags":"Canon,OT,Historical,Kings"}}
+{"idString":"BibleBook-1 Maccabees","entity":{"number":74,"altNames":["1Mac","1Macc","1 Machabees"],"chapterCount":16,"id":"1 Maccabees","tags":"Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc"}}
+{"idString":"BibleBook-1 Peter","entity":{"number":60,"altNames":["1Pe","1Pet","1 Kefa"],"chapterCount":5,"id":"1 Peter","tags":"Canon,NT,Letters,Peter"}}
+{"idString":"BibleBook-1 Samuel","entity":{"number":9,"altNames":["1Sam","1Sa","1Sm","1 Shamuel","1 Shmuel"],"chapterCount":31,"id":"1 Samuel","tags":"Canon,OT,Historical,Samuel,Sam"}}
+{"idString":"BibleBook-1 Thessalonians","entity":{"number":52,"altNames":["1Th","1Thes"],"chapterCount":5,"id":"1 Thessalonians","tags":"Canon,NT,Letters,Thessalonians,Thes"}}
+{"idString":"BibleBook-1 Timothy","entity":{"number":54,"altNames":["1Ti","1Tim"],"chapterCount":6,"id":"1 Timothy","tags":"Canon,NT,Letters,Timothy,Tim"}}
+{"idString":"BibleBook-2 Baruch","entity":{"number":110,"altNames":[],"chapterCount":87,"id":"2 Baruch","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-2 Chronicles","entity":{"number":14,"altNames":["2Ch","2Chr","2 Divrei HaYamim"],"chapterCount":36,"id":"2 Chronicles","tags":"Canon,OT,Historical,Chronicles,Chr"}}
+{"idString":"BibleBook-2 Clement","entity":{"number":122,"altNames":["2 Clem"],"chapterCount":20,"id":"2 Clement","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-2 Corinthians","entity":{"number":47,"altNames":["2Co","2Cor"],"chapterCount":13,"id":"2 Corinthians","tags":"Canon,NT,Letters,Corinthians,Cor"}}
+{"idString":"BibleBook-2 Enoch","entity":{"number":86,"altNames":["2 Hanok","2 Eno"],"chapterCount":68,"id":"2 Enoch","tags":"Apocrypha,Enoch"}}
+{"idString":"BibleBook-2 Esdras","entity":{"number":68,"altNames":["4 Ezra"],"chapterCount":16,"id":"2 Esdras","tags":"Apocrypha,Deuterocanon,Esdras,Ezra"}}
+{"idString":"BibleBook-2 John","entity":{"number":63,"altNames":["2Jo","2Jn","2 Yochanan"],"chapterCount":1,"id":"2 John","tags":"Canon,NT,Letters,John"}}
+{"idString":"BibleBook-2 Kings","entity":{"number":12,"altNames":["2Ki","2 Kgs","2 Malachim"],"chapterCount":25,"id":"2 Kings","tags":"Canon,OT,Historical,Kings"}}
+{"idString":"BibleBook-2 Maccabees","entity":{"number":75,"altNames":["2Mac","2Macc","2 Machabees"],"chapterCount":15,"id":"2 Maccabees","tags":"Apocrypha,Deuterocanon,Universal,Maccabees,Mac,Macc"}}
+{"idString":"BibleBook-2 Peter","entity":{"number":61,"altNames":["2Pe","2Pet","2 Kefa"],"chapterCount":3,"id":"2 Peter","tags":"Canon,NT,Letters,Peter"}}
+{"idString":"BibleBook-2 Samuel","entity":{"number":10,"altNames":["2Sam","2Sa","2Sm","2 Shemuel","2 Shamuel"],"chapterCount":24,"id":"2 Samuel","tags":"Canon,OT,Historical,Samuel,Sam"}}
+{"idString":"BibleBook-2 Thessalonians","entity":{"number":53,"altNames":["2Th","2Thes"],"chapterCount":3,"id":"2 Thessalonians","tags":"Canon,NT,Letters,Thessalonians,Thes"}}
+{"idString":"BibleBook-2 Timothy","entity":{"number":55,"altNames":["2Ti","2Tim"],"chapterCount":4,"id":"2 Timothy","tags":"Canon,NT,Letters,Timothy,Tim"}}
+{"idString":"BibleBook-3 Baruch","entity":{"number":111,"altNames":[],"chapterCount":17,"id":"3 Baruch","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-3 Corinthians","entity":{"number":120,"altNames":["3Co","3Cor"],"chapterCount":3,"id":"3 Corinthians","tags":"New Testament Apocrypha,Letters,Corinthians,Cor"}}
+{"idString":"BibleBook-3 Enoch","entity":{"number":87,"altNames":["3 Hanok","3 Eno"],"chapterCount":49,"id":"3 Enoch","tags":"Additional Apocrypha,Enoch"}}
+{"idString":"BibleBook-3 John","entity":{"number":64,"altNames":["3Jo","3Jn","3 Yochanan"],"chapterCount":1,"id":"3 John","tags":"Canon,NT,Letters,John"}}
+{"idString":"BibleBook-3 Maccabees","entity":{"number":83,"altNames":["3Mac","3Macc","3 Machabees"],"chapterCount":7,"id":"3 Maccabees","tags":"Apocrypha,Eastern,Machabees,Mac,Macc"}}
+{"idString":"BibleBook-4 Baruch","entity":{"number":112,"altNames":[],"chapterCount":9,"id":"4 Baruch","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-4 Maccabees","entity":{"number":84,"altNames":["4Mac","4Macc","4 Machabees"],"chapterCount":18,"id":"4 Maccabees","tags":"Apocrypha,Eastern,Machabees,Mac,Macc"}}
+{"idString":"BibleBook-Acts","entity":{"number":44,"altNames":["Act","Ac","Pyilut Hashaliachim"],"chapterCount":28,"id":"Acts","tags":"Canon,NT,Apostles"}}
+{"idString":"BibleBook-Additions to Esther","entity":{"number":81,"altNames":["Add Esther","Add Est","Add Esth","Add Es"],"chapterCount":16,"id":"Additions to Esther","tags":"Apocrypha,Esther,OT Additions"}}
+{"idString":"BibleBook-Amos","entity":{"number":30,"altNames":["Am"],"chapterCount":9,"id":"Amos","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Apocryphal Psalms","entity":{"number":82,"altNames":["Add Ps","Add Psa"],"chapterCount":5,"id":"Apocryphal Psalms","tags":"Additional Apocrypha,Psalms,Psa"}}
+{"idString":"BibleBook-Apocryphon of Ezekiel","entity":{"number":115,"altNames":[],"chapterCount":6,"id":"Apocryphon of Ezekiel","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Apology of Aristides","entity":{"number":129,"altNames":[],"chapterCount":17,"id":"Apology of Aristides","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Ascension of Isaiah","entity":{"number":109,"altNames":[],"chapterCount":11,"id":"Ascension of Isaiah","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Baruch","entity":{"number":73,"altNames":["Bar"],"chapterCount":5,"id":"Baruch","tags":"Apocrypha,Deuterocanon,Universal"}}
+{"idString":"BibleBook-Bel and the Dragon","entity":{"number":79,"altNames":["Bel"],"chapterCount":1,"id":"Bel and the Dragon","tags":"Apocrypha,OT Additions"}}
+{"idString":"BibleBook-Book of Adam and Eve","entity":{"number":94,"altNames":[],"chapterCount":51,"id":"Book of Adam and Eve","tags":"Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Book of Creation","entity":{"number":95,"altNames":[],"chapterCount":6,"id":"Book of Creation","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Book of Giants","entity":{"number":88,"altNames":["Giants"],"chapterCount":14,"id":"Book of Giants","tags":"Apocrypha,Enoch"}}
+{"idString":"BibleBook-Colossians","entity":{"number":51,"altNames":["Col","Co"],"chapterCount":4,"id":"Colossians","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Community Rule","entity":{"number":91,"altNames":["cr","Manual of Discipline","MD"],"chapterCount":1,"id":"Community Rule","tags":"Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Daniel","entity":{"number":27,"altNames":["Dan","Da","Dn"],"chapterCount":12,"id":"Daniel","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Deuteronomy","entity":{"number":5,"altNames":["Deut","De","Dt","Devarim"],"chapterCount":34,"id":"Deuteronomy","tags":"Canon,OT,Pentateuch"}}
+{"idString":"BibleBook-Didache","entity":{"number":117,"altNames":[],"chapterCount":16,"id":"Didache","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Ecclesiastes","entity":{"number":21,"altNames":["Ecc","Ec","kohelet"],"chapterCount":12,"id":"Ecclesiastes","tags":"Canon,OT,Wisdom"}}
+{"idString":"BibleBook-Enoch","entity":{"number":85,"altNames":["Hanok","Eno"],"chapterCount":108,"id":"Enoch","tags":"Apocrypha,Ethiopian"}}
+{"idString":"BibleBook-Ephesians","entity":{"number":49,"altNames":["Eph","Ep","Ephes"],"chapterCount":6,"id":"Ephesians","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Epistle of Barnabas","entity":{"number":119,"altNames":[],"chapterCount":21,"id":"Epistle of Barnabas","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Epistle of Mahetes to Diognetus","entity":{"number":126,"altNames":[],"chapterCount":12,"id":"Epistle of Mahetes to Diognetus","tags":"New Testament Apocrypha,Letters"}}
+{"idString":"BibleBook-Epistle of Polycarp to the Phillippians","entity":{"number":124,"altNames":[],"chapterCount":14,"id":"Epistle of Polycarp to the Phillippians","tags":"New Testament Apocrypha,Letters"}}
+{"idString":"BibleBook-Esther","entity":{"number":17,"altNames":["Est","Esth","Es","Hadassah"],"chapterCount":16,"id":"Esther","tags":"Canon,OT,Historical"}}
+{"idString":"BibleBook-Exodus","entity":{"number":2,"altNames":["Ex","Exo","Exod","Shemot"],"chapterCount":40,"id":"Exodus","tags":"Canon,OT,Pentateuch"}}
+{"idString":"BibleBook-Ezekiel","entity":{"number":26,"altNames":["Ezek","Eze","Ezk","Yechezkel"],"chapterCount":48,"id":"Ezekiel","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Ezra","entity":{"number":15,"altNames":["Ezr","Ez","1 Ezra"],"chapterCount":10,"id":"Ezra","tags":"Canon,OT,Historical"}}
+{"idString":"BibleBook-Gad the Seer","entity":{"number":108,"altNames":[],"chapterCount":14,"id":"Gad the Seer","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Galatians","entity":{"number":48,"altNames":["Ga","Gal"],"chapterCount":6,"id":"Galatians","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Genesis","entity":{"number":1,"altNames":["Gen","Ge","Gn","Bereishit","Beresheet"],"chapterCount":50,"id":"Genesis","tags":"Canon,OT,Pentateuch"}}
+{"idString":"BibleBook-Habakkuk","entity":{"number":35,"altNames":["Hab","Hb","Chavakkuk"],"chapterCount":3,"id":"Habakkuk","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Haggai","entity":{"number":37,"altNames":["Hag","Hg","Chaggai"],"chapterCount":2,"id":"Haggai","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Hebrews","entity":{"number":58,"altNames":["Heb","He","Yehudim","Mashiakim Yehudim"],"chapterCount":13,"id":"Hebrews","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Hosea","entity":{"number":28,"altNames":["Hos","Ho","Hoshea"],"chapterCount":14,"id":"Hosea","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Isaiah","entity":{"number":23,"altNames":["Isa","Is","Yeshayahu","Yashayahu","Yashaiahu"],"chapterCount":66,"id":"Isaiah","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-James","entity":{"number":59,"altNames":["Jas","Jm","Ya'akov"],"chapterCount":5,"id":"James","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Jasher","entity":{"number":90,"altNames":["Yasher","Yahusher"],"chapterCount":91,"id":"Jasher","tags":"Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Jeremiah","entity":{"number":24,"altNames":["Jer","Je","Yirmeyahu","Yirmiyah"],"chapterCount":52,"id":"Jeremiah","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Job","entity":{"number":18,"altNames":["Jb","Iyov"],"chapterCount":42,"id":"Job","tags":"Canon,OT,Wisdom"}}
+{"idString":"BibleBook-Joel","entity":{"number":29,"altNames":["Joe","Jl","Yoel"],"chapterCount":3,"id":"Joel","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-John","entity":{"number":43,"altNames":["Joh","Jn","Yochanan","Yohanan"],"chapterCount":21,"id":"John","tags":"Canon,NT,Gospel"}}
+{"idString":"BibleBook-Jonah","entity":{"number":32,"altNames":["Jon","Jo","Yonah"],"chapterCount":4,"id":"Jonah","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Joseph and Asenath","entity":{"number":101,"altNames":[],"chapterCount":29,"id":"Joseph and Asenath","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Josephus","entity":{"number":93,"altNames":[],"chapterCount":20,"id":"Josephus","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Joshua","entity":{"number":6,"altNames":["Josh","Jos","Jsh","Yehoshua","Yahosha","Yahoshai","Yahoshi","Yahusha","Yahushai","Yahushi"],"chapterCount":24,"id":"Joshua","tags":"Canon,OT,Historical"}}
+{"idString":"BibleBook-Jubilees","entity":{"number":89,"altNames":["Jub"],"chapterCount":50,"id":"Jubilees","tags":"Apocrypha,Ethiopian"}}
+{"idString":"BibleBook-Jude","entity":{"number":65,"altNames":["Jud","Jd","Yahudah"],"chapterCount":1,"id":"Jude","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Judges","entity":{"number":7,"altNames":["Judg","Jdg","Jg","Jdgs","Shoftim"],"chapterCount":21,"id":"Judges","tags":"Canon,OT,Historical"}}
+{"idString":"BibleBook-Judith","entity":{"number":70,"altNames":["Jth","Jdth","Jdt"],"chapterCount":16,"id":"Judith","tags":"Apocrypha,Deuterocanon,Universal"}}
+{"idString":"BibleBook-Ladder of Jacob","entity":{"number":100,"altNames":["Jacob's Ladder"],"chapterCount":8,"id":"Ladder of Jacob","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Lamentations","entity":{"number":25,"altNames":["Lam","La","Eicha"],"chapterCount":5,"id":"Lamentations","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Letter of Aristeas","entity":{"number":116,"altNames":["Epistle of the Aristeas","Aristeas"],"chapterCount":32,"unreleased":false,"id":"Letter of Aristeas","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Letter of Jeremiah","entity":{"number":76,"altNames":["LJe"],"chapterCount":1,"id":"Letter of Jeremiah","tags":"Apocrypha,OT Additions"}}
+{"idString":"BibleBook-Leviticus","entity":{"number":3,"altNames":["Lev","Le","Lv","Vayikra","Vyakra"],"chapterCount":27,"id":"Leviticus","tags":"Canon,OT,Pentateuch"}}
+{"idString":"BibleBook-Lives of the Prophets","entity":{"number":107,"altNames":["Prophets"],"chapterCount":23,"id":"Lives of the Prophets","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Luke","entity":{"number":42,"altNames":["Luk","Lu","Ur"],"chapterCount":24,"id":"Luke","tags":"Canon,NT,Gospel"}}
+{"idString":"BibleBook-Malachi","entity":{"number":39,"altNames":["Mal","ML"],"chapterCount":4,"id":"Malachi","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Mark","entity":{"number":41,"altNames":["Mar","Mr","Makabi"],"chapterCount":16,"id":"Mark","tags":"Canon,NT,Gospel"}}
+{"idString":"BibleBook-Martyrdom of Polycarp","entity":{"number":125,"altNames":[],"chapterCount":22,"id":"Martyrdom of Polycarp","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Matthew","entity":{"number":40,"altNames":["Matt","Mt","Matityah"],"chapterCount":28,"id":"Matthew","tags":"Canon,NT,Gospel"}}
+{"idString":"BibleBook-Megillat Antiochus","entity":{"number":130,"altNames":["Megillat"],"chapterCount":79,"unreleased":false,"id":"Megillat Antiochus","tags":"Jewish History"}}
+{"idString":"BibleBook-Micah","entity":{"number":33,"altNames":["Mic","Mc","Micha"],"chapterCount":7,"id":"Micah","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Nahum","entity":{"number":34,"altNames":["Nah","Nachum"],"chapterCount":3,"id":"Nahum","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Nehemiah","entity":{"number":16,"altNames":["Neh","Ne","Nechemya","2 Ezra"],"chapterCount":13,"id":"Nehemiah","tags":"Canon,OT,Historical"}}
+{"idString":"BibleBook-Numbers","entity":{"number":4,"altNames":["Num","Nu","Nm","Nb","Bamidbar","Bamidvar"],"chapterCount":36,"id":"Numbers","tags":"Canon,OT,Pentateuch"}}
+{"idString":"BibleBook-Obadiah","entity":{"number":31,"altNames":["Obad","Ob","Oba","Ovadya"],"chapterCount":1,"id":"Obadiah","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Odes of Peace","entity":{"number":128,"altNames":["Odes"],"chapterCount":42,"id":"Odes of Peace","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Philemon","entity":{"number":57,"altNames":["Phm","Ph"],"chapterCount":1,"id":"Philemon","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Philippians","entity":{"number":50,"altNames":["Phil","Php","Pp"],"chapterCount":4,"id":"Philippians","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Prayer of Azariah","entity":{"number":77,"altNames":["Song of the Three","Song of the Three Holy Children","Song of the Three Children","PrA","azriah"],"chapterCount":1,"id":"Prayer of Azariah","tags":"Apocrypha,OT Additions"}}
+{"idString":"BibleBook-Prayer of Manasseh","entity":{"number":80,"altNames":["PrM","PMa","Manasseh"],"chapterCount":1,"id":"Prayer of Manasseh","tags":"Apocrypha,Deuterocanon,OT Additions,Eastern"}}
+{"idString":"BibleBook-Proverbs","entity":{"number":20,"altNames":["Prov","Pro","Prv","Pr","Mishlei"],"chapterCount":31,"id":"Proverbs","tags":"Canon,OT,Wisdom"}}
+{"idString":"BibleBook-Psalms","entity":{"number":19,"altNames":["Ps","Psalm","Psa","Tehillim","Tikkan"],"chapterCount":155,"id":"Psalms","tags":"Canon,OT,Wisdom"}}
+{"idString":"BibleBook-Psalms of Solomon","entity":{"number":106,"altNames":[],"chapterCount":18,"id":"Psalms of Solomon","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Revelation","entity":{"number":66,"altNames":["Rev","Re","Revelations","Hagilu Natan Elohim\t"],"chapterCount":22,"id":"Revelation","tags":"Canon,NT,Prophecy"}}
+{"idString":"BibleBook-Revelation of Abraham","entity":{"number":97,"altNames":[],"chapterCount":32,"id":"Revelation of Abraham","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Revelation of EliJah","entity":{"number":113,"altNames":["Revelation of Eliyah"],"chapterCount":5,"id":"Revelation of EliJah","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Revelation of Peter","entity":{"number":118,"altNames":[],"chapterCount":4,"id":"Revelation of Peter","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Revelation of Zephaniah","entity":{"number":114,"altNames":[],"chapterCount":3,"id":"Revelation of Zephaniah","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Romans","entity":{"number":45,"altNames":["Rom","Ro","Rm"],"chapterCount":16,"id":"Romans","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Ruth","entity":{"number":8,"altNames":["Ru","Rth","Rut"],"chapterCount":4,"id":"Ruth","tags":"Canon,OT,Historical"}}
+{"idString":"BibleBook-Seven Epistles of Ignatius","entity":{"number":123,"altNames":[],"chapterCount":7,"unreleased":true,"id":"Seven Epistles of Ignatius","tags":"New Testament Apocrypha,Letters"}}
+{"idString":"BibleBook-Sirach","entity":{"number":72,"altNames":["Ecclesiasticus","Sir","Ecclus"],"chapterCount":51,"id":"Sirach","tags":"Apocrypha,Deuterocanon,Universal"}}
+{"idString":"BibleBook-Song of Solomon","entity":{"number":22,"altNames":["songs","song","sos","ca","Shir HaShirim"],"chapterCount":8,"id":"Song of Solomon","tags":"Canon,OT,Wisdom"}}
+{"idString":"BibleBook-Susanna","entity":{"number":78,"altNames":["Sus"],"chapterCount":1,"id":"Susanna","tags":"Apocrypha,OT Additions"}}
+{"idString":"BibleBook-Testament of Abraham","entity":{"number":96,"altNames":[],"chapterCount":20,"id":"Testament of Abraham","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Testament of Isaac","entity":{"number":98,"altNames":[],"chapterCount":13,"id":"Testament of Isaac","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Testament of Jacob","entity":{"number":99,"altNames":[],"chapterCount":8,"id":"Testament of Jacob","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Testament of Job","entity":{"number":102,"altNames":[],"chapterCount":12,"id":"Testament of Job","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Testament of Moses","entity":{"number":104,"altNames":[],"chapterCount":12,"id":"Testament of Moses","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Testament of Solomon","entity":{"number":105,"altNames":[],"chapterCount":28,"id":"Testament of Solomon","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Testaments of the Twelve Patriarchs","entity":{"number":103,"altNames":["Testaments of the Twelve","Testaments","TofT","ttp"],"chapterCount":12,"id":"Testaments of the Twelve Patriarchs","tags":"Apocrypha,Jewish History"}}
+{"idString":"BibleBook-The Shepherd of Hermas","entity":{"number":127,"altNames":[],"chapterCount":27,"id":"The Shepherd of Hermas","tags":"New Testament Apocrypha"}}
+{"idString":"BibleBook-Titus","entity":{"number":56,"altNames":["Tit","Ti"],"chapterCount":3,"id":"Titus","tags":"Canon,NT,Letters"}}
+{"idString":"BibleBook-Tobit","entity":{"number":69,"altNames":["Tob","Tb"],"chapterCount":14,"id":"Tobit","tags":"Apocrypha,Deuterocanon,Universal"}}
+{"idString":"BibleBook-War Scroll","entity":{"number":92,"altNames":["War"],"chapterCount":19,"id":"War Scroll","tags":"Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Wisdom of Solomon","entity":{"number":71,"altNames":["Wisdom","Wis","Ws"],"chapterCount":19,"id":"Wisdom of Solomon","tags":"Apocrypha,Deuterocanon,Universal"}}
+{"idString":"BibleBook-Zechariah","entity":{"number":38,"altNames":["Zech","Zec","Zc","Zecharya"],"chapterCount":14,"id":"Zechariah","tags":"Canon,OT,Prophets"}}
+{"idString":"BibleBook-Zephaniah","entity":{"number":36,"altNames":["Zeph","Zep","Zp","Tzefanya"],"chapterCount":3,"id":"Zephaniah","tags":"Canon,OT,Prophets"}}
