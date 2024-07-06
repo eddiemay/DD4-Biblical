@@ -34,6 +34,12 @@ indexes:
       - name: verse
   - kind: Scripture
     properties:
+      - name: book
+      - name: language
+      - name: chapter
+      - name: verse
+  - kind: Scripture
+    properties:
       - name: version
       - name: book
       - name: chapter
