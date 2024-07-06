@@ -2,6 +2,7 @@
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
     <runtime>java17</runtime>
     <app-engine-apis>true</app-engine-apis>
+    <service>default</service>
     <instance-class>B1</instance-class>
     <basic-scaling>
         <max-instances>4</max-instances>
