@@ -6,7 +6,7 @@ from openai import OpenAI
 from urllib import request
 
 llm_name = "gpt-4o"
-SEARCH_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/search?searchText={}&lang=en&version=ISR'
+SEARCH_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/fetch?searchText={}&lang=en&version=ISR'
 
 client = OpenAI()
 
