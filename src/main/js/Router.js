@@ -32,6 +32,10 @@ com.digitald4.biblical.router = function($routeProvider) {
 			controller: com.digitald4.biblical.GamesCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/games.html'
+		}).when('/chat', {
+			template: '<dd4-chat title="Bible Search Assistant" '
+			  + 'description="This interface uses the bible to answer your questions." '
+			  + 'url="https://chatbot-dot-dd4-biblical.uc.r.appspot.com/"></dd4-chat>'
 		}).when('/flashcards', {
 			controller: com.digitald4.biblical.FlashCardsCtrl,
 			controllerAs: '$ctrl',

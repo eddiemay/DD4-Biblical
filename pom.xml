@@ -144,11 +144,6 @@
                     <include name="*.html"/>
                   </fileset>
                 </copy>
-                <copy todir="${basedir}/target/${project.artifactId}-${project.version}/service_hello">
-                  <fileset dir="src/main/python/services">
-                    <include name="**/*"/>
-                  </fileset>
-                </copy>
               </target>
             </configuration>
             <goals>

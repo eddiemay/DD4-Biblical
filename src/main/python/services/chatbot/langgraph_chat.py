@@ -1,5 +1,5 @@
-import gradio
 import json
+import os
 import re
 import urllib
 from openai import OpenAI
@@ -8,7 +8,7 @@ from urllib import request
 llm_name = "gpt-4o"
 SEARCH_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/fetch?searchText={}&lang=en&version=ISR'
 
-client = OpenAI()
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 
 class Agent:
@@ -106,22 +106,3 @@ def query(question, history="", max_turns=7):
       print()
       return result
 
-
-question = """What does Genesis 2:3 say?"""
-query(question)
-question = """From Exodus 12:40\
-How long did the children sojourn in Egypt?"""
-query(question)
-question = """What does Exo 12:1-3 say?"""
-query(question)
-question = """Summarize Exo 12:1-3"""
-query(question)
-
-# Set up the Gradio chat interface
-iface = gradio.ChatInterface(
-  fn=query,
-  title="Bible Search Assistant",
-  description="This interface uses the bible to answer your questions.",
-  theme="default")
-
-iface.launch(share=False)
