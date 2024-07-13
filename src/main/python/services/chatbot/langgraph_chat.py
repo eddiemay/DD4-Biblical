@@ -80,13 +80,15 @@ known_actions = {
 action_re = re.compile('^Action: (\w+): (.*)$')
 
 
-def query(question, history="", max_turns=7):
+def query(question, max_turns=7):
   i = 0
+  results = []
   bot = Agent(prompt)
   next_prompt = question
   while i < max_turns:
     i += 1
     result = bot(next_prompt)
+    results.append(result)
     print(result)
     actions = [
       action_re.match(a)
@@ -104,5 +106,4 @@ def query(question, history="", max_turns=7):
       next_prompt = "Observation: {}".format(observation)
     else:
       print()
-      return result
-
+      return results
