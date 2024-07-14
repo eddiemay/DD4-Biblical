@@ -7,6 +7,7 @@
 {"strongsId":"H0175","root":"אהרנ","translation":"Aaron"}
 {"strongsId":"H0211","root":"אופר","translation":"Ophir"}
 {"strongsId":"H0215","root":"האיר","translation":"shine"}
+{"strongsId":"H0241","root":"אזנ","translation":"ear"}
 {"strongsId":"H0259","root":"אחד","translation":"one"}
 {"strongsId":"H0310","root":"אחר","translation":"after"}
 {"strongsId":"H0310","root":"אחרי","translation":"after"}
@@ -340,6 +341,7 @@
 ** {"strongsId":"H5769","root":"על","translation":"ever"}
 {"strongsId":"H5774","root":"עופפ","translation":"fly"}
 {"strongsId":"H5775","root":"עופ","translation":"bird"}
+{"strongsId":"H5782","root":"עיר","translation":"awaken"}
 {"strongsId":"H5782","root":"עורר","translation":"stir up"}
 {"strongsId":"H5826","root":"עוזר","translation":"helper"}
 {"strongsId":"H5848","root":"עטפ","translation":"overwhelm"}
@@ -471,6 +473,8 @@
 {"strongsId":"H8034","root":"שמ","translation":"name"}
 {"strongsId":"H8034","root":"שמה","translation":"name of her"}
 {"strongsId":"H8064","root":"שמימ","translation":"heavens"}
+{"strongsId":"H8085","root":"שמע","translation":"listen"}
+{"strongsId":"H8086","root":"שמע","translation":"listen"}
 {"strongsId":"H8104","root":"שמור","translation":"guard"}
 {"strongsId":"H8127","root":"שנ","translation":"tooth"}
 {"strongsId":"H8141","root":"שנה","translation":"year"}

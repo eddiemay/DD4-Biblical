@@ -118,7 +118,7 @@ public class MachineTranslationIntegrationTest {
         "Ecc 12:10 seek preacher to find words of desire and like return uprightness words of truth",
         "Ecc 12:11 words of wises like generationin  of uss and like nails planters mans of assembliess given of him from feed one",
         "Ecc 12:12 and remain from they sons of the warn accomplish books the multiply none end and study the multiply wearys flesh",
-        "Ecc 12:13 flags word the all we hear you the Mighty Ones fear and you commandments of him guard for this all the man",
+        "Ecc 12:13 flags word the all we listen you the Mighty Ones fear and you commandments of him guard for this all the man",
         "Ecc 12:14 for you all work the Mighty Ones he enter in judgment upon all we hide if good and if evil"
     );
   }
