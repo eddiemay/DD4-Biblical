@@ -32,11 +32,7 @@ def cors_enabled_function():
 
 def chat(request):
     question = request.args.get('question')
-    print(question)
-    """Return a friendly HTTP greeting.
+    sessionId = request.args.get('sessionId')
+    print('sessionId: {} question: {}'.format(sessionId, question))
 
-    Returns:
-        A string with the words 'Hello World!'.
-    """
-    return langgraph_chat.query(question)
-    # return "you asked: " + question
+    return langgraph_chat.query(question, sessionId)

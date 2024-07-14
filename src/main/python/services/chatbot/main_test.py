@@ -1,10 +1,18 @@
 import main
 
+main.app.testing = True
+client = main.app.test_client()
+
 
 def test_index():
-  main.app.testing = True
-  client = main.app.test_client()
+  response = client.get(
+      "/?sessionId=777&question=How%20many%20sons%20did%Jacob%20have")
+  assert response.status_code == 200
+  assert "twelve" in response.data.decode("utf-8")
 
-  r = client.get("/?question=How%20many%20sons%20did%20Abraham%20have")
-  assert r.status_code == 200
-  assert "eight" in r.data.decode("utf-8")
+
+def test_follow_up():
+  response = client.get(
+    "/?sessionId=777&question=How%20many%20children%20did%20he%20have")
+  assert response.status_code == 200
+  assert "thirteen" in response.data.decode("utf-8")

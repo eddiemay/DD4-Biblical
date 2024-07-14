@@ -58,8 +58,9 @@ if __name__ == '__main__':
 
         for result in response['items']:
             # print(result)
-            candidate = candidateMap['{} {}:{}'.format(result['book'], result['chapter'], result['verse'])]
-            if candidate is None :
+            candidate = candidateMap.get(
+                '{} {}:{}'.format(result['book'], result['chapter'], result['verse']))
+            if candidate is None:
                 candidate = Candidate(result['book'], result['chapter'], result['verse'], '')
                 candidates.append(candidate)
                 candidateMap[candidate.reference()] = candidate

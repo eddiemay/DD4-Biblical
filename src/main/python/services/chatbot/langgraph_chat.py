@@ -67,7 +67,7 @@ def fetch_scripture(reference):
   print('Sending request: ', search_url)
   with request.urlopen(search_url) as url:
     response = json.load(url)
-    print('Response: ', response)
+    # print('Response: ', response)
     scriptures = response['items']
     return scriptures
 
@@ -78,16 +78,22 @@ known_actions = {
 
 # python regular expression to selection action
 action_re = re.compile('^Action: (\w+): (.*)$')
+agents = {}
 
 
-def query(question, max_turns=7):
+def query(question, sessionId, max_turns=7):
   i = 0
   results = []
-  bot = Agent(prompt)
   next_prompt = question
   while i < max_turns:
     i += 1
-    result = bot(next_prompt)
+    agent = agents.get(sessionId)
+    if agent is None:
+      print('\nStarting new session: ', sessionId)
+      agent = Agent(prompt)
+      agents[sessionId] = agent
+
+    result = agent(next_prompt)
     results.append(result)
     print(result)
     actions = [
