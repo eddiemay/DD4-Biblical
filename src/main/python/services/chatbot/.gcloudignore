@@ -12,7 +12,6 @@
 # below:
 .git
 .gitignore
-env_variables.yaml
 
 # Python pycache:
 __pycache__/
