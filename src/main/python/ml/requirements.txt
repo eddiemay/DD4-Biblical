@@ -1,8 +1,11 @@
 chromadb
 gradio
+idx2numpy
 jq
+keras==3.4.1
 langchain_openai
 langchain_community
+pytesseract
 sentence_transformers
 tensorflow
 tensorflow_text

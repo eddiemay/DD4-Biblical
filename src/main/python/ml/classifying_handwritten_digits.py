@@ -1,3 +1,8 @@
+# Taken from Chapter 4 of the book: "Learning Deep Learning: Theory and Practice
+# of Neural Networks, Computer Vision, NLP, and Transformers using TensorFlow"
+# Data is supposed to be found out https://yann.lecun.com/exdb/mnist/,
+# however get permission denied error so instead got the data from:
+# https://github.com/golbin/TensorFlow-MNIST/blob/master/mnist/data/train-images-idx3-ubyte.gz
 import idx2numpy
 import matplotlib.pyplot as plt
 import numpy as np
@@ -5,10 +10,10 @@ import numpy as np
 np.random.seed(7) # To make repeatable
 LEARNING_RATE = 0.01
 EPOCHS = 20
-TRAIN_IMAGE_FILENAME = '../data/mnist/train-images-idx3-ubyte'
-TRAIN_LABEL_FILENAME = '../data/mnist/train-labels-idx1-ubyte'
-TEST_IMAGE_FILENAME = '../data/mnist/t10k-images-idx3-ubyte'
-TEST_LABEL_FILENAME = '../data/mnist/t10k-labels-idx1-ubyte'
+TRAIN_IMAGE_FILENAME = 'mnist/train-images-idx3-ubyte'
+TRAIN_LABEL_FILENAME = 'mnist/train-labels-idx1-ubyte'
+TEST_IMAGE_FILENAME = 'mnist/t10k-images-idx3-ubyte'
+TEST_LABEL_FILENAME = 'mnist/t10k-labels-idx1-ubyte'
 
 # Function to read dataset.
 def read_mnist():
@@ -84,8 +89,7 @@ def forward_pass(x):
   for i, w in enumerate(hidden_layer_w):
     z = np.dot(w, x)
     hidden_layer_y[i] = np.tanh(z)
-  hidden_output_array = np.concatenate(
-    (np.array([1.0]), hidden_layer_y))
+  hidden_output_array = np.concatenate((np.array([1.0]), hidden_layer_y))
   # Activation function for output layer
   for i, w in enumerate(output_layer_w):
     z = np.dot(w, hidden_output_array)
@@ -110,22 +114,18 @@ def backward_pass(y_truth):
     # Backpropagate error for hidden neuron.
 
     derivative = 1.0 - y**2 # tanh derivative
-    weighted_error = np.dot(error_weight_array,
-                            output_layer_error)
+    weighted_error = np.dot(error_weight_array, output_layer_error)
     hidden_layer_error[i] = weighted_error * derivative
 
 def adjust_weights(x):
   global output_layer_w
   global hidden_layer_w
   for i, error in enumerate(hidden_layer_error):
-    hidden_layer_w[i] -= (x * LEARNING_RATE
-                          * error) # Update all weights
-  hidden_output_array = np.concatenate(
-    (np.array([1.0]), hidden_layer_y))
+    hidden_layer_w[i] -= x * LEARNING_RATE * error # Update all weights
+  hidden_output_array = np.concatenate((np.array([1.0]), hidden_layer_y))
   for i, error in enumerate(output_layer_error):
-    output_layer_w[i] -= (hidden_output_array
-                          * LEARNING_RATE
-                          * error) # Update all weights
+    # Update all weights
+    output_layer_w[i] -= hidden_output_array * LEARNING_RATE * error
 
 # Network training loop.
 for i in range(EPOCHS): # Train EPOCHS iterations
@@ -146,6 +146,6 @@ for i in range(EPOCHS): # Train EPOCHS iterations
     if output_layer_y.argmax() == y_test[j].argmax():
       correct_test_results += 1
     # Show progress.
-  show_learning(i, correct_training_results/len(x_train),
-                correct_test_results/len(x_test))
+  show_learning(
+    i, correct_training_results/len(x_train), correct_test_results/len(x_test))
 plot_learning() # Create plot

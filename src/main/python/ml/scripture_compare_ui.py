@@ -1,5 +1,5 @@
 
-import gradio as gr
+import gradio
 import urllib.request, json
 from sentence_transformers import SentenceTransformer
 from sentence_transformers import util
@@ -88,19 +88,19 @@ def compare(reference, standard_version, compare_version):
     return '\n\n'.join(c.to_tabbed() for c in candidates)
 
 
-ui = gr.Interface(
+ui = gradio.Interface(
     compare,
     [
-        gr.Textbox(
+        gradio.Textbox(
             label="Scriptures",
             info="""Enter a verse, verse range, chapter(s) or mix
                 (e.g. Gen 2:3 or Gen 2:1-3 or Exo 12 or Lev 20-23 or Gen 2:3,Exo 12,Lev 20-23)""",
             lines=1,
         ),
-        gr.Radio(["ISR", "RSKJ", "NRSV", "NWT", "SEP", "DSS"], label="Control Version",
+        gradio.Radio(["ISR", "RSKJ", "NRSV", "NWT", "SEP", "DSS"], label="Control Version",
                  info="The version of scripture to use as the standard.", value="RSKJ"),
-        gr.Radio(["ISR", "RSKJ", "NRSV", "NWT", "SEP", "DSS"], label="Comparison Version",
+        gradio.Radio(["ISR", "RSKJ", "NRSV", "NWT", "SEP", "DSS"], label="Comparison Version",
                  info="The version of scripture to use as the comparison.", value="SEP")
     ],
-    gr.Textbox(label="Comparisons", lines=28))
+    gradio.Textbox(label="Comparisons", lines=28))
 ui.launch()
