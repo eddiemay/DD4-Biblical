@@ -179,6 +179,13 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     },
     templateUrl: 'js/html/inline_scripture.html',
   })
+  .component('lexiconView', {
+    controller: com.digitald4.biblical.LexiconViewCtrl,
+    bindings: {
+      lexiconRequest: '=',
+    },
+    templateUrl: 'js/html/lexicon_view.html',
+  })
   .component('scripture', {
     controller: function(globalData) {
       this.label = this.label || this.ref;

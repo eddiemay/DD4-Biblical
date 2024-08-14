@@ -1,14 +1,12 @@
-com.digitald4.biblical.ReadTheWordCtrl = function($location, $window, globalData,
-    bookService, interlinearService, lexiconService, scriptureService, tokenWordService) {
+com.digitald4.biblical.ReadTheWordCtrl =
+    function($location, $window, globalData, bookService, interlinearService, scriptureService) {
   this.locationProvider = $location;
   this.window = $window;
   this.globalData = globalData;
   this.globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.bookService = bookService;
   this.interlinearService = interlinearService;
-  this.lexiconService = lexiconService;
   this.scriptureService = scriptureService;
-  this.tokenWordService = tokenWordService;
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.language = $location.search()['lang'];
@@ -41,7 +39,8 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
     version: this.globalData.scriptureVersion,
     lang: this.language,
     pageSize: 50,
-    pageToken: this.pageToken};
+    pageToken: this.pageToken
+  };
   this.scriptureService.search(request, response => {
     if (response.resultType == 'GET') {
       this.processScriptureResult(response);
@@ -96,37 +95,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showScripture = function(versio
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDef = function(strongsId) {
-  this.strongsId = strongsId || this.strongsId;
-  if (this.strongsId == undefined) {return;}
-  this.lexicon = {id: this.strongsId, word: 'Loading...', strongsDefinition: '', rootWord: ''};
-  this.lexiconTranslations = [{translation: 'Loading...'}];
-  this.lexiconService.get(this.strongsId, lexicon => {this.lexicon = lexicon});
-  this.tokenWordService.getTranslations(this.strongsId, response => {this.lexiconTranslations = response.items});
-  this.addTokenWord = {strongsId: strongsId, word: '', translation: ''};
-  this.setDialogStyle();
-  this.dialogShown = 'LEXICON';
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.prevStrongsDef = function() {
-  this.showStrongsDef(this.strongsId.substring(0, 1) + (parseInt(this.strongsId.substring(1)) - 1));
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.nextStrongsDef = function() {
-  this.showStrongsDef(this.strongsId.substring(0, 1) + (parseInt(this.strongsId.substring(1)) + 1));
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.addTranslation = function() {
-  this.tokenWordService.create(this.addTokenWord, tokenWord => {
-    this.lexiconTranslations.push(tokenWord);
-    this.addTokenWord.word = '';
-    this.addTokenWord.translation = '';
-  });
-}
-
-com.digitald4.biblical.ReadTheWordCtrl.prototype.fillReferenceCount = function() {
-  this.lexiconService.fillReferenceCount(this.strongsId, referenceCount => {
-    this.lexicon.referenceCount = referenceCount;
-  });
+  this.lexiconRequest = {strongsId: strongsId};
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefDialog = function(interlinear) {
@@ -227,9 +196,8 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.drawScroll = function(ctx, scro
   var totalDrawn = 0;
   const bookService = this.bookService;
   var drawTile = function(c, r) {
-    var fileName = bookService
-        .getFileUrl('tiles_isaiah_9_' + (startTileCol + c) + '_' + (startTileRow + r) + '.jpg');
-    console.log('Loading: ' + fileName);
+    const col = (startTileCol + c);
+    const row =  (startTileRow + r)
     var img = new Image();
     img.onload = () => {
       if (c == 0) {
@@ -250,7 +218,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.drawScroll = function(ctx, scro
         }, 500); // Wait 1/2 a second before drawing lines to give time for images to be drawn.
       }
     }
-    img.src = fileName;
+    img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/isaiah/isaiah_9_${col}_${row}.jpg`;
   }
 
   for (var c = startTileCol; c <= endTileCol; c++) {

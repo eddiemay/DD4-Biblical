@@ -1,0 +1,163 @@
+<div style="display:block; position:absolute; left:0px;" data-ng-style="$ctrl.style">
+  <div class="modal-window block-border">
+    <ul class="action-tabs right">
+      <li><a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+        <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+      </a></li>
+      <li><a href="" data-ng-click="$ctrl.view='INFO'" title="Info">
+        <img src="images/icons/fugue/information-blue.png" width="16" height="16" alt="Info">
+      </a></li>
+      <li><a href="" data-ng-click="$ctrl.showStrongsRefs()" title="References">
+        <img src="images/icons/fugue/newspaper.png" width="16" height="16" alt="References">
+      </a></li>
+      <li><a href="" data-ng-click="$ctrl.view='SEARCH'" title="Search">
+        <img src="images/icons/fugue/magnifier.png" width="16" height="16" alt="Search">
+      </a></li>
+      <li data-ng-if="appCtrl.isUserLoggedIn()">
+        <a href="" data-ng-click="$ctrl.showEditLexiconDialog($ctrl.event)" title="Edit Event">Edit</a>
+      </li>
+    </ul>
+    <div class="block-content form">
+      <div data-ng-if="$ctrl.view=='INFO'">
+        <h2>Lexicon :: Strong's {{$ctrl.lexicon.id}} - {{$ctrl.lexicon.word}}</h2>
+        <div class="columns">
+          <div class="colx2-left">
+            <h3>Ancient</h3>
+            <p>{{$ctrl.lexicon.ancient}}</p>
+          </div>
+          <div class="colx2-right">
+            <h3>Constants Only</h3>
+            <p>{{$ctrl.lexicon.constantsOnly}}</p>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <h3>Transliteration</h3>
+            <p>{{$ctrl.lexicon.transliteration}}</p>
+          </div>
+          <div class="colx2-right">
+            <h3>Pronunciation</h3>
+            <p>{{$ctrl.lexicon.pronunciation}}</p>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <h3>Part of Speech</h3>
+            <p>{{$ctrl.lexicon.partOfSpeech}}</p>
+          </div>
+          <div class="colx2-right">
+            <h3>Root Word</h3>
+            <p data-bind-html-compile="$ctrl.lexicon.rootWord"></p>
+          </div>
+        </div>
+        <div class="columns">
+          <h3>Strong's Definitions</h3>
+          <p data-bind-html-compile="$ctrl.lexicon.strongsDefinition"></p>
+        </div>
+        <div class="columns">
+          <h3>KJV Translation Count</h3>
+          <p>
+            <b>The KJV translates in the following manner:</b>
+            <span data-ng-repeat="tc in $ctrl.lexicon.translationCounts">{{tc.word}} ({{tc.count}}x), </span>
+          </p>
+        </div>
+        <div class="columns">
+          <h3>Outline of Biblical Usage</h3>
+          <ol style="list-style: decimal">
+            <li data-ng-repeat="node in $ctrl.lexicon.outline">
+              {{node.value}}
+              <ol style="list-style: upper-alpha">
+                <li data-ng-repeat="subNode in node.children">{{subNode.value}}
+                  <ol style="list-style: lower-alpha"><li data-ng-repeat="botNode in subNode.children">{{botNode.value}}</li></ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </div>
+        <div class="columns">
+          <h3>Strong's Reference Count</h3>
+          <p>{{$ctrl.lexicon.referenceCount}}</p>
+          <button data-ng-if="!$ctrl.lexicon.referenceCount"
+                  data-ng-click="$ctrl.fillReferenceCount()">Fill Reference Count</button>
+        </div>
+        <div class="columns">
+          <h3>Spelling Variants</h3>
+          <ul>
+            <li data-ng-repeat="translation in $ctrl.lexiconTranslations">
+              {{translation.word}} {{translation.translation}}
+            </li>
+          </ul>
+          <div data-ng-if="appCtrl.isUserLoggedIn()">
+            <label>Word</label>
+            <input type="text" data-ng-model="$ctrl.addTokenWord.word">
+            <label>Translation</label>
+            <input type="text" data-ng-model="$ctrl.addTokenWord.translation">
+            <button data-ng-click="$ctrl.addTranslation()">Add</button>
+          </div>
+        </div>
+        <div class="columns">
+          <h3>Dictionary Aids</h3>
+          <p>{{$ctrl.lexicon.dictionaryAid}}</p>
+        </div>
+        <div class="columns">
+          <div class="colx3-left">
+            <button class="float-left" data-ng-click="$ctrl.prevStrongsDef()">Previous</button>
+          </div>
+          <div class="colx3-center">
+            <button class="float-center" data-ng-click="$ctrl.nextStrongsDef()">Next</button>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="colx3-left">
+            <input data-ng-model="$ctrl.strongsId" class="full-width"/>
+          </div>
+          <div class="colx3-center">
+            <button data-ng-click="$ctrl.showStrongsDef()">Show</button>
+          </div>
+        </div>
+      </div>
+      <div data-ng-if="$ctrl.view=='REFERENCES'">
+        <h2>References for Strong's {{$ctrl.lexicon.strongsId}} {{$ctrl.lexicon.constantsOnly}}</h2>
+        <h4>{{$ctrl.references.start}} to {{$ctrl.references.end}} of {{$ctrl.references.totalSize}}</h4>
+        <div data-ng-repeat="reference in $ctrl.references.items">
+          <h3>
+            <a href="" data-ng-click="$ctrl.showScripture(undefined, reference.book, reference.chapter)">{{reference.book}}
+              {{reference.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(reference.version, reference.book, reference.chapter, reference.verse)">{{reference.verse}}</a>
+            <a href="" data-ng-click="$ctrl.setReference(reference.reference)"><img src="images/icons/link_arrow.png" height="14"></a>
+          </h3>
+          <p>{{reference.constantsOnly}} {{reference.translation}}</p>
+        </div>
+        <fieldset>
+            <span data-ng-repeat="page in $ctrl.references.pages">
+              <button data-ng-click="$ctrl.showStrongsRefs(page)" data-ng-disabled="page == $ctrl.references.pageToken">
+                {{page}}
+              </button>
+            </span>
+        </fieldset>
+      </div>
+      <div data-ng-if="$ctrl.view=='SEARCH'">
+        <h2>Lexicon Search</h2>
+        <div class="columns">
+          <input type="text" data-ng-model="$ctrl.searchText"/>
+          <button data-ng-click="$ctrl.search()">Search</button>
+        </div>
+        <div data-ng-repeat="lexicon in $ctrl.searchResults.items">
+          <h3>
+            <a href="" data-ng-click="$ctrl.showStrongsDef(lexicon.id)">
+              {{lexicon.id}} {{lexicon.word}}
+            </a>
+          </h3>
+          <p data-bind-html-compile="lexicon.strongsDefinition"></p>
+        </div>
+        <fieldset>
+          <span data-ng-repeat="page in $ctrl.searchResults.pages">
+            <button data-ng-click="$ctrl.search(page)" data-ng-disabled="page == $ctrl.searchResults.pageToken">
+              {{page}}
+            </button>
+          </span>
+        </fieldset>
+      </div>
+      <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+    </div>
+  </div>
+</div>
