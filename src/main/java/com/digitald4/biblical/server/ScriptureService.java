@@ -1,8 +1,10 @@
 package com.digitald4.biblical.server;
 
+import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.ScriptureStore.GetOrSearchResponse;
+import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.service.Empty;
@@ -13,27 +15,25 @@ import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.*;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Api(
     name = "scriptures",
     version = "v1",
-    namespace = @ApiNamespace(
-        ownerDomain = "biblical.digitald4.com",
-        ownerName = "biblical.digitald4.com"
-    )
+    namespace = @ApiNamespace(ownerDomain = "biblical.digitald4.com", ownerName = "biblical.digitald4.com")
 )
 public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   private final ScriptureStore scriptureStore;
   private final ScriptureReferenceProcessor scriptureReferenceProcessor;
+  private final MachineTranslator machineTranslator;
 
   @Inject
   ScriptureService(ScriptureStore scriptureStore, LoginResolver loginResolver,
-                   ScriptureReferenceProcessor scriptureReferenceProcessor) {
+      ScriptureReferenceProcessor scriptureReferenceProcessor, MachineTranslator machineTranslator) {
     super(scriptureStore, loginResolver);
     this.scriptureStore = scriptureStore;
     this.scriptureReferenceProcessor = scriptureReferenceProcessor;
+    this.machineTranslator = machineTranslator;
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "scriptures")
@@ -117,6 +117,15 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
     try {
       resolveLogin(idToken, true);
       return scriptureStore.uploadScripture(version, lang, book, chapter, text, preview);
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "translate")
+  public ImmutableList<Interlinear> translate(@Named("text") String text) throws ServiceException {
+    try {
+      return machineTranslator.translate(text);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

@@ -12,9 +12,9 @@ public class Interlinear {
   // Id values
   private String version;
   private String book;
-  private int chapter;
-  private int verse;
-  private int index;
+  private Integer chapter;
+  private Integer verse;
+  private Integer index;
 
   // Indexed values
   private String strongsId;
@@ -24,7 +24,7 @@ public class Interlinear {
   // Non indexed values
   private String transliteration;
   private String morphology;
-  private int bookNumber; // For sorting by bible book number.
+  private Integer bookNumber; // For sorting by bible book number.
   private String translation;
 
   // FE only values
@@ -34,7 +34,7 @@ public class Interlinear {
   private List<SubToken> subTokens;
 
   public String getId() {
-    return String.format("%s%s-%d-%d-%d",
+    return book == null ? null : String.format("%s%s-%d-%d-%d",
         version == null ? "" : version + "-", getBook().replaceAll(" ", "_"), getChapter(), getVerse(), getIndex());
   }
 
@@ -58,30 +58,30 @@ public class Interlinear {
     return this;
   }
 
-  public int getChapter() {
+  public Integer getChapter() {
     return chapter;
   }
 
-  public Interlinear setChapter(int chapter) {
+  public Interlinear setChapter(Integer chapter) {
     this.chapter = chapter;
     return this;
   }
 
-  public int getVerse() {
+  public Integer getVerse() {
     return verse;
   }
 
-  public Interlinear setVerse(int verse) {
+  public Interlinear setVerse(Integer verse) {
     this.verse = verse;
     return this;
   }
 
   @NonIndexed
-  public int getIndex() {
+  public Integer getIndex() {
     return index;
   }
 
-  public Interlinear setIndex(int index) {
+  public Interlinear setIndex(Integer index) {
     this.index = index;
     return this;
   }
@@ -144,11 +144,11 @@ public class Interlinear {
   }
 
   @NonIndexed
-  public int getBookNumber() {
+  public Integer getBookNumber() {
     return bookNumber;
   }
 
-  public Interlinear setBookNumber(int bookNumber) {
+  public Interlinear setBookNumber(Integer bookNumber) {
     this.bookNumber = bookNumber;
     return this;
   }
@@ -167,7 +167,7 @@ public class Interlinear {
     return subTokens;
   }
 
-  public Interlinear setSubtokens(Iterable<SubToken> subTokens) {
+  public Interlinear setSubTokens(Iterable<SubToken> subTokens) {
     this.subTokens = ImmutableList.copyOf(subTokens);
     return this;
   }

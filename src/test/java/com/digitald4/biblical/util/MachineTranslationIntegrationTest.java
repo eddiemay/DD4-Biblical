@@ -142,6 +142,13 @@ public class MachineTranslationIntegrationTest {
   }
 
   @Test
+  public void rawTranslation_Jub1_1() {
+    assertThat(translate(new Scripture().setBook("Jubilees").setChapter(1).setVerse(1).setText("אלה דברי חלוקת הימים על פי התורה והעדות לתולדות השנים לשבועיהן וליובליהן כל ימי השמים על הארץ כאשר דבר אל משה בהר סיני ויהי בשנה הראשונה לצאת בני ישראל מארץ מצרים בחודש השלישי בשישה עשר בו וידבר ה' אל משה לאמור"))).isEqualTo(
+        "Jubilees 1:1 Mighty One words of [UNK] the days upon mouth the law and the testimony to generations the years to oaths of us and to jubilees of us all days of the heavens upon the earth like which word unto Moses in mountain Sinai and there came to be in year the first to go out sons of Yasharael from earth Mizraim in month the third in six ten in it and he word Yah unto Moses to say"
+    );
+  }
+
+  @Test
   public void rawTranslation1() {
     assertThat(translate(new Scripture().setBook("Jubilees").setChapter(6).setVerse(47).setText("אתה צו את בני ישראל ושמרו את השנים על פי המספר הזה ארבעה ושישים יום ושלוש מאות יום"))).isEqualTo(
         "Jubilees 6:47 she command you sons of Yasharael and keep of him you the years upon mouth the number this four and sixty day and three hundred day"

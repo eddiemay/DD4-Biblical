@@ -178,7 +178,7 @@ public class InterlinearStoreTest {
 
   private static ImmutableList<Interlinear> createInterlinears(String wlc) {
     return Arrays.stream(wlc.split(" "))
-        .map(word -> new Interlinear().setConstantsOnly(word))
+        .map(word -> new Interlinear().setBook("").setChapter(0).setVerse(0).setConstantsOnly(word))
         .collect(toImmutableList());
   }
 }

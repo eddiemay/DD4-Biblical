@@ -33,7 +33,7 @@ public class ScriptureServiceTest {
 
   @Before
   public void setup() {
-    scriptureService = new ScriptureService(scriptureStore, sessionStore, scriptureRefProcessor);
+    scriptureService = new ScriptureService(scriptureStore, sessionStore, scriptureRefProcessor, null);
   }
 
   @Test

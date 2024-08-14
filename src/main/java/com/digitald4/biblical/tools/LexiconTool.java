@@ -17,6 +17,7 @@ import com.digitald4.biblical.store.LexiconStore;
 import com.digitald4.biblical.util.AncientLexiconFetcher;
 import com.digitald4.biblical.util.BPETokenizer;
 import com.digitald4.biblical.util.Constants;
+import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.InterlinearFetcher;
 import com.digitald4.biblical.util.LexiconFetcher;
@@ -80,7 +81,9 @@ public class LexiconTool {
 
   public void migrateLexicon(String language, int startIndex, int endIndex) {
     String baseUrl = apiConnector.formatUrl("lexicons");
-    System.out.printf("Migrating: %s%d-%s%d...\n", language, startIndex, language, endIndex);
+    String start = HebrewConverter.toStrongsId(language + startIndex);
+    String end = HebrewConverter.toStrongsId(language + endIndex);
+    System.out.printf("Migrating: %s-%s...\n", start, end);
     apiConnector.sendGet(String.format(URL, baseUrl, "migrateLexicon", startIndex, endIndex, language));
   }
 

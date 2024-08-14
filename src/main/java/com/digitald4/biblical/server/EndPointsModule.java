@@ -99,7 +99,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 	public static Iterable<TokenWord> tokenWordProvider() {
 		APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
 		return Constants.VOCAB_FILES.stream()
-				.map(file -> String.format("http://dd4-biblical.appspot.com/ml/%s", file))
+				.map(file -> String.format("http://translation-dot-dd4-biblical.appspot.com/files/%s", file))
 				.map(apiConnector::sendGet)
 				.flatMap(result -> stream(result.split("\n")))
 				.filter(line -> !line.startsWith("*"))
@@ -110,7 +110,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 	@Provides
 	public static Map<String, Lexicon> lexiconProvider() {
 		APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-		return stream(apiConnector.sendGet("http://dd4-biblical.appspot.com/ml/lexicon.csv").split("\n"))
+		return stream(apiConnector.sendGet("http://translation-dot-dd4-biblical.appspot.com/files/lexicon.csv").split("\n"))
 				.skip(1)
 				.map(line -> line.split(","))
 				.collect(toImmutableMap(values -> values[0], values -> new Lexicon().setId(values[0])

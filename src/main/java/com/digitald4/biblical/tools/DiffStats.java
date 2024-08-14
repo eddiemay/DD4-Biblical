@@ -53,6 +53,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -324,14 +325,19 @@ public class DiffStats {
 
   private void outputInterlinear(ImmutableList<Interlinear> allInterlinears) throws IOException {
     ImmutableMap<String, String> mlWords;
-    try (BufferedReader br = new BufferedReader(new FileReader("data/isa-word-map-processed.csv"))) {
-      String line = br.readLine();
-      ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-      while ((line = br.readLine()) != null) {
-        String[] values = line.split(",");
-        builder.put(values[0], values[3]);
+    File file = new File("data/isa-word-map-processed.csv");
+    if (file.exists()) {
+      try (BufferedReader br = new BufferedReader(new FileReader("data/isa-word-map-processed.csv"))) {
+        String line = br.readLine();
+        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        while ((line = br.readLine()) != null) {
+          String[] values = line.split(",");
+          builder.put(values[0], values[3]);
+        }
+        mlWords = builder.build();
       }
-      mlWords = builder.build();
+    } else {
+       mlWords = ImmutableMap.of();
     }
     BufferedWriter bw = new BufferedWriter(new FileWriter("data/isa-interlinear.csv"));
     BufferedWriter bw2 = new BufferedWriter(new FileWriter("data/isa-word-map.csv"));

@@ -101,12 +101,12 @@ public class TranslationTool {
   }
 
   public static ImmutableList<String> readFile(String filename) {
-    String file = String.format("src/main/webapp/ml/%s", filename);
+    String file = String.format("src/main/python/services/translation/files/%s", filename);
     ImmutableList.Builder<String> lines = ImmutableList.builder();
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String line;
       while ((line = br.readLine()) != null) {
-        if (line.length() > 0) {
+        if (!line.isEmpty()) {
           lines.add(line);
         }
       }

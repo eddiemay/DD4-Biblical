@@ -4,7 +4,6 @@ import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
 
@@ -15,10 +14,9 @@ import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -53,14 +51,13 @@ public class MachineTranslator {
 
   public Interlinear translate(Interlinear interlinear) {
     AtomicBoolean wordFound = new AtomicBoolean();
-    interlinear.setSubtokens(
+    return interlinear.setSubTokens(
         subwordTokenizer
             .tokenizeWord(unfinalize(interlinear.getConstantsOnly()), interlinear.getStrongsId())
             .stream()
             .map(subWord -> getTranslation(subWord, interlinear.getStrongsId(), wordFound.get()))
             .peek(subToken -> wordFound.set(wordFound.get() || subToken.getStrongsId() != null))
             .collect(toImmutableList()));
-    return interlinear;
   }
 
   public ImmutableList<Interlinear> translate(Iterable<Interlinear> interlinears) {
@@ -68,9 +65,11 @@ public class MachineTranslator {
   }
 
   public ImmutableList<Interlinear> translate(String text) {
+    AtomicInteger index = new AtomicInteger();
     return translate(
         stream(removePunctuation(text).split(" "))
-            .map(word -> new Interlinear().setBook("").setWord(word).setConstantsOnly(toConstantsOnly(word)))
+            .map(word -> new Interlinear()
+                .setIndex(index.getAndIncrement()).setWord(word).setConstantsOnly(toConstantsOnly(word)))
             .collect(toImmutableList()));
   }
 

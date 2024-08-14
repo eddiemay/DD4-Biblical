@@ -1,5 +1,6 @@
 package com.digitald4.biblical.server;
 
+import static com.digitald4.biblical.util.HebrewConverter.toStrongsId;
 import static com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl.processScriptureReferences;
 import static com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl.processStrongsReferences;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -41,10 +42,10 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
   public AtomicInteger reindex(@Named("startIndex") int startIndex, @Named("endIndex") int endIndex,
-      @Named("language") @DefaultValue("H") String language) throws ServiceException {
+      @Named("language") @DefaultValue("H") String lang) throws ServiceException {
     try {
         return new AtomicInteger(getStore().create(range(startIndex, endIndex)
-            .mapToObj(id -> language + id).map(lexiconFetcher::getLexicon).collect(toImmutableList())).size());
+            .mapToObj(id -> toStrongsId(lang + id)).map(lexiconFetcher::getLexicon).collect(toImmutableList())).size());
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -58,7 +59,7 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
       return new AtomicInteger(
           getStore().create(
               getStore()
-                  .get(range(startIndex, endIndex).mapToObj(id -> lang + id).collect(toImmutableList()))
+                  .get(range(startIndex, endIndex).mapToObj(id -> toStrongsId(lang + id)).collect(toImmutableList()))
                   .getItems().stream()
                   .map(LexiconService::processReferences)
                   .collect(toImmutableList())).size());
@@ -85,7 +86,7 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
 
   @Override
   protected boolean requiresLogin(String method) {
-    return !method.equals("get") && !method.equals("list") && super.requiresLogin(method);
+    return !method.equals("get") && !method.equals("list") && !method.equals("search") && super.requiresLogin(method);
   }
 
   private static Lexicon processReferences(Lexicon lexicon) {
