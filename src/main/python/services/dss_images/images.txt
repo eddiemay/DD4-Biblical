@@ -1,14 +1,2 @@
-images/isaiah/isaiah_9_84_2.jpg
-images/isaiah/isaiah_9_84_3.jpg
-images/isaiah/isaiah_9_85_2.jpg
-images/isaiah/isaiah_9_85_3.jpg
-images/isaiah/isaiah_9_86_2.jpg
-images/isaiah/isaiah_9_86_3.jpg
-images/isaiah/isaiah_9_87_2.jpg
-images/isaiah/isaiah_9_87_3.jpg
-images/isaiah/isaiah_9_88_2.jpg
-images/isaiah/isaiah_9_88_3.jpg
-images/isaiah/isaiah_9_89_2.jpg
-images/isaiah/isaiah_9_89_3.jpg
-images/isaiah/isaiah_9_90_2.jpg
-images/isaiah/isaiah_9_90_3.jpg
+torah-4-7-4.jpeg
+torah-5-16-2.jpeg

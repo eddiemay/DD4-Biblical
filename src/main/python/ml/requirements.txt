@@ -5,6 +5,7 @@ jq
 keras==3.4.1
 langchain_openai
 langchain_community
+opencv-python
 pytesseract
 sentence_transformers
 tensorflow

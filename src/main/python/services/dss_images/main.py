@@ -16,7 +16,6 @@
 # [START gae_python3_app]
 from flask import Flask, request
 
-
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
@@ -24,48 +23,48 @@ app = Flask(__name__)
 
 @app.route("/")
 def cors_enabled_function():
-  # For more information about CORS and CORS preflight requests, see:
-  # https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
+    # For more information about CORS and CORS preflight requests, see:
+    # https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 
-  # Set CORS headers for the preflight request
-  if request.method == "OPTIONS":
-    # Allows GET requests from any origin with the Content-Type
-    # header and caches preflight response for an 3600s
-    headers = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Max-Age": "3600",
-    }
+    # Set CORS headers for the preflight request
+    if request.method == "OPTIONS":
+        # Allows GET requests from any origin with the Content-Type
+        # header and caches preflight response for an 3600s
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Max-Age": "3600",
+        }
 
-    return "", 204, headers
+        return "", 204, headers
 
-  # Set CORS headers for the main request
-  headers = {"Access-Control-Allow-Origin": "*"}
+    # Set CORS headers for the main request
+    headers = {"Access-Control-Allow-Origin": "*"}
 
-  return fetch(request, headers)
+    return fetch(request, headers)
 
 
 def fetch(request, headers):
-  file = request.args.get('file')
-  if file is None:
-    return "DeadSea Scroll Images Service"
+    file = request.args.get('file')
+    if file is None:
+        return "DeadSea Scroll Images Service"
 
-  try:
-    # Opening the binary file in binary mode as rb(read binary)
-    f = open("images/isaiah/{}".format(file), mode="rb")
+    try:
+        # Opening the binary file in binary mode as rb(read binary)
+        f = open("images/isaiah/{}".format(file), mode="rb")
 
-    # Reading file data with read() method
-    data = f.read()
+        # Reading file data with read() method
+        data = f.read()
 
-    # Printing our byte sequenced data
-    print(data)
+        # Printing our byte sequenced data
+        print(data)
 
-    # Closing the opened file
-    f.close()
+        # Closing the opened file
+        f.close()
 
-    headers["Content-Type"] = 'image/jpeg'
-    return data, 200, headers
-  except OSError:
-    print("Could not open/read file:", file)
-    return "File not found", 404, headers
+        headers["Content-Type"] = 'image/jpeg'
+        return data, 200, headers
+    except OSError:
+        print("Could not open/read file:", file)
+        return "File not found", 404, headers
