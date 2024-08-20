@@ -45,6 +45,6 @@ def construct_column(collection, column=1):
 construct_column(Collection.WAR, 15)
 construct_column(Collection.WAR, 14)
 construct_column(Collection.WAR, 1)
-# construct_column(Collection.TORAH, 1)
+construct_column(Collection.TORAH, 1)
 # for c in range(1, 55):
-# construct_column(Collection.ISAIAH, 1)
+construct_column(Collection.ISAIAH, 1)
