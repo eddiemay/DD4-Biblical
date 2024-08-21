@@ -1,0 +1,75 @@
+{
+	"id": "",
+	"title": "The Israel Museum, Jerusalem, The Community Rule",
+	"showRollers": false,
+	"width": "4378",
+	"height": "600",
+	"legendURL": "http://tiles.imj.org.il/thumbs/cummunity_thumb.png",
+	"tilePrefix": "http://tiles.imj.org.il/tiles/community/",
+	"blackPixelURL": "http://tiles.imj.org.il/tiles/empty.png",
+	"tileSize": 250,
+	"maxZoom": 8,
+	"minZoom": 6,
+	"fullSize": {
+		"w": "32043",
+		"h": "4500"
+	},
+	"columns": [
+		{
+			"id": "11",
+			"width": 442,
+			"x": 0,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community11.jpg"
+		}, {
+			"id": "10",
+			"width": 448,
+			"x": 442,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community10.jpg"
+		}, {
+			"id": "9",
+			"width": 390,
+			"x": 890,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community9.jpg"
+		}, {
+			"id": "8",
+			"width": 380,
+			"x": 1280,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community8.jpg"
+		}, {
+			"id": "7",
+			"width": 427,
+			"x": 1660,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community7.jpg"
+		}, {
+			"id": "6",
+			"width": 428,
+			"x": 2087,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community6.jpg"
+		}, {
+			"id": "5",
+			"width": 447,
+			"x": 2515,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community5.jpg"
+		}, {
+			"id": "4",
+			"width": 459,
+			"x": 2962,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community4.jpg"
+		}, {
+			"id": "3",
+			"width": 334,
+			"x": 3421,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community3.jpg"
+		}, {
+			"id": "2",
+			"width": 289,
+			"x": 3755,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community2.jpg"
+		}, {
+			"id": "1",
+			"width": 334,
+			"x": 4044,
+			"imageURL": "http://tiles.imj.org.il/columns/community/Community1.jpg"
+		}
+	]
+}
