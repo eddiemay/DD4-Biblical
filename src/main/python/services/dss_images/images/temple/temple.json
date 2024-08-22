@@ -414,6 +414,12 @@
             "width":191,
             "x":21971,
             "imageURL":"http://tiles.imj.org.il/columns/temple/Temple2.jpg"
+        },
+        {
+            "id":"1",
+            "width":1,
+            "x":22162,
+            "imageURL":"http://tiles.imj.org.il/columns/temple/Temple1.jpg"
         }
     ]
 }
