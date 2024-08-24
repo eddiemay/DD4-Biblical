@@ -1,6 +1,6 @@
 import json
+import math
 import os
-import numpy as np
 import requests
 from multiprocessing import Pool
 from pathlib import Path
@@ -41,11 +41,11 @@ def download(collection, col, row, group=0):
 
     if scroll == 'torah':
         # if row < 3 or row == 3 and col < 12:
-          #  group = 0
+        #  group = 0
         # elif row < 13 or row == 13 and col < 18:
-          #  group = 1
+        #  group = 1
         # else:
-           # group = 2
+        # group = 2
         url = MB_TILE_URL.format(group, res, col, row)
     else:
         url = collection.tile_prefix + file_name
@@ -57,12 +57,13 @@ def download(collection, col, row, group=0):
         with open(file_path, 'wb') as output:
             output.write(response.content)
     elif scroll == 'torah':
-        download(collection, col, row, group + 1)
+        if group < 5:
+            download(collection, col, row, group + 1)
 
 
 class Collection:
     def __init__(self, scroll=None, res=None, cols=None, rows=None,
-      tile_size=None, column_offsets=None, tile_prefix=None, json=None):
+      tile_size=None, columns=None, tile_prefix=None, json=None):
         self.scroll = scroll
         self.res = res
         self.tile_prefix = tile_prefix
@@ -82,29 +83,46 @@ class Collection:
                 ratio /= 2
 
             self.tile_size = json['tileSize']
-            self.rows = round(height * ratio / self.tile_size)
-            self.cols = round(width * ratio / self.tile_size)
-            columns = json['columns']
-            cs = len(columns)
-            self.column_offsets = [None] * (cs + 1)
-            for c in range(cs):
-                column = columns[c]
-                self.column_offsets[int(column['id'])] = column['x'] * ratio
-            self.column_offsets[0] = (
-              self.column_offsets[1] + columns[cs - 1]['width'] * ratio)
-            self.column_offsets = np.array(self.column_offsets)
+            self.rows = math.ceil(height * ratio / self.tile_size)
+            self.cols = math.ceil(width * ratio / self.tile_size)
+            self.columns = [None] * int(json['columns'][0]['id'])
+            for c in range(len(json['columns'])):
+                column = json['columns'][c]
+                self.columns[int(column['id']) - 1] = {
+                    'x': math.floor(column['x'] * ratio),
+                    'width': math.ceil(column['width'] * ratio)}
+
+            for c in range(len(self.columns), 0, -1):
+                if self.columns[c - 1] is None:
+                    self.columns[c - 1] = {
+                        'x': self.columns[c]['x'] + self.columns[c]['width'],
+                        'width': 1}
         else:
             self.tile_size = tile_size
             self.rows = rows
             self.cols = cols
-            self.column_offsets = column_offsets
+            self.columns = columns
 
     def to_string(self):
         return (
             'scroll: {}, res: {}, tile_size: {}, rows: {}, cols: {}, '
-            'tile_prefix: {}, column_offsets: {}').format(
+            'tile_prefix: {}, columns: {}').format(
             self.scroll, self.res, self.tile_size, self.rows, self.cols,
-            self.tile_prefix, self.column_offsets)
+            self.tile_prefix, self.columns)
+
+
+def download_tile(tile):
+    download(tile['collection'], tile['col'], tile['row'])
+
+
+def download_collection(collection):
+    tiles = []
+    for col in range(collection.cols):
+        for row in range(collection.rows):
+            tiles.append({'collection': collection, 'col': col, 'row': row})
+
+    with Pool() as pool:
+        pool.map(download_tile, tiles)
 
 
 Collection.ISAIAH = Collection(json=get_json('isaiah'))
@@ -112,32 +130,16 @@ Collection.WAR = Collection(json=get_json('war'))
 Collection.COMMUNITY_RULE = Collection(json=get_json('community'))
 Collection.TEMPLE_SCROLL = Collection(res=9, json=get_json('temple'))
 Collection.HABAKKUK = Collection(json=get_json('habakkuk'))
-Collection.TORAH_5 =(
-    Collection('torah', 5, 24, 17, 256, [5500, 4400, 3300, 2200, 1100, 0]))
-Collection.TORAH_4 =(
-    Collection('torah', 4, 14, 9, 256, [2750, 2200, 1650, 1100, 550, 0]))
-
-
-class Tile:
-    def __init__(self, collection, col, row):
-        self.collection = collection
-        self.col = col
-        self.row = row
-
-
-def download_tile(tile):
-    download(tile.collection, tile.col, tile.row)
-
-
-def download_collection(collection):
-    tiles = []
-    for col in range(collection.cols):
-        for row in range(collection.rows):
-            tiles.append(Tile(collection, col, row))
-
-    with Pool() as pool:
-        pool.map(download_tile, tiles)
-
+Collection.TORAH_5 = (
+    Collection('torah', 5, 24, 17, 256, [
+        {'x': 4500, 'width': 1200}, {'x': 3400, 'width': 1150},
+        {'x': 2300, 'width': 1300}, {'x': 1100, 'width': 1200},
+        {'x': 0, 'width': 1100}]))
+Collection.TORAH_4 = (
+    Collection('torah', 4, 14, 9, 256, [
+        {'x': 2250, 'width': 700}, {'x': 1700, 'width': 650},
+        {'x': 1150, 'width': 650}, {'x':550, 'width': 600},
+        {'x': 0, 'width': 550}]))
 
 if __name__ == '__main__':
     print(Collection.ISAIAH.to_string())
@@ -145,7 +147,8 @@ if __name__ == '__main__':
     print(Collection.COMMUNITY_RULE.to_string())
     print(Collection.HABAKKUK.to_string())
     print(Collection.TEMPLE_SCROLL.to_string())
-    print(Collection.TORAH.to_string())
+    print(Collection.TORAH_5.to_string())
+    print(Collection.TORAH_4.to_string())
 
     # Great Isaiah Scroll
     download_collection(Collection.ISAIAH)
@@ -163,4 +166,4 @@ if __name__ == '__main__':
     download_collection(Collection.HABAKKUK)
 
     # Torah Scroll
-    download_collection(Collection.TORAH)
+    download_collection(Collection.TORAH_5)
