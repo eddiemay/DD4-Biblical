@@ -95,6 +95,7 @@ public class HebrewTokenizer {
     private String strongsId;
     private String translation;
     private String asSuffix;
+    private String transliteration;
     public enum TokenType {PREFIX, PREFIX_ONLY, SUFFIX, SUFFIX_ONLY, WORD, WORD_STRONGS_MATCH_ONLY, DISABLED}
     private TokenType tokenType;
 
@@ -183,6 +184,15 @@ public class HebrewTokenizer {
 
     public TokenType tokenType() {
       return tokenType == null ? TokenType.WORD : tokenType;
+    }
+
+    public String getTransliteration() {
+      return transliteration;
+    }
+
+    public TokenWord setTransliteration(String transliteration) {
+      this.transliteration = transliteration;
+      return this;
     }
 
     @Override

@@ -1,13 +1,13 @@
 import pytesseract
 import requests, json
 
-pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/bin/tesseract'
+# pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/bin/tesseract'
 TRANSLATE_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/translate'
 
 
-def image_to_string(image_or_filename, translate=True):
-    text = pytesseract.image_to_string(image_or_filename, lang='heb')
-    print(text)
+def image_to_string(image_or_filename, translate=False, lang='heb'):
+    text = pytesseract.image_to_string(image_or_filename, lang=lang)
+    # print(text)
     translation = ''
     if translate:
         for line in text.splitlines():
@@ -25,3 +25,8 @@ def image_to_string(image_or_filename, translate=True):
                 translation += '\n'
 
     return text + '\n\n' + translation
+
+
+if __name__ == '__main__':
+    print(image_to_string('Torah-4-yom-3.png'))
+    print(image_to_string('Torah-4-yom-3.png', lang='Guttman_Stam'))

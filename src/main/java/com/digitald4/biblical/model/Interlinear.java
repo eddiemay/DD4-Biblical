@@ -221,6 +221,7 @@ public class Interlinear {
     private String word;
     private String translation;
     private String strongsId;
+    private String transliteration;
 
     public String getWord() {
       return word;
@@ -249,9 +250,18 @@ public class Interlinear {
       return this;
     }
 
+    public String getTransliteration() {
+      return transliteration;
+    }
+
+    public SubToken setTransliteration(String transliteration) {
+      this.transliteration = transliteration;
+      return this;
+    }
+
     @Override
     public String toString() {
-      return String.format("%s-%s-%s", word, translation, strongsId);
+      return String.format("%s-%s-%s-%s", word, translation, strongsId, transliteration);
     }
 
     @Override

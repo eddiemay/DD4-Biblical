@@ -9,25 +9,27 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class HebrewConverter {
-  enum AlefBet {
-    Alef("Alef", 'א', "𐤀", "𓃾", 'ࠀ', 'ا', 1, "A", "ox head, strength"),
+  public enum AlefBet {
+    Alef("Alef", 'א', "𐤀", "𓃾", 'ࠀ', 'ا', 1, "A", "ox head, strength", true),
     Bet("Bet", 'ב', "𐤁", "𓉔", 'ࠀ', 'ا', 2, "B", "house"),
     Gimel("Gimel", 'ג', "𐤂", "𓃀", 'ࠀ', 'ا', 3, "G", "foot, camel"),
     Dalet("Dalet", 'ד', "𐤃", "𓇯", 'ࠀ', 'ا', 4, "D", "door"),
     Hey("Hey", 'ה',"𐤄", "𓀠", 'ࠀ', 'ا', 5, "H", "jubilation, window"),
-    Wav("Wav", 'ו', "𐤅", "𓏲", 'ࠀ', 'ا', 6, "W", "hook"),
+    Wav("Wav", 'ו', "𐤅", "𓏲", 'ࠀ', 'ا', 6, "U", "hook", true),
     Zayin("Zayin", 'ז', "𐤆", "𓌻", 'ࠀ', 'ا' , 7, "Z", "weapon"),
     Chet("Chet", 'ח', "𐤇", "𓈈", 'ࠀ', 'ا' , 8, "Ch", "courtyard, gate"),
     Tet("Tet", 'ט', "𐤈", "𐤈", 'ࠀ', 'ا', 9, "T", "wheel"),
-    Yod("Yod", 'י', "𐤉", "𓂝", 'ࠀ', 'ا', 10, "Y", "arm, hand"),
-    Kaf("Kaf", 'כ', "𐤊", "𓂩", 'ࠀ', 'ا', 20, "K", "palm of hand", 'ך'),
+    Yod("Yod", 'י', "𐤉", "𓂝", 'ࠀ', 'ا', 10, "Y", "arm, hand", true),
+    Kaf("Kaf", 'כ', "𐤊", "𓂩", 'ࠀ', 'ا', 20, "C", "palm of hand", 'ך'),
     Lamed("Lamed", 'ל', "𐤋", "𓏱", 'ࠀ', 'ا' , 30, "L", "goad, staff"),
     Mem("Mem", 'מ', "𐤌", "𓈖", 'ࠀ', 'ا', 40, "M", "water, life", 'ם'),
     Nun("Nun", 'נ', "𐤍", "𓆓", 'ࠀ', 'ا', 50, "N", "fish", 'ן'),
     Samekh("Samekh", 'ס', "𐤎", "𓊽", 'ࠀ', 'ا', 60, "S", "pillar, support"),
-    Ayin("Ayin", 'ע',"𐤏", "𓁹", 'ࠀ', 'ا', 70, "I", "eye"),
+    Ayin("Ayin", 'ע',"𐤏", "𓁹", 'ࠀ', 'ا', 70, "I", "eye", true),
     Pay("Pay", 'פ', "𐤐", "𓂋", 'ࠀ', 'ا' , 80, "P", "mouth", 'ף'),
     Tzadi("Tzadi", 'צ', "𐤑", "𓄘", 'ࠀ', 'ا', 90, "Tz", "Man on side, desire, need", 'ץ'),
     Qof("Qof", 'ק', "𐤒", "𐤒", 'ࠀ', 'ا', 100, "Q", "eye of needle"),
@@ -45,14 +47,25 @@ public class HebrewConverter {
     public final String english;
     public final String meaning;
     public final Character finalModern;
+    public final boolean isVowel;
 
     AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
         int value, String english, String meaning) {
-      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, null);
+      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, false, null);
+    }
+
+    AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
+        int value, String english, String meaning, boolean isVowel) {
+      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, isVowel, null);
     }
 
     AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
         int value, String english, String meaning, Character finalModern) {
+      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, false, finalModern);
+    }
+
+    AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
+        int value, String english, String meaning, boolean isVowel, Character finalModern) {
       this.name = name;
       this.modern = modern;
       this.paleo = paleo;
@@ -62,6 +75,7 @@ public class HebrewConverter {
       this.value = value;
       this.english = english;
       this.meaning = meaning;
+      this.isVowel = isVowel;
       this.finalModern = finalModern;
     }
 
@@ -104,6 +118,10 @@ public class HebrewConverter {
     public char finalModern() {
       return finalModern;
     }
+
+    public boolean isVowel() {
+      return isVowel;
+    }
   }
 
   public static final ImmutableMap<Character, String> PICTOGRAPH_MAP = ImmutableMap.<Character, String>builder()
@@ -112,6 +130,14 @@ public class HebrewConverter {
           stream(AlefBet.values())
               .filter(alefBet -> alefBet.finalModern != null)
               .collect(toImmutableMap(AlefBet::finalModern, AlefBet::ancient)))
+      .build();
+
+  public static final ImmutableMap<Character, AlefBet> TRANSLITERATE_MAP = ImmutableMap.<Character, AlefBet>builder()
+      .putAll(stream(AlefBet.values()).collect(toImmutableMap(AlefBet::modern, Function.identity())))
+      .putAll(
+          stream(AlefBet.values())
+              .filter(alefBet -> alefBet.finalModern != null)
+              .collect(toImmutableMap(AlefBet::finalModern, Function.identity())))
       .build();
 
   public static String removeGarbage(String text) {
@@ -163,6 +189,33 @@ public class HebrewConverter {
     List<String> ancient = removePunctuation(text).chars().mapToObj(c -> toAncient((char) c)).collect(toList());
     Collections.reverse(ancient);
     return String.join("", ancient);
+  }
+
+  public static String transliterate(String word) {
+    if (word.length() == 1) {
+      AlefBet ab = TRANSLITERATE_MAP.get(word.charAt(0));
+      if (ab == null) {
+        return word;
+      }
+
+      return ab.english.toLowerCase() + (ab == AlefBet.Alef ? "" : "a");
+    }
+
+    AtomicReference<AlefBet> prev = new AtomicReference<>();
+    return word.chars().mapToObj(c -> {
+      AlefBet ab = TRANSLITERATE_MAP.get((char) c);
+      if (ab == null) {
+        return String.valueOf(c);
+      }
+
+      if (prev.get() != null && !ab.isVowel() && !prev.get().isVowel()) {
+        prev.set(ab);
+        return "a" + ab.english.toLowerCase();
+      }
+
+      prev.set(ab);
+      return ab.english.toLowerCase();
+    }).collect(joining());
   }
 
   public static String toAncientRtl(StringBuilder text) {

@@ -13,6 +13,7 @@ import com.digitald4.biblical.util.*;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.model.Company;
+import com.digitald4.common.model.Flag;
 import com.digitald4.common.model.User;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.server.service.BasicUserService;
@@ -74,6 +75,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		bind(TokenWordStore.class).asEagerSingleton();
 
 		bind(UserService.class).to(new TypeLiteral<UserService<BasicUser>>(){}).asEagerSingleton();
+		bind(new TypeLiteral<Store<Flag, String>>(){}).to(new TypeLiteral<GenericStore<Flag, String>>(){});
 
 		configureEndpoints(
 				getApiUrlPattern(),

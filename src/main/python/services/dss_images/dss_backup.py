@@ -29,12 +29,11 @@ def get_json(scroll):
     return ret
 
 
-def download(collection, col, row, group=0):
+def download(collection, res, col, row, group=0):
     scroll = collection.scroll
-    res = collection.res
     Path('images/' + scroll).mkdir(parents=True, exist_ok=True)
     file_name = FILE_NAME.format(res, col, row)
-    file_path = FILE_DIR.format(scroll) + file_name
+    file_path = FILE_DIR.format(scroll) + 'tiles/' + file_name
     if os.path.isfile(file_path) and os.path.getsize(file_path) > 1024:
         # print('File {} exists, exiting'.format(file_path))
         return
@@ -58,68 +57,72 @@ def download(collection, col, row, group=0):
             output.write(response.content)
     elif scroll == 'torah':
         if group < 5:
-            download(collection, col, row, group + 1)
+            download(collection, res, col, row, group + 1)
 
 
 class Collection:
-    def __init__(self, scroll=None, res=None, cols=None, rows=None,
-      tile_size=None, columns=None, tile_prefix=None, json=None):
-        self.scroll = scroll
-        self.res = res
-        self.tile_prefix = tile_prefix
-
+    def __init__(self, scroll=None, tile_size=None, width=None, height=None,
+      full_width=None, full_height=None, max_zoom=None, columns=None, tile_prefix=None, json=None):
         if json is not None:
-            if scroll is None:
-                self.scroll = json['scroll']
-            if tile_prefix is None:
-                self.tile_prefix = json['tilePrefix']
-            height = int(json['height'])
-            width = int(json['width'])
-            ratio = int(json['fullSize']['w']) / width
-            max_zoom = int(json['maxZoom'])
-            if res is None:
-                self.res = res = max_zoom - 1
-            for x in range(res, max_zoom):
-                ratio /= 2
-
+            self.scroll = json['scroll']
             self.tile_size = json['tileSize']
-            self.rows = math.ceil(height * ratio / self.tile_size)
-            self.cols = math.ceil(width * ratio / self.tile_size)
+            self.width = int(json['width'])
+            self.height = int(json['height'])
+            self.full_width = int(json['fullSize']['w'])
+            self.full_height = int(json['fullSize']['h'])
+            self.max_zoom = int(json['maxZoom'])
+            self.tile_prefix = json['tilePrefix']
+
             self.columns = [None] * int(json['columns'][0]['id'])
             for c in range(len(json['columns'])):
                 column = json['columns'][c]
                 self.columns[int(column['id']) - 1] = {
-                    'x': math.floor(column['x'] * ratio),
-                    'width': math.ceil(column['width'] * ratio)}
-
-            for c in range(len(self.columns), 0, -1):
-                if self.columns[c - 1] is None:
-                    self.columns[c - 1] = {
-                        'x': self.columns[c]['x'] + self.columns[c]['width'],
-                        'width': 1}
+                    'x': int(column['x']),
+                    'width': int(column['width'])}
         else:
+            self.scroll = scroll
             self.tile_size = tile_size
-            self.rows = rows
-            self.cols = cols
+            self.width = width
+            self.height = height
+            self.full_width = full_width
+            self.full_height = full_height
+            self.max_zoom = max_zoom
             self.columns = columns
+            self.tile_prefix = tile_prefix
+
+    def calc_at_res(self, res=None):
+        if res is None:
+            res = self.max_zoom - 1
+        ratio = self.full_width / self.width
+        for x in range(res, self.max_zoom):
+            ratio /= 2
+
+        cols = math.ceil(self.width * ratio / self.tile_size)
+        rows = math.ceil(self.height * ratio / self.tile_size)
+
+        return ratio, cols, rows
 
     def to_string(self):
-        return (
-            'scroll: {}, res: {}, tile_size: {}, rows: {}, cols: {}, '
-            'tile_prefix: {}, columns: {}').format(
-            self.scroll, self.res, self.tile_size, self.rows, self.cols,
-            self.tile_prefix, self.columns)
+        return (f'scroll: {self.scroll}, tile_size: {self.tile_size}, width: '
+                f'{self.width}, height: {self.height}, maxZoom: '
+                f'{self.max_zoom}, tile_prefix: {self.tile_prefix}, columns: '
+                f'{self.columns}')
 
 
 def download_tile(tile):
-    download(tile['collection'], tile['col'], tile['row'])
+    download(tile['collection'], tile['res'], tile['col'], tile['row'])
 
 
-def download_collection(collection):
+def download_collection(collection, res=None):
     tiles = []
-    for col in range(collection.cols):
-        for row in range(collection.rows):
-            tiles.append({'collection': collection, 'col': col, 'row': row})
+    if res is None:
+        res = collection.max_zoom - 1
+    ratio, cols, rows = collection.calc_at_res(res)
+
+    for col in range(cols):
+        for row in range(rows):
+            tiles.append(
+                {'collection': collection, 'res': res, 'col': col, 'row': row})
 
     with Pool() as pool:
         pool.map(download_tile, tiles)
@@ -128,18 +131,13 @@ def download_collection(collection):
 Collection.ISAIAH = Collection(json=get_json('isaiah'))
 Collection.WAR = Collection(json=get_json('war'))
 Collection.COMMUNITY_RULE = Collection(json=get_json('community'))
-Collection.TEMPLE_SCROLL = Collection(res=9, json=get_json('temple'))
+Collection.TEMPLE_SCROLL = Collection(json=get_json('temple'))
 Collection.HABAKKUK = Collection(json=get_json('habakkuk'))
-Collection.TORAH_5 = (
-    Collection('torah', 5, 24, 17, 256, [
-        {'x': 4500, 'width': 1200}, {'x': 3400, 'width': 1150},
-        {'x': 2300, 'width': 1300}, {'x': 1100, 'width': 1200},
-        {'x': 0, 'width': 1100}]))
-Collection.TORAH_4 = (
-    Collection('torah', 4, 14, 9, 256, [
-        {'x': 2250, 'width': 700}, {'x': 1700, 'width': 650},
-        {'x': 1150, 'width': 650}, {'x':550, 'width': 600},
-        {'x': 0, 'width': 550}]))
+Collection.TORAH = (
+    Collection('torah', 256, 768, 574, 6024, 4588, 5, [
+        {'x': 570, 'width': 170}, {'x': 435, 'width': 145},
+        {'x': 295, 'width': 140}, {'x': 145, 'width': 155},
+        {'x': 0, 'width': 145}]))
 
 if __name__ == '__main__':
     print(Collection.ISAIAH.to_string())
@@ -147,8 +145,7 @@ if __name__ == '__main__':
     print(Collection.COMMUNITY_RULE.to_string())
     print(Collection.HABAKKUK.to_string())
     print(Collection.TEMPLE_SCROLL.to_string())
-    print(Collection.TORAH_5.to_string())
-    print(Collection.TORAH_4.to_string())
+    print(Collection.TORAH.to_string())
 
     # Great Isaiah Scroll
     download_collection(Collection.ISAIAH)
@@ -160,10 +157,10 @@ if __name__ == '__main__':
     download_collection(Collection.COMMUNITY_RULE)
 
     # Temple Scroll
-    download_collection(Collection.TEMPLE_SCROLL)
+    download_collection(Collection.TEMPLE_SCROLL, res=9)
 
     # Commentary on Habakkuk
     download_collection(Collection.HABAKKUK)
 
     # Torah Scroll
-    download_collection(Collection.TORAH_5)
+    download_collection(Collection.TORAH)

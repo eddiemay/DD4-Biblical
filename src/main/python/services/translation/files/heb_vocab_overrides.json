@@ -411,6 +411,7 @@
 {"strongsId":"H6779","root":"צומח","translation":"grow"}
 {"strongsId":"H6884","root":"צרפ","translation":"cast"}
 {"strongsId":"H6884","root":"צורפ","translation":"caster"}
+{"strongsId":"H6915","root":"קד","translation":"bow"}
 {"strongsId":"H6944","root":"קידש","translation":"holy"}
 {"strongsId":"H6950","root":"קהיל","translation":"gathering"}
 {"strongsId":"H6953","root":"קוהל","translation":"preacher"}
@@ -473,6 +474,7 @@
 {"strongsId":"H7682","root":"שגיב","translation":"exalting"}
 {"strongsId":"H7782","root":"שפר","translation":"trumpet"}
 {"strongsId":"H7812","root":"שתח","translation":"worship"}
+{"strongsId":"H7901","root":"שכב","translation":"lay"}
 {"strongsId":"H7919","root":"שכיל","translation":"understanding"}
 {"strongsId":"H7939","root":"שכר","translation":"wage"}
 {"strongsId":"H7971","root":"שליח","translation":"send"}

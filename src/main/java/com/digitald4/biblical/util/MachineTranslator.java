@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 public class MachineTranslator {
   private final TokenWordStore tokenWordStore;
@@ -38,15 +37,17 @@ public class MachineTranslator {
     SubToken subToken = new SubToken().setWord(word);
     ImmutableList<TokenWord> options = tokenWordStore.getOptions(word);
     if (options.isEmpty()) {
-      return subToken.setTranslation("[UNK]");
+      return subToken.setTranslation("[UNK]").setTransliteration(HebrewConverter.transliterate(word));
     }
 
-    TokenWord option = options.size() == 1 ? options.get(0) : options.stream()
+    TokenWord option = options.stream()
         .filter(o -> Objects.equals(strongsId, o.getStrongsId())).findFirst()
         .orElse(options.get(0));
 
     return subToken.setTranslation(suffix ? option.asSuffix() : option.getTranslation())
-        .setStrongsId(option.getStrongsId());
+        .setStrongsId(option.getStrongsId())
+        .setTransliteration(
+            option.getTransliteration() != null ? option.getTransliteration() : HebrewConverter.transliterate(word));
   }
 
   public Interlinear translate(Interlinear interlinear) {

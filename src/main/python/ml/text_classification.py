@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     sample_file = os.path.join(train_dir, 'pos/1181_9.txt')
     with open(sample_file) as f:
-      print(f.read())
+        print(f.read())
 
     remove_dir = os.path.join(train_dir, 'unsup')
     shutil.rmtree(remove_dir)
@@ -84,8 +84,8 @@ if __name__ == '__main__':
     vectorize_layer.adapt(train_text)
 
     def vectorize_text(text, label):
-      text = tf.expand_dims(text, -1)
-      return vectorize_layer(text), label
+        text = tf.expand_dims(text, -1)
+        return vectorize_layer(text), label
 
     # retrieve a batch (of 32 reviews and labels) from the dataset
     text_batch, label_batch = next(iter(raw_train_ds))
