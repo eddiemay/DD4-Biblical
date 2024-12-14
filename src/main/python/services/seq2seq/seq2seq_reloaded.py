@@ -102,7 +102,6 @@ def decode_sequence(input_seq):
 
 def decode_interlinear(i):
     i.decoded = decode_sequence(encode_input(i.input())).strip()
-    # print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}{4}".format(i.id, i.input(), i.target(), i.decoded, "" if i.target() == i.decoded else "\nmissmatch!"))
     return i
 
 
@@ -127,13 +126,13 @@ if __name__ == '__main__':
             if candidates.__len__() < 20000 and i.is_candidate():
                 candidates.append(i)
 
-    print('processing {} candidates'.format(candidates.__len__()))
+    print(f'processing {candidates.__len__()} candidates')
     #for i in candidates:
      #   processed.append(decode_interlinear(i))
     with Pool() as pool:
         processed = pool.map(decode_interlinear, candidates)
 
-    # Process stats and write results out ot file.
+    # Process stats and write results out to file.
     with open(os.path.join(data_path, "isa-word-map-processed.csv"), "w", encoding="utf-8") as f:
         missmatches = 0
 
@@ -149,7 +148,10 @@ if __name__ == '__main__':
         f.write("Id,MT Word,DSS Word,ML Word\n")
         for i in processed:
             f.write(i.to_csv())
-            print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}{4}".format(i.id, i.input(), i.target(), i.decoded, "" if i.target() == i.decoded else "\nmissmatch!"))
+            if i.target() != i.decoded:
+                print("{0}\nInput  :{1}\nTarget :{2}\nDecoded:{3}{4}".format(
+                    i.id, i.input(), i.target(), i.decoded,
+                    "" if i.target() == i.decoded else "\nmissmatch!"))
             if i.target() != i.constantsOnly:
                 needfixing += 1
                 if i.target() == i.decoded:
@@ -167,11 +169,11 @@ if __name__ == '__main__':
             if i.target() != i.decoded:
                 missmatches += 1
 
-    print("\nMatching on {0} out of {1}".format(processed.__len__() - missmatches, processed.__len__()))
-    print("Fixed {0} out of {1}".format(fixed, needfixing))
-    print("Non fix attempted {0} out of {1}".format(fixedNotAttempted, needfixing))
-    print("Non success fix {0} out of {1}".format(nonSuccessFix, needfixing))
-    print("Remove Nikkuds correctly {0} out of {1}".format(correctNoChange, noFixNeeded))
-    print("Broke {0} out of {1}".format(falseChange, noFixNeeded))
+    print(f"\nMatching on {processed.__len__() - missmatches} out of {processed.__len__()}")
+    print(f"Fixed {fixed} out of {needfixing}")
+    print(f"Non fix attempted {fixedNotAttempted} out of {needfixing}")
+    print(f"Non success fix {nonSuccessFix} out of {needfixing}")
+    print(f"Remove Nikkuds correctly {correctNoChange} out of {noFixNeeded}")
+    print(f"Broke {falseChange} out of {noFixNeeded}")
 
-    print("\nProgram finished in {} seconds".format(time.perf_counter() - start_time))
+    print(f"\nProgram finished in {time.perf_counter() - start_time} seconds")

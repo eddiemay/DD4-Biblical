@@ -19,7 +19,6 @@ def construct_column(collection, column=1, res=None):
     start_x = math.floor(collection.columns[column - 1]['x'] * ratio)
     width = math.ceil(collection.columns[column - 1]['width'] * ratio)
     print('bounds: {}'.format([start_x, start_x + width]))
-    width += 100 # Put a buffer to insure we get the whole scroll
     tile_size = collection.tile_size
     col_offset = math.floor(start_x / tile_size)
     cols = math.ceil(width / tile_size)
@@ -33,21 +32,21 @@ def construct_column(collection, column=1, res=None):
             y = r * tile_size
             canvas[y:y + img.shape[0], x:x + img.shape[1]] = img
 
-    cv2.imshow('Canvas',  canvas)
+    cv2.imshow('Canvas', canvas)
     print('Cropping to: (h: {}, w: {})'.format(rows * tile_size, width))
-    canvas= canvas[0:rows * tile_size, start_x - (col_offset * tile_size):width]
+    canvas = canvas[0:rows * tile_size, start_x - col_offset * tile_size:width]
 
     print('Showing image {} column {}...'.format(collection.scroll, column))
-    cv2.imshow('Canvas exact',  canvas)
+    cv2.imshow('Canvas exact', canvas)
     print(image_to_string(canvas, False))
     Path(f'images/{collection.scroll}/columns').mkdir(exist_ok=True)
     cv2.imwrite(
         f'images/{collection.scroll}/columns/column_{res}_{column}.jpg', canvas)
-    cv2.waitKey(1000)
+    cv2.waitKey()
 
 
-for c in range(1, 5):
-    construct_column(Collection.TORAH, c)
+# for c in range(1, 5):
+    # construct_column(Collection.TORAH, c)
 
 # construct_column(Collection.TORAH, 5, res=5)
 # construct_column(Collection.TORAH, 4, res=5)
@@ -55,28 +54,28 @@ for c in range(1, 5):
 # construct_column(Collection.TORAH, 2, res=5)
 # construct_column(Collection.TORAH, 1, res=5)
 
-for c in range(1, 55):
-    construct_column(Collection.ISAIAH, c)
-# construct_column(Collection.ISAIAH, 6)
+# for c in range(1, 55):
+    # construct_column(Collection.ISAIAH, c)
+construct_column(Collection.ISAIAH, 14)
 # construct_column(Collection.ISAIAH, 1)
 
-for c in range(1, 16):
-    construct_column(Collection.WAR, c)
+# for c in range(1, 16):
+  #  construct_column(Collection.WAR, c)
 # construct_column(Collection.WAR, 14)
 # construct_column(Collection.WAR, 1)
 
-for c in range(1, 12):
-    construct_column(Collection.COMMUNITY_RULE, c)
+# for c in range(1, 12):
+    # construct_column(Collection.COMMUNITY_RULE, c)
 # construct_column(Collection.COMMUNITY_RULE, 10)
-# construct_column(Collection.COMMUNITY_RULE, 1)
+# construct_column(Collection.COMMUNITY_RULE, 11)
 
-for c in range(2, 68):
-    construct_column(Collection.TEMPLE_SCROLL, c, res=9)
+# for c in range(2, 68):
+    # construct_column(Collection.TEMPLE_SCROLL, c, res=9)
 # construct_column(Collection.TEMPLE_SCROLL, 66, res=9)
 # construct_column(Collection.TEMPLE_SCROLL, 2, res=9)
 # construct_column(Collection.TEMPLE_SCROLL, 1)
 
-for c in range(1, 15):
-    construct_column(Collection.HABAKKUK, c)
+# for c in range(1, 15):
+    # construct_column(Collection.HABAKKUK, c)
 # construct_column(Collection.HABAKKUK, 13)
 # construct_column(Collection.HABAKKUK, 1)

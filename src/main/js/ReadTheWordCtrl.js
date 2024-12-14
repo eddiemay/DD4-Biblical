@@ -125,7 +125,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showScroll = function(scripture
     return;
   }
   const ctx = canvas.getContext("2d");
-  this.canvasTitle = 'Dead Sea Scrolls Viewer - ' + scripture.reference;
+  this.canvasTitle = 'Dead Sea Scrolls Viewer - ' + this.canvasReference;
 
   this.scriptureService.getScrollCoords(scripture, scrollData => {
     this.canvasWidth = DSS_ISA_COLUMN_INFO[scrollData.columns[0]].width * 3.7445;

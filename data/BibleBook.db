@@ -80,7 +80,7 @@
 {"idString":"BibleBook-Judith","entity":{"number":70,"altNames":["Jth","Jdth","Jdt"],"chapterCount":16,"id":"Judith","tags":"Apocrypha,Deuterocanon,Universal"}}
 {"idString":"BibleBook-Ladder of Jacob","entity":{"number":100,"altNames":["Jacob's Ladder"],"chapterCount":8,"id":"Ladder of Jacob","tags":"Additional Apocrypha,Jewish History"}}
 {"idString":"BibleBook-Lamentations","entity":{"number":25,"altNames":["Lam","La","Eicha"],"chapterCount":5,"id":"Lamentations","tags":"Canon,OT,Prophets"}}
-{"idString":"BibleBook-Letter of Aristeas","entity":{"number":116,"altNames":["Epistle of the Aristeas","Aristeas"],"chapterCount":32,"unreleased":false,"id":"Letter of Aristeas","tags":"Additional Apocrypha,Jewish History"}}
+{"idString":"BibleBook-Letter of Aristeas","entity":{"number":116,"altNames":["Epistle of the Aristeas","Aristeas"],"chapterCount":1,"unreleased":false,"id":"Letter of Aristeas","tags":"Additional Apocrypha,Jewish History"}}
 {"idString":"BibleBook-Letter of Jeremiah","entity":{"number":76,"altNames":["LJe"],"chapterCount":1,"id":"Letter of Jeremiah","tags":"Apocrypha,OT Additions"}}
 {"idString":"BibleBook-Leviticus","entity":{"number":3,"altNames":["Lev","Le","Lv","Vayikra","Vyakra"],"chapterCount":27,"id":"Leviticus","tags":"Canon,OT,Pentateuch"}}
 {"idString":"BibleBook-Lives of the Prophets","entity":{"number":107,"altNames":["Prophets"],"chapterCount":23,"id":"Lives of the Prophets","tags":"Additional Apocrypha,Jewish History"}}

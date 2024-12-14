@@ -30,7 +30,6 @@ public class TokenWordStoreTest {
   @Test
   public void createsCapitalEntryForGreek() {
     TokenWordStore tokenWordStore = new TokenWordStore(
-        () -> dao,
         () -> ImmutableList.of(new HebrewTokenizer.TokenWord().setWord("μη").setTranslation("not")),
         ImmutableMap::of);
     assertThat(tokenWordStore.getAll()).containsExactly(

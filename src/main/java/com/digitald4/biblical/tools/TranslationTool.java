@@ -144,8 +144,8 @@ public class TranslationTool {
 
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     LexiconStore lexiconStore = new LexiconStore(() -> daoFileDB, lexiconFetcher);
-    TokenWordStore tokenWordStore = new TokenWordStore(
-        () -> daoFileDB, TranslationTool::tokenWordProvider, TranslationTool::lexiconProvider);
+    TokenWordStore tokenWordStore =
+        new TokenWordStore(TranslationTool::tokenWordProvider, TranslationTool::lexiconProvider);
     var machineTranslator = new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
     ScriptureStore scriptureStore = new ScriptureStore(() -> daoFileDB, null, bibleBookStore,
         scriputureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);

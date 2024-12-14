@@ -1,0 +1,77 @@
+<section class="grid_12">
+  <div class="block-border">
+    <div class="block-content form">
+      <h1>Deadsea Scroll Letter Identifier</h1>
+      <div class="block-content form">
+        <label>Scroll</label>
+        <select data-ng-model="$ctrl.scroll" data-ng-change="$ctrl.scrollChanged()"
+                data-ng-options="scroll as scroll.name for scroll in $ctrl.scrolls">
+        </select>
+        <select data-ng-model="$ctrl.column" data-ng-change="$ctrl.refresh()">
+          <option data-ng-repeat="n in [].constructor($ctrl.scroll.columns) track by $index+1">{{$index+1}}</option>
+        </select>
+        <h2>{{$ctrl.canvasTitle}}</h2>
+        <input type="checkbox" data-ng-model="$ctrl.showLetterBoxes" data-ng-change="$ctrl.drawScroll()">
+        <label>Show Letter Boxes</label>
+        <input type="checkbox" data-ng-model="$ctrl.showRowBoxes" data-ng-change="$ctrl.drawScroll()">
+        <label>Show Row Boxes</label>
+        <div style="max-height: 256px;max-width:100%;overflow: scroll;">
+          <canvas id="scroll_view" width="{{$ctrl.canvasWidth}}" height="{{$ctrl.canvasHeight}}"></canvas>
+        </div>
+
+        <div id="tab-global" class="tabs-content">
+          <ul class="tabs js-tabs same-height">
+            <li data-ng-repeat="tab in $ctrl.tabs" data-ng-show="tab.isEnabled()"
+                data-ng-class="{current: $ctrl.selectedTab == tab}">
+              <a data-ng-click="$ctrl.setSelectedTab(tab)" title="{{tab.name}}">{{tab.name}}</a>
+            </li>
+          </ul>
+          <div class="tabs-content">
+            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textFile">
+              <textarea data-ng-model="$ctrl.textFile" cols="52" rows="7" style="font-size: 24pt" disabled>
+              </textarea>
+            </div>
+            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.resultText">
+              <textarea data-ng-model="$ctrl.resultText" cols="52" rows="7" style="font-size: 24pt" disabled>
+              </textarea>
+            </div>
+            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textDiff" style="max-height: 256px;max-width:100%;overflow: scroll;">
+              <div data-ng-repeat="textDiff in $ctrl.textDiffs">
+                <p style="font-size: 24pt;">
+                  {{textDiff.expected}}<br>
+                  {{textDiff.actual}}<br>
+                  <span data-ng-repeat="diff in textDiff.diff" data-ng-class="[diff._class]">{{diff['1']}}</span>
+                </p>
+              </div>
+            </div>
+            <div data-ng-show="$ctrl.selectedTab == $ctrl.tabs.imagesByLetter" style="max-height: 256px;max-width:100%;overflow: scroll;">
+              <canvas id="letters" width="{{$ctrl.canvasWidth / 2}}" height="2000px"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Letter selection dialog start -->
+  <div data-ng-show="$ctrl.letterDialogShown" style="display:block; position:absolute; left:0px;" data-ng-style="$ctrl.dialogStyle">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li><a data-ng-click="$ctrl.closeDialog()" title="Close window">
+          <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+        </a></li>
+      </ul>
+      <div class="block-content form">
+        <span data-ng-repeat="letter in $ctrl.letters">
+          <button data-ng-class="{grey: letter.value==$ctrl.selectedBox.letter}"
+                  data-ng-click="$ctrl.create(letter)">{{letter.value}}</button>
+        </span><br>
+        <div>
+          <input type="number" min="1" max="50" data-ng-model="$ctrl.rowNum">
+          <button data-ng-click="$ctrl.createRow()">Row</button>
+        </div>
+      </div>
+      <button class="float-left" data-ng-click="$ctrl.closeDialog()">Close</button>
+    </div>
+  </div>
+  <!-- Letter selection dialog end -->
+</section>

@@ -5,6 +5,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+import com.digitald4.common.util.FormatText;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
 import java.util.List;
@@ -13,29 +14,30 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class HebrewConverter {
+  public enum CharacterType {Consonant, Vowel, Sometimes_Vowel}
   public enum AlefBet {
-    Alef("Alef", 'א', "𐤀", "𓃾", 'ࠀ', 'ا', 1, "A", "ox head, strength", true),
-    Bet("Bet", 'ב', "𐤁", "𓉔", 'ࠀ', 'ا', 2, "B", "house"),
-    Gimel("Gimel", 'ג', "𐤂", "𓃀", 'ࠀ', 'ا', 3, "G", "foot, camel"),
-    Dalet("Dalet", 'ד', "𐤃", "𓇯", 'ࠀ', 'ا', 4, "D", "door"),
-    Hey("Hey", 'ה',"𐤄", "𓀠", 'ࠀ', 'ا', 5, "H", "jubilation, window"),
-    Wav("Wav", 'ו', "𐤅", "𓏲", 'ࠀ', 'ا', 6, "U", "hook", true),
-    Zayin("Zayin", 'ז', "𐤆", "𓌻", 'ࠀ', 'ا' , 7, "Z", "weapon"),
-    Chet("Chet", 'ח', "𐤇", "𓈈", 'ࠀ', 'ا' , 8, "Ch", "courtyard, gate"),
-    Tet("Tet", 'ט', "𐤈", "𐤈", 'ࠀ', 'ا', 9, "T", "wheel"),
-    Yod("Yod", 'י', "𐤉", "𓂝", 'ࠀ', 'ا', 10, "Y", "arm, hand", true),
-    Kaf("Kaf", 'כ', "𐤊", "𓂩", 'ࠀ', 'ا', 20, "C", "palm of hand", 'ך'),
-    Lamed("Lamed", 'ל', "𐤋", "𓏱", 'ࠀ', 'ا' , 30, "L", "goad, staff"),
-    Mem("Mem", 'מ', "𐤌", "𓈖", 'ࠀ', 'ا', 40, "M", "water, life", 'ם'),
-    Nun("Nun", 'נ', "𐤍", "𓆓", 'ࠀ', 'ا', 50, "N", "fish", 'ן'),
-    Samekh("Samekh", 'ס', "𐤎", "𓊽", 'ࠀ', 'ا', 60, "S", "pillar, support"),
-    Ayin("Ayin", 'ע',"𐤏", "𓁹", 'ࠀ', 'ا', 70, "I", "eye", true),
-    Pay("Pay", 'פ', "𐤐", "𓂋", 'ࠀ', 'ا' , 80, "P", "mouth", 'ף'),
-    Tzadi("Tzadi", 'צ', "𐤑", "𓄘", 'ࠀ', 'ا', 90, "Tz", "Man on side, desire, need", 'ץ'),
-    Qof("Qof", 'ק', "𐤒", "𐤒", 'ࠀ', 'ا', 100, "Q", "eye of needle"),
-    Resh("Resh", 'ר', "𐤓", "𓁶", 'ࠀ', 'ا' , 200, "R", "man head"),
-    Shin("Shin", 'ש', "ש", "𓌓", 'ࠀ', 'ا', 300, "Sh", "tooth"),
-    Tav("Tav", 'ת', "𐤕", "𓏴", 'ࠀ', 'ا' , 400, "T", "mark, sign");
+    Alef("Alef", 'א', "𐤀", "𓃾", 'ࠀ', 'ا', 1, "a", "ox head, strength", CharacterType.Vowel, null),
+    Bet("Bet", 'ב', "𐤁", "𓉔", 'ࠀ', 'ا', 2, "b", "house"),
+    Gimel("Gimel", 'ג', "𐤂", "𓃀", 'ࠀ', 'ا', 3, "g", "foot, camel"),
+    Dalet("Dalet", 'ד', "𐤃", "𓇯", 'ࠀ', 'ا', 4, "d", "door"),
+    Hey("Hey", 'ה',"𐤄", "𓀠", 'ࠀ', 'ا', 5, "h", "jubilation, window"),
+    Wav("Wav", 'ו', "𐤅", "𓏲", 'ࠀ', 'ا', 6, "w", "hook", CharacterType.Sometimes_Vowel, "u"),
+    Zayin("Zayin", 'ז', "𐤆", "𓌻", 'ࠀ', 'ا' , 7, "z", "weapon"),
+    Chet("Chet", 'ח', "𐤇", "𓈈", 'ࠀ', 'ا' , 8, "ch", "courtyard, gate"),
+    Tet("Tet", 'ט', "𐤈", "𐤈", 'ࠀ', 'ا', 9, "t", "wheel"),
+    Yod("Yod", 'י', "𐤉", "𓂝", 'ࠀ', 'ا', 10, "y", "arm, hand", CharacterType.Sometimes_Vowel, "y"),
+    Kaf("Kaf", 'כ', "𐤊", "𓂩", 'ࠀ', 'ا', 20, "c", "palm of hand", 'ך'),
+    Lamed("Lamed", 'ל', "𐤋", "𓏱", 'ࠀ', 'ا' , 30, "l", "goad, staff"),
+    Mem("Mem", 'מ', "𐤌", "𓈖", 'ࠀ', 'ا', 40, "m", "water, life", 'ם'),
+    Nun("Nun", 'נ', "𐤍", "𓆓", 'ࠀ', 'ا', 50, "n", "fish", 'ן'),
+    Samekh("Samekh", 'ס', "𐤎", "𓊽", 'ࠀ', 'ا', 60, "s", "pillar, support"),
+    Ayin("Ayin", 'ע',"𐤏", "𓁹", 'ࠀ', 'ا', 70, "i", "eye", CharacterType.Vowel, null),
+    Pay("Pay", 'פ', "𐤐", "𓂋", 'ࠀ', 'ا' , 80, "p", "mouth", 'ף'),
+    Tzadi("Tzadi", 'צ', "𐤑", "𓄘", 'ࠀ', 'ا', 90, "tz", "Man on side, desire, need", 'ץ'),
+    Qof("Qof", 'ק', "𐤒", "𐤒", 'ࠀ', 'ا', 100, "q", "eye of needle"),
+    Resh("Resh", 'ר', "𐤓", "𓁶", 'ࠀ', 'ا' , 200, "r", "man head"),
+    Shin("Shin", 'ש', "ש", "𓌓", 'ࠀ', 'ا', 300, "sh", "tooth"),
+    Tav("Tav", 'ת', "𐤕", "𓏴", 'ࠀ', 'ا' , 400, "t", "mark, sign");
 
     public final String name;
     public final char modern;
@@ -47,25 +49,28 @@ public class HebrewConverter {
     public final String english;
     public final String meaning;
     public final Character finalModern;
-    public final boolean isVowel;
+    public final CharacterType characterType;
+    private final String vowelSound;
 
     AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
         int value, String english, String meaning) {
-      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, false, null);
+      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, null,
+          CharacterType.Consonant, null);
     }
 
     AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
-        int value, String english, String meaning, boolean isVowel) {
-      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, isVowel, null);
+        int value, String english, String meaning, CharacterType characterType, String engVowel) {
+      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, null, characterType, engVowel);
     }
 
     AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
         int value, String english, String meaning, Character finalModern) {
-      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, false, finalModern);
+      this(name, modern, paleo, ancient, samaritan, arabic, value, english, meaning, finalModern,
+          CharacterType.Consonant, null);
     }
 
-    AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic,
-        int value, String english, String meaning, boolean isVowel, Character finalModern) {
+    AlefBet(String name, char modern, String paleo, String ancient, char samaritan, char arabic, int value,
+        String english, String meaning, Character finalModern, CharacterType characterType, String vowelSound) {
       this.name = name;
       this.modern = modern;
       this.paleo = paleo;
@@ -75,8 +80,9 @@ public class HebrewConverter {
       this.value = value;
       this.english = english;
       this.meaning = meaning;
-      this.isVowel = isVowel;
       this.finalModern = finalModern;
+      this.characterType = characterType;
+      this.vowelSound = vowelSound;
     }
 
     public String getName() {
@@ -119,8 +125,8 @@ public class HebrewConverter {
       return finalModern;
     }
 
-    public boolean isVowel() {
-      return isVowel;
+    public String getVowelSound() {
+      return vowelSound != null ? vowelSound : english;
     }
   }
 
@@ -191,30 +197,40 @@ public class HebrewConverter {
     return String.join("", ancient);
   }
 
-  public static String transliterate(String word) {
+  public static String transliterate(String word, boolean isSuffix) {
     if (word.length() == 1) {
       AlefBet ab = TRANSLITERATE_MAP.get(word.charAt(0));
       if (ab == null) {
-        return word;
+        return "";
       }
 
-      return ab.english.toLowerCase() + (ab == AlefBet.Alef ? "" : "a");
+      return ab.english + (ab.characterType != CharacterType.Vowel ? "a" : "");
     }
 
-    AtomicReference<AlefBet> prev = new AtomicReference<>();
+    AtomicReference<Boolean> prevIsVowel = new AtomicReference<>();
     return word.chars().mapToObj(c -> {
       AlefBet ab = TRANSLITERATE_MAP.get((char) c);
       if (ab == null) {
-        return String.valueOf(c);
+        return "";
+        // return String.valueOf((char) c);
       }
 
-      if (prev.get() != null && !ab.isVowel() && !prev.get().isVowel()) {
-        prev.set(ab);
-        return "a" + ab.english.toLowerCase();
+      // If this is the first letter or the previous letter is producing a vowel sound, return the default constant sound.
+      if (prevIsVowel.get() == null || prevIsVowel.get() == Boolean.TRUE || ab.characterType == CharacterType.Vowel) {
+        prevIsVowel.set(ab.characterType == CharacterType.Vowel
+            || ab.characterType == CharacterType.Sometimes_Vowel && isSuffix);
+        return ab.english;
       }
 
-      prev.set(ab);
-      return ab.english.toLowerCase();
+      // If we are here then this is not the first letter and the previous letter was not a vowel.
+
+      if (ab.characterType == CharacterType.Sometimes_Vowel) {
+        prevIsVowel.set(true);
+        return ab.vowelSound;
+      }
+
+      prevIsVowel.set(false);
+      return "a" + ab.english;
     }).collect(joining());
   }
 
@@ -223,9 +239,11 @@ public class HebrewConverter {
   }
 
   public static String toConstantsOnly(String text) {
-    return removePunctuation(text).chars()
-        .filter(c -> c < 1425 || c > 1479)
-        .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
+    return FormatText.removeAccents(removePunctuation(text));
+  }
+
+  public static String toConstantsOnly(StringBuilder text) {
+    return toConstantsOnly(text.toString());
   }
 
   public static String toFullHebrew(String text) {
@@ -239,37 +257,18 @@ public class HebrewConverter {
         // output.append('י');
       }
 
-      if ((c < 1425 || c > 1479) && c != '\u202A' && c != '\u202C' && c != '\u200D') {
+      if ((c < 1425 || c > 1479) && c != '\u202A' && c != '\u202C' && c != '\u200D'
+          // Guard against inserting 2 waws in a row.
+          && (c != 'ו' || output.isEmpty() || output.charAt(output.length() - 1) != 'ו')) {
         output.append(c);
       }
     }
-    return output.toString();
-  }
-
-  public static String toConstantsOnly(StringBuilder text) {
-    return toConstantsOnly(text.toString());
+    return toConstantsOnly(output.toString());
   }
 
   public static String unfinalize(String text) {
-    return stream(text.split(" ")).map(HebrewConverter::unfinalizeWord).collect(joining(" "));
-  }
-
-  public static String unfinalizeWord(String word) {
-    if (word.length() == 0) {
-      return word;
-    }
-    return
-        word.replaceAll("ך", "כ").replaceAll("ם", "מ").replaceAll("ן", "נ").replaceAll("ף", "פ").replaceAll("ץ", "צ");
-
-    /* int lastIndex = word.length() - 1;
-    return switch (word.charAt(lastIndex)) {
-      case 'ך' -> word.substring(0, lastIndex) + 'כ';
-      case 'ם' -> word.substring(0, lastIndex) + 'מ';
-      case 'ן' -> word.substring(0, lastIndex) + 'נ';
-      case 'ף' -> word.substring(0, lastIndex) + 'פ';
-      case 'ץ' -> word.substring(0, lastIndex) + 'צ';
-      default -> word;
-    }; */
+    return text
+        .replaceAll("ך", "כ").replaceAll("ם", "מ").replaceAll("ן", "נ").replaceAll("ף", "פ").replaceAll("ץ", "צ");
   }
 
   public static String finalize(String text) {

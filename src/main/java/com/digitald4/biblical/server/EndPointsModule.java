@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Arrays.stream;
 
+import com.digitald4.biblical.model.LetterBox;
 import com.digitald4.biblical.model.HighScore;
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.BibleBookStore;
@@ -61,6 +62,8 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 
 		bind(new TypeLiteral<Store<HighScore, Long>>(){})
 				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
+		bind(new TypeLiteral<Store<LetterBox, Long>>(){})
+				.toInstance(new GenericStore<>(LetterBox.class, getProvider(DAO.class)));
 		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){}).asEagerSingleton();
 
 		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
@@ -87,6 +90,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CalendarRuleService.class,
 						CalendarValidatorService.class,
 						CommandmentService.class,
+						LetterBoxService.class,
 						FileService.class,
 						HighScoreService.class,
 						InterlinearService.class,

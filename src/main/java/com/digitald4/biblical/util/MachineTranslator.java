@@ -2,6 +2,7 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
+import static com.digitald4.biblical.util.HebrewConverter.toFullHebrew;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
@@ -29,7 +30,7 @@ public class MachineTranslator {
     this.subwordTokenizer = subwordTokenizer;
   }
 
-  private SubToken getTranslation(String word, String strongsId, boolean suffix) {
+  private SubToken getTranslation(String word, String strongsId, boolean isSuffix) {
     if (word.startsWith("##")) {
       word = word.substring(2);
     }
@@ -37,24 +38,24 @@ public class MachineTranslator {
     SubToken subToken = new SubToken().setWord(word);
     ImmutableList<TokenWord> options = tokenWordStore.getOptions(word);
     if (options.isEmpty()) {
-      return subToken.setTranslation("[UNK]").setTransliteration(HebrewConverter.transliterate(word));
+      return subToken.setTranslation("[UNK]").setTransliteration(HebrewConverter.transliterate(word, isSuffix));
     }
 
     TokenWord option = options.stream()
         .filter(o -> Objects.equals(strongsId, o.getStrongsId())).findFirst()
         .orElse(options.get(0));
 
-    return subToken.setTranslation(suffix ? option.asSuffix() : option.getTranslation())
+    return subToken.setTranslation(isSuffix ? option.asSuffix() : option.getTranslation())
         .setStrongsId(option.getStrongsId())
-        .setTransliteration(
-            option.getTransliteration() != null ? option.getTransliteration() : HebrewConverter.transliterate(word));
+        .setTransliteration(option.getTransliteration() != null ?
+            option.getTransliteration() : HebrewConverter.transliterate(word, isSuffix));
   }
 
   public Interlinear translate(Interlinear interlinear) {
     AtomicBoolean wordFound = new AtomicBoolean();
     return interlinear.setSubTokens(
         subwordTokenizer
-            .tokenizeWord(unfinalize(interlinear.getConstantsOnly()), interlinear.getStrongsId())
+            .tokenizeWord(unfinalize(toFullHebrew(interlinear.getWord())), interlinear.getStrongsId())
             .stream()
             .map(subWord -> getTranslation(subWord, interlinear.getStrongsId(), wordFound.get()))
             .peek(subToken -> wordFound.set(wordFound.get() || subToken.getStrongsId() != null))

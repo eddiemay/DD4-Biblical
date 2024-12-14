@@ -15,6 +15,10 @@
 runtime: python311
 service: dss-images # Will be served at http://dss-images-dot-dd4-biblical.appspot.com/
 handlers:
+  - url: /books
+    static_dir: books
+    http_headers:
+      Access-Control-Allow-Origin: '*'
   - url: /images
     static_dir: images
     http_headers:

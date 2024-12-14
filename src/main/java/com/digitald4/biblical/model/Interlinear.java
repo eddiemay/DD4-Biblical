@@ -124,7 +124,7 @@ public class Interlinear {
   }
 
   public Interlinear setConstantsOnly(String constantsOnly) {
-    this.constantsOnly = FormatText.removeAccents(constantsOnly);
+    this.constantsOnly = HebrewConverter.toConstantsOnly(constantsOnly);
     return this;
   }
 

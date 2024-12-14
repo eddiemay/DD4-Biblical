@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFetcher {
   private static final String CHAPTER_URL = "https://biblehub.com/%s/%s/%d.htm";
   private static final String INTERLINEAR_PAGE_URL = "https://biblehub.com/interlinear/%s/%d.htm";
-  private static final String SEP_INTERLINEAR_PAGE_URL = "https://biblehub.com/interlinear/apostolic/%s/%d.htm";
   private static final String REF_TEXT = "reftext";
   private static final Pattern VERSE_PATTERN = Pattern.compile("(\\d+)(.+)");
   private static final Pattern VERSE_CLS_PATTERN = Pattern.compile("([\\d\\w]+)-(\\d+)-(\\d+)");
@@ -58,13 +57,13 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements chaps = doc.getElementsByClass("chap");
-    if (chaps.size() == 0) {
+    if (chaps.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content for " + url);
     }
     Element chap = chaps.get(0);
 
     Elements scs = chap.getElementsByClass("sc");
-    if (scs.size() > 0) {
+    if (!scs.isEmpty()) {
       return scs.stream()
           .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
           .map(sc -> new Scripture()
@@ -90,7 +89,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
     String url = String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
     Elements scs = doc.getElementsByClass("spcl");
-    if (scs.size() == 0) {
+    if (scs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content for " + url);
     }
 
@@ -100,7 +99,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
         .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
         .map(sc -> new Scripture()
             .setVersion(version)
-            .setLanguage(version.equals("WLC") ? Language.HEBREWISH : Language.HEBREW)
+            .setLanguage(version.equals("WLC") ? Language.YIDDISH : Language.HEBREW)
             .setBook(book.name())
             .setChapter(chapter)
             .setVerse(verse.incrementAndGet())
@@ -112,7 +111,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
     String url = String.format(CHAPTER_URL, version.toLowerCase(), formatBookForUrl(book.name()), chapter);
     Document doc = Jsoup.parse(apiConnector.sendGet(url).trim());
     Elements spans = doc.getElementsByClass("chap").first().getElementsByClass("greek");
-    if (spans.size() == 0) {
+    if (spans.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content for " + url);
     }
 
@@ -134,7 +133,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
     String htmlResult = apiConnector.sendGet(url);
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements wrappers = doc.getElementsByClass("chap");
-    if (wrappers.size() == 0) {
+    if (wrappers.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
     Element wrapper = wrappers.get(0);

@@ -15,7 +15,7 @@ import org.junit.Test;
 public class HebrewTokenizerTest {
   private static final DAOInMemoryImpl inMemoryImpl = new DAOInMemoryImpl();
   private static final HebrewTokenizer tokenizer = new HebrewTokenizer(
-      new TokenWordStore(() -> inMemoryImpl, () -> ImmutableSet.of(
+      new TokenWordStore(() -> ImmutableSet.of(
           new TokenWord().setWord("ב").setTokenType(TokenType.PREFIX_ONLY),
           new TokenWord().setWord("ה").setTokenType(TokenType.PREFIX),
           new TokenWord().setWord("ו").setTokenType(TokenType.PREFIX),

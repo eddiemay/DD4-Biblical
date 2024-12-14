@@ -22,15 +22,17 @@ class Interlinear:
         return self.dss
 
     def is_candidate(self):
-        return self.target() == self.constantsOnly or self.ld == 1 and self.diff >= "+א" and self.diff <= "+ת"
+        return (self.target() == self.constantsOnly
+            or self.diff == "+ו"
+            or self.diff == "+י")
 
     def to_csv(self):
         return "{0},{1},{2},{3}\n".format(self.id, self.mt, self.dss, self.decoded)
 
 
 if __name__ == "__main__":
-    batch_size = 64  # Batch size for training.
-    epochs = 100  # Number of epochs to train for.
+    batch_size = 32  # Batch size for training.
+    epochs = 400  # Number of epochs to train for.
     num_samples = 20000  # Number of samples to train on.
     # Path to the data txt file on disk.
     file_path = os.path.join(data_path, "isa-word-map.csv")
@@ -137,12 +139,29 @@ if __name__ == "__main__":
     # loss = 'binary_crossentropy'
     # loss = 'mse'
     model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+
+    early_stopping_monitor = keras.callbacks.EarlyStopping(
+        monitor='loss',
+        min_delta=0,
+        patience=10,
+        verbose=1,
+        mode='auto',
+        baseline=None,
+        restore_best_weights=True
+    )
+
+    checkpoint = keras.callbacks.ModelCheckpoint(
+        # 'model-{epoch:03d}-{val_loss:03f}.keras',
+        'seq2seq_model-best-checkpoint.keras',
+        verbose=1, monitor='val_loss', save_best_only=True, mode='auto')
+
     history = model.fit(
         [encoder_input_data, decoder_input_data],
         decoder_target_data,
         batch_size=batch_size,
         epochs=epochs,
-        validation_split=0.2,
+        validation_split=0.4,
+        callbacks=[checkpoint, early_stopping_monitor]
     )
     # Save model
     model.save("seq2seq_model.keras")

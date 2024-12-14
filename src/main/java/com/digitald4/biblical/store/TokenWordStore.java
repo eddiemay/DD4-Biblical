@@ -1,6 +1,5 @@
 package com.digitald4.biblical.store;
 
-import static com.digitald4.common.util.FormatText.toCapitalized;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
@@ -11,9 +10,7 @@ import static java.util.function.Function.identity;
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.exception.DD4StorageException;
-import com.digitald4.common.storage.DAO;
-import com.digitald4.common.storage.GenericStore;
-import com.digitald4.common.storage.Query;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -26,16 +23,15 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class TokenWordStore extends GenericStore<TokenWord, String> {
+public class TokenWordStore {
   private final Provider<Iterable<TokenWord>> tokenWordsProvider;
   private final Provider<Map<String, Lexicon>> lexiconProvider;
   private volatile ImmutableListMultimap<String, TokenWord> tokenWordsByWord;
   private volatile ImmutableListMultimap<String, TokenWord> tokenWordsByStrongsId;
 
   @Inject
-  public TokenWordStore(Provider<DAO> dao, Provider<Iterable<TokenWord>> tokenWordsProvider,
-                        Provider<Map<String, Lexicon>> lexiconProvider) {
-    super(TokenWord.class, dao);
+  public TokenWordStore(
+      Provider<Iterable<TokenWord>> tokenWordsProvider, Provider<Map<String, Lexicon>> lexiconProvider) {
     this.tokenWordsProvider = tokenWordsProvider;
     this.lexiconProvider = lexiconProvider;
   }
@@ -49,9 +45,8 @@ public class TokenWordStore extends GenericStore<TokenWord, String> {
     ImmutableMap<String, Integer> countsByStrongsId =
         lexiconProvider.get().values().stream().collect(toImmutableMap(Lexicon::getId, Lexicon::getReferenceCount));
 
-    tokenWordsByWord = Stream
-        .concat(list(Query.forList()).getItems().stream(), stream(tokenWordsProvider.get()))
-        .filter(tw -> tw.getWord().length() > 0)
+    tokenWordsByWord = stream(tokenWordsProvider.get())
+        .filter(tw -> !tw.getWord().isEmpty())
         .flatMap(tw -> {
           try {
             if (tw.getWord().endsWith("ה")) {
@@ -104,6 +99,10 @@ public class TokenWordStore extends GenericStore<TokenWord, String> {
     return tokenWordsByWord.get(word);
   }
 
+  public static String toCapitalized(String text) {
+    return Strings.isNullOrEmpty(text) ? text : Character.toUpperCase(text.charAt(0)) + text.substring(1);
+  }
+
   public ImmutableList<TokenWord> getTranslations(String strongsId) {
     if (tokenWordsByStrongsId == null) {
       init();
@@ -118,11 +117,5 @@ public class TokenWordStore extends GenericStore<TokenWord, String> {
     }
 
     return tokenWordsByWord.values();
-  }
-
-  @Override
-  protected Iterable<TokenWord> postprocess(Iterable<TokenWord> entities) {
-    reset();
-    return super.postprocess(entities);
   }
 }

@@ -5,8 +5,6 @@ import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
-import com.digitald4.common.server.service.EntityServiceImpl;
-import com.digitald4.common.storage.LoginResolver;
 import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
@@ -25,11 +23,10 @@ import javax.inject.Inject;
         ownerName = "biblical.digitald4.com"
     )
 )
-public class TokenWordService extends EntityServiceImpl<TokenWord, String> {
+public class TokenWordService {
   private final TokenWordStore tokenWordStore;
   @Inject
-  TokenWordService(TokenWordStore store, LoginResolver loginResolver) {
-    super(store, loginResolver);
+  TokenWordService(TokenWordStore store) {
     this.tokenWordStore = store;
   }
 

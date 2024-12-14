@@ -80,6 +80,9 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     }
     return lessonService;
   })
+  .service('letterBoxService', function(apiConnector) {
+    return new com.digitald4.common.JSONService('letterBox', apiConnector)
+  })
   .service('lexiconService', function(apiConnector) {
     var lexiconService = new com.digitald4.common.JSONService('lexicon', apiConnector);
     lexiconService.fillReferenceCount = function(strongsId, success, error) {

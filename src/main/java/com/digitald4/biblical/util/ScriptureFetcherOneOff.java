@@ -422,7 +422,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     final Pattern verseLinePattern = Pattern.compile("(\\d+)\\s+(.+)");
     final Pattern chapterPattern = Pattern.compile("(\\d+):(\\d+)(.+)");
     final Pattern versePattern = Pattern.compile("(\\d+)\\s+(\\D+)");
-    String[] lines = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/isaiah_dss.txt")
+    String[] lines = apiConnector.sendGet("http://dss-images-dot-dd4-biblical.appspot.com/books/1Q_Isaiah_a.txt")
         .replaceAll("\u00a0", " ").split("\n");
     final String fragment = "1QIsaA";
     ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();

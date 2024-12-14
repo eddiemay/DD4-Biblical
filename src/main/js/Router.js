@@ -40,6 +40,10 @@ com.digitald4.biblical.router = function($routeProvider) {
 			controller: com.digitald4.biblical.FlashCardsCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/flashcards.html'
+		}).when('/dss_identifier', {
+			controller: com.digitald4.biblical.DssIdentifierCtrl,
+			controllerAs: '$ctrl',
+			templateUrl: 'js/html/dss_identifier.html'
 		}).when('/utils', {
 			controller: com.digitald4.biblical.UtilsCtrl,
 			controllerAs: '$ctrl',

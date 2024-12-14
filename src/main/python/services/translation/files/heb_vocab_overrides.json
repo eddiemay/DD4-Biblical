@@ -2,6 +2,7 @@
 {"strongsId":"H0113","root":"אדונ","translation":"master"}
 {"strongsId":"H0113","root":"אדו","translation":"master"}
 {"strongsId":"H0136","root":"אדונ","translation":"master"}
+{"strongsId":"H0157","root":"אוהב","translation":"love"}
 {"strongsId":"H0167","root":"הל","translation":"pitch"}
 {"strongsId":"H0168","root":"אהל","translation":"tabernacle"}
 {"strongsId":"H0175","root":"אהרנ","translation":"Aaron"}
@@ -19,15 +20,14 @@
 {"strongsId":"H0369","root":"אינ","translation":"none"}
 {"strongsId":"H0400","root":"אוכל","translation":"food"}
 {"strongsId":"H0402","root":"אכלה","translation":"food"}
-{"strongsId":"H0426","root":"אלוה","translation":"Mighty One"}
 {"strongsId":"H0426","root":"אלה","translation":"Mighty One"}
-{"strongsId":"H0430","root":"אלוה","translation":"Mighty One"}
 {"strongsId":"H0430","root":"אלה","translation":"Mighty One"}
-{"strongsId":"H0430","root":"אלהימ","translation":"Mighty Ones"}
+{"strongsId":"H0430","root":"אלוה","translation":"Mighty One"}
 {"strongsId":"H0433","root":"אלוה","translation":"Mighty One"}
 {"strongsId":"H0518","root":"אמ","translation":"if"}
 {"strongsId":"H0559","root":"אמר","translation":"said"}
 {"strongsId":"H0559","root":"אמור","translation":"say"}
+{"strongsId":"H0559","root":"ואמר","translation":"said"}
 {"strongsId":"H0587","root":"אנחנו","translation":"we are"}
 {"strongsId":"H0595","root":"אנכי","translation":"I am"}
 {"strongsId":"H0624","root":"סיפ","translation":"threshold"}
@@ -46,8 +46,10 @@
 {"strongsId":"H0852","root":"אתת","translation":"sign"}
 {"strongsId":"H0853","root":"את","translation":"you"}
 {"strongsId":"H0853","root":"אתה","translation":"she"}
+{"strongsId":"H0853","root":"אותו","translation":"him"}
 {"strongsId":"H0853","root":"אתו","translation":"him"}
 {"strongsId":"H0853","root":"אתמ","translation":"them"}
+{"strongsId":"H0853","root":"אותמ","translation":"them"}
 {"strongsId":"H0853","word":"להמ","translation":"to them"}
 {"strongsId":"H0853","word":"לכ","translation":"for yourself"}
 {"strongsId":"H0853","word":"לכמ","translation":"to them"}
@@ -67,6 +69,7 @@
 {"strongsId":"H0954","root":"בש","translation":"ashamed"}
 {"strongsId":"H0962","root":"בזז","translation":"plunder"}
 {"strongsId":"H0962","root":"בזוז","translation":"plundered"}
+{"strongsId":"H0962","root":"בוזז","translation":"plunderer"}
 {"strongsId":"H0970","root":"בחורת","translation":"youth"}
 {"strongsId":"H0995","root":"בנ","translation":"understand"}
 {"strongsId":"H1004","root":"בת","translation":"house"}
@@ -110,6 +113,7 @@
 {"strongsId":"H2088","root":"הזה","translation":"this"}
 {"strongsId":"H1980","root":"לכ","translation":"go"}
 {"strongsId":"H1980","root":"הלוכ","translation":"going"}
+{"strongsId":"H1980","root":"הולכ","translation":"walk"}
 {"strongsId":"H2005","root":"הנ","translation":"behold"}
 {"strongsId":"H2022","root":"הר","translation":"mountain"}
 {"strongsId":"H2026","root":"הרוג","translation":"slaughter"}
@@ -121,11 +125,15 @@
 {"strongsId":"H2142","root":"זכיר","translation":"remember"}
 {"strongsId":"H2142","root":"זכור","translation":"remember"}
 {"strongsId":"H2151","root":"זולל","translation":"glutton"}
+{"strongsId":"H2168","root":"זמור","translation":"prune"}
+{"strongsId":"H2181","root":"זנוה","translation":"harlot"}
 {"strongsId":"H2232","root":"זריע","translation":"sowing"}
+{"strongsId":"H2232","root":"זורע","translation":"sow"}
 {"strongsId":"H2236","root":"זורק","translation":"sprinkled"}
 {"strongsId":"H2282","root":"חוג","translation":"feast"}
 {"strongsId":"H2290","root":"חגרה","translation":"covering"}
 {"strongsId":"H2296","root":"חגר","translation":"belt"}
+{"strongsId":"H2296","root":"חגור","translation":"belt"}
 {"strongsId":"H2332","root":"חוה","translation":"Chawah (Eve)"}
 {"strongsId":"H2388","root":"חזיק","translation":"strength"}
 {"strongsId":"H2398","root":"חוטא","translation":"sinner"}
@@ -152,6 +160,7 @@
 {"strongsId":"H2873","root":"טבוח","translation":"killed"}
 {"strongsId":"H2903","root":"טטפת","translation":"frontlets"}
 {"strongsId":"H2921","root":"טלוא","translation":"spotted"}
+{"strongsId":"H2986","root":"ובל","translation":"carry"}
 {"strongsId":"H3004","root":"יבשה","translation":"dry land"}
 {"strongsId":"H3026","root":"יגר","translation":"Jegar"}
 {"strongsId":"H3026","root":"שהדותא","translation":"Sahadutha"}
@@ -160,6 +169,7 @@
 {"strongsId":"H3051","root":"הבה","translation":"come"}
 {"strongsId":"H3068","root":"יהוה","translation":"יהוה"}
 {"strongsId":"H3069","root":"יהוה","translation":"יהוה"}
+{"strongsId":"H3091","root":"יהושוע","translation":"Yahushi"}
 {"strongsId":"H3117","root":"ימ","translation":"day"}
 {"strongsId":"H3117","root":"ימימ","translation":"days"}
 {"strongsId":"H3117","root":"ימי","translation":"days of"}
@@ -177,6 +187,7 @@
 {"strongsId":"H3240","root":"יניח","translation":"left"}
 {"strongsId":"H3254","root":"ספ","translation":"again"}
 {"strongsId":"H3289","root":"יועצ","translation":"counselor"}
+{"strongsId":"H3290","root":"יעקוב","translation":"Jacob"}
 {"strongsId":"H3313","root":"הופיע","translation":"appeared"}
 {"strongsId":"H3318","root":"צא","translation":"out"}
 {"strongsId":"H3318","root":"צאת","translation":"go out"}
@@ -201,6 +212,7 @@
 {"strongsId":"H3481","root":"ישראלימ","translation":"Israelites"}
 {"strongsId":"H3772","root":"כרות","translation":"cut"}
 {"strongsId":"H3778","root":"כשדי","translation":"Chaldean"}
+{"strongsId":"H3779","root":"כשדימ","translation":"Chaldeans"}
 {"strongsId":"H3381","root":"ירד","translation":"down"}
 {"strongsId":"H3384","root":"מור","translation":"teacher"}
 {"strongsId":"H3487","root":"את","translation":"you"}
@@ -208,8 +220,9 @@
 {"strongsId":"H3533","root":"כבשה","translation":"subdue"}
 {"strongsId":"H3568","root":"כוש","translation":"Cush"}
 {"strongsId":"H3588","root":"כי","translation":"for"}
-** {"strongsId":"H3606","root":"כל","translation":"all"}
-{"strongsId":"H3615","root":"כלוה","translation":"completed"}
+{"strongsId":"H3605","root":"כול","translation":"all"}
+{"strongsId":"H3606","root":"כול","translation":"all"}
+{"strongsId":"H3615","root":"כולוה","translation":"completed"}
 {"strongsId":"H3615","root":"כלה","translation":"complete"}
 {"strongsId":"H3707","root":"כעיס","translation":"anger"}
 {"strongsId":"H3742","root":"כרוב","translation":"cherub"}
@@ -219,14 +232,17 @@
 {"strongsId":"H3801","root":"כתנ","translation":"garment"}
 {"strongsId":"H3807","root":"כתות","translation":"beated"}
 {"strongsId":"H3808","root":"לא","translation":"not"}
+{"strongsId":"H3835","root":"לבונ","translation":"whiten"}
 {"strongsId":"H3838","root":"לבנה","translation":"Lebanah"}
 {"strongsId":"H3843","root":"לבנה","translation":"brick"}
 {"strongsId":"H3866","root":"לודימ","translation":"Ludim"}
+{"strongsId":"H3871","root":"לח","translation":"table"}
 {"strongsId":"H3887","root":"לצ","translation":"scorn"}
 {"strongsId":"H3887","root":"לוצ","translation":"scorned"}
 {"strongsId":"H3887","root":"ליצ","translation":"scorning"}
 {"strongsId":"H3924","root":"לולי","translation":"loop"}
 {"strongsId":"H3947","root":"קח","translation":"took"}
+{"strongsId":"H3950","root":"לקוט","translation":"gather"}
 {"strongsId":"H3956","root":"לשנ","translation":"language"}
 {"strongsId":"H3966","root":"מאד","translation":"very"}
 {"strongsId":"H3967","root":"מאות","translation":"hundred"}
@@ -247,6 +263,7 @@
 {"strongsId":"H4208","root":"מזלות","translation":"constellation"}
 {"strongsId":"H4216","root":"מזרה","translation":"Mazzaroth"}
 {"strongsId":"H4232","root":"מחייאל","translation":"Mehujael"}
+{"strongsId":"H4256","root":"מחלוקת","translation":"division"}
 {"strongsId":"H4305","root":"מטיר","translation":"rain"}
 {"strongsId":"H6327","root":"פיצ","translation":"scatter"}
 {"strongsId":"H4325","root":"מימ","translation":"waters"}
@@ -259,18 +276,22 @@
 {"strongsId":"H4480","root":"ממ","translation":"from"}
 {"strongsId":"H4480","root":"מנ","translation":"from"}
 {"strongsId":"H4600","root":"מעוכ","translation":"bruised"}
+{"strongsId":"H4672","root":"מצוא","translation":"find"}
 {"strongsId":"H4713","root":"מצרי","translation":"Mitsrite"}
 {"strongsId":"H4714","root":"מצרימ","translation":"Mizraim"}
 {"strongsId":"H4723","root":"מקוה","translation":"collection"}
 {"strongsId":"H4725","root":"מקו","translation":"place"}
 {"strongsId":"H4725","root":"מקומ","translation":"places"}
 {"strongsId":"H4728","root":"קוחה","translation":"worn"}
+{"strongsId":"H4872","root":"מושה","translation":"Moses"}
+{"strongsId":"H4910","root":"משול","translation":"rule"}
 {"strongsId":"H4931","root":"משמרת","translation":"charge"}
 {"strongsId":"H4944","root":"שוקק","translation":"runner"}
 {"strongsId":"H4975","root":"מתנ","translation":"waist"}
 {"strongsId":"H5014","root":"נבוב","translation":"hollowed"}
 {"strongsId":"H5019","root":"נבוכדנאצר","translation":"Nebuchadnezzar"}
-{"strongsId":"H5046","root":"גיד","translation":"told"}
+{"strongsId":"H5046","root":"גיד","translation":"tell"}
+{"strongsId":"H5046","root":"יגד","translation":"tell"}
 {"strongsId":"H5055","root":"יגח","translation":"gore"}
 {"strongsId":"H5060","root":"גע","translation":"touch"}
 {"strongsId":"H5060","root":"גיע","translation":"reaching"}
@@ -286,6 +307,7 @@
 {"strongsId":"H5140","root":"זל","translation":"flood"}
 {"strongsId":"H5140","root":"זיל","translation":"flowing"}
 {"strongsId":"H5144","root":"זיר","translation":"consecrate"}
+{"strongsId":"H5146","root":"נוח","translation":"Noah"}
 {"strongsId":"H5185","root":"הטי","translation":"incline"}
 {"strongsId":"H5186","root":"טה","translation":"prevert"}
 {"strongsId":"H5193","root":"טע","translation":"plant"}
@@ -293,9 +315,11 @@
 {"strongsId":"H5201","root":"טר","translation":"grudge"}
 {"strongsId":"H5203","root":"טש","translation":"forsake"}
 {"strongsId":"H5265","root":"נסוע","translation":"journey"}
+{"strongsId":"H5265","root":"סע","translation":"set out"}
 {"strongsId":"H5301","root":"פח","translation":"blew"}
 {"strongsId":"H5307","root":"פל","translation":"fall"}
-{"strongsId":"H5307","root":"פיל","translation":"knocks out"}
+{"strongsId":"H5307","root":"פיל","translation":"falling"}
+{"strongsId":"H5307","root":"פול","translation":"fell"}
 {"strongsId":"H5327","root":"צת","translation":"strive"}
 {"strongsId":"H5337","root":"ציל","translation":"taken"}
 {"strongsId":"H5337","root":"הציל","translation":"saved"}
@@ -304,6 +328,7 @@
 {"strongsId":"H5344","root":"קוב","translation":"cursed"}
 {"strongsId":"H5375","root":"שא","translation":"lift up"}
 {"strongsId":"H5377","root":"שיא","translation":"deceived"}
+{"strongsId":"H5391","root":"נשוכ","translation":"bit"}
 {"strongsId":"H5414","root":"נת","translation":"give"}
 {"strongsId":"H5414","root":"נתנ","translation":"given"}
 {"strongsId":"H5414","root":"נתת","translation":"give"}
@@ -312,13 +337,19 @@
 {"strongsId":"H5414","root":"תת","translation":"give"}
 {"strongsId":"H5422","root":"תצ","translation":"broken down"}
 {"strongsId":"H5423","root":"נתוק","translation":"broken"}
-{"strongsId":"H5435","root":"סובא","translation":"liquor"}
+{"strongsId":"H5435","root":"סבא","translation":"liquor"}
+{"strongsId":"H5435","root":"סובא","translation":"drunkard"}
+{"strongsId":"H5435","root":"סבוא","translation":"drunkard"}
 {"strongsId":"H5437","root":"סובב","translation":"about"}
+{"strongsId":"H5437","root":"סובו","translation":"around"}
+{"strongsId":"H5440","root":"סבוכ","translation":"fold"}
 {"strongsId":"H5445","root":"סתבל","translation":"burden"}
-{"strongsId":"H5462","root":"סגיר","translation":"isolate"}
 {"strongsId":"H5456","root":"סגד","translation":"prostrate"}
 {"strongsId":"H5456","root":"סגיד","translation":"prostrating"}
 {"strongsId":"H5456","root":"סגוד","translation":"prostrated"}
+{"strongsId":"H5462","root":"סגיר","translation":"isolate"}
+{"strongsId":"H5462","root":"סוגר","translation":"shut"}
+{"strongsId":"H5467","root":"סדומ","translation":"Sodom"}
 {"strongsId":"H5496","root":"סית","translation":"persuade"}
 {"strongsId":"H5526","root":"סכסכ","translation":"defend"}
 {"strongsId":"H5543","root":"סלוא","translation":"Sallu"}
@@ -330,16 +361,21 @@
 {"strongsId":"H5637","root":"סורר","translation":"stubborn"}
 {"strongsId":"H5641","root":"סתירה","translation":"hidden"}
 {"strongsId":"H5641","root":"סתתר","translation":"hidden"}
+{"strongsId":"H5662","root":"עובדיה","translation":"Obadiah"}
 {"strongsId":"H5668","root":"עבור","translation":"over"}
 {"strongsId":"H5670","root":"עביט","translation":"lend"}
 {"strongsId":"H5674","root":"העביר","translation":"crossed over"}
 {"strongsId":"H5674","root":"עובר","translation":"passing"}
 {"strongsId":"H5674","root":"עביר","translation":"pass"}
+{"strongsId":"H5676","root":"עבר","translation":"over"}
 {"strongsId":"H5704","root":"עד","translation":"until"}
 {"strongsId":"H5702","root":"עד","translation":"ever"}
 {"strongsId":"H5703","root":"עד","translation":"forever"}
 {"strongsId":"H5715","root":"עדו","translation":"testify"}
+{"strongsId":"H5715","root":"עד","translation":"testify"}
+{"strongsId":"H5726","root":"עדולמי","translation":"Adullamite"}
 {"strongsId":"H5736","root":"עדיפ","translation":"remained"}
+{"strongsId":"H5736","root":"עודפ","translation":"remained"}
 {"strongsId":"H5749","root":"עיד","translation":"witness"}
 {"strongsId":"H5756","root":"עיז","translation":"refuge"}
 ** {"strongsId":"H5769","root":"על","translation":"ever"}
@@ -367,13 +403,14 @@
 {"strongsId":"H6155","root":"ערב","translation":"evening"}
 {"strongsId":"H6202","root":"ערופ","translation":"neck"}
 {"strongsId":"H6213","root":"עשה","translation":"made"}
+{"strongsId":"H6213","root":"עושה","translation":"made"}
 {"strongsId":"H6213","root":"עש","translation":"made"}
 {"strongsId":"H6213","root":"עשה","translation":"create"}
 {"strongsId":"H6213","root":"עשות","translation":"accomplish"}
 {"strongsId":"H6256","root":"מעת","translation":"from time"}
 {"strongsId":"H6279","root":"עתיר","translation":"intreated"}
 {"strongsId":"H6293","root":"פגיע","translation":"falling"}
-{"strongsId":"H6310","root":"פי","translation":"mouth"}
+{"strongsId":"H6310","root":"פיה","translation":"mouth"}
 {"strongsId":"H6320","root":"פוכ","translation":"colorful"}
 {"strongsId":"H6328","root":"פקו","translation":"stumble"}
 {"strongsId":"H6329","root":"פק","translation":"obtain"}
@@ -409,9 +446,11 @@
 {"strongsId":"H6743","root":"צליח","translation":"prosper"}
 {"strongsId":"H6779","root":"צמיח","translation":"grow"}
 {"strongsId":"H6779","root":"צומח","translation":"grow"}
+{"strongsId":"H6850","root":"צפצפ","translation":"whisper"}
 {"strongsId":"H6884","root":"צרפ","translation":"cast"}
 {"strongsId":"H6884","root":"צורפ","translation":"caster"}
 {"strongsId":"H6915","root":"קד","translation":"bow"}
+{"strongsId":"H6915","root":"קוד","translation":"bowed"}
 {"strongsId":"H6944","root":"קידש","translation":"holy"}
 {"strongsId":"H6950","root":"קהיל","translation":"gathering"}
 {"strongsId":"H6953","root":"קוהל","translation":"preacher"}
@@ -419,6 +458,7 @@
 {"strongsId":"H6963","root":"קל","translation":"voice"}
 {"strongsId":"H6965","root":"קמ","translation":"up"}
 {"strongsId":"H6982","root":"קרה","translation":"roof"}
+{"strongsId":"H6996","root":"קטונ","translation":"lesser"}
 {"strongsId":"H6999","root":"קטיר","translation":"burn"}
 {"strongsId":"H7038","root":"קלוט","translation":"lacking"}
 {"strongsId":"H7090","root":"קפוד","translation":"porcupine"}
@@ -432,9 +472,10 @@
 {"strongsId":"H7181","root":"קשיב","translation":"hearkening"}
 {"strongsId":"H7188","root":"קשיח","translation":"hardening"}
 {"strongsId":"H7194","root":"קשורה","translation":"tied up"}
+{"strongsId":"H7197","root":"קושש","translation":"gather"}
 {"strongsId":"H7200","root":"ראה","translation":"see"}
 {"strongsId":"H7200","root":"ראוה","translation":"saw"}
-{"strongsId":"H7200","root":"יראה","translation":"he saw"}
+{"strongsId":"H7200","root":"יראה","translation":"he see"}
 {"strongsId":"H7280","root":"רגיע","translation":"rest"}
 {"strongsId":"H7223","root":"ראשנ","translation":"first"}
 {"strongsId":"H7235","root":"רבו","translation":"multiply"}
@@ -447,6 +488,7 @@
 {"strongsId":"H7279","root":"רוגנ","translation":"murmurer"}
 {"strongsId":"H7287","root":"רדו","translation":"rule"}
 {"strongsId":"H7287","root":"רודה","translation":"rule"}
+{"strongsId":"H7291","root":"רדופ","translation":"pursue"}
 {"strongsId":"H7300","root":"ריד","translation":"dominion"}
 {"strongsId":"H7323","root":"ריצ","translation":"run"}
 {"strongsId":"H7327","root":"רר","translation":"run"}
@@ -457,6 +499,7 @@
 {"strongsId":"H7379","root":"ריב","translation":"strife"}
 {"strongsId":"H7399","root":"רכוש","translation":"possession"}
 {"strongsId":"H7430","root":"רומש","translation":"that move"}
+{"strongsId":"H7453","root":"רעה","translation":"neighbor"}
 {"strongsId":"H7493","root":"רעיש","translation":"shook"}
 {"strongsId":"H7523","root":"רצח","translation":"slay"}
 {"strongsId":"H7523","root":"רוצח","translation":"slayer"}
@@ -467,6 +510,7 @@
 {"strongsId":"H7760","root":"סמ","translation":"put"}
 {"strongsId":"H7760","root":"שמ","translation":"put"}
 {"strongsId":"H7673","root":"שבת","translation":"shabbat"}
+{"strongsId":"H7673","root":"שבות","translation":"shabated"}
 {"strongsId":"H7674","root":"שבת","translation":"shabbat"}
 {"strongsId":"H7675","root":"שבת","translation":"shabbat"}
 {"strongsId":"H7676","root":"שבת","translation":"shabbat"}
@@ -481,6 +525,7 @@
 {"strongsId":"H7974","root":"שלח","translation":"Shelah"}
 {"strongsId":"H7992","root":"שלישי","translation":"third"}
 {"strongsId":"H8004","root":"שלמ","translation":"Shalom"}
+{"strongsId":"H8032","root":"שלשומ","translation":"times past"}
 {"strongsId":"H8034","root":"שמ","translation":"name"}
 {"strongsId":"H8034","root":"שמה","translation":"name of her"}
 {"strongsId":"H8064","root":"שמימ","translation":"heavens"}
@@ -488,6 +533,7 @@
 {"strongsId":"H8086","root":"שמע","translation":"listen"}
 {"strongsId":"H8104","root":"שמור","translation":"guard"}
 {"strongsId":"H8127","root":"שנ","translation":"tooth"}
+{"strongsId":"H8130","root":"שונא","translation":"hater"}
 {"strongsId":"H8141","root":"שנה","translation":"year"}
 {"strongsId":"H8141","root":"שנימ","translation":"years"}
 {"strongsId":"H8141","root":"בשנה","translation":"in year"}

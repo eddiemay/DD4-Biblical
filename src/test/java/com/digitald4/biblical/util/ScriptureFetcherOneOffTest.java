@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
+  private static final String ISAIAH_SCROLL = "src/main/python/services/dss_images/books/1Q_Isaiah_a.txt";
   @Before
   public void setup() {
     super.setup();
@@ -364,8 +365,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
 
   @Test
   public void fetchIsaiahDSS() throws Exception {
-    when(apiConnector.sendGet(anyString())).thenReturn(
-        getContent("src/main/webapp/books/isaiah_dss.txt"));
+    when(apiConnector.sendGet(anyString())).thenReturn(getContent(ISAIAH_SCROLL));
 
     assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 1:1-4,31,2:1-2")
         .getItems()).containsExactly(
@@ -394,8 +394,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
 
   @Test
   public void fetchIsaiahDSS_noVerseLeftBehind() throws Exception {
-    when(apiConnector.sendGet(anyString())).thenReturn(
-        getContent("src/main/webapp/books/isaiah_dss.txt"));
+    when(apiConnector.sendGet(anyString())).thenReturn(getContent(ISAIAH_SCROLL));
 
     assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 45:24-46:1").getItems()).containsExactly(
         new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XXXIX-4").setChapter(45).setVerse(24).setText(
@@ -408,8 +407,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
 
   @Test
   public void fetchIsaiahDSS_noVerseLeftBehind64() throws Exception {
-    when(apiConnector.sendGet(anyString())).thenReturn(
-        getContent("src/main/webapp/books/isaiah_dss.txt"));
+    when(apiConnector.sendGet(anyString())).thenReturn(getContent(ISAIAH_SCROLL));
 
     assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 63:19-64:2").getItems()).containsExactly(
         new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-LI-14").setChapter(63).setVerse(19).setText(
@@ -422,7 +420,7 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
 
   @Test
   public void fetchIsaiahDSS_duplicates() throws Exception {
-    when(apiConnector.sendGet(anyString())).thenReturn(getContent("src/main/webapp/books/isaiah_dss.txt"));
+    when(apiConnector.sendGet(anyString())).thenReturn(getContent(ISAIAH_SCROLL));
 
     assertThat(scriptureStore.getScriptures("DSS", HEBREW, "Isaiah 16:14").getItems()).containsExactly(
         new Scripture().setVersion("DSS").setBook("Isaiah").setLanguage("he").setLocation("1QIsaA-XIII-31").setChapter(16).setVerse(14).setText(
