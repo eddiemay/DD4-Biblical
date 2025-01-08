@@ -1,14 +1,13 @@
 import cv2
 import math
 import numpy
-from dss_backup import Collection, download
+from dss_backup import Collection, download, BASE_DIR
 from training.dss_ocr import image_to_string
 from pathlib import Path
 
 
 def load_img(collection, res, col, row):
-    download(collection, res, col, row)
-    file_path = f'images/{collection.scroll}/tiles/{res}_{col}_{row}.jpg'
+    file_path = download(collection, res, col, row)
     return cv2.imread(file_path)
 
 
@@ -21,7 +20,8 @@ def construct_column(collection, column=1, res=None):
     print('bounds: {}'.format([start_x, start_x + width]))
     tile_size = collection.tile_size
     col_offset = math.floor(start_x / tile_size)
-    cols = math.ceil(width / tile_size)
+    actual_start = start_x - col_offset * tile_size
+    cols = math.ceil((actual_start + width) / tile_size)
     print('Creating canvas of size: (h: {}, w: {})'.format(
         rows * tile_size, cols * tile_size))
     canvas = numpy.zeros((rows * tile_size, cols * tile_size, 3), dtype='uint8')
@@ -33,16 +33,18 @@ def construct_column(collection, column=1, res=None):
             canvas[y:y + img.shape[0], x:x + img.shape[1]] = img
 
     cv2.imshow('Canvas', canvas)
-    print('Cropping to: (h: {}, w: {})'.format(rows * tile_size, width))
-    canvas = canvas[0:rows * tile_size, start_x - col_offset * tile_size:width]
 
-    print('Showing image {} column {}...'.format(collection.scroll, column))
-    cv2.imshow('Canvas exact', canvas)
-    print(image_to_string(canvas, False))
-    Path(f'images/{collection.scroll}/columns').mkdir(exist_ok=True)
-    cv2.imwrite(
-        f'images/{collection.scroll}/columns/column_{res}_{column}.jpg', canvas)
-    cv2.waitKey()
+    print('Cropping to: (h: {}, w: {})'.format(rows * tile_size, width))
+    exact = canvas[0:rows * tile_size, actual_start:actual_start + width]
+    print('Showing image {} column {}... of shape: {}'.format(collection.scroll, column, exact.shape[:2]))
+    cv2.imshow(f'Canvas exact Res: {res}', exact)
+
+    print(image_to_string(exact, False))
+
+    columns_dir = f'{BASE_DIR.format(collection.scroll)}/columns'
+    Path(columns_dir).mkdir(exist_ok=True)
+    cv2.imwrite(f'{columns_dir}/column_{res}_{column}.jpg', exact)
+    cv2.waitKey(2)
 
 
 # for c in range(1, 5):
@@ -54,10 +56,17 @@ def construct_column(collection, column=1, res=None):
 # construct_column(Collection.TORAH, 2, res=5)
 # construct_column(Collection.TORAH, 1, res=5)
 
-# for c in range(1, 55):
-    # construct_column(Collection.ISAIAH, c)
-construct_column(Collection.ISAIAH, 14)
+# for c in range(1):
+    # construct_column(Collection.ISAIAH, 47, 8)
+    # construct_column(Collection.ISAIAH, 47, 9)
+    # construct_column(Collection.ISAIAH, 47, 10)
+    # print(f'Showing Isaiah column {c + 1}')
+    # cv2.waitKey(2)
+construct_column(Collection.ISAIAH, 47, 10)
+# construct_column(Collection.ISAIAH, 45, 10)
+# construct_column(Collection.ISAIAH, 45, 8)
 # construct_column(Collection.ISAIAH, 1)
+cv2.waitKey(0)
 
 # for c in range(1, 16):
   #  construct_column(Collection.WAR, c)

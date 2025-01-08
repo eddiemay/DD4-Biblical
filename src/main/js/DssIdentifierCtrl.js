@@ -124,6 +124,25 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     }
 
     if (!this.selectedBox) {
+      if (event.shiftKey && event.key == 'ArrowRight') {
+        this.letterBoxes.forEach(letterBox => {
+          letterBox.x1 += 1;
+          letterBox.x2 += 1;
+        });
+        this.drawScroll();
+      } else if (event.shiftKey && event.key == 'ArrowLeft') {
+        this.letterBoxes.forEach(letterBox => {
+          letterBox.x1 -= 1;
+          letterBox.x2 -= 1;
+        });
+        this.drawScroll();
+      } else if (event.shiftKey && (event.key == 's' || event.key == 'S')) {
+        this.letterBoxes.forEach(letterBox => letterBox._row = undefined);
+        this.letterBoxService.batchCreate(this.letterBoxes, result => {
+          this.selectedBox = undefined;
+          this.drawScroll();
+        });
+      }
       return;
     }
 
@@ -134,15 +153,15 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
           // Remove the letter from the list.
           this.letterBoxes.splice(this.letterBoxes.indexOf(deleteBox), 1);
 
-          // Remove from stats and recalculate.
+          // Remove from stats.
           var stats = this.statMap[this.selectedBox.value];
           stats.letterBoxes.splice(stats.letterBoxes.indexOf(deleteBox), 1);
-          stats.totalWidth -= deleteBox.x2 - deleteBox.x1;
-          stats.totalHeight -= deleteBox.y2 - deleteBox.y1;
 
-          // Refresh all rows.
-          this.rows.forEach(row => row._letterBoxes = []);
-          this.letterBoxes.forEach(letterBox => this.addLetterStat(letterBox));
+          // Remove from row.
+          if (deleteBox._row) {
+            var row = deleteBox._row;
+            row._letterBoxes.splice(row._letterBoxes.indexOf(deleteBox), 1);
+          }
         } else if (deleteBox.type == 'Row') {
           this.rows.splice(this.rows.indexOf(deleteBox), 1);
         }
@@ -154,11 +173,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
       this.dialogStyle = {top: $window.visualViewport.pageTop - 20};
       this.$scope.$apply();
     } else if (event.key == 's' || event.key == 'S') {
-      /* this.letterBoxService.create(this.selectedBox, result => {
-        this.selectedBox = undefined;
-        this.drawScroll();
-      }); */
-      this.letterBoxService.batchCreate(this.letterBoxes, result => {
+      this.letterBoxService.create(this.selectedBox, result => {
         this.selectedBox = undefined;
         this.drawScroll();
       });
@@ -199,22 +214,28 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
 
   // If there is a selected box currently, save it to the backend and deselect it.
   var saveBox = this.selectedBox;
-  saveBox._state = 'saving';
   this.selectedBox = undefined;
+  saveBox._state = 'saving';
+  saveBox._letterBoxes = undefined;
+  saveBox._row = undefined;
   this.letterBoxService.create(saveBox, result => {
     saveBox._state = undefined;
     saveBox.id = result.id;
     this.drawScroll();
   }, error => {
-    letterBox._state = 'error';
+    saveBox._state = 'error';
     notifyError(error);
     this.drawScroll();
   });
+
   if (saveBox.type == 'Letter') {
     this.addLetterStat(saveBox);
   } else {
     this.rows.forEach(row => row._letterBoxes = []);
-    this.letterBoxes.forEach(letterBox => this.addLetterStat(letterBox));
+    this.letterBoxes.forEach(letterBox => {
+      letterBox._row = undefined;
+      this.addLetterStat(letterBox);
+    });
   }
 }
 
@@ -308,31 +329,44 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
     }, errorResponse => {
       notifyError(response.data.error);
     });
+  } else {
+    this.textFile = undefined;
   }
 
   this.drawScroll();
+}
+
+com.digitald4.biblical.DssIdentifierCtrl.prototype.getAvgDim = function(letter) {
+  var stats = this.statMap[letter.value];
+  if (stats) {
+    var count = stats.letterBoxes.length, totalWidth = 0, totalHeight = 0;
+    stats.letterBoxes.forEach(letterBox => {
+      totalWidth += letterBox.x2 - letterBox.x1;
+      totalHeight += letterBox.y2 - letterBox.y1;
+    });
+    return {avgWidth: totalWidth / count, avgHeight: totalHeight / count};
+  }
+  return {avgWidth: 26, avgHeight: 26};
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.create = function(letter) {
   if (this.selectedBox) {
     if (this.selectedBox.value != letter.value) {
       var stats = this.statMap[this.selectedBox.value];
-      stats.totalWidth -= this.selectedBox.x2 - this.selectedBox.x1;
-      stats.totalHeight -= this.selectedBox.y2 - this.selectedBox.y1;
       stats.letterBoxes.splice(stats.letterBoxes.indexOf(this.selectedBox), 1);
       this.selectedBox.value = letter.value;
     }
   } else {
-    var stats = this.statMap[letter.value] || {avgWidth: 26, avgHeight: 26};
+    var stats = this.getAvgDim(letter);
     var letterBox = {
       filename: this.filename, type: 'Letter', value: letter.value,
       x1: this.x - stats.avgWidth / 2, y1: this.y - stats.avgHeight / 2,
       x2: this.x + stats.avgWidth / 2, y2: this.y + stats.avgHeight / 2};
 
     this.letterBoxes.push(letterBox);
-    this.addLetterStat(letterBox);
     this.selectedBox = letterBox;
   }
+  this.addLetterStat(this.selectedBox);
   this.drawScroll();
   this.closeDialog();
 }
@@ -351,9 +385,9 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.createRow = function() {
     }
     this.rows.splice(index, 0, rowBox);
     this.selectedBox = rowBox;
-    this.rowNum++;
   }
 
+  this.rowNum++;
   this.drawScroll();
   this.closeDialog();
 }
@@ -421,15 +455,15 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(lett
 
   var stats = this.statMap[letterBox.value];
   if (!stats) {
-    stats = {letterBoxes: [], totalWidth: 0, totalHeight: 0};
+    stats = {letterBoxes: []};
     this.statMap[letterBox.value] = stats;
   }
   if (stats.letterBoxes.indexOf(letterBox) == -1) {
     stats.letterBoxes.push(letterBox);
-    stats.totalWidth += letterBox.x2 - letterBox.x1;
-    stats.totalHeight += letterBox.y2 - letterBox.y1;
-    stats.avgWidth = stats.totalWidth / stats.letterBoxes.length;
-    stats.avgHeight = stats.totalHeight / stats.letterBoxes.length;
+  }
+
+  if (letterBox._row) {
+    letterBox._row.splice(letterBox._row.indexOf(letterBox), 1);
   }
 
   for (var r = 0; r < this.rows.length; r++) {
@@ -441,16 +475,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(lett
           index++;
         }
         row._letterBoxes.splice(index, 0, letterBox);
-
-        // If the letter is part of the last or next row remove after adding to this row.
-        var lr = r - 1;
-        if (lr > -1 && this.rows[lr]._letterBoxes.indexOf(letterBox) != -1) {
-          this.rows[lr]._letterBoxes.splice(this.rows[lr]._indexOf(letterBox), 1);
-        }
-        var nr = r + 1;
-        if (nr < this.rows.length && this.rows[nr]._letterBoxes.indexOf(letterBox) != -1) {
-          this.rows[nr]._letterBoxes.splice(this.rows[nr]._indexOf(letterBox), 1);
-        }
+        letterBox._row = row;
       }
       break;
     }
@@ -562,9 +587,10 @@ function unfinalize(text) {
 }
 
 function romanize(num) {
-  var lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1},roman = '',i;
-  for ( i in lookup ) {
-    while ( num >= lookup[i] ) {
+  var lookup = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1};
+  var roman = '', i;
+  for (i in lookup) {
+    while (num >= lookup[i]) {
       roman += i;
       num -= lookup[i];
     }

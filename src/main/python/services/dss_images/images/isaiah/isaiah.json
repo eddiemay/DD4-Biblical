@@ -21,7 +21,7 @@
 			"range": "66:14-24"
 		}, {
 			"id": 53,
-			"width": 340,
+			"width": 290,
 			"x": 300,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah53.jpg",
 			"range": "65:19-66:14"
@@ -57,8 +57,8 @@
 			"range": "58:6-59:17"
 		}, {
 			"id": 47,
-			"width": 299,
-			"x": 2084,
+			"width": 314,
+			"x": 2072,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah47.jpg",
 			"range": "57:2-58:6"
 		}, {
@@ -69,13 +69,13 @@
 			"range": "55:8-57:2"
 		}, {
 			"id": 45,
-			"width": 254,
-			"x": 2668,
+			"width": 256,
+			"x": 2664,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah45.jpg",
 			"range": "54:4-55:8"
 		}, {
 			"id": 44,
-			"width": 260,
+			"width": 275,
 			"x": 2917,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah44.jpg",
 			"range": "52:13-54:4"
@@ -123,7 +123,7 @@
 			"range": "43:20-44:23"
 		}, {
 			"id": 36,
-			"width": 374,
+			"width": 316,
 			"x": 5505,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah36.jpg",
 			"range": "42:18-43:20"
@@ -177,7 +177,7 @@
 			"range": "34:1-36:2"
 		}, {
 			"id": 27,
-			"width": 264,
+			"width": 267,
 			"x": 8189,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah27.jpg",
 			"range": "33:1-24"
@@ -255,7 +255,7 @@
 			"range": "18:7-19:23"
 		}, {
 			"id": 14,
-			"width": 260,
+			"width": 254,
 			"x": 11632,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah14.jpg",
 			"range": "16:14-18:7"
@@ -285,7 +285,7 @@
 			"range": "10:14-11:12"
 		}, {
 			"id": 9,
-			"width": 251,
+			"width": 256,
 			"x": 13097,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah9.jpg",
 			"range": "9:11-10:14"

@@ -12,6 +12,17 @@ public class LetterBox extends ModelObjectModUser<Long> {
   private int y2;
   private String value;
 
+  @Override
+  public Long getId() {
+    return super.getId();
+  }
+
+  @Override
+  public LetterBox setId(Long id) {
+    super.setId(id);
+    return this;
+  }
+
   public String getFilename() {
     return filename;
   }

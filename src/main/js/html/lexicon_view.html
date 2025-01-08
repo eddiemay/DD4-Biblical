@@ -19,7 +19,11 @@
     </ul>
     <div class="block-content form">
       <div data-ng-if="$ctrl.view=='INFO'">
-        <h2>Lexicon :: Strong's {{$ctrl.lexicon.id}} - {{$ctrl.lexicon.word}}</h2>
+        <h2>Lexicon :: Strong's <a href="" data-ng-click="$ctrl.prevStrongsDef()"><img src="images/chevron-left.png" alt="Previous"></a>
+          <input data-ng-model="$ctrl.strongsId" size="5" data-on-change="$ctrl.showStrongsDef()">
+          <a href="" data-ng-click="$ctrl.nextStrongsDef()"><img src="images/chevron.png" alt="Next"></a>
+          {{$ctrl.lexicon.word}}
+        </h2>
         <div class="columns">
           <div class="colx2-left">
             <h3>Ancient</h3>
@@ -98,22 +102,6 @@
         <div class="columns">
           <h3>Dictionary Aids</h3>
           <p>{{$ctrl.lexicon.dictionaryAid}}</p>
-        </div>
-        <div class="columns">
-          <div class="colx3-left">
-            <button class="float-left" data-ng-click="$ctrl.prevStrongsDef()">Previous</button>
-          </div>
-          <div class="colx3-center">
-            <button class="float-center" data-ng-click="$ctrl.nextStrongsDef()">Next</button>
-          </div>
-        </div>
-        <div class="columns">
-          <div class="colx3-left">
-            <input data-ng-model="$ctrl.strongsId" class="full-width"/>
-          </div>
-          <div class="colx3-center">
-            <button data-ng-click="$ctrl.showStrongsDef()">Show</button>
-          </div>
         </div>
       </div>
       <div data-ng-if="$ctrl.view=='REFERENCES'">

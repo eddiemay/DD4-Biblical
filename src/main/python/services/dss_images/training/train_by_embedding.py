@@ -9,11 +9,11 @@ from pathlib import Path
 from urllib import request
 from train_by_font import cache_bible
 from train_by_font import training_text_file
+from utility import unfinalize
 
 letter_box_file = 'letter_boxes.json'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-LETTERBOX_URL = API_BASE + 'letterBoxs/v1/list?filter=letter%3D'
-LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0'
+LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1'
 BASE_OUTPUT = 'tesstrain/data/'
 output_directory = f'{BASE_OUTPUT}embedding-ground-truth'
 base_image = cv2.imread('../images/isaiah/columns/column_9_54.jpg')
@@ -26,18 +26,23 @@ fragment_map = {}
 line_spacing = 60
 min_space = 5
 max_space = 10
-override_letter_cache = True
+override_letter_cache = False
 
 
-def cache_letter_boxes(fragments):
+def cache_letter_boxes(override_letter_cache=False):
+    if os.path.exists(letter_box_file) and not override_letter_cache:
+        return
+
+    fragments = [
+        'isaiah-column-2', 'isaiah-column-4', 'isaiah-column-9', 'isaiah-column-14',
+        'isaiah-column-20', 'isaiah-column-27', 'isaiah-column-36', 'isaiah-column-44',
+        'isaiah-column-45', 'isaiah-column-47', 'isaiah-column-48', 'isaiah-column-53',
+        'community-column-11', 'habakkuk-column-4', 'temple-column-5',
+        'war-column-1']
     # Open the file for write.
     print('Writing file: ', letter_box_file)
     with (open(letter_box_file, "w", encoding="utf-8") as f):
-        # TODO(eddiemay): Find out why query by letter throwing NPE in backend
-        # for letter in "אבגדהוזחטיכלמנסעפצקרשת":
-            # letterbox_url = u''.join((LETTERBOX_URL, letter)).encode('utf-8').strip()
-            # LETTERBOX_URL.format(letter.encode('utf-8').strip())
-        for fragment in fragments:
+        for fragment in fragments[:9]:
             letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
             print('Sending request: ', letterbox_url)
             with request.urlopen(letterbox_url) as url:
@@ -46,24 +51,25 @@ def cache_letter_boxes(fragments):
                 letterboxes = response['items']
                 # Dump each scripture verse into the file.
                 for letterbox in letterboxes:
-                    if letterbox['type'] == 'Letter':
-                        json.dump(letterbox, f)
-                        f.write("\n")
+                    json.dump(letterbox, f)
+                    f.write("\n")
 
 
 def get_random_letter_box(letter):
     if not letter_map:
         print('creating letter map')
         with open(letter_box_file, "r", encoding="utf-8") as f:
-            lines = f.read().strip().split("\n")
-            for line in lines:
+            letters = 0
+            for line in f:
                 letter_box = json.loads(line)
-                collection = letter_map.get(letter_box['value'])
-                if not collection:
-                    collection = []
-                    letter_map[letter_box['value']] = collection
-                collection.append(letter_box)
-            print(f'{len(lines)} letters')
+                if letter_box['type'] == 'Letter':
+                    letters += 1
+                    collection = letter_map.get(letter_box['value'])
+                    if not collection:
+                        collection = []
+                        letter_map[letter_box['value']] = collection
+                    collection.append(letter_box)
+            print(f'{letters} letters')
             for l in sorted(letter_map):
                 print(f'{l}: {len(letter_map.get(l))}')
 
@@ -159,14 +165,6 @@ def output_files(sample):
 def process_and_output(sample):
     process(sample)
     output_files(sample)
-    output_files(sample)
-
-
-def unfinalize(text):
-    return (text.replace("ך", "כ").replace("ם", "מ").replace("ן", "נ")
-            .replace("ף", "פ").replace("ץ", "צ")
-            .replace('[', '').replace(']', '').replace('(','').replace(')','')
-            .replace('', '').replace('1', '').replace('9', ''))
 
 
 def create_isa_6_7_11_sample():
@@ -186,14 +184,7 @@ if __name__ == '__main__':
     # cv2.waitKey()
 
     cache_bible()
-
-    fragments = [
-        'isaiah-column-4', 'isaiah-column-9', 'isaiah-column-14', 'isaiah-column-27',
-        'isaiah-column-36', 'isaiah-column-44', 'isaiah-column-53',
-        'community-column-11', 'habakkuk-column-4', 'temple-column-5',
-        'war-column-1']
-    if not os.path.exists(letter_box_file) or override_letter_cache:
-        cache_letter_boxes(fragments[:7])
+    cache_letter_boxes(override_letter_cache)
 
     # Read each training file line and put it in an array.
     lines = []
@@ -232,6 +223,8 @@ if __name__ == '__main__':
     output_files(samples[1])
     cv2.imshow('Gen 1:1-7', samples[1]['image'])
     cv2.waitKey()
+    # Close all windows
+    cv2.destroyAllWindows()
 
     # The edge cases are a must-have.
     with open('edge_cases.txt', 'r') as edge_cases:

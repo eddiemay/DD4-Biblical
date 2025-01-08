@@ -98,8 +98,16 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsDef = function(stron
   this.lexiconRequest = {strongsId: strongsId};
 }
 
-com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefDialog = function(interlinear) {
+com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefDialog = function(interlinear, isSub) {
   this.setDialogStyle();
+  this.strongsId = interlinear.strongsId;
+  if (isSub) {
+    for (var subToken of interlinear.subTokens) {
+      if (subToken.strongsId) {
+        this.strongId = subToken.strongsId;
+      }
+    }
+  }
   this.interlinear = interlinear;
   this.references = undefined;
   this.dialogShown = 'REFERENCES';
@@ -107,7 +115,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefDialog = function
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(page) {
   var request = {pageToken: page};
-  if (this.globalData.matchStrongs) request.strongsId = this.interlinear.strongsId;
+  if (this.globalData.matchStrongs) request.strongsId = this.strongsId;
   if (this.globalData.matchWord) request.word = this.interlinear.word;
   if (this.globalData.matchConstantsOnly) request.hebrewWord = this.interlinear.constantsOnly;
   this.interlinearService.getReferences(request, response => {
@@ -218,7 +226,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.drawScroll = function(ctx, scro
         }, 500); // Wait 1/2 a second before drawing lines to give time for images to be drawn.
       }
     }
-    img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/isaiah/isaiah_9_${col}_${row}.jpg`;
+    img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/isaiah/tiles/9_${col}_${row}.jpg`;
   }
 
   for (var c = startTileCol; c <= endTileCol; c++) {

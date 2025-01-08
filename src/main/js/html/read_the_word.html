@@ -126,7 +126,9 @@
                             </span>
                           </td></tr>
                           <tr><td class="translit">
-                            <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.transliteration}} </span>
+                            <a href="" data-ng-click="$ctrl.showStrongsRefDialog(interlinear, true)">
+                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.transliteration}} </span>
+                            </a>
                           </td></tr>
                           <tr><td class="hebrew">
                             <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.word}} </span>
@@ -186,7 +188,7 @@
         </li>
       </ul>
       <div class="block-content form">
-        <h2>References for Strong's {{$ctrl.interlinear.strongsId}} {{$ctrl.interlinear.constantsOnly}}</h2>
+        <h2>References for Strong's {{$ctrl.strongsId}} {{$ctrl.interlinear.constantsOnly}}</h2>
         <h4>{{$ctrl.references.start}} to {{$ctrl.references.end}} of {{$ctrl.references.totalSize}}</h4>
         <fieldset>
           <h4>Match Criteria</h4>

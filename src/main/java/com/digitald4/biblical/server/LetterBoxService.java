@@ -2,7 +2,9 @@ package com.digitald4.biblical.server;
 
 import com.digitald4.biblical.model.LetterBox;
 import com.digitald4.common.exception.DD4StorageException;
+import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.server.service.EntityServiceBulkImpl;
+import com.digitald4.common.server.service.IterableParam;
 import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.Store;
 import com.google.api.server.spi.ServiceException;
@@ -13,6 +15,7 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.config.Nullable;
 import com.google.common.collect.ImmutableList;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 @Api(
