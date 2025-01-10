@@ -62,7 +62,7 @@ def construct_column(collection, column=1, res=None):
     # construct_column(Collection.ISAIAH, 47, 10)
     # print(f'Showing Isaiah column {c + 1}')
     # cv2.waitKey(2)
-construct_column(Collection.ISAIAH, 47, 10)
+construct_column(Collection.ISAIAH, 2, 10)
 # construct_column(Collection.ISAIAH, 45, 10)
 # construct_column(Collection.ISAIAH, 45, 8)
 # construct_column(Collection.ISAIAH, 1)

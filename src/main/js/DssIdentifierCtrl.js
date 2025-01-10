@@ -159,8 +159,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
 
           // Remove from row.
           if (deleteBox._row) {
-            var row = deleteBox._row;
-            row._letterBoxes.splice(row._letterBoxes.indexOf(deleteBox), 1);
+            deleteBox._row._letterBoxes.splice(deleteBox._row._letterBoxes.indexOf(deleteBox), 1);
           }
         } else if (deleteBox.type == 'Row') {
           this.rows.splice(this.rows.indexOf(deleteBox), 1);
@@ -217,7 +216,10 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
   this.selectedBox = undefined;
   saveBox._state = 'saving';
   saveBox._letterBoxes = undefined;
-  saveBox._row = undefined;
+  if (saveBox._row) {
+    saveBox._row._letterBoxes.splice(saveBox._row._letterBoxes.indexOf(saveBox), 1);
+    saveBox._row = undefined;
+  }
   this.letterBoxService.create(saveBox, result => {
     saveBox._state = undefined;
     saveBox.id = result.id;
@@ -463,7 +465,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(lett
   }
 
   if (letterBox._row) {
-    letterBox._row.splice(letterBox._row.indexOf(letterBox), 1);
+    letterBox._row._letterBoxes.splice(letterBox._row._letterBoxes.indexOf(letterBox), 1);
   }
 
   for (var r = 0; r < this.rows.length; r++) {

@@ -7,6 +7,7 @@ from dss_ocr import image_to_string
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
 from pytesseract import Output
+from scipy import stats
 from utility import image_to_boxes_data, post_process_boxes, romanize, unfinalize
 from utility import draw_letter_boxes_and_text
 
@@ -63,11 +64,12 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     mblur = cv2.medianBlur(gray, 3)
-    gblur = cv2.GaussianBlur(gray, (3,3), sigmaX=30, sigmaY=300)
+    gblur = cv2.GaussianBlur(gray, [3, 3], sigmaX=30, sigmaY=300)
     mth = cv2.threshold(mblur, 145, 255, cv2.THRESH_BINARY)[1] # Best 145
     gth = cv2.threshold(gblur, 132, 255, cv2.THRESH_BINARY)[1] # Best 132
     blf = cv2.bilateralFilter(gray, 9, 75, 75)
     otsu = cv2.threshold(gblur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
     images = [img, gray, mblur, gblur, mth, gth, blf, otsu]
 
     if img_proc is not None:
@@ -124,8 +126,10 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
         # cv2.imshow('Row locations',  line_img)
 
         # run tesseract, returning the bounding boxes
-        boxes = post_process_boxes(image_to_boxes_data(best['image'], lang=lang))
+        boxes = image_to_boxes_data(best['image'], lang=lang)
         cv2.imshow('Letter locations', draw_letter_boxes_and_text(img, boxes))
+        cv2.imshow('Post Processed Letter Locations',
+                   draw_letter_boxes_and_text(img, post_process_boxes(boxes)))
 
         for i in range(len(titles)):
             # cv2.imshow(titles[i], images[i])
@@ -168,20 +172,25 @@ def verify_frag(column):
 
 if __name__ == '__main__':
     with Pool() as pool:
-        results = sorted(pool.map(verify_frag, range(8)),
-                        key=lambda r: r['best']['percent'])
+        results = sorted(pool.map(verify_frag, range(54)),
+                        key=lambda r:r['best']['percent'])
 
     print(f'\n{titles}')
     percents = []
     for result in results:
-        rp = list(map(lambda e: e['percent'], result['evaluated']))
+        rp = np.array(list(map(lambda e:e['percent'], result['evaluated'])))
         percents.append(rp)
         print(f'{result["name"]}: {rp}, {result["best"]["name"]}, {result["best"]["percent"]}%')
-    best_percents = list(map(lambda r:r['best']['percent'], results))
+    percents = np.array(percents)
+    best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
+    best_title_indexes = np.array(
+        list(map(lambda r:titles.index(r['best']['name']), results)))
     means = np.round(np.mean(percents, axis=0), 2)
-    print(f'Means:  \t{means}, {titles[np.argmax(means)]}, {np.round(np.mean(best_percents))}%')
+    print(f'Means:\t\t{means}, {titles[np.argmax(means)]}, {np.round(np.mean(best_percents))}%')
     medians = np.round(np.median(percents, axis=0), 2)
-    print(f'Medians:\t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents))}%\n')
+    print(f'Medians: \t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents))}%')
+    modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
+    print(f'Modes:\t\t{modes}, {titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}\n')
 
     langs = ['heb', 'DSS_Paleo', 'embedding', 'fragment']
     for lang in langs:

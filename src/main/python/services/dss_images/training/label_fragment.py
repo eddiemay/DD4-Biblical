@@ -7,7 +7,7 @@ from verify import verify_fragment
 from utility import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-ID_TOKEN = 'idToken=1160559708'
+ID_TOKEN = 'idToken=283711286'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0'
 LETTERBOX_BATCH_DELETE_URL = API_BASE + 'letterBoxs/v1/batchDelete?' + ID_TOKEN
 LETTERBOX_BATCH_CREATE_URL = API_BASE + 'letterBoxs/v1/batchCreate?' + ID_TOKEN
@@ -68,10 +68,9 @@ def label(scroll, fragment, lang='fragment', display=True, upload=None):
         letter_box = {'filename': filename, 'type': 'Letter', 'value': b['text'],
                       'x1': b['left'], 'y1': b['top'], 'x2': b['right'], 'y2': b['bottom']}
         letter_boxes.append(letter_box)
-        print(letter_box)
-        img = cv2.rectangle(
-            img, [b['left'], b['top']], [b['right'], b['bottom']],
-            (0, 255, 0), 2)
+        # print(letter_box)
+        img = cv2.rectangle(img, [b['left'], b['top']], [b['right'], b['bottom']],
+                            [0, 255, 0], 2)
 
     print(f'Found {original_count} boxes, filtered down to {len(letter_boxes)}')
 
@@ -110,4 +109,4 @@ def label(scroll, fragment, lang='fragment', display=True, upload=None):
 
 
 if __name__ == '__main__':
-    label('isaiah', 20, upload=None)
+    label('isaiah', 2, upload=None)
