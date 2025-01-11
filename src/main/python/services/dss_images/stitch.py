@@ -2,7 +2,6 @@ import cv2
 import math
 import numpy
 from dss_backup import Collection, download, BASE_DIR
-from training.dss_ocr import image_to_string
 from pathlib import Path
 
 
@@ -39,52 +38,51 @@ def construct_column(collection, column=1, res=None):
     print('Showing image {} column {}... of shape: {}'.format(collection.scroll, column, exact.shape[:2]))
     cv2.imshow(f'Canvas exact Res: {res}', exact)
 
-    print(image_to_string(exact, False))
-
     columns_dir = f'{BASE_DIR.format(collection.scroll)}/columns'
     Path(columns_dir).mkdir(exist_ok=True)
     cv2.imwrite(f'{columns_dir}/column_{res}_{column}.jpg', exact)
     cv2.waitKey(2)
 
 
-# for c in range(1, 5):
-    # construct_column(Collection.TORAH, c)
+if __name__ == '__main__':
+    # for c in range(1, 5):
+        # construct_column(Collection.TORAH, c)
 
-# construct_column(Collection.TORAH, 5, res=5)
-# construct_column(Collection.TORAH, 4, res=5)
-# construct_column(Collection.TORAH, 3, res=5)
-# construct_column(Collection.TORAH, 2, res=5)
-# construct_column(Collection.TORAH, 1, res=5)
+    # construct_column(Collection.TORAH, 5, res=5)
+    # construct_column(Collection.TORAH, 4, res=5)
+    # construct_column(Collection.TORAH, 3, res=5)
+    # construct_column(Collection.TORAH, 2, res=5)
+    # construct_column(Collection.TORAH, 1, res=5)
 
-# for c in range(1):
-    # construct_column(Collection.ISAIAH, 47, 8)
-    # construct_column(Collection.ISAIAH, 47, 9)
-    # construct_column(Collection.ISAIAH, 47, 10)
-    # print(f'Showing Isaiah column {c + 1}')
-    # cv2.waitKey(2)
-construct_column(Collection.ISAIAH, 2, 10)
-# construct_column(Collection.ISAIAH, 45, 10)
-# construct_column(Collection.ISAIAH, 45, 8)
-# construct_column(Collection.ISAIAH, 1)
-cv2.waitKey(0)
+    # for c in range(1):
+        # construct_column(Collection.ISAIAH, 47, 8)
+        # construct_column(Collection.ISAIAH, 47, 9)
+        # construct_column(Collection.ISAIAH, 47, 10)
+        # print(f'Showing Isaiah column {c + 1}')
+        # cv2.waitKey(2)
+    construct_column(Collection.ISAIAH, 2, 9)
+    # construct_column(Collection.ISAIAH, 45, 10)
+    # construct_column(Collection.ISAIAH, 45, 8)
+    # construct_column(Collection.ISAIAH, 1)
+    cv2.waitKey(0)
 
-# for c in range(1, 16):
-  #  construct_column(Collection.WAR, c)
-# construct_column(Collection.WAR, 14)
-# construct_column(Collection.WAR, 1)
+    # for c in range(1, 16):
+      #  construct_column(Collection.WAR, c)
+    # construct_column(Collection.WAR, 14)
+    # construct_column(Collection.WAR, 1)
 
-# for c in range(1, 12):
-    # construct_column(Collection.COMMUNITY_RULE, c)
-# construct_column(Collection.COMMUNITY_RULE, 10)
-# construct_column(Collection.COMMUNITY_RULE, 11)
+    # for c in range(1, 12):
+        # construct_column(Collection.COMMUNITY_RULE, c)
+    # construct_column(Collection.COMMUNITY_RULE, 10)
+    # construct_column(Collection.COMMUNITY_RULE, 11)
 
-# for c in range(2, 68):
-    # construct_column(Collection.TEMPLE_SCROLL, c, res=9)
-# construct_column(Collection.TEMPLE_SCROLL, 66, res=9)
-# construct_column(Collection.TEMPLE_SCROLL, 2, res=9)
-# construct_column(Collection.TEMPLE_SCROLL, 1)
+    # for c in range(2, 68):
+        # construct_column(Collection.TEMPLE_SCROLL, c, res=9)
+    # construct_column(Collection.TEMPLE_SCROLL, 66, res=9)
+    # construct_column(Collection.TEMPLE_SCROLL, 2, res=9)
+    # construct_column(Collection.TEMPLE_SCROLL, 1)
 
-# for c in range(1, 15):
-    # construct_column(Collection.HABAKKUK, c)
-# construct_column(Collection.HABAKKUK, 13)
-# construct_column(Collection.HABAKKUK, 1)
+    # for c in range(1, 15):
+        # construct_column(Collection.HABAKKUK, c)
+    # construct_column(Collection.HABAKKUK, 13)
+    # construct_column(Collection.HABAKKUK, 1)

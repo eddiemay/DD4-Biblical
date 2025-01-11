@@ -2,6 +2,7 @@ import cv2
 import Levenshtein
 import numpy as np
 import pytesseract
+import time
 from diff_match_patch import diff_match_patch
 from dss_ocr import image_to_string
 from matplotlib import pyplot as plt
@@ -87,8 +88,7 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
             with Pool() as pool:
                 result['evaluated'] = pool.map(evaluate, result['evaluated'])
 
-    best = result['evaluated'][
-        np.argmax(list(map(lambda e: e['percent'], result['evaluated'])))]
+    best = result['evaluated'][np.argmax(list(map(lambda e: e['percent'], result['evaluated'])))]
     result['best'] = best
     print(f'{name}, {lang}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
 
@@ -112,16 +112,14 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
         word_img = img.copy()
         for i in range(len(d['level'])):
             if d['level'][i] == 5:
-                x, y, w, h = (
-                    d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+                x, y, w, h = d['left'][i], d['top'][i], d['width'][i], d['height'][i]
                 cv2.rectangle(word_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         # cv2.imshow('Word locations',  word_img)
 
         line_img = img.copy()
         for i in range(len(d['level'])):
             if d['level'][i] == 4:
-                x, y, w, h = (
-                    d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+                x, y, w, h = d['left'][i], d['top'][i], d['width'][i], d['height'][i]
                 cv2.rectangle(line_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         # cv2.imshow('Row locations',  line_img)
 
@@ -131,6 +129,7 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
         cv2.imshow('Post Processed Letter Locations',
                    draw_letter_boxes_and_text(img, post_process_boxes(boxes)))
 
+        plt.figure(num=f'{name} {lang}')
         for i in range(len(titles)):
             # cv2.imshow(titles[i], images[i])
             plt.subplot(3, 3, i + 1), plt.imshow(images[i], 'gray')
@@ -171,9 +170,10 @@ def verify_frag(column):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     with Pool() as pool:
-        results = sorted(pool.map(verify_frag, range(54)),
-                        key=lambda r:r['best']['percent'])
+        results = sorted(pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
+    pool_time = time.time()
 
     print(f'\n{titles}')
     percents = []
@@ -183,26 +183,27 @@ if __name__ == '__main__':
         print(f'{result["name"]}: {rp}, {result["best"]["name"]}, {result["best"]["percent"]}%')
     percents = np.array(percents)
     best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
-    best_title_indexes = np.array(
-        list(map(lambda r:titles.index(r['best']['name']), results)))
+    best_title_indexes = np.array( list(map(lambda r:titles.index(r['best']['name']), results)))
     means = np.round(np.mean(percents, axis=0), 2)
     print(f'Means:\t\t{means}, {titles[np.argmax(means)]}, {np.round(np.mean(best_percents))}%')
     medians = np.round(np.median(percents, axis=0), 2)
     print(f'Medians: \t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents))}%')
     modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
-    print(f'Modes:\t\t{modes}, {titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}\n')
+    print(f'Modes:\t\t{modes},'
+          f'{titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}\n')
 
-    langs = ['heb', 'DSS_Paleo', 'embedding', 'fragment']
-    for lang in langs:
-        verify(
-            'dss_isa_9_6_7-11.png', 'dss_isa_6_7-11.txt', lang, lang == 'fragment')
+    print(f"Pool time: {pool_time - start_time} seconds")
+    print(f"Column comparison time: {time.time() - start_time} seconds")
+
+    langs = ['heb', 'script/Hebrew',
+             # 'DSS_Paleo', 'embedding',
+             'fragment']
 
     for lang in langs:
         verify_fragment('isaiah', 48, lang, lang == 'fragment')
 
-    image_files = [
-        'dss_isa_9_6_7-11_scaled.png', 'dss_isa 9_6_7-11_threshold.png',
-        'dss-isa_6_7-11.tif', 'dss_isa_9_6_7-11_embedded.jpg']
+    image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png', 'dss_isa 9_6_7-11_threshold.png',
+                   'dss-isa_6_7-11.tif', 'dss_isa_9_6_7-11_embedded.jpg']
     for img_file in image_files:
         for lang in langs:
             verify(img_file, 'dss_isa_6_7-11.txt', lang, lang == 'fragment')

@@ -36,13 +36,11 @@ def cache_letter_boxes(override_letter_cache=False):
     fragments = [
         'isaiah-column-2', 'isaiah-column-4', 'isaiah-column-9', 'isaiah-column-14',
         'isaiah-column-20', 'isaiah-column-27', 'isaiah-column-36', 'isaiah-column-44',
-        'isaiah-column-45', 'isaiah-column-47', 'isaiah-column-48', 'isaiah-column-53',
-        'community-column-11', 'habakkuk-column-4', 'temple-column-5',
-        'war-column-1']
+        'isaiah-column-45', 'isaiah-column-47', 'isaiah-column-48', 'isaiah-column-53']
     # Open the file for write.
     print('Writing file: ', letter_box_file)
     with (open(letter_box_file, "w", encoding="utf-8") as f):
-        for fragment in fragments[:9]:
+        for fragment in fragments:
             letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
             print('Sending request: ', letterbox_url)
             with request.urlopen(letterbox_url) as url:

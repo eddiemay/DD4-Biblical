@@ -1,2 +1,6 @@
+cv2
 diff-match-patch
-codeformer
+Levenshtein
+matplotlib
+pytesseract
+scipy

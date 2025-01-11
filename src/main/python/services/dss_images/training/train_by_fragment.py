@@ -6,13 +6,14 @@ import os
 import random
 import shutil
 import subprocess
-from multiprocessing import Pool
+import time
 from pathlib import Path
 from train_by_embedding import cache_letter_boxes
 from train_by_embedding import letter_box_file
 
 BASE_OUTPUT = 'tesstrain/data/'
-output_directory = f'{BASE_OUTPUT}fragment-ground-truth'
+MODEL_NAME = 'fragment'
+output_directory = f'{BASE_OUTPUT}{MODEL_NAME}-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
 row_map = {}
 img_map = {}
@@ -103,10 +104,10 @@ def process(sample):
 
     if res == 10:
         ratio = 2
-    elif res == 9:
-        ratio = 1
     elif res == 8:
         ratio = .5
+    else:
+        ratio = 1
 
     srow, erow = sample['srow'], sample['erow']
     filename = f'{scroll}-column-{fragment}'
@@ -196,8 +197,7 @@ def output_files(sample):
 
     with open(f'{output_directory}/{file_base_name}.box', 'w') as box_file:
         for box in sample['boxes']:
-            box_file.write(
-                f'{box["value"]} {box["x1"]} {box["y1"]} {box["x2"]} {box["y2"]} 0\n')
+            box_file.write(f'{box["value"]} {box["x1"]} {box["y1"]} {box["x2"]} {box["y2"]} 0\n')
 
 
 def process_and_output(sample):
@@ -208,8 +208,7 @@ def process_and_output(sample):
 def display(sample):
     print(sample['text'])
     print(sample['boxes'])
-    output_base = FILE_BASE_NAME.format(
-        sample['filename'],sample['res'],sample['srow'],sample['erow'])
+    output_base = FILE_BASE_NAME.format(sample['filename'],sample['res'],sample['srow'],sample['erow'])
 
     cv2.imshow(f'{output_base} cleared', sample["image"])
     cv2.imshow(f'{output_base} outlined', sample["outlined"])
@@ -218,38 +217,54 @@ def display(sample):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     cache_letter_boxes()
     # for r in range(1, 8):
         # output_row('isaiah', 44, r)
-    display(process({
-        'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 25, 'res': 10}))
-    display(process({
-        'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 27, 'res': 9}))
-    display(process({
-        'scroll': 'isaiah', 'fragment': 44, 'srow': 1, 'erow': 7, 'res': 8}))
+    # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 25, 'res': 10}))
+    # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 27, 'res': 9}))
+    # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 1, 'erow': 7, 'res': 8}))
 
     # Git clone the training programs if they don't exist.
     if not os.path.exists(BASE_OUTPUT):
-        subprocess.run(
-            ['git', 'clone', 'https://github.com/tesseract-ocr/tesstrain'])
-        subprocess.run(
-            ['git', 'clone', 'https://github.com/tesseract-ocr/tessdata_best'])
+        subprocess.run(['git', 'clone', 'https://github.com/tesseract-ocr/tesstrain'])
+        subprocess.run(['git', 'clone', 'https://github.com/tesseract-ocr/tessdata_best'])
+        os.chdir('tesstrain')
+        subprocess.run(['brww', 'install', 'wget'])
+        subprocess.run(['make', 'tesseract-langdata'])
+        os.chdir('../')
 
     # Delete and recreate the training data directories.
     if os.path.exists(output_directory):
         shutil.rmtree(output_directory)
-    if os.path.exists(BASE_OUTPUT + 'fragment'):
-        shutil.rmtree(BASE_OUTPUT + 'fragment')
-    if os.path.exists(BASE_OUTPUT + 'fragment' + '.traineddata'):
-        Path(BASE_OUTPUT + 'fragment' + '.traineddata').unlink()
+    if os.path.exists(BASE_OUTPUT + MODEL_NAME):
+        shutil.rmtree(BASE_OUTPUT + MODEL_NAME)
+    if os.path.exists(BASE_OUTPUT + MODEL_NAME + '.traineddata'):
+        Path(BASE_OUTPUT + MODEL_NAME + '.traineddata').unlink()
 
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-    for frag in [4, 9, 14, 20, 27, 36, 44, 45, 47, 48, 53]:
+    image_start = time.time()
+    for frag in [2, 4, 9, 14, 20, 27, 36, 44, 45, 47, 48, 53]:
         for r in range(1, 33):
-            process_and_output(
-                {'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r})
+            process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r})
             if r % 3 == 1:
                 process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r+2})
             if r % 7 == 1:
                 process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r+6})
+
+    training_start = time.time()
+    print(f'Files creation time: {training_start - image_start} seconds')
+
+    os.chdir('tesstrain')
+    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', 'START_MODEL=script/Hebrew',
+               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=8192']
+    print(command)
+    subprocess.run(command)
+    subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata'])
+
+    end_time = time.time()
+    print(f'Setup time: {image_start - start_time} seconds')
+    print(f'Files creation time: {training_start - image_start} seconds')
+    print(f'Training time: {training_start - end_time}')
+    print(f'Total time: {end_time - start_time}')

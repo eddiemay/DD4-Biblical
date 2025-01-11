@@ -96,7 +96,7 @@ def draw_letter_text(img, boxes, box_colors=None):
     pil_image = Image.fromarray(image)
 
     # Draw non-ascii text onto image
-    font = ImageFont.truetype("DSSPaleo.ttf", 16)
+    font = ImageFont.truetype("Arial", 16)
     draw = ImageDraw.Draw(pil_image)
     ci = 0
     for b in boxes:
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     otsu = cv2.threshold(gblur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
     # run tesseract, returning the bounding boxes
-    boxes = image_to_boxes_data(otsu, lang='fragment')
+    boxes = image_to_boxes_data(otsu, lang='heb')
     letter_box_img = draw_letter_boxes(img, boxes)
     pp_boxes = post_process_boxes(boxes)
 
