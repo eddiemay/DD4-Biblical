@@ -190,10 +190,9 @@ if __name__ == '__main__':
     print(f'Medians: \t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents))}%')
     modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
     print(f'Modes:\t\t{modes},'
-          f'{titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}\n')
-
+          f'{titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}')
     print(f"Pool time: {pool_time - start_time} seconds")
-    print(f"Column comparison time: {time.time() - start_time} seconds")
+    print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
     langs = ['heb', 'script/Hebrew',
              # 'DSS_Paleo', 'embedding',
