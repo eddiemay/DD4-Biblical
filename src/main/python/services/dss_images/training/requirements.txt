@@ -1,6 +1,7 @@
-cv2
 diff-match-patch
 Levenshtein
 matplotlib
+opencv-python
 pytesseract
+requests
 scipy
