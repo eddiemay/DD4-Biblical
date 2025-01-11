@@ -257,8 +257,8 @@ if __name__ == '__main__':
     print(f'Files creation time: {training_start - image_start} seconds')
 
     os.chdir('tesstrain')
-    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', 'START_MODEL=script/Hebrew',
-               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=8192']
+    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', 'START_MODEL=DSS_Paleo',
+               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=4096']
     print(command)
     subprocess.run(command)
     subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata'])
@@ -266,5 +266,5 @@ if __name__ == '__main__':
     end_time = time.time()
     print(f'Setup time: {image_start - start_time} seconds')
     print(f'Files creation time: {training_start - image_start} seconds')
-    print(f'Training time: {training_start - end_time}')
-    print(f'Total time: {end_time - start_time}')
+    print(f'Training time: {end_time - training_start} seconds')
+    print(f'Total time: {end_time - start_time} seconds')
