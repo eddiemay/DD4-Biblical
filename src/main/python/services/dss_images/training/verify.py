@@ -185,12 +185,21 @@ if __name__ == '__main__':
     best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
     best_title_indexes = np.array( list(map(lambda r:titles.index(r['best']['name']), results)))
     means = np.round(np.mean(percents, axis=0), 2)
-    print(f'Means:\t\t{means}, {titles[np.argmax(means)]}, {np.round(np.mean(best_percents))}%')
+    bests_mean = np.round(np.mean(best_percents), 2)
+    print(f'Means:\t\t{means}, {titles[np.argmax(means)]}, {bests_mean}%')
     medians = np.round(np.median(percents, axis=0), 2)
-    print(f'Medians: \t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents))}%')
+    print(f'Medians: \t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents), 2)}%')
     modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
     print(f'Modes:\t\t{modes}, '
-          f'{titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}')
+          f'{titles[stats.mode(best_title_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}%')
+    stds = np.round(np.std(percents, axis=0), 2)
+    bests_std = np.round(np.std(best_percents), 2)
+    print(f'Stds:\t\t{stds}, {titles[np.argmin(stds)]}, {bests_std}')
+    zScoreLows = means - stds * 3
+    print(f'Z-Score Low: {zScoreLows}, {titles[np.argmax(zScoreLows)]}, {np.round(bests_mean - bests_std * 3, 2)}')
+    zScoreHighs = means + stds * 3
+    bests_zScoreHigh = np.round(bests_mean + bests_std * 3, 2)
+    print(f'Z-Score High:{zScoreHighs}, {titles[np.argmin(np.absolute(bests_zScoreHigh - zScoreHighs))]}, {bests_zScoreHigh}')
     print(f"Pool time: {pool_time - start_time} seconds")
     print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
