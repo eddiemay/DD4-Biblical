@@ -33,7 +33,7 @@ def get_json(scroll):
 # Returns the path to the file,
 def download(collection, res, col, row, group=0):
     scroll = collection.scroll
-    tiles_dir = f'{BASE_DIR.format(scroll)}/tiles'
+    tiles_dir = f'{BASE_DIR.format(scroll)}/{'tiles' if res < 10 else 'large_tiles'}'
     Path(tiles_dir).mkdir(parents=True, exist_ok=True)
     file_name = FILE_NAME.format(res, col, row)
     file_path = f'{tiles_dir}/{file_name}'
