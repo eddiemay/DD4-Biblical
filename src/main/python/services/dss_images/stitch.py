@@ -41,7 +41,7 @@ def construct_column(collection, column=1, res=None):
     columns_dir = f'{BASE_DIR.format(collection.scroll)}/columns'
     Path(columns_dir).mkdir(exist_ok=True)
     cv2.imwrite(f'{columns_dir}/column_{res}_{column}.jpg', exact)
-    cv2.waitKey(2)
+    cv2.waitKey(1)
 
 
 if __name__ == '__main__':
@@ -54,17 +54,16 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 2, res=5)
     # construct_column(Collection.TORAH, 1, res=5)
 
-    # for c in range(1):
+    for c in range(54):
         # construct_column(Collection.ISAIAH, 47, 8)
-        # construct_column(Collection.ISAIAH, 47, 9)
+        for res in range(8, 11):
+            construct_column(Collection.ISAIAH, c + 1, res)
         # construct_column(Collection.ISAIAH, 47, 10)
         # print(f'Showing Isaiah column {c + 1}')
-        # cv2.waitKey(2)
-    construct_column(Collection.ISAIAH, 52, 10)
-    # construct_column(Collection.ISAIAH, 45, 10)
-    # construct_column(Collection.ISAIAH, 45, 8)
-    # construct_column(Collection.ISAIAH, 1)
-    cv2.waitKey(0)
+        # cv2.waitKey(0)
+    # for res in range(8, 11):
+        # construct_column(Collection.ISAIAH, 31, res)
+    # cv2.waitKey(0)
 
     # for c in range(1, 16):
       #  construct_column(Collection.WAR, c)

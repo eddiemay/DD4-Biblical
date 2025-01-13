@@ -155,7 +155,7 @@ if __name__ == '__main__':
     # Great Isaiah Scroll
     download_collection(Collection.ISAIAH, 8)
     download_collection(Collection.ISAIAH, 9)
-    # download_collection(Collection.ISAIAH, 10)
+    download_collection(Collection.ISAIAH, 10)
 
     # War Scroll
     download_collection(Collection.WAR)
