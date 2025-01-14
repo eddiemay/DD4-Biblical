@@ -13,6 +13,8 @@
         <h2>{{$ctrl.canvasTitle}}</h2>
         <input type="checkbox" data-ng-model="$ctrl.showLetterBoxes" data-ng-change="$ctrl.drawScroll()">
         <label>Show Letter Boxes</label>
+        <input type="checkbox" data-ng-model="$ctrl.showLetters" data-ng-change="$ctrl.drawScroll()">
+        <label>Show Letters</label>
         <input type="checkbox" data-ng-model="$ctrl.showRowBoxes" data-ng-change="$ctrl.drawScroll()">
         <label>Show Row Boxes</label>
         <div style="max-height: 256px;max-width:100%;overflow: scroll;">

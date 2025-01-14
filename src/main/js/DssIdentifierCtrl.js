@@ -4,6 +4,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
   this.$window = $window;
   this.letterBoxService = letterBoxService;
   this.showLetterBoxes = true;
+  this.showLetters = true;
   this.rowNum = 1;
   this.scrolls = {
     ISAIAH: {name: 'Isaiah', filename: 'isaiah', columns: 54, res: 9, textFile: '1Q_Isaiah_a.txt'},
@@ -70,13 +71,14 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     var x = event.x - rect.left,
         y = event.y - rect.top;
 
-    if (this.showLetterBoxes) {
+    if (this.showLetterBoxes || this.showLetters) {
       for (var b = 0; b < this.letterBoxes.length; b++)  {
         var lx = x > this.canvasWidth / 2 ? x - this.canvasWidth / 2 : x;
         var ly = x > this.canvasWidth / 2 ? y + 20 : y;
-        var letterBox = this.letterBoxes[b];
-        if (letterBox.x1 < lx && letterBox.x2 > lx && letterBox.y1 < ly && letterBox.y2 > ly) {
-          this.selectedBox = letterBox;
+        var letBox = this.letterBoxes[b];
+        if (this.showLetterBoxes && letBox.x1 < lx && letBox.x2 > lx && letBox.y1 < ly && letBox.y2 > ly ||
+            this.showLetters && x >= letBox.x1 + 7 && x < letBox.x1 + 14 && y > letBox.y2 + 7 && y <= letBox.y2 + 14) {
+          this.selectedBox = letBox;
           this.drawScroll();
           return;
         }
@@ -403,11 +405,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawScroll = function() {
   this.ctx.fillStyle = 'white';
   this.ctx.fillRect(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight);
 
-  this.letterBoxes.forEach(letterBox => {
-    if (this.showLetterBoxes || this.selectedBox == letterBox) {
-      this.drawLetterBox(letterBox);
-    }
-  });
+  this.letterBoxes.forEach(letterBox => this.drawLetterBox(letterBox));
   this.canvasReady = true;
   this.drawImagesByLetter();
 
@@ -440,14 +438,25 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawLetterBox = function(lett
   }
 
   var ctx = this.ctx;
-  ctx.beginPath();
-  ctx.strokeStyle = color || 'green';
-  ctx.rect(letterBox.x1, letterBox.y1, letterBox.x2 - letterBox.x1, letterBox.y2 - letterBox.y1);
-  ctx.stroke();
 
-  ctx.font = '25px Arial';
-  ctx.fillStyle = color || 'black';
-  ctx.fillText(letterBox.value, letterBox.x1 + this.canvasWidth / 2, letterBox.y2 - 20);
+  // If we are showing letter boxes or the letter is of interest.
+  if (this.showLetterBoxes || color) {
+      ctx.beginPath();
+      ctx.strokeStyle = color || 'green';
+      ctx.rect(letterBox.x1, letterBox.y1, letterBox.x2 - letterBox.x1, letterBox.y2 - letterBox.y1);
+      ctx.stroke();
+
+      ctx.font = '25px Arial';
+      ctx.fillStyle = color || 'black';
+      ctx.fillText(letterBox.value, letterBox.x1 + this.canvasWidth / 2, letterBox.y2 - 20);
+  }
+
+  // If we are showing letters or the letter is of interest.
+  if (this.showLetters || color) {
+      ctx.font = '16px Arial';
+      ctx.fillStyle = color || 'green';
+      ctx.fillText(letterBox.value, letterBox.x1 + 7, letterBox.y2 + 14);
+  }
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(letterBox) {
