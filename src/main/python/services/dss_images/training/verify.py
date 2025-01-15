@@ -47,7 +47,7 @@ def diff_line_mode(text1, text2):
 
 def evaluate(eval):
     txt = eval['text']
-    ocr = unfinalize(image_to_string(eval['image'], lang=eval['lang']).strip())
+    ocr = unfinalize(image_to_string(eval['image'], model=eval['model']).strip())
     ld = Levenshtein.distance(txt, ocr)
     percent = round((len(txt) - ld) * 100 / len(txt), 2)
     eval['ocr'], eval['ld'], eval['percent'] = ocr, ld, percent
@@ -55,7 +55,7 @@ def evaluate(eval):
     return eval
 
 
-def verify_(name, img_file, txt, lang, img_proc, display, multithread):
+def verify_(name, img_file, txt, model, img_proc, display, multithread):
     result = {'name': name, 'evaluated': []}
     img = cv2.imread(img_file)
 
@@ -76,10 +76,10 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
     if img_proc is not None:
         i = titles.index(img_proc)
         result['evaluated'].append(evaluate(
-            {'name': titles[i], 'text': txt, 'image': images[i], 'lang': lang}))
+            {'name': titles[i], 'text': txt, 'image': images[i], 'model': model}))
     else:
         for i in range(len(titles)):
-            eval = {'name': titles[i], 'text': txt, 'image': images[i], 'lang': lang}
+            eval = {'name': titles[i], 'text': txt, 'image': images[i], 'model': model}
             result['evaluated'].append(eval)
             if not multithread:
                 evaluate(eval)
@@ -90,7 +90,7 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
 
     best = result['evaluated'][np.argmax(list(map(lambda e: e['percent'], result['evaluated'])))]
     result['best'] = best
-    print(f'{name}, {lang}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
+    print(f'{name}, {model}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
 
     if display:
         print(f'expected:\n{txt}\n{get_letter_counts(txt)}\n'
@@ -107,7 +107,7 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
                 diff_str += f'{bcolors.OKGREEN}{diff[1]}{bcolors.ENDC}'
         print(diff_str)
 
-        d = pytesseract.image_to_data(best['image'], lang=lang, output_type=Output.DICT)
+        d = pytesseract.image_to_data(best['image'], lang=model, output_type=Output.DICT)
 
         word_img = img.copy()
         for i in range(len(d['level'])):
@@ -124,12 +124,12 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
         # cv2.imshow('Row locations',  line_img)
 
         # run tesseract, returning the bounding boxes
-        boxes = image_to_boxes_data(best['image'], lang=lang)
+        boxes = image_to_boxes_data(best['image'], model=model)
         cv2.imshow('Letter locations', draw_letter_boxes_and_text(img, boxes))
         cv2.imshow('Post Processed Letter Locations',
                    draw_letter_boxes_and_text(img, post_process_boxes(boxes)))
 
-        plt.figure(num=f'{name} {lang}')
+        plt.figure(num=f'{name} {model}')
         for i in range(len(titles)):
             # cv2.imshow(titles[i], images[i])
             plt.subplot(3, 3, i + 1), plt.imshow(images[i], 'gray')
@@ -141,13 +141,13 @@ def verify_(name, img_file, txt, lang, img_proc, display, multithread):
     return result
 
 
-def verify(img_file, txt_file, lang='heb', display=False, img_proc=None, multithread=True):
+def verify(img_file, txt_file, model='heb', display=False, img_proc=None, multithread=True):
     with open(txt_file, 'r') as f:
         txt = unfinalize(f.read().strip())
-    verify_(img_file, img_file, txt, lang, img_proc, display, multithread)
+    verify_(img_file, img_file, txt, model, img_proc, display, multithread)
 
 
-def verify_fragment(scroll, fragment, lang='heb', display=False, img_proc=None, multithread=True):
+def verify_fragment(scroll, fragment, model='heb', display=False, img_proc=None, multithread=True):
     img_file= f'../images/{scroll}/columns/column_9_{fragment}.jpg'
     txt_file = '../books/1Q_Isaiah_a.txt'
     roman_numeral = romanize(fragment)
@@ -162,24 +162,29 @@ def verify_fragment(scroll, fragment, lang='heb', display=False, img_proc=None, 
             txt += lines[l].strip() + '\n'
 
     return verify_(
-        f'{scroll}-{fragment}', img_file, unfinalize(txt), lang, img_proc, display, multithread)
+        f'{scroll}-{fragment}', img_file, unfinalize(txt), model, img_proc, display, multithread)
 
 
 def verify_frag(column):
     return verify_fragment('isaiah', column + 1, 'fragment', multithread=False)
 
 
+def as_csv(values):
+    return ','.join(list(map(str, values)))
+
+
 if __name__ == '__main__':
     start_time = time.time()
     with Pool() as pool:
-        results = sorted(pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
+        results = sorted(pool.map(verify_frag, range(14)), key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
-    print(f'\n{titles}')
+    print(f'\n{as_csv(titles)}')
     percents = []
     for result in results:
         rp = np.array(list(map(lambda e:e['percent'], result['evaluated'])))
         percents.append(rp)
+        # print(f'{result["name"]},{as_csv(rp)},{result["best"]["name"]},{result["best"]["percent"]}%')
         print(f'{result["name"]}: {rp}, {result["best"]["name"]}, {result["best"]["percent"]}%')
     percents = np.array(percents)
     best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
@@ -203,15 +208,15 @@ if __name__ == '__main__':
     print(f"Pool time: {pool_time - start_time} seconds")
     print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
-    langs = ['heb', 'script/Hebrew',
+    models = ['heb', 'script/Hebrew',
              # 'DSS_Paleo', 'embedding',
              'fragment']
 
-    for lang in langs:
-        verify_fragment('isaiah', 48, lang, lang == 'fragment')
+    for model in models:
+        verify_fragment('isaiah', 54, model, model == 'fragment')
 
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png', 'dss_isa 9_6_7-11_threshold.png',
                    'dss-isa_6_7-11.tif', 'dss_isa_9_6_7-11_embedded.jpg']
     for img_file in image_files:
-        for lang in langs:
-            verify(img_file, 'dss_isa_6_7-11.txt', lang, lang == 'fragment')
+        for model in models:
+            verify(img_file, 'dss_isa_6_7-11.txt', model, model == 'fragment')

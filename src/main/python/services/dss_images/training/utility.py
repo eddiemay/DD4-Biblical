@@ -7,10 +7,10 @@ roman_numerals = {'M':1000, 'CM':900, 'D':500, 'CD':400, 'C':100, 'XC':90,
                   'L':50, 'XL':40, 'X':10, 'IX':9, 'V':5, 'IV':4, 'I':1}
 
 
-def image_to_boxes_data(img, lang=None):
+def image_to_boxes_data(img, model=None):
     boxes = []
     h = img.shape[0]
-    for b in pytesseract.image_to_boxes(img, lang=lang).splitlines():
+    for b in pytesseract.image_to_boxes(img, lang=model).splitlines():
         b = b.split(' ')
         boxes.append({'text': b[0], 'left': int(b[1]), 'top': h - int(b[4]),
                       'right':  int(b[3]), 'bottom': h - int(b[2])})
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     otsu = cv2.threshold(gblur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
     # run tesseract, returning the bounding boxes
-    boxes = image_to_boxes_data(otsu, lang='heb')
+    boxes = image_to_boxes_data(otsu, model='heb')
     letter_box_img = draw_letter_boxes(img, boxes)
     pp_boxes = post_process_boxes(boxes)
 

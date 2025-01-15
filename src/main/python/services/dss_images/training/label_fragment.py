@@ -31,15 +31,15 @@ def send_json_req(url, data):
         return response
 
 
-def label(scroll, fragment, lang='fragment', display=True, upload=None):
+def label(scroll, fragment, model='fragment', display=True, upload=None):
     filename = f'{scroll}-column-{fragment}'
 
-    result = verify_fragment(scroll, fragment, lang, multithread=True)
+    result = verify_fragment(scroll, fragment, model, multithread=True)
 
     img = result['evaluated'][0]['image']
     best_img = result['best']['image']
 
-    d = pytesseract.image_to_data(best_img, lang=lang, output_type=Output.DICT)
+    d = pytesseract.image_to_data(best_img, lang=model, output_type=Output.DICT)
 
     rows = []
     line_img = img.copy()
@@ -59,7 +59,7 @@ def label(scroll, fragment, lang='fragment', display=True, upload=None):
         print(rows)
 
     # run tesseract, returning the bounding boxes
-    boxes = image_to_boxes_data(best_img, lang=lang)
+    boxes = image_to_boxes_data(best_img, model=model)
     original_count = len(boxes)
     boxes = post_process_boxes(boxes)
     letter_boxes = []
@@ -109,4 +109,4 @@ def label(scroll, fragment, lang='fragment', display=True, upload=None):
 
 
 if __name__ == '__main__':
-    label('isaiah', 2, upload=None)
+    label('isaiah', 7, upload=None)

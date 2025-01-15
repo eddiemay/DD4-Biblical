@@ -5,9 +5,9 @@ import requests, json
 TRANSLATE_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/translate'
 
 
-def image_to_string(image_or_filename, translate=False, lang='fragment'):
+def image_to_string(image_or_filename, translate=False, model='fragment'):
     text = pytesseract.image_to_string(
-        image_or_filename, lang=lang,
+        image_or_filename, lang=model,
         # config='-c tessedit_char_whitelist=אבגדהוזחטיכלמנסעפצקרשת'
         )
     # print(text)
