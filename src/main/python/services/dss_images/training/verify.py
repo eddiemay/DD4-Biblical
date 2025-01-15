@@ -176,7 +176,7 @@ def as_csv(values):
 if __name__ == '__main__':
     start_time = time.time()
     with Pool() as pool:
-        results = sorted(pool.map(verify_frag, range(14)), key=lambda r:r['best']['percent'])
+        results = sorted(pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
     print(f'\n{as_csv(titles)}')
