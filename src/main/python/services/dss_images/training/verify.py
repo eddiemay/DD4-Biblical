@@ -131,7 +131,7 @@ def verify_(name, img_file, txt, model, img_proc, display, multithread):
 
         plt.figure(num=f'{name} {model}')
         for i in range(len(titles)):
-            # cv2.imshow(titles[i], images[i])
+            cv2.imshow(titles[i], images[i])
             plt.subplot(3, 3, i + 1), plt.imshow(images[i], 'gray')
             plt.title(f'{titles[i]} {result["evaluated"][i]["percent"]}%')
             plt.xticks([]), plt.yticks([])
@@ -166,11 +166,12 @@ def verify_fragment(scroll, fragment, model='heb', display=False, img_proc=None,
 
 
 def verify_frag(column):
-    return verify_fragment('isaiah', column + 1, 'fragment', multithread=False)
+    return verify_fragment('isaiah', column + 1, 'script/Hebrew', multithread=False)
 
 
-def as_csv(values):
-    return ','.join(list(map(str, values)))
+def output(output_file, row_title, values):
+    print(f'{row_title}: {values}')
+    output_file.write(f'{row_title},{','.join(list(map(str, values)))}\n')
 
 
 if __name__ == '__main__':
@@ -179,41 +180,43 @@ if __name__ == '__main__':
         results = sorted(pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
-    print(f'\n{as_csv(titles)}')
-    percents = []
-    for result in results:
-        rp = np.array(list(map(lambda e:e['percent'], result['evaluated'])))
-        percents.append(rp)
-        # print(f'{result["name"]},{as_csv(rp)},{result["best"]["name"]},{result["best"]["percent"]}%')
-        print(f'{result["name"]}: {rp}, {result["best"]["name"]}, {result["best"]["percent"]}%')
-    percents = np.array(percents)
-    best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
-    best_indexes = np.array( list(map(lambda r:titles.index(r['best']['name']), results)))
-    means = np.round(np.mean(percents, axis=0), 2)
-    bests_mean = np.round(np.mean(best_percents), 2)
-    print(f'Means:\t\t{means}, {titles[np.argmax(means)]}, {bests_mean}%')
-    medians = np.round(np.median(percents, axis=0), 2)
-    print(f'Medians: \t{medians}, {titles[np.argmax(medians)]}, {np.round(np.median(best_percents), 2)}%')
-    modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
-    print(f'Modes:\t\t{modes}, '
-          f'{titles[stats.mode(best_indexes).mode]}, {stats.mode(np.round(best_percents / 5) * 5).mode}%')
-    stds = np.round(np.std(percents, axis=0), 2)
-    bests_std = np.round(np.std(best_percents), 2)
-    print(f'Stds:\t\t{stds}, {titles[np.argmin(stds)]}, {bests_std}')
-    zScoreLows = means - stds * 3
-    print(f'Z-Score Low: {zScoreLows}, {titles[np.argmax(zScoreLows)]}, {np.round(bests_mean - bests_std * 3, 2)}')
-    zScoreHighs = means + stds * 3
-    bests_zScoreHigh = np.round(bests_mean + bests_std * 3, 2)
-    print(f'Z-Score High:{zScoreHighs}, {titles[np.argmin(np.absolute(bests_zScoreHigh - zScoreHighs))]}, {bests_zScoreHigh}')
-    print(f"Pool time: {pool_time - start_time} seconds")
-    print(f"Column comparison time: {time.time() - start_time} seconds\n")
+
+    with open('training.csv', 'w') as csv:
+        output(csv, 'Fragment', np.append(titles.copy(), ['Best', 'Best Percent']))
+        percents = []
+        for result in results:
+            rp = np.array(list(map(lambda e:e['percent'], result['evaluated'])))
+            percents.append(rp)
+            out = rp.copy()
+            output(csv, result["name"], np.append(rp.copy(), [result["best"]["name"], result["best"]["percent"]]))
+        output(csv, '', [])
+        percents = np.array(percents)
+        best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
+        best_indexes = np.array( list(map(lambda r:titles.index(r['best']['name']), results)))
+        means = np.round(np.mean(percents, axis=0), 2)
+        bests_mean = np.round(np.mean(best_percents), 2)
+        output(csv, 'Means', np.append(means.copy(), [titles[np.argmax(means)], bests_mean]))
+        medians = np.round(np.median(percents, axis=0), 2)
+        output(csv, 'Medians', np.append(medians.copy(), [titles[np.argmax(medians)], np.round(np.median(best_percents), 2)]))
+        modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
+        output(csv, 'Modes', np.append(modes.copy(), [titles[stats.mode(best_indexes).mode], stats.mode(np.round(best_percents / 5) * 5).mode]))
+        stds = np.round(np.std(percents, axis=0), 2)
+        bests_std = np.round(np.std(best_percents), 2)
+        output(csv, 'Stds', np.append(stds.copy(), [titles[np.argmin(stds)], bests_std]))
+        zLows = np.round(means - stds * 3, 2)
+        output(csv, 'Z-Lows', np.append(zLows.copy(), [titles[np.argmax(zLows)], np.round(bests_mean - bests_std * 3, 2)]))
+        zHighs = np.round(means + stds * 3, 2)
+        bests_zScoreHigh = np.round(bests_mean + bests_std * 3, 2)
+        output(csv, 'Z-Highs', np.append(zHighs.copy(), [titles[np.argmin(np.absolute(bests_zScoreHigh - zHighs))], bests_zScoreHigh]))
+        print(f"Pool time: {pool_time - start_time} seconds")
+        print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
     models = ['heb', 'script/Hebrew',
              # 'DSS_Paleo', 'embedding',
              'fragment']
 
     for model in models:
-        verify_fragment('isaiah', 54, model, model == 'fragment')
+        verify_fragment('isaiah', 7, model, model == 'fragment')
 
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png', 'dss_isa 9_6_7-11_threshold.png',
                    'dss-isa_6_7-11.tif', 'dss_isa_9_6_7-11_embedded.jpg']
