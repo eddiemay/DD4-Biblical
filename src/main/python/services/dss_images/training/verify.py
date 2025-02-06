@@ -166,7 +166,7 @@ def verify_fragment(scroll, fragment, model='heb', display=False, img_proc=None,
 
 
 def verify_frag(column):
-    return verify_fragment('isaiah', column + 1, 'script/Hebrew', multithread=False)
+    return verify_fragment('isaiah', column + 1, 'fragment', multithread=False)
 
 
 def output(output_file, row_title, values):
@@ -179,7 +179,6 @@ if __name__ == '__main__':
     with Pool() as pool:
         results = sorted(pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
     pool_time = time.time()
-
 
     with open('training.csv', 'w') as csv:
         output(csv, 'Fragment', np.append(titles.copy(), ['Best', 'Best Percent']))

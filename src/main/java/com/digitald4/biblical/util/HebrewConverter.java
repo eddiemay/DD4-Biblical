@@ -184,7 +184,7 @@ public class HebrewConverter {
   }
 
   public static String toAncient(StringBuilder text) {
-    return toAncient(text.toString());
+    return toAncient(toFullHebrew(text.toString()));
   }
 
   public static String toAncientRtl(String text) {
@@ -223,7 +223,6 @@ public class HebrewConverter {
       }
 
       // If we are here then this is not the first letter and the previous letter was not a vowel.
-
       if (ab.characterType == CharacterType.Sometimes_Vowel) {
         prevIsVowel.set(true);
         return ab.vowelSound;
@@ -264,6 +263,18 @@ public class HebrewConverter {
       }
     }
     return toConstantsOnly(output.toString());
+  }
+
+  public static String toFullHebrew(StringBuilder text) {
+    return toFullHebrew(text.toString());
+  }
+
+  public static String toRestoredHebrew(String text) {
+    return unfinalize(toFullHebrew(text));
+  }
+
+  public static String toRestoredHebrew(StringBuilder text) {
+    return toRestoredHebrew(text.toString());
   }
 
   public static String unfinalize(String text) {

@@ -33,6 +33,7 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
 
   @Override
   public Lexicon getLexicon(String strongsId) {
+    System.out.println("Fetching " + strongsId);
     String htmlResult = apiConnector.sendGet(String.format(URL, strongsId));
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     String modern = doc.getElementsByClass("lexTitle" + (strongsId.startsWith("H") ? "Hb" : "GK")).first().text().trim();
@@ -40,7 +41,6 @@ public class LexiconFetcherBlueLetterImpl implements LexiconFetcher {
     return new Lexicon()
         .setId(strongsId)
         .setWord(modern)
-        .setConstantsOnly(HebrewConverter.toConstantsOnly(modern))
         .setTransliteration(doc.getElementById("lexTrans").getElementsByClass("small-text-right").first().text().trim())
         .setPronunciation(doc.getElementById("lexPro").getElementsByClass("small-text-right").first().ownText().trim())
         .setPartOfSpeech(doc.getElementById("lexPart").getElementsByClass("small-text-right").first().text().trim())

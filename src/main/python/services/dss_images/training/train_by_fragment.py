@@ -245,7 +245,7 @@ if __name__ == '__main__':
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
     image_start = time.time()
-    for frag in [2, 4, 9, 14, 20, 27, 36, 44, 45, 47, 48, 53]:
+    for frag in [2, 4, 7, 9, 14, 20, 27, 36, 40, 44, 45, 47, 48, 53]:
         for r in range(1, 33):
             process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r})
             if r % 3 == 1:

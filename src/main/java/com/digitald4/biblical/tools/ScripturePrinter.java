@@ -52,18 +52,8 @@ public class ScripturePrinter {
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     // refreshBooks(apiConnector, daoFileDB);
     ScriptureStore scriptureStore = new ScriptureStore(
-        () -> dao, null, bibleBookStore,
-        new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
-        new ScriptureFetcherRouter(
-            new ScriptureFetcherBibleGateway(apiConnector),
-            new ScriptureFetcherBibleHub(apiConnector),
-            new ScriptureFetcherJWOrg(apiConnector),
-            new ScriptureFetcherKJV1611(apiConnector),
-            new ScriptureFetcherOneOff(apiConnector),
-            new ScriptureFetcherPseudepigrapha(apiConnector),
-            new ScriptureFetcherSefariaOrg(apiConnector),
-            new ScriptureFetcherStepBibleOrg(apiConnector)),
-        null, null);
+        () -> dao, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
+        new ScriptureFetcherRouter(apiConnector), null, null);
 
     scriptureStore.getScriptures(version, language, reference).getItems().forEach(System.out::println);
   }

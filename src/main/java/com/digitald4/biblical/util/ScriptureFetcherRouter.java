@@ -2,6 +2,7 @@ package com.digitald4.biblical.util;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.common.server.APIConnector;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
@@ -17,23 +18,15 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
   private final ScriptureFetcherStepBibleOrg stepBibleOrg;
 
   @Inject
-  public ScriptureFetcherRouter(
-      ScriptureFetcherBibleGateway bibleGateway,
-      ScriptureFetcherBibleHub bibleHub,
-      ScriptureFetcherJWOrg jwOrg,
-      ScriptureFetcherKJV1611 kjv1611,
-      ScriptureFetcherOneOff oneOff,
-      ScriptureFetcherPseudepigrapha pseudepigrapha,
-      ScriptureFetcherSefariaOrg sefariaOrg,
-      ScriptureFetcherStepBibleOrg stepBibleOrg) {
-    this.bibleGateway = bibleGateway;
-    this.bibleHub = bibleHub;
-    this.oneOff = oneOff;
-    this.jwOrg = jwOrg;
-    this.kjv1611 = kjv1611;
-    this.pseudepigrapha = pseudepigrapha;
-    this.sefariaOrg = sefariaOrg;
-    this.stepBibleOrg = stepBibleOrg;
+  public ScriptureFetcherRouter(APIConnector apiConnector) {
+    this.bibleGateway = new ScriptureFetcherBibleGateway(apiConnector);
+    this.bibleHub = new ScriptureFetcherBibleHub(apiConnector);
+    this.oneOff = new ScriptureFetcherOneOff(apiConnector);
+    this.jwOrg = new ScriptureFetcherJWOrg(apiConnector);
+    this.kjv1611 = new ScriptureFetcherKJV1611(apiConnector);
+    this.pseudepigrapha = new ScriptureFetcherPseudepigrapha(apiConnector);
+    this.sefariaOrg = new ScriptureFetcherSefariaOrg(apiConnector);
+    this.stepBibleOrg = new ScriptureFetcherStepBibleOrg(apiConnector);
   }
 
   @Override

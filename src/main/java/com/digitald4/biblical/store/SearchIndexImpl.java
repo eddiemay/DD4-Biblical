@@ -1,11 +1,15 @@
 package com.digitald4.biblical.store;
 
+import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
+import static com.digitald4.biblical.util.HebrewConverter.toRestoredHebrew;
+import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.Commandment;
+import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.ScriptureVersion;
 import com.digitald4.biblical.util.Language;
@@ -14,6 +18,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.storage.DAOCloudDS.Context;
 import com.digitald4.common.storage.SearchIndexerAppEngineImpl;
 import com.google.appengine.api.search.Document;
+import com.google.appengine.api.search.Document.Builder;
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.Index;
 import com.google.appengine.api.search.IndexSpec;
@@ -38,21 +43,24 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
   }
 
   @Override
-  protected <T> Document toDocument(T t) {
+  protected <T> Document.Builder toDocumentBuilder(T t) {
     if (t instanceof Commandment) {
-      return toDocument((Commandment) t);
+      return toDocumentBuilder((Commandment) t);
     } else if (t instanceof Scripture) {
-      return toDocument((Scripture) t);
+      return toDocumentBuilder((Scripture) t);
+    } else if (t instanceof Lexicon) {
+      return toDocumentBuilder((Lexicon) t);
     }
 
-    return super.toDocument(t);
+    return super.toDocumentBuilder(t);
   }
 
-  public Document toDocument(Scripture scripture) {
+  public Document.Builder toDocumentBuilder(Scripture scripture) {
     ScriptureVersion scriptureVersion = ScriptureVersion.get(scripture.getVersion());
     BibleBook bibleBook = bibleBookStore.get(scripture.getBook());
+    String text = scripture.getText().toString();
 
-    return Document.newBuilder()
+    Document.Builder builder = Document.newBuilder()
         .setId(scripture.getId())
         .addField(Field.newBuilder().setName("book").setAtom(scripture.getBook()))
         .addField(Field.newBuilder().setName("bookNum").setNumber(bibleBook.getNumber()))
@@ -63,31 +71,44 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
         .addField(Field.newBuilder().setName("versionNum").setNumber(scriptureVersion.getVersionNum()))
         .addField(Field.newBuilder().setName("text").setHTML(scripture.getText().toString()))
         .addField(Field.newBuilder().setName("bookTags").setText(bibleBook.getTags()))
-        .addField(Field.newBuilder().setName("bookAltNames").setText(String.join(",", bibleBook.getAltNames())))
-        .build();
+        .addField(Field.newBuilder().setName("bookAltNames").setText(String.join(",", bibleBook.getAltNames())));
+
+    if (Language.HEBREW.equals(scripture.getLanguage())) {
+      String constantsOnly = toConstantsOnly(text);
+      builder
+          .addField(Field.newBuilder().setName("unfinalized").setHTML(unfinalize(constantsOnly)))
+          .addField(Field.newBuilder().setName("constantsOnly").setHTML(constantsOnly))
+          .addField(Field.newBuilder().setName("restored").setHTML(toRestoredHebrew(text)));
+    }
+
+    return builder;
   }
 
-  public Document toDocument(Commandment commandment) {
+  public Document.Builder toDocumentBuilder(Lexicon lexicon) {
+    String constantsOnly = toConstantsOnly(lexicon.getWord());
+    return super.toDocumentBuilder(lexicon)
+        .addField(Field.newBuilder().setName("unfinalized").setAtom(unfinalize(constantsOnly)))
+        .addField(Field.newBuilder().setName("constantsOnly").setAtom(constantsOnly))
+        .addField(Field.newBuilder().setName("restored").setAtom(lexicon.restored()));
+  }
+
+  public Document.Builder toDocumentBuilder(Commandment commandment) {
     ImmutableList<VerseRange> verseRanges = scriptureRefProcessor.computeVerseRanges(commandment.getScriptures());
     VerseRange firstDeclared = verseRanges.get(0);
     ImmutableSet<BibleBook> bibleBooks = verseRanges.stream().map(VerseRange::getBook).collect(toImmutableSet());
 
-    return Document.newBuilder()
-        .setId(String.valueOf(commandment.getId()))
-        .addField(Field.newBuilder().setName("summary").setText(commandment.getSummary()))
-        .addField(Field.newBuilder().setName("scriptures").setAtom(commandment.getScriptures()))
-        .addField(Field.newBuilder().setName("tags").setText(commandment.getTags()))
+    return super.toDocumentBuilder(commandment)
         .addField(Field.newBuilder().setName("bookNum").setNumber(firstDeclared.getBook().getNumber()))
         .addField(Field.newBuilder().setName("book").setAtom(firstDeclared.getBook().name()))
         .addField(Field.newBuilder().setName("chapter").setNumber(firstDeclared.getChapter()))
         .addField(Field.newBuilder().setName("verse").setNumber(firstDeclared.getStartVerse()))
         .addField(Field.newBuilder().setName("scriptureText").setText(
             scriptureStore.get().getScripturesTextAllVersions(Language.EN, commandment.getScriptures())))
-        .addField(Field.newBuilder().setName("bookTags").setText(bibleBooks.stream()
-            .flatMap(bibleBook -> stream(bibleBook.getTags().split(","))).distinct().collect(joining(","))))
+        .addField(Field.newBuilder().setName("bookTags").setText(
+            bibleBooks.stream()
+                .flatMap(bibleBook -> stream(bibleBook.getTags().split(","))).distinct().collect(joining(","))))
         .addField(Field.newBuilder().setName("bookAltNames").setText(
-            bibleBooks.stream().flatMap(bibleBook -> bibleBook.getAltNames().stream()).collect(joining(","))))
-        .build();
+            bibleBooks.stream().flatMap(bibleBook -> bibleBook.getAltNames().stream()).collect(joining(","))));
   }
 
   @Override
@@ -95,6 +116,5 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
     return c == Scripture.class
         ? SearchServiceFactory.getSearchService().getIndex(IndexSpec.newBuilder().setName("scripture-index").build())
         : super.computeIndex(c);
-
   }
 }

@@ -5,18 +5,12 @@ import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;
 import com.digitald4.common.storage.Annotations.NonIndexed;
-import com.digitald4.common.util.FormatText;
 import com.digitald4.common.util.JSONUtil;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableList;
 
 public class Lexicon extends ModelObject<String> implements Searchable {
-  // Indexed values
   private String word;
-  private String constantsOnly;
-  private String strongsId;
-
-  // Non Indexed values
   private String transliteration;
   private String pronunciation;
   private String partOfSpeech;
@@ -38,15 +32,7 @@ public class Lexicon extends ModelObject<String> implements Searchable {
     return this;
   }
 
-  public String getStrongsId() {
-    return strongsId != null ? strongsId : getId();
-  }
-
-  public Lexicon setStrongsId(String strongsId) {
-    this.strongsId = strongsId;
-    return this;
-  }
-
+  @NonIndexed
   public String getWord() {
     return word;
   }
@@ -56,18 +42,19 @@ public class Lexicon extends ModelObject<String> implements Searchable {
     return this;
   }
 
-  public String getConstantsOnly() {
-    return constantsOnly;
+  @ApiResourceProperty
+  public String constantsOnly() {
+    return HebrewConverter.toConstantsOnly(word);
   }
 
-  public Lexicon setConstantsOnly(String constantsOnly) {
-    this.constantsOnly = FormatText.removeAccents(constantsOnly);
-    return this;
+  @ApiResourceProperty
+  public String restored() {
+    return HebrewConverter.toRestoredHebrew(word);
   }
 
   @ApiResourceProperty
   public String ancient() {
-    return HebrewConverter.toAncientRtl(constantsOnly);
+    return HebrewConverter.toAncientRtl(restored());
   }
 
   @NonIndexed
@@ -186,6 +173,7 @@ public class Lexicon extends ModelObject<String> implements Searchable {
     return this;
   }
 
+  @NonIndexed
   public Integer getReferenceCount() {
     return referenceCount;
   }

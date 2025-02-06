@@ -34,8 +34,9 @@ def cache_letter_boxes(override_letter_cache=False):
         return
 
     fragments = [
-        'isaiah-column-2', 'isaiah-column-4', 'isaiah-column-9', 'isaiah-column-14',
-        'isaiah-column-20', 'isaiah-column-27', 'isaiah-column-36', 'isaiah-column-44',
+        'isaiah-column-2', 'isaiah-column-4', 'isaiah-column-7', 'isaiah-column-9',
+        'isaiah-column-14', 'isaiah-column-20', 'isaiah-column-27',
+        'isaiah-column-36', 'isaiah-column-40', 'isaiah-column-44',
         'isaiah-column-45', 'isaiah-column-47', 'isaiah-column-48', 'isaiah-column-53']
     # Open the file for write.
     print('Writing file: ', letter_box_file)

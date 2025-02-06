@@ -43,14 +43,14 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
   }
 
   @Test
-  public void fetchWLCO() throws Exception {
+  public void fetchWLC() throws Exception {
     when(apiConnector.sendGet(anyString()))
         .thenReturn(getContent("src/test/java/com/digitald4/biblical/util/data/wlco.html"));
 
-    assertThat(scriptureStore.getScriptures("WLCO", Language.HEBREW, "Psalms 117").getItems()).containsExactly(
-        new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(1)
+    assertThat(scriptureStore.getScriptures("WLC", Language.HEBREW, "Psalms 117").getItems()).containsExactly(
+        new Scripture().setVersion("WLC").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(1)
             .setText("הללו את־יהוה כל־גוים בחוהו כל־האמים׃"),
-        new Scripture().setVersion("WLCO").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(2)
+        new Scripture().setVersion("WLC").setLanguage("he").setBook("Psalms").setChapter(117).setVerse(2)
             .setText("כי גבר עלינו ׀ חסדו ואמת־יהוה לעולם הללו־יה׃"));
   }
 
@@ -85,8 +85,7 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
   @Test
   public void fetchInterlinear() throws Exception {
     when(apiConnector.sendGet(anyString())).thenReturn(
-        getContent(
-            "src/test/java/com/digitald4/biblical/util/data/biblehub_interlinear_psalms_117.htm"));
+        getContent("src/test/java/com/digitald4/biblical/util/data/biblehub_interlinear_psalms_117.htm"));
 
     ImmutableList<Interlinear> interlinears =
         interlinearFetcher.fetchInterlinear(new BibleBook().setName("Psalms"), 117);

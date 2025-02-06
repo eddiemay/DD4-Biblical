@@ -55,6 +55,7 @@ public class LexiconTool {
   private final static String INTER_MIGRATE_URL = "%s/migrateInterlinear?book=%s&chapter=%d";
   private final static String INTER_DELETE_URL = "%s/deleteInterlinear?version=%s&book=%s&chapter=%d";
   private final static String INTER_FETCH_URL = "%s/search?lang=interlinear&searchText=%s+%d:1";
+  private final static String TRANSLATION_JSON = "src/main/python/services/translation/files/%s.json";
   private final APIConnector apiConnector;
   private final LexiconStore lexiconStore;
   private final InterlinearStore interlinearStore;
@@ -240,8 +241,8 @@ public class LexiconTool {
     int start = batch * 1000;
     int end = (batch + 1) * 1000;
     Query.List query = Query.forList(
-        Filter.of("strongsId", ">=", String.format("%s%04d", lang, start)),
-        Filter.of("strongsId", "<", String.format("%s%04d", lang, end)));
+        Filter.of("id", ">=", String.format("%s%04d", lang, start)),
+        Filter.of("id", "<", String.format("%s%04d", lang, end)));
     query.setPageSize(1000);
 
     ImmutableList<Lexicon> lexicons = lexiconStore.list(query).getItems();
@@ -265,10 +266,11 @@ public class LexiconTool {
     ImmutableList<Lexicon> lexicons = range(0, 9).boxed()
         .flatMap(batch -> getLexicons(lang, batch).stream())
         .collect(toImmutableList());
-    String filename = String.format("src/main/webapp/ml/%s_vocab_lexicon_strongs.txt", "H".equals(lang) ? "heb" : "gk");
+    String filename =
+        String.format(TRANSLATION_JSON, String.format("%s_vocab_lexicon_strongs", "H".equals(lang) ? "heb" : "gk"));
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
       lexicons.stream()
-          .map(TokenWord::from)
+          .flatMap(lexicon -> TokenWord.from(lexicon).stream())
           .sorted(comparing(TokenWord::getStrongsId))
           .map(JSONObject::new)
           .forEach(json -> {
@@ -286,7 +288,8 @@ public class LexiconTool {
     ImmutableList<AncientLexicon> ancientLexicons = range(0, 23).boxed()
         .flatMap(batch -> getAncientLexicons(batch).stream())
         .collect(toImmutableList());
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_lexicon_ancient.txt"))) {
+    String filename = String.format(TRANSLATION_JSON, "heb_vocab_lexicon_ancient");
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
       ancientLexicons.stream()
           .flatMap(ancientLexicon -> TokenWord.from(ancientLexicon).stream())
           .sorted(comparing(TokenWord::getStrongsId))
@@ -311,7 +314,8 @@ public class LexiconTool {
 
     ImmutableList<TokenWord> overrides = TranslationTool.loadFromFile("heb_vocab_overrides.txt");
 
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/webapp/ml/heb_vocab_overrides.txt"))) {
+    String filename = String.format(TRANSLATION_JSON, "heb_vocab_overrides");
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
       overrides
           .stream()
           .sorted(comparing(TokenWord::getStrongsId))
@@ -329,7 +333,8 @@ public class LexiconTool {
   }
 
   public void refreshLexicons() {
-    DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
+    range(1, 8675).forEach(id -> lexiconStore.get(String.format("H%04d", id)));
+    /* DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
     int batches = 9;
     int batchSize = 1000;
     ImmutableList<Lexicon> lexicons = range(8, batches)
@@ -343,7 +348,7 @@ public class LexiconTool {
         .flatMap(query -> apiDao.list(Lexicon.class, query).getItems().stream())
         .collect(toImmutableList());
 
-    lexiconStore.create(lexicons);
+    lexiconStore.create(lexicons); */
   }
 
   public void outputReferenceCounts() {
@@ -375,7 +380,7 @@ public class LexiconTool {
     System.out.println("[");
     range(0, 9).boxed().flatMap(batch -> getLexicons("H", batch).stream())
         .map(lexicon -> new JSONObject()
-            .put("hebrew", lexicon.getConstantsOnly())
+            .put("hebrew", lexicon.restored())
             .put("strongsId", lexicon.getId())
             .put("translation", lexicon.translation())
             .put("transliteration", lexicon.getTransliteration())
@@ -406,7 +411,8 @@ public class LexiconTool {
     LexiconTool lexiconTool = new LexiconTool(
         apiConnector, lexiconStore, interlinearStore, interlinearFetcher, bibleBookStore, ancientLexiconFetcher);
     // lexiconTool.printInterlinear("Judges 21");
-    // lexiconTool.outputLexiconStrongs("G");
+    lexiconTool.refreshLexicons();
+    lexiconTool.outputLexiconStrongs("H");
 
     // System.out.println(lexiconStore.get("H997"));
 
@@ -415,15 +421,13 @@ public class LexiconTool {
 
     int batchSize = 8674 / 18;
     int day = 3;
-    range(0, 8674 / batchSize + 1)
-        .forEach(s -> lexiconTool.migrateLexicon("H", s * batchSize + 1, (s + 1) * batchSize + 1));
+    // range(0, 8674 / batchSize + 1).forEach(s -> lexiconTool.migrateLexicon("H", s * batchSize + 1, (s + 1) * batchSize + 1));
     // lexiconTool.migrateLexicon("G", 6090, 6091);
 
     /* AtomicInteger total = new AtomicInteger();
     range(batchSize * (day - 1) + 1, batchSize * day + 1).mapToObj(id -> "G" + id)
         .mapToInt(lexiconTool::setReferenceCount).forEach(c ->  System.out.printf(" Total: %d\n", total.addAndGet(c))); */
 
-    // lexiconTool.refreshLexicons();
     // lexiconTool.outputReferenceCounts();
     // lexiconTool.outputLexiconJSON();
     // lexiconTool.outputAncientLexiconJSON();

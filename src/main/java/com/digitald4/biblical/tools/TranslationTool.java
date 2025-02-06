@@ -127,23 +127,16 @@ public class TranslationTool {
     DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
+    DAOApiImpl apiDao = new DAOApiImpl(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     InterlinearStore interlinearStore = new InterlinearStore(
         () -> daoFileDB, new ScriptureReferenceProcessorSplitImpl(bibleBookStore), interlinearFetcher);
     ScriptureReferenceProcessor scriputureRefProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
-    ScriptureFetcher scriptureFetcher = new ScriptureFetcherRouter(
-        new ScriptureFetcherBibleGateway(apiConnector),
-        new ScriptureFetcherBibleHub(apiConnector),
-        new ScriptureFetcherJWOrg(apiConnector),
-        new ScriptureFetcherKJV1611(apiConnector),
-        new ScriptureFetcherOneOff(apiConnector),
-        new ScriptureFetcherPseudepigrapha(apiConnector),
-        new ScriptureFetcherSefariaOrg(apiConnector),
-        new ScriptureFetcherStepBibleOrg(apiConnector));
+    ScriptureFetcher scriptureFetcher = new ScriptureFetcherRouter(apiConnector);
 
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
-    LexiconStore lexiconStore = new LexiconStore(() -> daoFileDB, lexiconFetcher);
+    LexiconStore lexiconStore = new LexiconStore(() -> apiDao, lexiconFetcher);
     TokenWordStore tokenWordStore =
         new TokenWordStore(TranslationTool::tokenWordProvider, TranslationTool::lexiconProvider);
     var machineTranslator = new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
@@ -151,9 +144,9 @@ public class TranslationTool {
         scriputureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
     TranslationTool translationTool = new TranslationTool(scriptureStore);
-    // translationTool.translateAndPrint("Gen 1:1-2:3");
+    translationTool.translateAndPrint("Gen 48:17-18");
     // translationTool.translateAndPrint("Isa 9:6, Psa 83:18, Gen 14:18,16:3,19:8,19:12");
-    translationTool.translateAndPrint("Isa 1-66");
+    // translationTool.translateAndPrint("Isa 1-66");
     /* translationTool.translateAndPrint("Exo 20");
     translationTool.translateAndPrint("Lev 23");
     translationTool.translateAndPrint("Dan 8:11");
@@ -168,7 +161,7 @@ public class TranslationTool {
             + "ויהי בשנה הראשונה לצאת בני ישראל מארץ מצרים בחודש השלישי בשישה עשר בו וידבר ה' אל משה לאמור:");
     translationTool.translateAndPrint("Jub 1:2",
         "עלה אלי פה ההרה ואתנה לך את שתי לוחות האבן והתורה והמצווה אשר כתבתי להורותם:"); */
-    translationTool.translateAndPrint("Jub 6:45-46");
+    // translationTool.translateAndPrint("Jub 6:45-46");
 
     System.out.println("\nIndex, Hebrew, KJV Translation, StrongsId, Strongs Hebrew, StrongsIds, Breakdown, MT");
     translationTool.hasTranslationDiff.build().stream()
@@ -176,7 +169,7 @@ public class TranslationTool {
         .filter(i -> i.getSubTokens().get(0).getTranslation().equals("[UNK]"))
         .forEach(i -> System.out.printf("%s, %s, %s, %s, %s, %s, %s, %s\n",
             i.getId(), i.getConstantsOnly(), i.getTranslation(), i.getStrongsId(),
-            i.getStrongsId() == null ? null : lexiconStore.get(i.getStrongsId()).getConstantsOnly(),
+            i.getStrongsId() == null ? null : lexiconStore.get(i.getStrongsId()).restored(),
             i.getSubTokens().stream().map(SubToken::getStrongsId).filter(Objects::nonNull).collect(joining(" ")),
             i.getSubTokens().stream().map(SubToken::getWord).collect(joining(".")),
             i.getSubTokens().stream().map(SubToken::getTranslation).collect(joining(""))));

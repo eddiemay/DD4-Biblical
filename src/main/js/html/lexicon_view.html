@@ -27,11 +27,11 @@
         <div class="columns">
           <div class="colx2-left">
             <h3>Ancient</h3>
-            <p>{{$ctrl.lexicon.ancient}}</p>
+            <p style="font-size:1.5em">{{$ctrl.lexicon.ancient}}</p>
           </div>
           <div class="colx2-right">
-            <h3>Constants Only</h3>
-            <p>{{$ctrl.lexicon.constantsOnly}}</p>
+            <h3>Restored</h3>
+            <p style="font-size:1.5em">{{$ctrl.lexicon.restored}}</p>
           </div>
         </div>
         <div class="columns">
@@ -105,7 +105,7 @@
         </div>
       </div>
       <div data-ng-if="$ctrl.view=='REFERENCES'">
-        <h2>References for Strong's {{$ctrl.lexicon.strongsId}} {{$ctrl.lexicon.constantsOnly}}</h2>
+        <h2>References for Strong's {{$ctrl.lexicon.id}} {{$ctrl.lexicon.constantsOnly}}</h2>
         <h4>{{$ctrl.references.start}} to {{$ctrl.references.end}} of {{$ctrl.references.totalSize}}</h4>
         <div data-ng-repeat="reference in $ctrl.references.items">
           <h3>

@@ -99,7 +99,7 @@ public class ScriptureFetcherBibleHub implements ScriptureFetcher, InterlinearFe
         .peek(sc -> sc.getElementsByClass("fn").forEach(Element::remove))
         .map(sc -> new Scripture()
             .setVersion(version)
-            .setLanguage(version.equals("WLC") ? Language.YIDDISH : Language.HEBREW)
+            .setLanguage(Language.HEBREW)
             .setBook(book.name())
             .setChapter(chapter)
             .setVerse(verse.incrementAndGet())

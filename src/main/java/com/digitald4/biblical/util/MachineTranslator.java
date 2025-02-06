@@ -2,7 +2,7 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
-import static com.digitald4.biblical.util.HebrewConverter.toFullHebrew;
+import static com.digitald4.biblical.util.HebrewConverter.toRestoredHebrew;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
@@ -55,7 +55,7 @@ public class MachineTranslator {
     AtomicBoolean wordFound = new AtomicBoolean();
     return interlinear.setSubTokens(
         subwordTokenizer
-            .tokenizeWord(unfinalize(toFullHebrew(interlinear.getWord())), interlinear.getStrongsId())
+            .tokenizeWord(toRestoredHebrew(interlinear.getWord()), interlinear.getStrongsId())
             .stream()
             .map(subWord -> getTranslation(subWord, interlinear.getStrongsId(), wordFound.get()))
             .peek(subToken -> wordFound.set(wordFound.get() || subToken.getStrongsId() != null))

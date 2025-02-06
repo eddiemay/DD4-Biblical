@@ -59,7 +59,12 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("מושה").setTranslation("Moses").setStrongsId("H4872"),
       new TokenWord().setWord("מורשה").setTranslation("possession").setStrongsId("H4181"),
       new TokenWord().setWord("קהל").setStrongsId("H6952").setTranslation("congregation"),
-      new TokenWord().setWord("יעקוב").setStrongsId("H3290").setTranslation("Jacob"));
+      new TokenWord().setWord("יעקוב").setStrongsId("H3290").setTranslation("Jacob"),
+      new TokenWord().setWord("יהי").setStrongsId("H1931").setTranslation("there came to be"),
+      new TokenWord().setWord("ראה").setStrongsId("H7200").setTranslation("see"),
+      new TokenWord().setWord("שמ").setStrongsId("H8034").setTranslation("name"),
+      new TokenWord().setWord("גד").setStrongsId("H1410").setTranslation("Gad"),
+      new TokenWord().setWord("יהודה").setStrongsId("H3063").setTranslation("Judah"));
 
   private final TokenWordStore tokenWordStore =
       new TokenWordStore(() -> TOKEN_WORDS, ImmutableMap::of);
@@ -132,6 +137,23 @@ public class MachineTranslatorTest {
         new SubToken().setWord("נתנ").setTranslation("given").setStrongsId("H5414").setTransliteration("natan"),
         new SubToken().setWord("ה'").setTranslation("Yah").setStrongsId("H3050").setTransliteration("Yah"),
         new SubToken().setWord("לכ").setTranslation("to you").setStrongsId("H0853").setTransliteration("lac"));
+  }
+
+  @Test
+  public void translate_with_hypens() {
+    ImmutableList<Interlinear> translation = machineTranslator.translate("ויהי כאשר ראה שם את־יהודה ואת־גד");
+    assertThat(translation.stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList())).containsExactly(
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("יהי").setTranslation("there came to be").setStrongsId("H1931").setTransliteration("yahy"),
+        new SubToken().setWord("כ").setTranslation("like ").setTransliteration("ca"),
+        new SubToken().setWord("אשר").setTranslation("which").setStrongsId("H0834").setTransliteration("ashar"),
+        new SubToken().setWord("ראה").setTranslation("see").setStrongsId("H7200").setTransliteration("rah"),
+        new SubToken().setWord("שמ").setTranslation("name").setStrongsId("H8034").setTransliteration("sham"),
+        new SubToken().setWord("את").setTranslation("you").setStrongsId("H0853").setTransliteration("at"),
+        new SubToken().setWord("יהודה").setTranslation("Judah").setStrongsId("H3063").setTransliteration("yahudah"),
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("את").setTranslation("you").setStrongsId("H0853").setTransliteration("at"),
+        new SubToken().setWord("גד").setTranslation("Gad").setStrongsId("H1410").setTransliteration("gad"));
   }
 
   @Test

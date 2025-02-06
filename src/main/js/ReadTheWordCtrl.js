@@ -62,9 +62,9 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.processScriptureResult = functi
         || previous.book != script.book || previous.version != script.version) {
       script.showChapter = true;
     }
-    script.dir = script.language == 'he' ? 'rtl' : 'ltr';
-    script.tableAlign = script.language == 'he' ? 'right' : 'left';
-    script.tableFloat = script.language == 'he' ? 'tablefloatheb' : 'tablefloat';
+    script.dir = script.language.startsWith('he') ? 'rtl' : 'ltr';
+    script.tableAlign = script.language.startsWith('he') ? 'right' : 'left';
+    script.tableFloat = script.language.startsWith('he') ? 'tablefloatheb' : 'tablefloat';
     if (this.highlight != undefined && script.interlinears) {
       for (const interlinear of script.interlinears) {
         interlinear.highlight = interlinear.strongsId == this.highlight ? 'diff-delete' : undefined;

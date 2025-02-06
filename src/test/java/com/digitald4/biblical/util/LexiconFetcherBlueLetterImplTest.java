@@ -35,7 +35,6 @@ public class LexiconFetcherBlueLetterImplTest {
         new Lexicon()
             .setId("H410")
             .setWord("אֵל")
-            .setConstantsOnly("אל")
             .setTransliteration("'ēl")
             .setPronunciation("ale")
             .setPartOfSpeech("masculine noun")

@@ -7,7 +7,7 @@ from verify import verify_fragment
 from utility import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-ID_TOKEN = 'idToken=283711286'
+ID_TOKEN = 'idToken=1907141930'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0'
 LETTERBOX_BATCH_DELETE_URL = API_BASE + 'letterBoxs/v1/batchDelete?' + ID_TOKEN
 LETTERBOX_BATCH_CREATE_URL = API_BASE + 'letterBoxs/v1/batchCreate?' + ID_TOKEN

@@ -49,7 +49,7 @@ public class TokenWordStore {
         .filter(tw -> !tw.getWord().isEmpty())
         .flatMap(tw -> {
           try {
-            if (tw.getWord().endsWith("ה")) {
+            if (tw.getWord().endsWith("ה") && tw.getWord().length() > 2) {
               Lexicon lexicon = lexicons.get(tw.getStrongsId());
               // If this words ends with a ה and not a proper noun such as a name, add a second entry without the ה.
               if (lexicon == null || !"proper masculine noun".equals(lexicon.getPartOfSpeech())) {

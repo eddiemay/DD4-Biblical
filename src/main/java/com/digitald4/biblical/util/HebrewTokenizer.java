@@ -214,11 +214,17 @@ public class HebrewTokenizer {
       return JSONUtil.toObject(TokenWord.class, new JSONObject(this));
     }
 
-    public static TokenWord from(Lexicon lexicon) {
-      return new TokenWord()
-          .setRoot(unfinalize(lexicon.getConstantsOnly()))
-          .setTranslation(lexicon.translation())
-          .setStrongsId(lexicon.getStrongsId());
+    public static ImmutableList<TokenWord> from(Lexicon lexicon) {
+      String restored = lexicon.restored();
+      String constantsOnly = unfinalize(lexicon.constantsOnly());
+      if (!restored.equals(constantsOnly)) {
+        return ImmutableList.of(
+            new TokenWord().setRoot(restored).setTranslation(lexicon.translation()).setStrongsId(lexicon.getId()),
+            new TokenWord().setRoot(constantsOnly).setTranslation(lexicon.translation()).setStrongsId(lexicon.getId()));
+      }
+
+      return ImmutableList.of(
+          new TokenWord().setRoot(restored).setTranslation(lexicon.translation()).setStrongsId(lexicon.getId()));
     }
 
     public static ImmutableList<TokenWord> from(AncientLexicon ancientLexicon) {

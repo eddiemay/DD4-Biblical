@@ -39,7 +39,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     }
 
     // Temporary code until we can find Hebrews sources for the other DSS books.
-    if (language.equals(Language.HEBREW)) {
+    if (Language.HEBREW.equals(language)) {
       return ImmutableList.of();
     }
 

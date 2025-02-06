@@ -25,18 +25,8 @@ public class ScriptureFetcherTest {
   public void setup() {
     DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, null, searchIndexer, null));
     scriptureStore = new ScriptureStore(
-        () -> dao, null, bibleBookStore,
-        new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
-        new ScriptureFetcherRouter(
-            new ScriptureFetcherBibleGateway(apiConnector),
-            new ScriptureFetcherBibleHub(apiConnector),
-            new ScriptureFetcherJWOrg(apiConnector),
-            new ScriptureFetcherKJV1611(apiConnector),
-            new ScriptureFetcherOneOff(apiConnector),
-            new ScriptureFetcherPseudepigrapha(apiConnector),
-            new ScriptureFetcherSefariaOrg(apiConnector),
-            new ScriptureFetcherStepBibleOrg(apiConnector)),
-        null, null);
+        () -> dao, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
+        new ScriptureFetcherRouter(apiConnector), null, null);
   }
 
   protected static String getContent(String filename) throws Exception {

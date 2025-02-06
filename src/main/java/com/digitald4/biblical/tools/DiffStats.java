@@ -252,8 +252,8 @@ public class DiffStats {
         .limit(21)
         .forEach(e -> {
           Lexicon lexicon = lexiconStore.get(e.getKey());
-          System.out.printf("%s %s %s %d\n",
-              e.getKey(), lexicon.getConstantsOnly(), lexicon.translation(), e.getValue());
+          System.out.printf("%s %s %s %d\n", e.getKey(), lexicon.restored(), lexicon.translation(), e.getValue());
+          System.out.printf("%s %s %s %d\n", e.getKey(), unfinalize(lexicon.constantsOnly()), lexicon.translation(), e.getValue());
         });
   }
 
@@ -447,18 +447,9 @@ public class DiffStats {
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     LexiconStore lexiconStore = new LexiconStore(() -> dao, lexiconFetcher);
     ScriptureStore scriptureStore = new ScriptureStore(
-        () -> dao, null, bibleBookStore,
-        referenceProcessor,
-        new ScriptureFetcherRouter(
-            new ScriptureFetcherBibleGateway(apiConnector),
-            new ScriptureFetcherBibleHub(apiConnector),
-            new ScriptureFetcherJWOrg(apiConnector),
-            new ScriptureFetcherKJV1611(apiConnector),
-            new ScriptureFetcherOneOff(apiConnector),
-            new ScriptureFetcherPseudepigrapha(apiConnector),
-            new ScriptureFetcherSefariaOrg(apiConnector),
-            new ScriptureFetcherStepBibleOrg(apiConnector)),
-        interlinearStore, new MachineTranslator(null, null) {
+        () -> dao, null, bibleBookStore, referenceProcessor,
+        new ScriptureFetcherRouter(apiConnector), interlinearStore,
+        new MachineTranslator(null, null) {
           @Override
           public Interlinear translate(Interlinear interlinear) {
             return interlinear;
