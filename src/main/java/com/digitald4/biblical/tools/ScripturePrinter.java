@@ -20,8 +20,8 @@ public class ScripturePrinter {
   private final static String BOOK_URL = "%s/books?includeUnreleased=true";
   public static void main(String[] args) {
     String version = "ISR";
-    String language = "interlaced";
-    String reference = "Gen 2:2";
+    String language = "gez";
+    String reference = "Isa 1:1";
     boolean useApi = false;
     for (int a = 0; a < args.length; a++) {
       if (args[a].isEmpty()) {
@@ -29,12 +29,12 @@ public class ScripturePrinter {
       }
       switch (args[a]) {
         case "--version" -> version = args[++a];
-        case "--language" -> language = args[++a];
+        case "--language", "--lang" -> language = args[++a];
         case "--useApi" -> useApi = true;
         default -> reference = args[a];
       }
     }
-    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
+    APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
     DAO dao = useApi ? new DAOApiImpl(apiConnector)
         : new DAOTestingImpl(new ChangeTracker(null, null, null, new SearchIndexer() {
             @Override

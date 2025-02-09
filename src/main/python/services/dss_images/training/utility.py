@@ -1,3 +1,8 @@
+# import subprocess
+# subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
+# subprocess.run(['brew', 'install', 'tesseract'])
+# subprocess.run(['brew', 'install', 'tesseract-lang'])
+
 import cv2
 import numpy as np
 import pytesseract

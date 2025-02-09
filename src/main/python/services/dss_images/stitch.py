@@ -1,3 +1,7 @@
+# Install dependencies if you do not have them.
+import subprocess
+subprocess.run(['pip', 'install', 'opencv-python', 'numpy', 'requests'])
+
 import cv2
 import math
 import numpy
@@ -54,7 +58,7 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 2, res=5)
     # construct_column(Collection.TORAH, 1, res=5)
 
-    for c in range(54):
+    for c in range(2):
         # construct_column(Collection.ISAIAH, 47, 8)
         for res in range(8, 11):
             construct_column(Collection.ISAIAH, c + 1, res)

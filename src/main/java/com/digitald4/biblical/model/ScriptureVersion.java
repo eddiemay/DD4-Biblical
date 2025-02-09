@@ -29,7 +29,6 @@ public class ScriptureVersion {
           Language.EN, Language.HEBREW),
       new ScriptureVersion("Covenant Christian Coalition", "CCC", 61,
           ImmutableSet.of("Additional Apocrypha", "New Testament Apocrypha")),
-      new ScriptureVersion("Open Siddur", "SID", 65, ImmutableSet.of("Jubilees"), Language.GEEZ),
       new ScriptureVersion("King James 1611", "KJV1611", 70,
           ImmutableSet.of("Canon", "OT Additions", "Deuterocanon")),
       new ScriptureVersion("Brenton's Septuagint", "SEP", 75, "OT"), // Support for Septuagint.
@@ -39,6 +38,8 @@ public class ScriptureVersion {
       new ScriptureVersion("Dead Sea Scrolls", "DSS", 82,
           ImmutableSet.of("Community Rule", "War Scroll", "Book of Giants", BibleBook.ISAIAH),
           Language.EN, Language.HEBREW),
+      new ScriptureVersion("Open Siddur", "SID", 85, ImmutableSet.of("Jubilees"), Language.GEEZ),
+      new ScriptureVersion("Geez Experience", "GzExp", 86, ImmutableSet.of("Canon"), Language.GEEZ),
       new ScriptureVersion(INTERLINEAR, INTERLINEAR, 90, "Canon"));
 
   public static final ImmutableMap<String, ScriptureVersion> BY_VERSION =

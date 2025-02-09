@@ -7,13 +7,13 @@ from multiprocessing import Pool
 from pathlib import Path
 from urllib import request
 
-training_text_file = 'torah.txt'
+training_text_file = 'bible_heb.txt'
 font = 'DSS Paleo'
 # font = 'Guttman Stam'
 font_filename = font.replace(" ", "_")
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 BOOK_INFO_URL = API_BASE + 'books/v1/get?id={}'
-SEARCH_URL = API_BASE + 'scriptures/v1/fetch?searchText={}+{}&lang=he'
+SEARCH_URL = API_BASE + 'scriptures/v1/fetch?searchText={}+{}&lang=he-re'
 BASE_OUTPUT = 'tesstrain/data/'
 output_directory = f'{BASE_OUTPUT}{font_filename}-ground-truth'
 
@@ -22,19 +22,26 @@ def cache_bible():
     if os.path.exists(training_text_file):
         return
 
-    # If the training file does not exist create it using the Torah.
-    books = ['Gen', 'Exo', 'Lev', 'Num', 'Deut', 'Josh', 'Isa']
+    # If the training file does not exist create it using the Hebrew Scriptures.
+    books = ['Gen', 'Exo', 'Lev', 'Num', 'Deut', 'Josh', 'Jdg', 'Ruth', '1Sam', '2Sam', '1Ki', '2Ki', '1Chr', '2Chr',
+             'Ezra', 'Neh', 'Est', 'Job', 'Psa', 'Prv', 'Ecc', 'sos', 'Isa', 'Jer', 'Lam', 'Eze', 'Dan', 'Hos', 'Joel',
+             'Amos', 'Ob', 'Jonah', 'Micah', 'Nah', 'Hab', 'Zep', 'Hag', 'Zec', 'Mal']
     # Open the file for write.
     print('Writing file: ', training_text_file)
     with open(training_text_file, "w", encoding="utf-8") as f:
         for book in books:
             # Get the info about the book to obtain the number of chapters.
-            book_info_url = BOOK_INFO_URL.format(book)
-            print('Sending request: ', book_info_url)
-            with request.urlopen(book_info_url) as url:
-                response = json.load(url)
-                print('Response: ', response)
-                chapters = response['chapterCount']
+            if (book == 'Psa'):
+                chapters = 150
+            elif (book == 'Est'):
+                chapters = 10
+            else:
+                book_info_url = BOOK_INFO_URL.format(book)
+                print('Sending request: ', book_info_url)
+                with request.urlopen(book_info_url) as url:
+                    response = json.load(url)
+                    print('Response: ', response)
+                    chapters = response['chapterCount']
 
             # For each chapter make a request to get all the verses.
             for chapter in range(1, chapters + 1):
@@ -86,10 +93,8 @@ if __name__ == '__main__':
 
     # Git clone the training programs if they don't exist.
     if not os.path.exists(BASE_OUTPUT):
-        subprocess.run(
-            ['git', 'clone', 'https://github.com/tesseract-ocr/tesstrain'])
-        subprocess.run(
-            ['git', 'clone', 'https://github.com/tesseract-ocr/tessdata_best'])
+        subprocess.run(['git', 'clone', 'https://github.com/tesseract-ocr/tesstrain'])
+        subprocess.run(['git', 'clone', 'https://github.com/tesseract-ocr/tessdata_best'])
 
     # Delete and recreate the training data directories.
     if os.path.exists(output_directory):

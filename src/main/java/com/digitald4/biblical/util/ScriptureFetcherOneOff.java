@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -33,7 +34,11 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
-    if (book.name().equals(BibleBook.ISAIAH)) {
+    if (Language.GEEZ.equals(language)) {
+      return book.name().equals(BibleBook.JUBILEES)
+          ? fetchJubileesOpenSiddur(version, book, language)
+          : fetchGeezExperience(version, language, book, chapter);
+    } else if (book.name().equals(BibleBook.ISAIAH)) {
       return language.equals(Language.HEBREW)
           ? fetchDSSIsaiahHe(version, book) : fetchDSSIsaiahEn(version, book, chapter);
     }
@@ -65,8 +70,6 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       return fetch1Clem(version, book);
     } else if (book.name().equals(BibleBook.ODES_OF_PEACE)) {
       return fetchOdesOfPeace(version, book);
-    } else if (book.name().equals(BibleBook.JUBILEES)) {
-      return fetchJubileesOpenSiddur(version, book, language);
     }
 
     throw new DD4StorageException("Unknown oneoff fetch request for book: " + book);
@@ -76,7 +79,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     String htmlResult = apiConnector.sendGet("https://www.essene.com/History&Essenes/md.htm");
     Document doc = Jsoup.parse(htmlResult.trim(), "", Parser.xmlParser());
     Elements paragraphs = doc.getElementsByTag("p");
-    if (paragraphs.size() == 0) {
+    if (paragraphs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -84,7 +87,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     return paragraphs.stream()
         .filter(p -> {
           Elements fonts = p.getElementsByTag("font");
-          return fonts.size() == 0 || fonts.get(0).attr("size").isEmpty();
+          return fonts.isEmpty() || fonts.get(0).attr("size").isEmpty();
         })
         .map(Element::text)
         .map(String::trim)
@@ -103,7 +106,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     String htmlResult = apiConnector.sendGet("https://www.qumran.org/js/qumran/hss/1qm");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements rows = doc.getElementsByTag("tr");
-    if (rows.size() == 0) {
+    if (rows.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -136,7 +139,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
         apiConnector.sendGet("https://rejectedscriptures.weebly.com/the-third-book-of-enoch.html");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements divs = doc.getElementsByTag("div");
-    if (divs.size() == 0) {
+    if (divs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -174,11 +177,10 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
   }
 
   private synchronized ImmutableList<Scripture> fetchGiants(String version, BibleBook book) {
-    final Pattern versePattern = Pattern.compile("(\\d+) ([^<]+)");
     String htmlResult = apiConnector.sendGet("http://www.gnosis.org/library/dss/dss_book_of_giants.htm");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements blockquotes = doc.getElementsByTag("blockquote").get(1).getElementsByTag("blockquote");
-    if (blockquotes.size() == 0) {
+    if (blockquotes.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -212,7 +214,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     String htmlResult = apiConnector.sendGet(String.format(urlTemplate, chapter));
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements paragraphs = doc.getElementsByTag("p");
-    if (paragraphs.size() == 0) {
+    if (paragraphs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -241,7 +243,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     String htmlResult = apiConnector.sendGet(urlTemplate);
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements paragraphs = doc.getElementsByTag("p");
-    if (paragraphs.size() == 0) {
+    if (paragraphs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -330,7 +332,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     String htmlResult = apiConnector.sendGet("http://dd4-biblical.appspot.com/books/lives_of_the_prophets.html");
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements divs = doc.getElementsByTag("div");
-    if (divs.size() == 0) {
+    if (divs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
 
@@ -428,9 +430,6 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     ImmutableList.Builder<Scripture> scriptures = ImmutableList.builder();
     String col = null;
     int chapterStart;
-    int verseStart;
-    int chapterEnd;
-    int verseEnd;
     int chapter = 0;
     Scripture lastScripture = null;
     for (String line : lines) {
@@ -442,10 +441,6 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
       if (rangeMatcher.matches()) {
         col = rangeMatcher.group(1);
         chapterStart = Integer.parseInt(rangeMatcher.group(2));
-        verseStart = Integer.parseInt(rangeMatcher.group(3));
-        chapterEnd = rangeMatcher.groupCount() == 5 ? Integer.parseInt(rangeMatcher.group(4)) : chapterStart;
-        verseEnd = rangeMatcher.groupCount() == 5
-            ? Integer.parseInt(rangeMatcher.group(5)) : Integer.parseInt(rangeMatcher.group(4));
         chapter = chapterStart;
 
         // System.out.printf("Isaiah %d:%d-%d:%d\n", chapterStart, verseStart, chapterEnd, verseEnd);
@@ -460,7 +455,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
             // System.out.println(chapterMatcher.group(0));
             // System.out.println("Chapter: " + chapter);
 
-            if (chapterMatcher.start() > 2) {
+            if (chapterMatcher.start() > 2 && lastScripture != null) {
               lastScripture.getText().append(" ")
                   .append(ScriptureFetcher.trim(versePart.substring(0, chapterMatcher.start())));
             }
@@ -482,10 +477,10 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
                     .setLocation(String.format("%s-%s-%d", fragment, col, lineNumber)));
           }
           Matcher verseMatcher = versePattern.matcher(versePart);
-          if (!verseMatcher.find()) {
+          if (!verseMatcher.find() && lastScripture != null) {
             lastScripture.getText().append(" ").append(ScriptureFetcher.trim(versePart));
           } else {
-            if (verseMatcher.start() > 2) {
+            if (verseMatcher.start() > 2 && lastScripture != null) {
               lastScripture.getText().append(" ")
                   .append(ScriptureFetcher.trim(versePart.substring(0, verseMatcher.start())));
             }
@@ -541,7 +536,7 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
     Document doc = Jsoup.parse(apiConnector.sendGet(
         "https://opensiddur.org/readings-and-sourcetexts/festival-and-fast-day-readings/jewish-readings/shavuot-readings/sefer-hayovelim-jubilees-preserved-in-geez/").trim());
     Elements divs = doc.getElementsByTag("div");
-    if (divs.size() == 0) {
+    if (divs.isEmpty()) {
       throw new DD4StorageException("Unable to find scripture content");
     }
     return divs.stream()
@@ -564,5 +559,30 @@ public class ScriptureFetcherOneOff implements ScriptureFetcher {
           return scriptures.build().stream();
         })
         .collect(toImmutableList());
+  }
+
+  private synchronized ImmutableList<Scripture> fetchGeezExperience(
+      String version, String lang, BibleBook book, int chapter) {
+    String fetchLang = Language.GEEZ.equals(lang) ? "tigrinya" : lang;
+    String url = String.format(
+        "http://bible.geezexperience.com/server/list_api.php?language=%s&book=%d&chapter=%d",
+        fetchLang, book.getNumber(), chapter);
+    // System.out.println(url);
+    JSONArray json = new JSONArray(apiConnector.sendGet(url));
+    if (json.length() == 0) {
+      throw new DD4StorageException("Unable to find scripture content");
+    }
+    ImmutableList.Builder<Scripture> result = ImmutableList.builder();
+    for (int x = 0; x < json.length(); x++) {
+      result.add(
+          new Scripture()
+              .setVersion(version)
+              .setLanguage(lang)
+              .setBook(book.name())
+              .setChapter(chapter)
+              .setVerse(json.getJSONObject(x).getInt("no"))
+              .setText(json.getJSONObject(x).getString("article")));
+    }
+    return result.build();
   }
 }

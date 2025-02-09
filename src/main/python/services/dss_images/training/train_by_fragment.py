@@ -229,8 +229,9 @@ if __name__ == '__main__':
     if not os.path.exists(BASE_OUTPUT):
         subprocess.run(['git', 'clone', 'https://github.com/tesseract-ocr/tesstrain'])
         subprocess.run(['git', 'clone', 'https://github.com/tesseract-ocr/tessdata_best'])
+        subprocess.run(['brew', 'install', 'wget'])
+        subprocess.run(['cp', 'tesstrain_Makefile_gcc3.81', 'tesstrain/Makefile'])
         os.chdir('tesstrain')
-        subprocess.run(['brww', 'install', 'wget'])
         subprocess.run(['make', 'tesseract-langdata'])
         os.chdir('../')
 
@@ -257,7 +258,7 @@ if __name__ == '__main__':
     print(f'Files creation time: {training_start - image_start} seconds')
 
     os.chdir('tesstrain')
-    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', 'START_MODEL=DSS_Paleo',
+    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', 'START_MODEL=script/Hebrew',
                'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=4096']
     print(command)
     subprocess.run(command)

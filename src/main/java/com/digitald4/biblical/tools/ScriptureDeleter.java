@@ -34,17 +34,12 @@ public class ScriptureDeleter {
   }
 
   public static void main(String[] args) throws IOException {
-    String idToken = null;
     if (args.length == 0 || args[0].isEmpty()) {
       System.out.println("Usage ScriptureDeleter searchText [idtoken]");
       return;
     }
 
     String searchText = args[0];
-
-    if (args.length == 2) {
-      idToken = args[1];
-    }
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAOApiImpl dao = new DAOApiImpl(apiConnector);

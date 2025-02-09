@@ -446,4 +446,26 @@ public class ScriptureFetcherOneOffTest extends ScriptureFetcherTest {
         new Scripture().setVersion("SID").setBook("Jubilees").setLanguage("gez").setChapter(2).setVerse(9).setText(
             "ወወሀበ እግዚአብሔር ፀሐየ ለትእምርት ዐቢይ ዲበ ምድር ለመዋዕል ወለሰንበት ወለአውራኅ ወለበዓላት ወለዓመታት ወለሰንበታተ ዓመታት ወለኢዮቤልዉሳት ወለኵሉ ጊዜ ለዓመታት።"));
   }
+
+  @Test
+  public void fetchGeezExperience_Psa117() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+            getContent("src/test/java/com/digitald4/biblical/util/data/geezexperience_tigrinya_Psa_117.json"));
+
+    assertThat(scriptureStore.getScriptures("GzExp", GEEZ, "Psa 117").getItems()).containsExactly(
+        new Scripture().setVersion("GzExp").setBook("Psalms").setLanguage("gez").setChapter(117).setVerse(1)
+            .setText("ኵሉኹም ኣህዛብ፣ ንእግዚኣብሄር ኣመስግንዎ፣ ኵሉኹም ህዝብታት፣ ወድስዎ።"),
+        new Scripture().setVersion("GzExp").setBook("Psalms").setLanguage("gez").setChapter(117).setVerse(2)
+            .setText("ጸጋኡ ኣባና ዓብዪ እዩ እሞ፣ ሓቂ እግዚኣብሄር ድማ ንዘለአለም ይነብር እዩ። ሃሌሉያ።"));
+  }
+
+  @Test
+  public void fetchGeezExperience_Isa2_9() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/test/java/com/digitald4/biblical/util/data/geezexperience_tigrinya_Isa_9.json"));
+
+    assertThat(scriptureStore.getScriptures("GzExp", GEEZ, "Isa 9:6").getItems()).containsExactly(
+        new Scripture().setVersion("GzExp").setBook("Isaiah").setLanguage("gez").setChapter(9).setVerse(6).setText(
+            "ሕጻን ተወሊዱልና፡ ወዲ ተውሂብና እዩ እሞ፡ እቲ ግዝኣት ከኣ ኣብ መንኲቡ እዩ፡ ስሙውን ግሩም፡ መካር፡ ብርቱዕ ኣምላኽ፡ ኣቦ ዘለኣለም፡ መስፍን ሰላም ኪስመ እዩ።"));
+  }
 }

@@ -39,7 +39,7 @@ public class ScriptureFetcherRouter implements ScriptureFetcher {
       case "NKJV", "NRSV", "RSV", "WYC" -> bibleGateway;
       case "NWT" -> jwOrg;
       case "KJV1611" -> kjv1611;
-      case "DSS", "CCC", "SID" -> oneOff;
+      case "DSS", "CCC", "SID", "GzExp" -> oneOff;
       case "OXFORD" -> pseudepigrapha;
       case "Sefaria" -> sefariaOrg;
       case "RSKJ" -> stepBibleOrg;

@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.stream.IntStream;
 
 public class ScriptureFetcher {
-  private final static String URL = "%s/scriptures?reference=%s%%20%d:1&version=%s";
+  private final static String URL = "%s/scriptures?reference=%s%%20%d:1&version=%s&lang=gez";
   private final APIConnector apiConnector;
   private final BibleBookStore bibleBookStore;
 
@@ -46,13 +46,20 @@ public class ScriptureFetcher {
       System.exit(1);
     }
 
+    String version = args[0];
+    String start = null;
+    String end = null;
+    if (args.length > 1 && !args[1].isEmpty()) {
+      start = args[1];
+    }
+    if (args.length > 2 && !args[2].isEmpty()) {
+      end = args[2];
+    }
+
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
     DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
-    new ScriptureFetcher(apiConnector, bibleBookStore).fetch(
-        args[0],
-        args.length < 2 || args[1].isEmpty() ? null : args[1],
-        args.length < 3 || args[2].isEmpty() ? null : args[2]);
+    new ScriptureFetcher(apiConnector, bibleBookStore).fetch(version, start, end);
   }
 }
