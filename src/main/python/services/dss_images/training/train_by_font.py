@@ -8,14 +8,14 @@ from pathlib import Path
 from urllib import request
 
 training_text_file = 'bible_heb.txt'
+BASE_MODEL = 'Hebrew'
 font = 'DSS Paleo'
-# font = 'Guttman Stam'
-font_filename = font.replace(" ", "_")
+MODEL_NAME = f'{BASE_MODEL}_Font'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 BOOK_INFO_URL = API_BASE + 'books/v1/get?id={}'
 SEARCH_URL = API_BASE + 'scriptures/v1/fetch?searchText={}+{}&lang=he-re'
 BASE_OUTPUT = 'tesstrain/data/'
-output_directory = f'{BASE_OUTPUT}{font_filename}-ground-truth'
+output_directory = f'{BASE_OUTPUT}{MODEL_NAME}-ground-truth'
 
 
 def cache_bible():
@@ -99,10 +99,10 @@ if __name__ == '__main__':
     # Delete and recreate the training data directories.
     if os.path.exists(output_directory):
         shutil.rmtree(output_directory)
-    if os.path.exists(BASE_OUTPUT + font_filename):
-        shutil.rmtree(BASE_OUTPUT + font_filename)
-    if os.path.exists(BASE_OUTPUT + font_filename + '.traineddata'):
-        Path(BASE_OUTPUT + font_filename + '.traineddata').unlink()
+    if os.path.exists(BASE_OUTPUT + MODEL_NAME):
+        shutil.rmtree(BASE_OUTPUT + MODEL_NAME)
+    if os.path.exists(BASE_OUTPUT + MODEL_NAME + '.traineddata'):
+        Path(BASE_OUTPUT + MODEL_NAME + '.traineddata').unlink()
 
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     # Randomly pick samples from the training set to include.
     random.shuffle(lines)
-    for l in range(2048):
+    for l in range(4096):
         samples.append({
             'id': l,
             'text': f'{lines[l]}  {lines[l+1]}\n{lines[l+2]}  {lines[l+3]}'})
@@ -122,7 +122,10 @@ if __name__ == '__main__':
     with Pool() as pool:
       pool.map(output_files, samples)
 
-    # Need to change directory to tesstrain then run the following:
-    # subprocess.run(['make', 'tesseract-langdata']) #once
-    # make training MODEL_NAME=Guttman_Stam START_MODEL=heb TESSDATA=../tessdata_best MAX_ITERATIONS=4096
-    # cp data/Guttman_Stam.traineddata /opt/homebrew/share/tessdata
+    os.chdir('tesstrain')
+    start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
+    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', f'START_MODEL={start_model}',
+               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=8192']
+    print(command)
+    subprocess.run(command)
+    subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata'])

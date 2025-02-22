@@ -11,8 +11,11 @@ from pathlib import Path
 from train_by_embedding import cache_letter_boxes
 from train_by_embedding import letter_box_file
 
+BASE_MODEL = 'Hebrew_Font'
 BASE_OUTPUT = 'tesstrain/data/'
-MODEL_NAME = 'fragment'
+ITERATIONS = 4092
+fragments = [2, 4, 7, 9, 14, 20, 27, 36, 40, 44, 45, 47, 48, 53]
+MODEL_NAME = f'{BASE_MODEL}_Label_{len(fragments)}'
 output_directory = f'{BASE_OUTPUT}{MODEL_NAME}-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
 row_map = {}
@@ -246,7 +249,7 @@ if __name__ == '__main__':
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
     image_start = time.time()
-    for frag in [2, 4, 7, 9, 14, 20, 27, 36, 40, 44, 45, 47, 48, 53]:
+    for frag in fragments:
         for r in range(1, 33):
             process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r})
             if r % 3 == 1:
@@ -258,8 +261,9 @@ if __name__ == '__main__':
     print(f'Files creation time: {training_start - image_start} seconds')
 
     os.chdir('tesstrain')
-    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', 'START_MODEL=script/Hebrew',
-               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=4096']
+    start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
+    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', f'START_MODEL={start_model}',
+               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS={ITERATIONS}']
     print(command)
     subprocess.run(command)
     subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata'])
