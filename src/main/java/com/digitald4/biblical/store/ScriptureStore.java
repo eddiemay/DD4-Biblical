@@ -36,6 +36,7 @@ import com.digitald4.common.storage.Query.Filter;
 import com.digitald4.common.storage.Query.OrderBy;
 import com.digitald4.common.storage.QueryResult;
 import com.digitald4.common.storage.SearchIndexer;
+import com.digitald4.common.util.FormatText;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -161,6 +162,10 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
             return list(new LanguageRequest(version, Language.HEBREW, false), book, chapter, startVerse, endVerse)
                 .getItems().stream()
                 .peek(s -> s.setLanguage(Language.HEBREW_RESTORED).setText(toRestoredHebrew(s.getText())));
+          } else if (Language.GREEK.equals(languageRequest.getLanguage())) {
+            return list(new LanguageRequest(version, Language.GK, false), book, chapter, startVerse, endVerse)
+                .getItems().stream()
+                .peek(s -> s.setLanguage(Language.GREEK).setText(FormatText.removeAccents(s.getText().toString())));
           }
           return list(languageRequest, book, chapter, startVerse, endVerse).getItems().stream();
         })
@@ -181,7 +186,7 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
           : ImmutableList.of(
               new LanguageRequest(version, Language.EN, true),
               new LanguageRequest(version, Language.HEBREW, false),
-              new LanguageRequest(version, Language.GREEK, false));
+              new LanguageRequest(version, Language.GK, false));
     }
 
     return ImmutableList.of(new LanguageRequest(version, language, true));

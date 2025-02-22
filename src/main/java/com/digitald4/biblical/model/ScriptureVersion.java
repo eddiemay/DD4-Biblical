@@ -34,7 +34,7 @@ public class ScriptureVersion {
       new ScriptureVersion("Brenton's Septuagint", "SEP", 75, "OT"), // Support for Septuagint.
       new ScriptureVersion("Westminster Leningrad Codex", "WLC", 80, ImmutableSet.of("OT"),
           Language.HEBREW),
-      new ScriptureVersion("Nestle 104 GNT", "Nestle", 81, ImmutableSet.of("NT"), Language.GREEK),
+      new ScriptureVersion("Nestle 104 GNT", "Nestle", 81, ImmutableSet.of("NT"), Language.GK),
       new ScriptureVersion("Dead Sea Scrolls", "DSS", 82,
           ImmutableSet.of("Community Rule", "War Scroll", "Book of Giants", BibleBook.ISAIAH),
           Language.EN, Language.HEBREW),

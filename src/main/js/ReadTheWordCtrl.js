@@ -104,7 +104,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefDialog = function
   if (isSub) {
     for (var subToken of interlinear.subTokens) {
       if (subToken.strongsId) {
-        this.strongId = subToken.strongsId;
+        this.strongsId = subToken.strongsId;
       }
     }
   }

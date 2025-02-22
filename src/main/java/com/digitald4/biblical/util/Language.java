@@ -7,7 +7,8 @@ public class Language {
   // public static final String HEBREW_NIQQUD = "he-nqd";
   public static final String HEBREW_HASER = "he-haser";
   public static final String HEBREW_RESTORED = "he-re";
-  public static final String GREEK = "gk";
+  public static final String GK = "gk";
+  public static final String GREEK = "greek";
   public static final String GEEZ = "gez";
   public static final String INTERLACED = "interlaced";
 }

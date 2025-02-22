@@ -55,11 +55,11 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
   }
 
   @Test
-  public void fetchGreek() throws Exception {
+  public void fetchGk() throws Exception {
     when(apiConnector.sendGet(anyString())).thenReturn(
         getContent("src/test/java/com/digitald4/biblical/util/data/biblehub_nestle_matthew_1.htm"));
 
-    assertThat(scriptureStore.getScriptures("Nestle", Language.GREEK, "Matt 1:1-5").getItems()).containsExactly(
+    assertThat(scriptureStore.getScriptures("Nestle", Language.GK, "Matt 1:1-5").getItems()).containsExactly(
         new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(1)
             .setText("Βίβλος γενέσεως Ἰησοῦ Χριστοῦ υἱοῦ Δαυεὶδ υἱοῦ Ἀβραάμ."),
         new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(2)
@@ -70,6 +70,24 @@ public class ScriptureFetcherBibleHubTest extends ScriptureFetcherTest {
             .setText("Ἀρὰμ δὲ ἐγέννησεν τὸν Ἀμιναδάβ, Ἀμιναδὰβ δὲ ἐγέννησεν τὸν Ναασσών, Ναασσὼν δὲ ἐγέννησεν τὸν Σαλμών,"),
         new Scripture().setVersion("Nestle").setLanguage("gk").setBook("Matthew").setChapter(1).setVerse(5)
             .setText("Σαλμὼν δὲ ἐγέννησεν τὸν Βόες ἐκ τῆς Ῥαχάβ, Βόες δὲ ἐγέννησεν τὸν Ἰωβὴδ ἐκ τῆς Ῥούθ, Ἰωβὴδ δὲ ἐγέννησεν τὸν Ἰεσσαί,"));
+  }
+
+  @Test
+  public void fetchGreek() throws Exception {
+    when(apiConnector.sendGet(anyString())).thenReturn(
+        getContent("src/test/java/com/digitald4/biblical/util/data/biblehub_nestle_matthew_1.htm"));
+
+    assertThat(scriptureStore.getScriptures("Nestle", Language.GREEK, "Matt 1:1-5").getItems()).containsExactly(
+        new Scripture().setVersion("Nestle").setLanguage("greek").setBook("Matthew").setChapter(1).setVerse(1)
+            .setText("Βιβλος γενεσεως Ιησου Χριστου υιου Δαυειδ υιου Αβρααμ."),
+        new Scripture().setVersion("Nestle").setLanguage("greek").setBook("Matthew").setChapter(1).setVerse(2)
+            .setText("Αβρααμ εγεννησεν τον Ισαακ, Ισαακ δε εγεννησεν τον Ιακωβ, Ιακωβ δε εγεννησεν τον Ιουδαν και τους αδελφους αυτου,"),
+        new Scripture().setVersion("Nestle").setLanguage("greek").setBook("Matthew").setChapter(1).setVerse(3)
+            .setText("Ιουδας δε εγεννησεν τον Φαρες και τον Ζαρα εκ της Θαμαρ, Φαρες δε εγεννησεν τον Εσρωμ, Εσρωμ δε εγεννησεν τον Αραμ,"),
+        new Scripture().setVersion("Nestle").setLanguage("greek").setBook("Matthew").setChapter(1).setVerse(4)
+            .setText("Αραμ δε εγεννησεν τον Αμιναδαβ, Αμιναδαβ δε εγεννησεν τον Ναασσων, Ναασσων δε εγεννησεν τον Σαλμων,"),
+        new Scripture().setVersion("Nestle").setLanguage("greek").setBook("Matthew").setChapter(1).setVerse(5)
+            .setText("Σαλμων δε εγεννησεν τον Βοες εκ της Ραχαβ, Βοες δε εγεννησεν τον Ιωβηδ εκ της Ρουθ, Ιωβηδ δε εγεννησεν τον Ιεσσαι,"));
   }
 
   @Test

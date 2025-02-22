@@ -4,14 +4,16 @@ var HEBREW_MONTHS = [
   {number: 1, displayText: '1st Month', days: 30, name: 'Abib/Aviv/Nisan'},
   {number: 2, displayText: '2nd Month', days: 30, name: 'Ziw/Ziv'},
   {number: 3, displayText: '3rd Month', days: 31, name: 'Siwan/Sivan'},
-  {number: 4, displayText: '4th Month', days: 30}, {number: 5, displayText: '5th Month', days: 30},
+  {number: 4, displayText: '4th Month', days: 30},
+  {number: 5, displayText: '5th Month', days: 30},
   {number: 6, displayText: '6th Month', days: 31, name: 'Elul'},
   {number: 7, displayText: '7th Month', days: 30, name: 'Eythanim/Ethanim'},
   {number: 8, displayText: '8th Month', days: 30, name: 'Bul'},
   {number: 9, displayText: '9th Month', days: 31, name: 'Kislew/Chislev'},
   {number: 10, displayText: '10th Month', days: 30, name: 'Tebeth'},
   {number: 11, displayText: '11th Month', days: 30, name: 'Shebat'},
-  {number: 12, displayText: '12th Month', days: 31, name: 'Adar'}, {number: 13, displayText: 'Leap Week', days: 7}];
+  {number: 12, displayText: '12th Month', days: 31, name: 'Adar'},
+  {number: 13, displayText: 'Leap Week', days: 7}];
 
 HebrewDate = function(year, month, day, date) {
   this.year = year;
@@ -141,6 +143,11 @@ getAbibOne = function(year) {
 
   // Skip every 40th year for the second 200 years.
   weeks -= Math.floor(yearDiff < 200 ? 0 : (yearDiff - 200) / 40);
+
+  // If this year is divisable by 5 jump back bcz the leap comes after the year.
+  if (year % 5 == 0) {
+    weeks -= 1;
+  }
 
   var abibOne = new Date(baseAbib.getTime() + weeks * ONE_DAY * 7);
   console.log('First day of Abib: ' + abibOne + ', baseYear: ' + baseYear + ', baseAbib: ' + baseAbib);

@@ -1707,7 +1707,7 @@ position:fixed; right: 0px; bottom:0px;  z-index:1;
 
 
 }
-.tablefloat {float: left; margin: 4px;}
+.tablefloat {float: left; margin: 15px;}
 .tablefloatheb {float: right; margin: 15px; text-align:right;}
 .bot2 {width:85%; max-width:736px;}
 

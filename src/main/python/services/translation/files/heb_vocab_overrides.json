@@ -183,6 +183,7 @@
 {"strongsId":"H3045","root":"ודיע","translation":"know"}
 {"strongsId":"H3045","root":"יודע","translation":"known"}
 {"strongsId":"H3050","root":"ה'","translation":"Yah"}
+{"strongsId":"H3050","root":"יה","translation":"Yah"}
 {"strongsId":"H3051","root":"הבה","translation":"come"}
 {"strongsId":"H3068","root":"יהוה","translation":"יהוה"}
 {"strongsId":"H3069","root":"יהוה","translation":"יהוה"}
@@ -280,11 +281,13 @@
 {"strongsId":"H4186","root":"משב","translation":"dwelling"}
 {"strongsId":"H4191","root":"מת","translation":"die"}
 {"strongsId":"H4191","root":"מות","translation":"death"}
+{"strongsId":"H4191","root":"מית","translation":"death"}
 {"strongsId":"H4191","root":"ומת","translation":"put death"}
 {"strongsId":"H4208","root":"מזלות","translation":"constellation"}
 {"strongsId":"H4216","root":"מזרה","translation":"Mazzaroth"}
 {"strongsId":"H4232","root":"מחייאל","translation":"Mehujael"}
 {"strongsId":"H4256","root":"מחלוקת","translation":"division"}
+{"strongsId":"H4294","root":"מטה","translation":"branch"}
 {"strongsId":"H4305","root":"מטיר","translation":"rain"}
 {"strongsId":"H6327","root":"פיצ","translation":"scatter"}
 {"strongsId":"H4325","root":"מימ","translation":"waters"}
@@ -318,6 +321,8 @@
 {"strongsId":"H5060","root":"גיע","translation":"reaching"}
 {"strongsId":"H5060","root":"תגיע","translation":"reached"}
 {"strongsId":"H5060","root":"מגיע","translation":"reached"}
+{"strongsId":"H5065","root":"נגש","translation":"press"}
+{"strongsId":"H5065","root":"נוגש","translation":"oppressor"}
 {"strongsId":"H5066","root":"גש","translation":"came near"}
 {"strongsId":"H5080","root":"דיח","translation":"entice"}
 {"strongsId":"H5117","root":"נח","translation":"rested"}
@@ -426,10 +431,9 @@
 {"strongsId":"H6153","root":"ערבימ","translation":"evenings"}
 {"strongsId":"H6155","root":"ערב","translation":"evening"}
 {"strongsId":"H6202","root":"ערופ","translation":"neck"}
-{"strongsId":"H6213","root":"עשה","translation":"made"}
+{"strongsId":"H6213","root":"עשה","translation":"make"}
 {"strongsId":"H6213","root":"עושה","translation":"maker"}
 {"strongsId":"H6213","root":"עש","translation":"made"}
-{"strongsId":"H6213","root":"עשה","translation":"create"}
 {"strongsId":"H6213","root":"עשות","translation":"accomplish"}
 {"strongsId":"H6256","root":"מעת","translation":"from time"}
 {"strongsId":"H6279","root":"עתיר","translation":"intreated"}
@@ -522,7 +526,10 @@
 {"strongsId":"H7337","root":"רחיב","translation":"enlarged"}
 {"strongsId":"H7363","root":"מרחפת","translation":"hovering"}
 {"strongsId":"H7379","root":"ריב","translation":"strife"}
+{"strongsId":"H7392","root":"רוכב","translation":"rider"}
 {"strongsId":"H7399","root":"רכוש","translation":"possession"}
+{"strongsId":"H7411","root":"רמה","translation":"cast"}
+{"strongsId":"H7411","root":"רמית","translation":"deceive"}
 {"strongsId":"H7430","root":"רומש","translation":"that move"}
 {"strongsId":"H7453","root":"רעה","translation":"neighbor"}
 {"strongsId":"H7493","root":"רעיש","translation":"shook"}
