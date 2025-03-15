@@ -126,9 +126,12 @@
 {"strongsId":"H1980","root":"הלוכ","translation":"going"}
 {"strongsId":"H1980","root":"הולכ","translation":"walk"}
 {"strongsId":"H2005","root":"הנ","translation":"behold"}
+{"strongsId":"H2008","root":"הנ","translation":"here"}
+{"strongsId":"H2008","root":"הנה","translation":"here"}
 {"strongsId":"H2022","root":"הר","translation":"mountain"}
 {"strongsId":"H2026","root":"הרוג","translation":"slaughter"}
 {"strongsId":"H2032","root":"הרנ","translation":"conception"}
+{"strongsId":"H2040","root":"הרוס","translation":"thrown down"}
 {"strongsId":"H2076","root":"זובח","translation":"sacrificer"}
 {"strongsId":"H2100","root":"זב","translation":"flow"}
 {"strongsId":"H2111","root":"זע","translation":"move"}
@@ -147,6 +150,7 @@
 {"strongsId":"H2296","root":"חגר","translation":"belt"}
 {"strongsId":"H2296","root":"חגור","translation":"belt"}
 {"strongsId":"H2332","root":"חוה","translation":"Chawah (Eve)"}
+{"strongsId":"H2356","root":"חיר","translation":"cave"}
 {"strongsId":"H2388","root":"חזיק","translation":"strength"}
 {"strongsId":"H2398","root":"חוטא","translation":"sinner"}
 {"strongsId":"H2416","root":"חיתו","translation":"his life"}
@@ -171,6 +175,7 @@
 {"strongsId":"H2834","root":"חשופ","translation":"uncovered"}
 {"strongsId":"H2856","root":"חת","translation":"seal"}
 {"strongsId":"H2873","root":"טבוח","translation":"killed"}
+{"strongsId":"H2883","root":"טובע","translation":"sunk"}
 {"strongsId":"H2903","root":"טטפת","translation":"frontlets"}
 {"strongsId":"H2921","root":"טלוא","translation":"spotted"}
 {"strongsId":"H2932","root":"טומאה","translation":"uncleanness"}
@@ -221,6 +226,7 @@
 {"strongsId":"H3335","root":"יוצר","translation":"former"}
 {"strongsId":"H3363","root":"וקע","translation":"hang"}
 {"strongsId":"H3384","root":"הורת","translation":"teach"}
+{"strongsId":"H3384","root":"יורה","translation":"taught"}
 {"strongsId":"H3391","root":"ירח","translation":"moon"}
 {"strongsId":"H3393","root":"ירח","translation":"moon"}
 {"strongsId":"H3394","root":"ירח","translation":"moon"}
@@ -533,6 +539,7 @@
 {"strongsId":"H7430","root":"רומש","translation":"that move"}
 {"strongsId":"H7453","root":"רעה","translation":"neighbor"}
 {"strongsId":"H7493","root":"רעיש","translation":"shook"}
+{"strongsId":"H7495","root":"רופא","translation":"healer"}
 {"strongsId":"H7523","root":"רצח","translation":"slay"}
 {"strongsId":"H7523","root":"רוצח","translation":"slayer"}
 {"strongsId":"H7533","root":"רצוצ","translation":"oppressed"}

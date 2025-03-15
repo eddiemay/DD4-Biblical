@@ -10,7 +10,6 @@ app = Flask(__name__)
 def cors_enabled_function():
     # For more information about CORS and CORS preflight requests, see:
     # https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
-
     # Set CORS headers for the preflight request
     if request.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type
@@ -32,7 +31,7 @@ def cors_enabled_function():
 
 def chat(request):
     question = request.args.get('question')
-    sessionId = request.args.get('sessionId')
-    print('sessionId: {} question: {}'.format(sessionId, question))
+    session_id = request.args.get('sessionId')
+    print('session_id: {} question: {}'.format(session_id, question))
 
-    return langgraph_chat.query(question, sessionId)
+    return langgraph_chat.query(question, session_id)

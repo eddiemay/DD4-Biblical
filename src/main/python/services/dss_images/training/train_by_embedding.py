@@ -12,6 +12,8 @@ from train_by_font import training_text_file
 from utility import unfinalize
 
 letter_box_file = 'letter_boxes.json'
+BASE_MODEL = 'Hebrew_Font'
+MODEL_NAME = f'{BASE_MODEL}_Embedding'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1'
 BASE_OUTPUT = 'tesstrain/data/'
@@ -231,7 +233,7 @@ if __name__ == '__main__':
 
     # Randomly pick samples from the training set to include.
     # random.shuffle(lines)
-    for l in range(0, len(lines) - 3, 4):
+    for l in range(0, 4096, 4):
         samples.append({
             'id': l / 4,
             'text': f'{lines[l]}  {lines[l+1]}\n{lines[l+2]}  {lines[l+3]}'})
@@ -239,7 +241,12 @@ if __name__ == '__main__':
     with Pool() as pool:
         pool.map(process_and_output, samples)
 
-    # Need to change directory to tesstrain then run the following:
-    # subprocess.run(['make', 'tesseract-langdata']) #once
-    # make training MODEL_NAME=embedding START_MODEL=heb TESSDATA=../tessdata_best MAX_ITERATIONS=4096
-    # cp data/embedding.traineddata /opt/homebrew/share/tessdata
+    os.chdir('tesstrain')
+    start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
+    command = ['make', 'training', 'MODEL_NAME=embedding', f'START_MODEL={start_model}',
+               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=8192']
+    print(' '.join(command))
+    subprocess.run(command)
+    command = ['cp', 'data/embedding.traineddata', f'/opt/homebrew/share/tessdata/{MODEL_NAME}.traineddata']
+    print(' '.join(command))
+    subprocess.run(command)

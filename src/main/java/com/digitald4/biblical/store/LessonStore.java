@@ -9,6 +9,7 @@ import com.digitald4.biblical.util.ScriptureMarkupProcessor;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.GenericStore;
 import com.digitald4.common.storage.Query;
+import com.digitald4.common.util.Pair;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
@@ -88,15 +89,13 @@ public class LessonStore extends GenericStore<Lesson, Long> {
     }
 
     @Override
-    protected Iterable<LessonVersion> preprocess(Iterable<LessonVersion> items, boolean isCreate) {
-      return super.preprocess(
-          stream(items)
-              .peek(lessonVersion ->
-                  lessonVersion
-                      .setThemeText(markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
-                      .setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
-              .collect(toImmutableList()),
-          isCreate);
+    protected Iterable<LessonVersion> preprocess(Iterable<Pair<LessonVersion, LessonVersion>> items) {
+      return stream(items)
+          .map(Pair::getLeft)
+          .peek(lessonVersion -> lessonVersion
+              .setThemeText(markupProcessor.replaceScriptures(lessonVersion.getThemeText()))
+              .setContent(markupProcessor.replaceScriptures(lessonVersion.getContent())))
+          .collect(toImmutableList());
     }
   }
 }

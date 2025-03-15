@@ -11,12 +11,12 @@ from pathlib import Path
 from train_by_embedding import cache_letter_boxes
 from train_by_embedding import letter_box_file
 
-BASE_MODEL = 'Hebrew_Font'
+BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
 ITERATIONS = 4092
 fragments = [2, 4, 7, 9, 14, 20, 27, 36, 40, 44, 45, 47, 48, 53]
 MODEL_NAME = f'{BASE_MODEL}_Label_{len(fragments)}'
-output_directory = f'{BASE_OUTPUT}{MODEL_NAME}-ground-truth'
+output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
 row_map = {}
 img_map = {}
@@ -241,10 +241,10 @@ if __name__ == '__main__':
     # Delete and recreate the training data directories.
     if os.path.exists(output_directory):
         shutil.rmtree(output_directory)
-    if os.path.exists(BASE_OUTPUT + MODEL_NAME):
-        shutil.rmtree(BASE_OUTPUT + MODEL_NAME)
-    if os.path.exists(BASE_OUTPUT + MODEL_NAME + '.traineddata'):
-        Path(BASE_OUTPUT + MODEL_NAME + '.traineddata').unlink()
+    if os.path.exists(BASE_OUTPUT + 'label'):
+        shutil.rmtree(BASE_OUTPUT + 'label')
+    if os.path.exists(BASE_OUTPUT + 'label' + '.traineddata'):
+        Path(BASE_OUTPUT + 'label' + '.traineddata').unlink()
 
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
@@ -262,11 +262,13 @@ if __name__ == '__main__':
 
     os.chdir('tesstrain')
     start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
-    command = ['make', 'training', f'MODEL_NAME={MODEL_NAME}', f'START_MODEL={start_model}',
-               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS={ITERATIONS}']
-    print(command)
+    command = ['make', 'training', 'MODEL_NAME=label', f'START_MODEL={start_model}',
+               'TESSDATA=../tessdata_best', f'MAX_ITERATIONS={ITERATIONS}']
+    print(' '.join(command))
     subprocess.run(command)
-    subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata'])
+    command = ['cp', 'data/label.traineddata', f'/opt/homebrew/share/tessdata/{MODEL_NAME}.traineddata']
+    print(' '.join(command))
+    subprocess.run(command)
 
     end_time = time.time()
     print(f'Setup time: {image_start - start_time} seconds')

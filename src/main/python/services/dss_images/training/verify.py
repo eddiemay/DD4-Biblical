@@ -1,8 +1,10 @@
 import cv2
+import json
 import Levenshtein
 import numpy as np
 import pytesseract
 import time
+
 from diff_match_patch import diff_match_patch
 from dss_ocr import image_to_string
 from matplotlib import pyplot as plt
@@ -12,14 +14,16 @@ from scipy import stats
 from utility import image_to_boxes_data, post_process_boxes, romanize, unfinalize
 from utility import draw_letter_boxes_and_text
 
-titles = [# 'Orginal', 'Gray Scale', 'OTSU', 'OTSU2',
-          'Bilateral7', 'Bilateral9', 'Bilateral12', 'Bilateral15',
-          'MedBlur3', 'GauBlur3', 'MedThres3', 'GauThres3',
-          'MedBlur3g', 'GauBlur3g', 'MedThres3g', 'GauThres3g',
-          'MedBlur5', 'GauBlur5', 'MedThres5', 'GauThres5',
-          'MedBlur5g', 'GauBlur5g', 'MedThres5g', 'GauThres5g',
-          'BiMedBlur3', 'BiGauBlur3', 'BiMedThres3', 'BiGauThres3',
-          'BiMedBlur5', 'BiGauBlur5', 'BiMedThres5', 'BiGauThres5',]
+output_all = False
+threshold_names = {
+    cv2.THRESH_BINARY: 'THRESH_BINARY',
+    cv2.THRESH_BINARY_INV: 'THRESH_BINARY_INV',
+    cv2.THRESH_TRUNC: 'THRESH_TRUNC',
+    cv2.THRESH_TOZERO: 'THRESH_TOZERO',
+    cv2.THRESH_TOZERO_INV: 'THRESH_TOZERO_INV',
+    cv2.THRESH_MASK: 'THRESH_MASK',
+    cv2.THRESH_OTSU: 'THRESH_OTSU',
+    cv2.THRESH_TRIANGLE: 'THRESH_TRIANGLE'}
 
 
 class bcolors:
@@ -53,15 +57,36 @@ def diff_line_mode(text1, text2):
 
 def evaluate(eval):
     txt = eval['text']
-    ocr = unfinalize(image_to_string(eval['image'], model=eval['model']).strip())
+    img = eval['image']
+    params = eval['parameters']
+    name = ''
+    if params['gray']:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        name += 'gray'
+    if params['bf'] is not None:
+        img = cv2.bilateralFilter(img, params['bf'], 75, 75)
+        name += f'-bf{params['bf']}'
+    if params['blur'] == 'median':
+        img = cv2.medianBlur(img, params['blur_size'])
+        name += f'-median{params['blur_size']}'
+    elif params['blur'] == 'gaussian':
+        img = cv2.GaussianBlur(img, [params['blur_size'], params['blur_size']], sigmaX=30, sigmaY=300)
+        name += f'-gaussian{params['blur_size']}'
+    if params['threshold_type'] is not None:
+        threshold_type = params['threshold_type']
+        img = cv2.threshold(img, params['threshold'], 255, threshold_type)[1]
+        name += f'-{threshold_names[threshold_type]}_{params['threshold']}'
+
+    ocr = unfinalize(image_to_string(img, model=params['model']).strip())
     ld = Levenshtein.distance(txt, ocr)
     percent = round((len(txt) - ld) * 100 / len(txt), 2)
-    eval['ocr'], eval['ld'], eval['percent'] = ocr, ld, percent
+    eval['name'], eval['image'], eval['ocr'], eval['ld'], eval['percent'] =(
+        name, img, ocr, ld, percent)
 
     return eval
 
 
-def verify_(name, img_file, txt, model, img_proc, display, multithread):
+def verify_(name, img_file, txt, model, display, multithread):
     result = {'name': name, 'evaluated': []}
     img = cv2.imread(img_file)
 
@@ -69,61 +94,27 @@ def verify_(name, img_file, txt, model, img_proc, display, multithread):
         cv2.imshow(f'Original Image', img)
         cv2.waitKey(1)
 
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    otsu = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-    otsu2 = cv2.threshold(gray, 100, 205, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-    blf7 = cv2.bilateralFilter(img, 7, 75, 75)
-    blf9 = cv2.bilateralFilter(img, 9, 75, 75)
-    blf12 = cv2.bilateralFilter(img, 12, 75, 75)
-    blf15 = cv2.bilateralFilter(img, 15, 75, 75)
-    fmblur3 = cv2.medianBlur(blf15, 3)
-    fgblur3 = cv2.GaussianBlur(blf15, [3, 3], sigmaX=30, sigmaY=300)
-    fmth3 = cv2.threshold(fmblur3, 135, 255, cv2.THRESH_BINARY)[1]
-    fgth3 = cv2.threshold(fgblur3, 132, 255, cv2.THRESH_BINARY)[1]
-    fmblur5 = cv2.medianBlur(blf15, 5)
-    fgblur5 = cv2.GaussianBlur(blf15, [5, 5], sigmaX=30, sigmaY=300)
-    fmth5 = cv2.threshold(fmblur5, 135, 255, cv2.THRESH_BINARY)[1]
-    fgth5 = cv2.threshold(fgblur5, 132, 255, cv2.THRESH_BINARY)[1]
-    mblur3 = cv2.medianBlur(img, 3)
-    gblur3 = cv2.GaussianBlur(img, [3, 3], sigmaX=30, sigmaY=300)
-    mth3 = cv2.threshold(mblur3, 135, 255, cv2.THRESH_BINARY)[1]
-    gth3 = cv2.threshold(gblur3, 132, 255, cv2.THRESH_BINARY)[1]
-    mblur3g = cv2.medianBlur(gray, 3)
-    gblur3g = cv2.GaussianBlur(gray, [3, 3], sigmaX=30, sigmaY=300)
-    mth3g = cv2.threshold(mblur3g, 145, 255, cv2.THRESH_BINARY)[1] # Best 145
-    gth3g = cv2.threshold(gblur3g, 132, 255, cv2.THRESH_BINARY)[1] # Best 132
-    mblur5 = cv2.medianBlur(img, 5)
-    gblur5 = cv2.GaussianBlur(img, [5, 5], sigmaX=30, sigmaY=300)
-    mth5 = cv2.threshold(mblur5, 135, 255, cv2.THRESH_BINARY)[1]
-    gth5 = cv2.threshold(gblur5, 132, 255, cv2.THRESH_BINARY)[1]
-    mblur5g = cv2.medianBlur(gray, 5)
-    gblur5g = cv2.GaussianBlur(gray, [5, 5], sigmaX=30, sigmaY=300)
-    mth5g = cv2.threshold(mblur5g, 135, 255, cv2.THRESH_BINARY)[1]
-    gth5g = cv2.threshold(gblur5g, 132, 255, cv2.THRESH_BINARY)[1]
+    for isGray in [False, True]:
+        for bf in [None, 7, 14, 21, 28, 35]:
+            for blur in [None, 'median', 'gaussian']:
+                threshold_values = [130, 135, 145] if blur == 'median' else [132]
+                for blur_size in [3, 5] if blur is not None else [None]:
+                    for threshold_type in [None, cv2.THRESH_BINARY, cv2.THRESH_BINARY_INV, cv2.THRESH_TRUNC]:
+                        for threshold in threshold_values if threshold_type is not None else [None]:
+                            eval = {'text': txt, 'image': img,
+                                    'parameters': {
+                                        'model': model, 'gray': isGray, 'bf': bf,
+                                        'blur': blur, 'blur_size': blur_size,
+                                        'threshold': threshold,
+                                        'threshold_type': threshold_type}}
+                            result['evaluated'].append(eval)
 
-    images = [# img, gray, otsu, otsu2,
-              blf7, blf9, blf12, blf15,
-              mblur3, gblur3, mth3, gth3,
-              mblur3g, gblur3g, mth3g, gth3g,
-              mblur5, gblur5, mth5, gth5,
-              mblur5g, gblur5g, mth5g, gth5g,
-              fmblur3, fgblur3, fmth3, fgth3,
-              fmblur5, fgblur5, fmth5, fgth5]
-
-    if img_proc is not None:
-        i = titles.index(img_proc)
-        result['evaluated'].append(evaluate(
-            {'name': titles[i], 'text': txt, 'image': images[i], 'model': model}))
+    print(f'Evaluating {name} with {len(result['evaluated'])} preprocessors')
+    if multithread:
+        with Pool() as pool:
+            result['evaluated'] = pool.map(evaluate, result['evaluated'])
     else:
-        for i in range(len(titles)):
-            eval = {'name': titles[i], 'text': txt, 'image': images[i], 'model': model}
-            result['evaluated'].append(eval)
-            if not multithread:
-                evaluate(eval)
-
-        if multithread:
-            with Pool() as pool:
-                result['evaluated'] = pool.map(evaluate, result['evaluated'])
+        result['evaluated'] = list(map(evaluate, result['evaluated']))
 
     best = result['evaluated'][np.argmax(list(map(lambda e: e['percent'], result['evaluated'])))]
     result['best'] = best
@@ -168,10 +159,12 @@ def verify_(name, img_file, txt, model, img_proc, display, multithread):
 
         cv2.imshow('Best Image', best['image'])
         plt.figure(num=f'{name} {model}')
-        for i in range(len(titles)):
-            # cv2.imshow(titles[i], images[i])
-            plt.subplot(6, 4, i + 1), plt.imshow(images[i], 'gray')
-            plt.title(f'{titles[i]} {result["evaluated"][i]["percent"]}%')
+        sr = list(
+            reversed(sorted(result['evaluated'], key=lambda r:r['percent'])))
+        for i in range(6):
+            # cv2.imshow(sr[i]['name'], sr[i]['image'])
+            plt.subplot(3, 2, i + 1), plt.imshow(sr[i]['image'])
+            plt.title(f'{sr[i]['name']} {sr[i]["percent"]}%')
             plt.xticks([]), plt.yticks([])
         cv2.waitKey(1)
         plt.show()
@@ -179,13 +172,13 @@ def verify_(name, img_file, txt, model, img_proc, display, multithread):
     return result
 
 
-def verify(img_file, txt_file, model='heb', display=False, img_proc=None, multithread=True):
+def verify(img_file, txt_file, model='heb', display=False, multithread=True):
     with open(txt_file, 'r') as f:
         txt = unfinalize(f.read().strip())
-    verify_(img_file, img_file, txt, model, img_proc, display, multithread)
+    verify_(img_file, img_file, txt, model, display, multithread)
 
 
-def verify_fragment(scroll, fragment, model='heb', display=False, img_proc=None, multithread=True):
+def verify_fragment(scroll, fragment, model='heb', display=False, multithread=True):
     img_file= f'../images/{scroll}/columns/column_9_{fragment}.jpg'
     txt_file = '../books/1Q_Isaiah_a.txt'
     roman_numeral = romanize(fragment)
@@ -200,64 +193,121 @@ def verify_fragment(scroll, fragment, model='heb', display=False, img_proc=None,
             txt += lines[l].strip() + '\n'
 
     return verify_(
-        f'{scroll}-{fragment}', img_file, unfinalize(txt), model, img_proc, display, multithread)
+        f'{scroll}-{fragment}', img_file, unfinalize(txt), model, display, multithread)
 
 
 def verify_frag(column):
-    return verify_fragment('isaiah', column + 1, 'Hebrew_Font_Label_14', multithread=False)
+    return verify_fragment('isaiah', column + 1, 'Hebrew_Font_Embedding_Label_14', multithread=False)
 
 
-def output(output_file, row_title, values):
-    print(f'{row_title}: {values}')
-    output_file.write(f'{row_title},{','.join(list(map(str, values)))}\n')
+def output(output_file, row_title, values, best_values):
+    print(f'{row_title}:{' ,' + values if output_all else ''} {list(map(str, best_values))}')
+    output_file.write(f'{row_title}{',' + ','.join(list(map(str, values))) if output_all else ''},{','.join(list(map(str, best_values)))}\n')
 
 
-if __name__ == '__main__':
+def output_column_stats():
     start_time = time.time()
+    # Load the best by fragment from file.
+    bests_by_fragment = {}
+    with open('verify_best_by_fragment.json', "r", encoding="utf-8") as f:
+        for line in f:
+            j = json.loads(line)
+            bests_by_fragment[j.get('fragment')] = j['bests']
+
     with Pool() as pool:
-        results = sorted(pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
+        results = sorted(
+            pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
+    titles = list(map(lambda e:e['name'], results[0]['evaluated']))
+
     with open('verify.csv', 'w') as csv:
-        output(csv, 'Fragment', np.append(titles.copy(), ['Best', 'Best Percent']))
+        output(csv, 'Fragment', titles, ['Best', 'Best Percent'])
         percents = []
         for result in results:
             rp = np.array(list(map(lambda e:e['percent'], result['evaluated'])))
             percents.append(rp)
-            out = rp.copy()
-            output(csv, result["name"], np.append(rp.copy(), [result["best"]["name"], result["best"]["percent"]]))
-        output(csv, '', [])
+            output(csv, result["name"], rp, [result["best"]["name"], result["best"]["percent"]])
+        output(csv, '', [], [])
         percents = np.array(percents)
         best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
         best_indexes = np.array(list(map(lambda r:titles.index(r['best']['name']), results)))
         means = np.round(np.mean(percents, axis=0), 2)
         bests_mean = np.round(np.mean(best_percents), 2)
-        output(csv, 'Means', np.append(means.copy(), [titles[np.argmax(means)], bests_mean]))
+        output(csv, 'Means',means, [titles[np.argmax(means)], bests_mean])
         medians = np.round(np.median(percents, axis=0), 2)
-        output(csv, 'Medians', np.append(medians.copy(), [titles[np.argmax(medians)], np.round(np.median(best_percents), 2)]))
+        output(csv, 'Medians', medians, [titles[np.argmax(medians)], np.round(np.median(best_percents), 2)])
         modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
-        output(csv, 'Modes', np.append(modes.copy(), [titles[stats.mode(best_indexes).mode], stats.mode(np.round(best_percents / 5) * 5).mode]))
+        output(csv, 'Modes', modes, [titles[stats.mode(best_indexes).mode], stats.mode(np.round(best_percents / 5) * 5).mode])
         stds = np.round(np.std(percents, axis=0), 2)
         bests_std = np.round(np.std(best_percents), 2)
-        output(csv, 'Stds', np.append(stds.copy(), [titles[np.argmin(stds)], bests_std]))
+        output(csv, 'Stds', stds, [titles[np.argmin(stds)], bests_std])
         zLows = np.round(means - stds * 3, 2)
-        output(csv, 'Z-Lows', np.append(zLows.copy(), [titles[np.argmax(zLows)], np.round(bests_mean - bests_std * 3, 2)]))
+        output(csv, 'Z-Lows', zLows, [titles[np.argmax(zLows)], np.round(bests_mean - bests_std * 3, 2)])
         zHighs = np.round(means + stds * 3, 2)
         bests_zScoreHigh = np.round(bests_mean + bests_std * 3, 2)
-        output(csv, 'Z-Highs', np.append(zHighs.copy(), [titles[np.argmin(np.absolute(bests_zScoreHigh - zHighs))], bests_zScoreHigh]))
+        output(csv, 'Z-Highs', zHighs, [titles[np.argmin(np.absolute(bests_zScoreHigh - zHighs))], bests_zScoreHigh])
         print(f"Pool time: {pool_time - start_time} seconds")
         print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
+    # Save the best parameters for each scroll.
+    for result in results:
+        # Find the entry for this fragment.
+        by_fragment = bests_by_fragment.get(result['name'])
+        preprocessor_names = {}
+        if by_fragment is None:
+            by_fragment = []
+        else:
+            for best in by_fragment:
+                preprocessor_names[best['preprocessor_name']] = 1
+        # Append the 7 best from this run and skip any that are already part of the set.
+        for eval in list(reversed(sorted(result['evaluated'], key=lambda r:r['percent'])))[:7]:
+            if preprocessor_names.get(eval['name']) is None:
+                by_fragment.append({
+                    'preprocessor_name': eval['name'],
+                    'percent': eval['percent'],
+                    'parameters': eval['parameters']
+                })
+        # Sort the results from greatest percentage and only keep the top 7.
+        bests_by_fragment[result['name']] = list(
+            reversed(sorted(by_fragment, key=lambda r:r['percent'])))[:7]
+
+    bests = {}
+    with open('verify_best_by_fragment.json', "w", encoding="utf-8") as f:
+        for b in sorted(bests_by_fragment):
+            json.dump({'fragment': b, 'bests': bests_by_fragment[b]}, f)
+            f.write("\n")
+
+            for best in bests_by_fragment[b]:
+                name = best['preprocessor_name']
+                if bests.get(name) is None:
+                    bests[name] = {'preprocessor_name': name, 'count': 1,
+                                   'parameters': best['parameters']}
+                else:
+                    bests[name]['count'] = bests[name]['count'] + 1
+
+    with open('verify_best_preprocessors.json', "w", encoding="utf-8") as f:
+        for b in sorted(bests):
+            json.dump(bests[b], f)
+            f.write("\n")
+
+
+if __name__ == '__main__':
+    output_column_stats()
+
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
-             # 'embedding',
+              'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
               'Hebrew_Paleo_14', 'heb_Paleo_14', 'Hebrew_Label_13', 'Heb_Label_13',
-              'Hebrew_Font_Label_13', 'Hebrew_Font_Label_14']
+              'Hebrew_Font_Label_13', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14']
 
-    for model in models:
-        verify_fragment('isaiah', 7, model, model == 'Hebrew_Font_Label_14')
+    for fragment in [7, 48, 1, 54]:
+        print(f'\nIsaiah-{fragment}')
+        for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14']:
+            verify_fragment('isaiah', fragment, model, model == 'Hebrew_Font_Label_16')
 
-    image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png', 'dss_isa 9_6_7-11_threshold.png',
-                   'dss-isa_6_7-11.tif', 'dss_isa_9_6_7-11_embedded.jpg']
+    image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
+                   'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
+                   'dss_isa_9_6_7-11_embedded.jpg']
     for img_file in image_files:
-        for model in models:
-            verify(img_file, 'dss_isa_6_7-11.txt', model, model == 'Hebrew_Font_Label_14')
+        for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14']:
+            verify(img_file, 'dss_isa_6_7-11.txt', model, model == 'Hebrew_Font_Embedding_Label_14')

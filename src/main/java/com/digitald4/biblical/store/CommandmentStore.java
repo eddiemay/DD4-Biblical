@@ -10,6 +10,7 @@ import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.GenericLongStore;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.SearchIndexer;
+import com.digitald4.common.util.Pair;
 import com.google.common.collect.Streams;
 
 import javax.inject.Inject;
@@ -32,8 +33,9 @@ public class CommandmentStore extends GenericLongStore<Commandment> {
   }
 
   @Override
-  protected Iterable<Commandment> preprocess(Iterable<Commandment> commandments, boolean isCreate) {
+  protected Iterable<Commandment> preprocess(Iterable<Pair<Commandment, Commandment>> commandments) {
     return Streams.stream(commandments)
+        .map(Pair::getLeft)
         // Try and parse the scriptures to make sure it is valid.
         .peek(commandment -> scriptureRefProcessor.computeVerseRanges(commandment.getScriptures()))
         .map(this::fixTags)
