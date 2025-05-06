@@ -162,7 +162,7 @@ public class HebrewConverter {
           }
         })
         .filter(c -> c != '׀' && c != '[' && c != ']' && c != '(' && c != ')' && c != '‸'
-            && c != ',' && c != '.' && !foundEnd.get())
+            && c != ',' && c != '.' && c != '፡' && c != '።' && c != '፥' && !foundEnd.get())
         .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
   }
 
@@ -238,7 +238,20 @@ public class HebrewConverter {
   }
 
   public static String toConstantsOnly(String text) {
-    return FormatText.removeAccents(removePunctuation(text));
+    String normalized = FormatText.removeAccents(removePunctuation(text));
+    StringBuilder output = new StringBuilder();
+    for (int i = 0; i < normalized.length(); i++) {
+      char c = normalized.charAt(i);
+      // Check if the character is Ethiopic Geez.
+      if (c > 0x1200 && c < 0x1347) {
+        // Calculate the base consonant by subtracting the vowel offset
+        c -= ((c - 0x1200) % 8);
+        // output.append((char) baseConsonant);
+      }
+      output.append(c);
+    }
+
+    return output.toString();
   }
 
   public static String toConstantsOnly(StringBuilder text) {
@@ -249,17 +262,17 @@ public class HebrewConverter {
     StringBuilder output = new StringBuilder();
     int[] letters = removePunctuation(text).chars().toArray();
     for (int l = 0; l < letters.length; l++) {
-      char c = (char) letters[l];
-      if ((c == '\u05BB' || c == '\u05B9') && letters[l - 1] != 'ו' && letters[l + 1] != 'ו') {
+      int c = letters[l];
+      if ((c == 0x05BB || c == 0x05B9) && letters[l - 1] != 'ו' && letters[l + 1] != 'ו') {
         output.append('ו');
-      } else if (c == '\u05B4' && letters[l - 1] != 'י' && letters[l + 1] != 'י') {
+      } else if (c == 0x05B4 && letters[l - 1] != 'י' && letters[l + 1] != 'י') {
         // output.append('י');
       }
 
-      if ((c < 1425 || c > 1479) && c != '\u202A' && c != '\u202C' && c != '\u200D'
+      if ((c < 1425 || c > 1479) && c != 0x202A && c != 0x202C && c != 0x200D
           // Guard against inserting 2 waws in a row.
           && (c != 'ו' || output.isEmpty() || output.charAt(output.length() - 1) != 'ו')) {
-        output.append(c);
+        output.append((char) c);
       }
     }
     return toConstantsOnly(output.toString());
@@ -269,12 +282,12 @@ public class HebrewConverter {
     return toFullHebrew(text.toString());
   }
 
-  public static String toRestoredHebrew(String text) {
+  public static String toRestored(String text) {
     return unfinalize(toFullHebrew(text));
   }
 
-  public static String toRestoredHebrew(StringBuilder text) {
-    return toRestoredHebrew(text.toString());
+  public static String toRestored(StringBuilder text) {
+    return toRestored(text.toString());
   }
 
   public static String unfinalize(String text) {

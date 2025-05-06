@@ -2,16 +2,15 @@ import cv2
 import json
 import pytesseract
 from pytesseract import Output
-from urllib import parse, request
+from urllib import request
 from verify import verify_fragment
 from utility import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-ID_TOKEN = 'idToken=1907141930'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0'
-LETTERBOX_BATCH_DELETE_URL = API_BASE + 'letterBoxs/v1/batchDelete?' + ID_TOKEN
-LETTERBOX_BATCH_CREATE_URL = API_BASE + 'letterBoxs/v1/batchCreate?' + ID_TOKEN
-
+LETTERBOX_BATCH_DELETE_URL = API_BASE + 'letterBoxs/v1/batchDelete?idToken='
+LETTERBOX_BATCH_CREATE_URL = API_BASE + 'letterBoxs/v1/batchCreate?idToken='
+session = {}
 
 class Upload:
     ROWS = 1
@@ -20,10 +19,14 @@ class Upload:
 
 
 def send_json_req(url, data):
+    if session.get('id') is None:
+        with open('token.id', 'r') as f:
+            session['id'] = f.readline()
+
     json_data = json.dumps(data).encode('utf-8')
-    req = request.Request(url)
+    req = request.Request(url + session['id'])
     req.add_header('Content-Type', 'application/json')
-    req.add_header('Content-Length', len(json_data))
+    req.add_header('Content-Length', str(len(json_data)))
     print(f'Sending request: {url} with data: {json_data}')
     with request.urlopen(req, json_data) as resp:
         response = json.load(resp)
@@ -100,7 +103,7 @@ def label(scroll, fragment, model='fragment', display=True, upload=None):
         if upload & Upload.ROWS:
             # Delete old rows and create the new ones.
             send_json_req(LETTERBOX_BATCH_DELETE_URL, {'items': row_ids})
-            send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': rows})
+            # send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': rows})
 
         if upload & Upload.LETTERS:
             # Delete old letter boxes and create the new ones.
@@ -109,4 +112,4 @@ def label(scroll, fragment, model='fragment', display=True, upload=None):
 
 
 if __name__ == '__main__':
-    label('isaiah', 7, upload=None)
+    label('isaiah', 16, upload=Upload.ROWS_AND_LETTERS)

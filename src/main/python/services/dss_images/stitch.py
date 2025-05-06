@@ -1,10 +1,12 @@
 # Install dependencies if you do not have them.
-import subprocess
-subprocess.run(['pip', 'install', 'opencv-python', 'numpy', 'requests'])
+import os
+''' import subprocess
+subprocess.run(['pip', 'install', 'opencv-python', 'numpy', 'requests']) '''
 
 import cv2
 import math
 import numpy
+import re
 from dss_backup import Collection, download, BASE_DIR
 from pathlib import Path
 
@@ -48,7 +50,46 @@ def construct_column(collection, column=1, res=None):
     cv2.waitKey(1)
 
 
+DSS_ORG_PATTERN = r"x(\d+)-y(\d+)-z(\d+)"
+def construct_dss_org(scroll, file_pattern, output_name):
+    files = []
+    min_x, max_x, min_y, max_y = 99, 0, 99, 0
+    tile_dir = f'images/{scroll}/tiles/'
+    for entry in sorted(os.listdir(tile_dir)):
+        if file_pattern in entry:
+            match = re.search(DSS_ORG_PATTERN, entry)
+            print(f'Found: {entry}')
+            x, y = int(match.group(1)), int(match.group(2))
+            files.append({'x': x, 'y': y, 'path': os.path.join(tile_dir, entry)})
+            if x < min_x:
+                min_x = x
+            if x > max_x:
+                max_x = x
+            if y < min_y:
+                min_y = y
+            if y > max_y:
+                max_y = y
+
+    print(f'x range: ({min_x}, {max_x}), y range: ({min_y}, {max_y})')
+
+    canvas = numpy.zeros(((max_y + 1 - min_y) * 512, (max_x + 1 - min_x) * 512, 3), dtype='uint8')
+    for file in files:
+        img = cv2.imread(file['path'])
+        y = (file['y'] - min_y) * 512
+        x = (file['x'] - min_x) * 512
+        print(f'{file['path']} y, x = {y},{x}')
+        canvas[y:y + 512, x:x + 512] = img
+
+    cv2.imshow(f'{output_name}', canvas)
+    cv2.waitKey(0)
+    cv2.imwrite(f'images/{scroll}/{output_name}.jpg', canvas)
+
+
 if __name__ == '__main__':
+    # construct_dss_org('4Q320', '0hBWsyGjCZT', 'Infrared-Frag1')
+    # construct_dss_org('4Q320', 'wmhm0ryg', 'Infrared-Frag2')
+    # construct_dss_org('4Q320', 'BtzcLAfA', 'Infrared-Frag3')
+
     # for c in range(1, 5):
         # construct_column(Collection.TORAH, c)
 
@@ -58,16 +99,9 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 2, res=5)
     # construct_column(Collection.TORAH, 1, res=5)
 
-    for c in range(2):
-        # construct_column(Collection.ISAIAH, 47, 8)
-        for res in range(8, 11):
-            construct_column(Collection.ISAIAH, c + 1, res)
-        # construct_column(Collection.ISAIAH, 47, 10)
-        # print(f'Showing Isaiah column {c + 1}')
-        # cv2.waitKey(0)
-    # for res in range(8, 11):
-        # construct_column(Collection.ISAIAH, 31, res)
-    # cv2.waitKey(0)
+    for res in range(8, 11):
+        construct_column(Collection.ISAIAH, 16, res)
+    cv2.waitKey(0)
 
     # for c in range(1, 16):
       #  construct_column(Collection.WAR, c)

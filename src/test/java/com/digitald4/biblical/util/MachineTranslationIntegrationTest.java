@@ -169,15 +169,89 @@ public class MachineTranslationIntegrationTest {
     );
   }
 
+  @Test
+  public void geezTranslation() {
+    assertThat(translate(ImmutableList.of(
+        new Scripture().setBook("Gen").setChapter(1).setVerse(1).setText("ኣምላኽ ብመጀመርታ ሰማይን ምድርን ፈጠረ።"),
+        new Scripture().setBook("Lev").setChapter(8).setVerse(1).setText("እግዚኣብሄር ድማ ንሙሴ ኸምዚ ኢሉ ተዛረቦ፥"),
+        new Scripture().setBook("Lev").setChapter(8).setVerse(5).setText("ሙሴ ድማ ነቲ ኣኼባ፥ እቲ እግዚኣብሄር ኪግበር ዝኣዘዞ ነገር እዚ እዩ፡ በለ።"))))
+        .containsExactly(
+            "Gen 1:1 the Mighty One in beginnings sky of him land of him created",
+            "Lev 8:1 יהוה and to Mosheh as this said he spoke",
+            "Lev 8:5 Mosheh and the assembly was יהוה to do that which command word this it is said");
+  }
+
+  @Test
+  public void geezTranslation_greatWords() {
+    assertThat(translate(ImmutableList.of(
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(1).setText("እግዚኣብሄር ድማ እዚ ቓላት እዚ ዅሉ ኸምዚ ኢሉ ተዛረበ፡"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(2).setText("ካብ ምድሪ ግብጺ፡ ካብ ቤት ባርነት ዘውጻእኩኻ፡ ኣነ እግዚኣብሄር ኣምላኽካ እየ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(3).setText("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(4).setText("ኣብ ላዕሊ ኣብ ሰማይ ካብ ዘለዉ፡ ኣብ ታሕቲ ድማ ኣብ ምድሪ ኻብ ዘለዉ፡ ኣብ ማይ ከኣ ኣብ ትሕቲ ምድሪ ኻብ ዘለዉ፡ ምስልን ስእሊ ዘበለን ንኣኻ ኣይትግበር።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(5).setText("ኣይትስገድሎም ኣይተገልግሎምን ድማ። ኣነ እግዚኣብሄር ኣምላኽካ፡ ቀናእ ኣምላኽ እየ እሞ፡ ንዚጸልኡኒ ሓጢኣት ኣቦታት ኣብ ደቂ ኽሳዕ ሳልሳይ ክሳዕ ራብዓይን ወለዶ ዝቐጽዕ፡"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(6).setText("ንዚፈትዉንን ትእዛዛተይ ንዚሕልዉን ግና ክሳዕ ኣሽሓት ምሕረት ዝገብር እየ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(7).setText("እግዚኣብሄር ስሙ ብኸንቱ ንዘልዐለ ኸይቀጽዔ ኣይሐድጎን እዩ እሞ፡ ስም እግዚኣብሄር ኣምላኽካ ብኸንቱ ኣይተልዕል።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(8).setText("መዓልቲ ስንበት ክትቅድሳ ዘክር።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(9).setText("ሹድሽተ መዓልቲ ዕየ፡ ተግባርካ ዅሉ ግበር።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(10).setText("እታ ሳብዐይቲ ግና ናይ እግዚኣብሄር ኣምላኽካ ሰንበት እያ። ብእኣ ንስኻን ወድኻን ጓልካን ግዙእካን ግዝእትኻን ማልካን ኣብ ውሽጢ ደጌታትካ ዚነብር ስደተኛን ገለ እኳ ዕዮ ኣይትዕየ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(11).setText("እግዚኣብሄር ብሹድሽተ መዓልቲ ሰማይን ምድርን ባሕርን ኣባታቶም ዘሎ ዅሉን ገይሩ እዩ እሞ፡ ብሳብዐይቲ መዓልቲ ከኣ ዐረፈ። ስለዚ እግዚኣብሄር ንመዓልቲ ሰንበት ባረኻን ቀደሳን።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(12).setText("ኣብቲ እግዚኣብሄር ኣምላኽካ ዚህበካ ምድሪ ዕድሜኻ ምእንቲ ኺነውሕሲ፡ ኣቦኻን ኣዴኻን ኣኽብር።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(13).setText("ኣይትቕተል።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(14).setText("ኣይትዘሙ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(15).setText("ኣይትስረቕ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(16).setText("ኣብ ብጻይካ ብሓሶት ኣይትመስክር።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(17).setText("ቤት ብጻይካ ኣይትተምነ። ሰበይቲ ብጻይካ ግዙኡ፡ ግዝእቱ፡ ብዕራዩ፡ ኣድጉ፡ ገንዘብ ብጻይካ ዘበለ ዅሉ ድማ ኣይትተምነ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(18).setText("ኵሎም ህዝቢ ድማ ነጕድን ሃልሃልታን ደሃይ መለኸትን እቲ ኸረን ኪተክኽን ረኣዩ። እቶም ህዝቢ እዚ ምስ ረኣዩ ኸኣ፡ ኣንቀጥቀጡ፡ ርሒቖም ድማ ደው በሉ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(19).setText("ንሙሴ ድማ፡ ንስኻ ንገረና ንሰምዕ ኢና፡ ኣምላኽ ግና፡ ምእንቲ ኸይንመውት፡ ኣይዛረበና፡ በልዎ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(20).setText("ሙሴ ኸኣ ነቶም ህዝቢ፡ ሓጢያት ምእንቲ ኸይትገብሩ፡ ፍርሃቱ ኣብ ቅድሜኹም ኪኽወን፡ ኣምላኽ ምእንቲ ኺዕዘበኩም እዩ ዝመጸ እሞ፡ ኣይትፍርሁ፡ በሎም።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(21).setText(" እቲ ህዝቢ ኣብ ርሑቕ ቈመ፡ ሙሴ ናብቲ ኣምላኽ ዘለዎ ጣቓ ቐረበ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(22).setText("እግዚኣብሄር ድማ ንሙሴ በሎ፡ ንደቂ እስራኤል ከምዚ በሎም፡ ኣነ ኻብ ሰማይ ከም እተዛረብኩኹም፡ ባዕላትኩም ርኤኹም።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(23).setText("ምሳይ ኣማልኽቲ ኣይትግበሩ፡ ኣማልኽቲ ብሩርን ኣማልኽቲ ወርቅን ንኣኻትኩም ኣይትግበሩ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(24).setText("መሰውኢ መሬት ስርሓለይ፡ ኣብ ልዕሊኡ ድማ ዚሐርር መስዋእትታትካን መስዋእቲ ምስጋናኻን፡ ኣባጊዕካን ኣብዑርካን ሰውእ። ስመይ ኣብ ዘዘከርኩሉ ዅላ ቦታ ናባኻ መጺኤ ኽባርኸካ እየ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(25).setText("መሰውኢ እምኒ እንተ ገበርካለይ፡ ብመንደልካ እንተ ተንኬኻዩ ተርክሶ ኢኻ እሞ፡ ብውቑር እምኒ ኣይትንደቆ።"),
+        new Scripture().setBook("Exodus").setChapter(20).setVerse(26).setText("ናብ መሰውእየይ፡ ኣብ ልዕሊኡ ሕፍረትካ ኸይቅላዕሲ፡ ብመሳልል ኣይትደይብ።")))).containsExactly(
+            "Exodus 20:1 יהוה and this words this all as this said he spoke",
+        "Exodus 20:2 of land Mitsrayim of house slavery I brought out of you I יהוה the Mighty One of you it is",
+        "Exodus 20:3 others the Mighty Ones at before me there is no of you",
+        "Exodus 20:4 at high at sky of existing at down and at land from the existing at water from at down land from the existing carve of him image anything of him for of you not do",
+        "Exodus 20:5 not bow down of them not serve of them of him and I יהוה the Mighty One of you jealous the Mighty One it is so visiting of him sins fathers at son until third until fourth of him generation who punishes",
+        "Exodus 20:6 to that which decide exist of him commandments me to that which keep exist however until thousands mercys that which do it is",
+        "Exodus 20:7 יהוה his name in vain to that which high I cause cut of him the  mecomplete of him it is so his name יהוה the Mighty One of you in vain not high",
+        "Exodus 20:8 days Shabbat holy set-apart remember",
+        "Exodus 20:9 six days work action all do",
+        "Exodus 20:10 was the seventh however of the יהוה the Mighty One of you Shabbat it is by her you of him son of you daughter of you servant of you servants of you animal of you at inside gate of you that which exist of he stranger of him some through work not work",
+        "Exodus 20:11 יהוה in six days sky of him land of him sea of him in them existing all of him entered of he it is so in the seventh days from he rested thus יהוה to days Shabbat blessed of him set-apart of him",
+        "Exodus 20:12 father יהוה the Mighty One of you that which give of you land age of you in order that prolong at of you mother of you honor",
+        "Exodus 20:13 not kill",
+        "Exodus 20:14 not commit adultery",
+        "Exodus 20:15 not steal",
+        "Exodus 20:16 at in neighbour in lies not testify",
+        "Exodus 20:17 house in neighbour not covet wife in neighbour servant servants bull of him donkey money in neighbour anything all and not covet",
+        "Exodus 20:18 all of them people and to sound of him intensities of him sound Mighty Ones of him was mountain of him to existing of him seen the complete people this Mosheh seen and trembled [UNK] and [UNK] said",
+        "Exodus 20:19 to Mosheh and you word of him to his name of him I the Mighty One however in order that [UNK] [UNK] [UNK]",
+        "Exodus 20:20 Mosheh and the of them people sins in order that I cause sdo [UNK] at before of you of them [UNK] the Mighty One in order that [UNK] it is [UNK] so [UNK] said of them",
+        "Exodus 20:21 was people at [UNK] [UNK] Mosheh exists the Mighty One existing [UNK] [UNK]",
+        "Exodus 20:22 יהוה and to Mosheh said to son Yasharael as this said of them I from the sky Cam the he spoke of you of you of them foods of you of them see of you of them",
+        "Exodus 20:23 Mosheh me the Mighty Ones not do the Mighty Ones [UNK] the Mighty Ones [UNK] for of yous of you of them not do",
+        "Exodus 20:24 alter [UNK] his  of hekeep me at [UNK] and [UNK] altersss of you alters [UNK] [UNK] at of him of he of you [UNK] sky at [UNK] all house exist of you [UNK] honor of you of you it is",
+        "Exodus 20:25 alter so of him Is do of youfor  me [UNK] Is [UNK] [UNK] [UNK] so [UNK] so of him not to son",
+        "Exodus 20:26 exist alter me me at [UNK] [UNK] [UNK] [UNK] [UNK]");
+  }
+
   private String translate(String ref) {
     return ref + " " + machineTranslator.translate(interlinearStore.getInterlinear(ref)).stream()
         .map(i -> i.getSubTokens().stream().map(SubToken::getTranslation).collect(joining()))
         .collect(joining(" ")).trim();
   }
 
+  private ImmutableList<String> translate(ImmutableList<Scripture> scriptures) {
+    return scriptures.stream().map(this::translate).collect(toImmutableList());
+  }
+
   private String translate(Scripture scripture) {
     return scripture.reference() + " " + machineTranslator.translate(scripture).stream()
         .map(i -> i.getSubTokens().stream().map(SubToken::getTranslation).collect(joining()))
+        .map(String::trim)
         .collect(joining(" ")).trim();
   }
 }

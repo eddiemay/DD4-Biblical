@@ -38,7 +38,7 @@ public class ScripturePrinter {
     DAO dao = useApi ? new DAOApiImpl(apiConnector)
         : new DAOTestingImpl(new ChangeTracker(null, null, null, new SearchIndexer() {
             @Override
-            public <T extends Searchable> void index(Iterable<T> iterable) {}
+            public <T extends Searchable> int index(Iterable<T> iterable) {return 0;}
 
             @Override
             public <T extends Searchable> QueryResult<T> search(Class<T> aClass, Search search) {

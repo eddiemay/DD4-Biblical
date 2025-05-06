@@ -14,7 +14,8 @@ from train_by_embedding import letter_box_file
 BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
 ITERATIONS = 4092
-fragments = [2, 4, 7, 9, 14, 20, 27, 36, 40, 44, 45, 47, 48, 53]
+fragments = [2, 4, 7, 9, 13, 14, 16, 17, 18, 20, 26, 27, 36, 40, 44, 45, 47, 48, 53]
+override_letter_cache = False
 MODEL_NAME = f'{BASE_MODEL}_Label_{len(fragments)}'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
@@ -221,7 +222,7 @@ def display(sample):
 
 if __name__ == '__main__':
     start_time = time.time()
-    cache_letter_boxes()
+    cache_letter_boxes(fragments, override_letter_cache)
     # for r in range(1, 8):
         # output_row('isaiah', 44, r)
     # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 25, 'res': 10}))

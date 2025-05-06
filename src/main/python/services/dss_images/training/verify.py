@@ -14,6 +14,7 @@ from scipy import stats
 from utility import image_to_boxes_data, post_process_boxes, romanize, unfinalize
 from utility import draw_letter_boxes_and_text
 
+BEST_MODEL='Hebrew_Font_Embedding_Label_19'
 output_all = False
 threshold_names = {
     cv2.THRESH_BINARY: 'THRESH_BINARY',
@@ -86,7 +87,7 @@ def evaluate(eval):
     return eval
 
 
-def verify_(name, img_file, txt, model, display, multithread):
+def verify_(name, img_file, txt, model, display, multithread, use_best):
     result = {'name': name, 'evaluated': []}
     img = cv2.imread(img_file)
 
@@ -94,20 +95,26 @@ def verify_(name, img_file, txt, model, display, multithread):
         cv2.imshow(f'Original Image', img)
         cv2.waitKey(1)
 
-    for isGray in [False, True]:
-        for bf in [None, 7, 14, 21, 28, 35]:
-            for blur in [None, 'median', 'gaussian']:
-                threshold_values = [130, 135, 145] if blur == 'median' else [132]
-                for blur_size in [3, 5] if blur is not None else [None]:
-                    for threshold_type in [None, cv2.THRESH_BINARY, cv2.THRESH_BINARY_INV, cv2.THRESH_TRUNC]:
-                        for threshold in threshold_values if threshold_type is not None else [None]:
-                            eval = {'text': txt, 'image': img,
-                                    'parameters': {
+    if use_best:
+        with open('verify_best_preprocessors.json', 'r') as f:
+            for l in f:
+                js = json.loads(l)
+                result['evaluated'].append(
+                    {'text': txt, 'image': img, 'parameters': js['parameters']})
+    else:
+        for isGray in [False, True]:
+            for bf in [None, 7, 14, 21, 28, 35]:
+                for blur in [None, 'median', 'gaussian']:
+                    threshold_values = [130, 135, 145] if blur == 'median' else [132]
+                    for blur_size in [3, 5] if blur is not None else [None]:
+                        for threshold_type in [None, cv2.THRESH_BINARY, cv2.THRESH_BINARY_INV, cv2.THRESH_TRUNC]:
+                            for threshold in threshold_values if threshold_type is not None else [None]:
+                                result['evaluated'].append(
+                                    {'text': txt, 'image': img, 'parameters': {
                                         'model': model, 'gray': isGray, 'bf': bf,
                                         'blur': blur, 'blur_size': blur_size,
                                         'threshold': threshold,
-                                        'threshold_type': threshold_type}}
-                            result['evaluated'].append(eval)
+                                        'threshold_type': threshold_type}})
 
     print(f'Evaluating {name} with {len(result['evaluated'])} preprocessors')
     if multithread:
@@ -172,13 +179,13 @@ def verify_(name, img_file, txt, model, display, multithread):
     return result
 
 
-def verify(img_file, txt_file, model='heb', display=False, multithread=True):
+def verify(img_file, txt_file, model='heb', display=False, multithread=True, use_best=True):
     with open(txt_file, 'r') as f:
         txt = unfinalize(f.read().strip())
-    verify_(img_file, img_file, txt, model, display, multithread)
+    verify_(img_file, img_file, txt, model, display, multithread, use_best)
 
 
-def verify_fragment(scroll, fragment, model='heb', display=False, multithread=True):
+def verify_fragment(scroll, fragment, model='heb', display=False, multithread=True, use_best=True):
     img_file= f'../images/{scroll}/columns/column_9_{fragment}.jpg'
     txt_file = '../books/1Q_Isaiah_a.txt'
     roman_numeral = romanize(fragment)
@@ -192,12 +199,13 @@ def verify_fragment(scroll, fragment, model='heb', display=False, multithread=Tr
             l += 1
             txt += lines[l].strip() + '\n'
 
-    return verify_(
-        f'{scroll}-{fragment}', img_file, unfinalize(txt), model, display, multithread)
+    return verify_(f'{scroll}-{fragment}', img_file, unfinalize(txt),
+                   model, display, multithread, use_best)
 
 
 def verify_frag(column):
-    return verify_fragment('isaiah', column + 1, 'Hebrew_Font_Embedding_Label_14', multithread=False)
+    return verify_fragment('isaiah', column + 1, BEST_MODEL,
+                           multithread=False, use_best=False)
 
 
 def output(output_file, row_title, values, best_values):
@@ -205,7 +213,7 @@ def output(output_file, row_title, values, best_values):
     output_file.write(f'{row_title}{',' + ','.join(list(map(str, values))) if output_all else ''},{','.join(list(map(str, best_values)))}\n')
 
 
-def output_column_stats():
+def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread=True):
     start_time = time.time()
     # Load the best by fragment from file.
     bests_by_fragment = {}
@@ -214,9 +222,14 @@ def output_column_stats():
             j = json.loads(line)
             bests_by_fragment[j.get('fragment')] = j['bests']
 
-    with Pool() as pool:
-        results = sorted(
-            pool.map(verify_frag, range(54)), key=lambda r:r['best']['percent'])
+    if use_column_multithread and not use_best:
+        with Pool() as pool:
+            results = pool.map(verify_frag, range(54))
+    else:
+        results = list(map(
+            lambda c:verify_fragment('Isaiah', c + 1, model, use_best=use_best), range(54)
+        ))
+    results = sorted(results, key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
     titles = list(map(lambda e:e['name'], results[0]['evaluated']))
@@ -250,64 +263,66 @@ def output_column_stats():
         print(f"Pool time: {pool_time - start_time} seconds")
         print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
-    # Save the best parameters for each scroll.
-    for result in results:
-        # Find the entry for this fragment.
-        by_fragment = bests_by_fragment.get(result['name'])
-        preprocessor_names = {}
-        if by_fragment is None:
-            by_fragment = []
-        else:
-            for best in by_fragment:
-                preprocessor_names[best['preprocessor_name']] = 1
-        # Append the 7 best from this run and skip any that are already part of the set.
-        for eval in list(reversed(sorted(result['evaluated'], key=lambda r:r['percent'])))[:7]:
-            if preprocessor_names.get(eval['name']) is None:
-                by_fragment.append({
-                    'preprocessor_name': eval['name'],
-                    'percent': eval['percent'],
-                    'parameters': eval['parameters']
-                })
-        # Sort the results from greatest percentage and only keep the top 7.
-        bests_by_fragment[result['name']] = list(
-            reversed(sorted(by_fragment, key=lambda r:r['percent'])))[:7]
+    if not use_best:
+        # Save the best parameters for each scroll.
+        for result in results:
+            # Find the entry for this fragment.
+            by_fragment = bests_by_fragment.get(result['name'])
+            preprocessor_names = {}
+            if by_fragment is None:
+                by_fragment = []
+            else:
+                for best in by_fragment:
+                    preprocessor_names[best['preprocessor_name']] = 1
+            # Append the 7 best from this run and skip any that are already part of the set.
+            for eval in list(reversed(sorted(result['evaluated'], key=lambda r:r['percent'])))[:7]:
+                if preprocessor_names.get(eval['name']) is None:
+                    by_fragment.append({
+                        'preprocessor_name': eval['name'],
+                        'percent': eval['percent'],
+                        'parameters': eval['parameters']
+                    })
+            # Sort the results from greatest percentage and only keep the top 7.
+            bests_by_fragment[result['name']] = list(
+                reversed(sorted(by_fragment, key=lambda r:r['percent'])))[:7]
 
-    bests = {}
-    with open('verify_best_by_fragment.json', "w", encoding="utf-8") as f:
-        for b in sorted(bests_by_fragment):
-            json.dump({'fragment': b, 'bests': bests_by_fragment[b]}, f)
-            f.write("\n")
+        bests = {}
+        with open('verify_best_by_fragment.json', "w", encoding="utf-8") as f:
+            for b in sorted(bests_by_fragment):
+                json.dump({'fragment': b, 'bests': bests_by_fragment[b]}, f)
+                f.write("\n")
 
-            for best in bests_by_fragment[b]:
-                name = best['preprocessor_name']
-                if bests.get(name) is None:
-                    bests[name] = {'preprocessor_name': name, 'count': 1,
-                                   'parameters': best['parameters']}
-                else:
-                    bests[name]['count'] = bests[name]['count'] + 1
+                for best in bests_by_fragment[b]:
+                    name = best['preprocessor_name']
+                    if bests.get(name) is None:
+                        bests[name] = {'preprocessor_name': name, 'count': 1,
+                                       'parameters': best['parameters']}
+                    else:
+                        bests[name]['count'] = bests[name]['count'] + 1
 
-    with open('verify_best_preprocessors.json', "w", encoding="utf-8") as f:
-        for b in sorted(bests):
-            json.dump(bests[b], f)
-            f.write("\n")
+        with open('verify_best_preprocessors.json', "w", encoding="utf-8") as f:
+            for b in sorted(bests):
+                json.dump(bests[b], f)
+                f.write("\n")
 
 
 if __name__ == '__main__':
-    output_column_stats()
+    output_column_stats(use_best=False)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
               'Hebrew_Paleo_14', 'heb_Paleo_14', 'Hebrew_Label_13', 'Heb_Label_13',
-              'Hebrew_Font_Label_13', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14']
+              'Hebrew_Font_Label_13', 'Hebrew_Font_Label_14',
+              'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]
 
-    for fragment in [7, 48, 1, 54]:
+    for fragment in [16, 7, 48, 1, 54]:
         print(f'\nIsaiah-{fragment}')
-        for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14']:
-            verify_fragment('isaiah', fragment, model, model == 'Hebrew_Font_Label_16')
+        for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
+            verify_fragment('isaiah', fragment, model, model == BEST_MODEL, use_best=False)
 
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
                    'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
                    'dss_isa_9_6_7-11_embedded.jpg']
     for img_file in image_files:
-        for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14']:
-            verify(img_file, 'dss_isa_6_7-11.txt', model, model == 'Hebrew_Font_Embedding_Label_14')
+        for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
+            verify(img_file, 'dss_isa_6_7-11.txt', model, model == BEST_MODEL)

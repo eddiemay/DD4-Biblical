@@ -40,8 +40,8 @@ public class LexiconService extends EntityServiceImpl<Lexicon, String> {
     this.tokenWordStore = tokenWordStore;
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
-  public AtomicInteger reindex(@Named("startIndex") int startIndex, @Named("endIndex") int endIndex,
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindexLexicon")
+  public AtomicInteger reindexLexicon(@Named("startIndex") int startIndex, @Named("endIndex") int endIndex,
       @Named("language") @DefaultValue("H") String lang) throws ServiceException {
     try {
         return new AtomicInteger(getStore().create(range(startIndex, endIndex)

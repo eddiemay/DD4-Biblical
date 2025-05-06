@@ -9,6 +9,7 @@ import static java.util.function.Function.identity;
 
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
+import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.digitald4.common.exception.DD4StorageException;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableCollection;
@@ -42,8 +43,8 @@ public class TokenWordStore {
     }
 
     ImmutableMap<String, Lexicon> lexicons = ImmutableMap.copyOf(lexiconProvider.get());
-    ImmutableMap<String, Integer> countsByStrongsId =
-        lexiconProvider.get().values().stream().collect(toImmutableMap(Lexicon::getId, Lexicon::getReferenceCount));
+    ImmutableMap<String, Integer> countsByStrongsId = lexiconProvider.get().values().stream()
+        .collect(toImmutableMap(Lexicon::getId, Lexicon::getReferenceCount));
 
     tokenWordsByWord = stream(tokenWordsProvider.get())
         .filter(tw -> !tw.getWord().isEmpty())
@@ -58,7 +59,8 @@ public class TokenWordStore {
             } else if (tw.getWord().charAt(0) >= 'α' && tw.getWord().charAt(0) <= 'ω') {
               // For Greek words add a second capitalized entry.
               return Stream.of(
-                  tw.copy().setWord(toCapitalized(tw.getWord())).setTranslation(toCapitalized(tw.getTranslation())),
+                  tw.copy().setWord(toCapitalized(tw.getWord()))
+                      .setTranslation(toCapitalized(tw.getTranslation())),
                   tw);
             }
             return Stream.of(tw);
@@ -68,21 +70,22 @@ public class TokenWordStore {
         })
         .distinct()
         .peek(tw -> {
-          if (tw.getTokenType() == null) {
+          if (tw.tokenType() == TokenType.WORD) {
             Integer referenceCount = countsByStrongsId.get(tw.getStrongsId());
             if (referenceCount != null && referenceCount < 7) {
               // For all these words that have less than a handful of references,
               // we don't want to use them for non-strong's translation.
-              tw.setTokenType(TokenWord.TokenType.WORD_STRONGS_MATCH_ONLY);
+              tw.setTokenType(TokenType.WORD_STRONGS_MATCH_ONLY);
             }
           }
         })
-        .filter(tw -> tw.getTokenType() != TokenWord.TokenType.DISABLED)
+        .filter(tw -> tw.tokenType() != TokenWord.TokenType.DISABLED)
         .sorted(comparing(TokenWord::getWord)
             .thenComparing(TokenWord::tokenType)
             .thenComparing(tw -> countsByStrongsId.getOrDefault(tw.getStrongsId(), 0), reverseOrder()))
         .collect(toImmutableListMultimap(TokenWord::getWord, identity()));
-    tokenWordsByStrongsId = tokenWordsByWord.entries().stream().map(Entry::getValue)
+
+     tokenWordsByStrongsId = tokenWordsByWord.entries().stream().map(Entry::getValue)
         .filter(tokenWord -> Objects.nonNull(tokenWord.getStrongsId()))
         .collect(toImmutableListMultimap(TokenWord::getStrongsId, identity()));
   }

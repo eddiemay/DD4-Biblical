@@ -2,8 +2,7 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
-import static com.digitald4.biblical.util.HebrewConverter.toRestoredHebrew;
-import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
+import static com.digitald4.biblical.util.HebrewConverter.toRestored;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
@@ -14,6 +13,7 @@ import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
+import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,6 +47,7 @@ public class MachineTranslator {
 
     return subToken.setTranslation(isSuffix ? option.asSuffix() : option.getTranslation())
         .setStrongsId(option.getStrongsId())
+        .setTokenType(isSuffix ? TokenType.SUFFIX : option.tokenType())
         .setTransliteration(option.getTransliteration() != null ?
             option.getTransliteration() : HebrewConverter.transliterate(word, isSuffix));
   }
@@ -55,10 +56,10 @@ public class MachineTranslator {
     AtomicBoolean wordFound = new AtomicBoolean();
     return interlinear.setSubTokens(
         subwordTokenizer
-            .tokenizeWord(toRestoredHebrew(interlinear.getWord()), interlinear.getStrongsId())
+            .tokenizeWord(toRestored(interlinear.getWord()), interlinear.getStrongsId())
             .stream()
             .map(subWord -> getTranslation(subWord, interlinear.getStrongsId(), wordFound.get()))
-            .peek(subToken -> wordFound.set(wordFound.get() || subToken.getStrongsId() != null))
+            .peek(subToken -> wordFound.set(wordFound.get() || subToken.isWord()))
             .collect(toImmutableList()));
   }
 
@@ -87,5 +88,9 @@ public class MachineTranslator {
                 .setChapter(scripture.getChapter()).setVerse(scripture.getVerse())
                 .setWord(word).setConstantsOnly(toConstantsOnly(word)))
             .collect(toImmutableList()));
+  }
+
+  public void invalidateCache() {
+    tokenWordStore.reset();
   }
 }

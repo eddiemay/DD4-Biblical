@@ -21,6 +21,7 @@ import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.storage.*;
@@ -169,11 +170,11 @@ public class ScriptureStoreTest {
   @Test
   public void getScriptures_interlaced() {
     assertThat(
-        scriptureStore.getScriptures(VERSION, Language.INTERLACED, "2 Kings 23:5").getItems()).containsExactly(
+        scriptureStore.getScriptures(VERSION, EN, "2 Kings 23:5", View.Interlaced).getItems()).containsExactly(
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
             new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
     assertThat(
-        scriptureStore.getScriptures(VERSION, Language.INTERLACED, "2 Kings 23:3-5").getItems()).containsExactly(
+        scriptureStore.getScriptures(VERSION, EN, "2 Kings 23:3-5", View.Interlaced).getItems()).containsExactly(
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
             new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
             new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
@@ -183,7 +184,51 @@ public class ScriptureStoreTest {
   }
 
   @Test
+  public void getScriptures_interlaced_geez() {
+    assertThat(
+        scriptureStore.getScriptures(VERSION, Language.GEEZ, "2 Kings 23:5", View.Interlaced).getItems()).containsExactly(
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("GzExp").setLanguage(Language.GEEZ).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
+    assertThat(
+        scriptureStore.getScriptures(VERSION, Language.GEEZ, "2 Kings 23:3-5", View.Interlaced).getItems()).containsExactly(
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("GzExp").setLanguage(Language.GEEZ).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("GzExp").setLanguage(Language.GEEZ).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("GzExp").setLanguage(Language.GEEZ).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder();
+  }
+
+  @Test
   public void getScriptures_interlacedNotSupported() {
+    assertThat(scriptureStore.getScriptures(VERSION, EN, "Jasher 1:1", View.Interlaced).getItems())
+        .containsExactly(
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
+    assertThat(scriptureStore.getScriptures("OXFORD", EN, "Jasher 5:17-19", View.Interlaced).getItems())
+        .containsExactly(
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(19).setText("[Fetched OXFORD From Web]"));
+  }
+
+  @Test
+  public void getScriptures_interlaced_legacy() {
+    assertThat(
+        scriptureStore.getScriptures(VERSION, Language.INTERLACED, "2 Kings 23:5").getItems()).containsExactly(
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
+    assertThat(
+        scriptureStore.getScriptures(VERSION, Language.INTERLACED, "2 Kings 23:3-5").getItems()).containsExactly(
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
+        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder();
+  }
+
+  @Test
+  public void getScriptures_interlacedNotSupported_legacy() {
     assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Jasher 1:1").getItems())
         .containsExactly(
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
@@ -201,21 +246,16 @@ public class ScriptureStoreTest {
         new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H1254").setWord("בָּרָ֣א"),
         new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H0430").setWord("אֱלֹהִ֑ים"));
     when(interlinearStore.getInterlinear(any(VerseRange.class))).thenReturn(interlinears);
-    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Gen 1:1").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, "en", "Gen 1:1", View.Interlinear).getItems())
         .containsExactly(new InterlinearScripture(interlinears));
-    /* assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Gen 5:17-19").getItems())
-        .containsExactly(
-            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(17),
-            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(18),
-            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(19)); */
   }
 
   @Test
   public void getScriptures_interlinearNotSupported() {
-    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jasher 1:1").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, "en", "Jasher 1:1", View.Interlinear).getItems())
         .containsExactly(
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
-    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jasher 5:17-19").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, "en", "Jasher 5:17-19", View.Interlinear).getItems())
         .containsExactly(
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
             new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
@@ -246,13 +286,89 @@ public class ScriptureStoreTest {
                     .setText("וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה:")),
             1, null));
 
-    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jub 6:45").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, "en", "Jub 6:45", View.Interlinear).getItems())
         .containsExactly(new InterlinearScripture(interlinears));
-    /* assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Gen 5:17-19").getItems())
+  }
+
+  @Test
+  public void getScriptures_interlinear_gez() {
+    ImmutableList<Interlinear> interlinears = ImmutableList.of(
+        createInterlinear("Gen", 2, 3, 1, "ኣምላኽ", null),
+        createInterlinear("Gen", 2, 3, 2, "ከኣ", null),
+        createInterlinear("Gen", 2, 3, 3, "ኻብቲ", null),
+        createInterlinear("Gen", 2, 3, 4, "ዝፈጠሮን", null),
+        createInterlinear("Gen", 2, 3, 5, "ዝገበሮን", null),
+        createInterlinear("Gen", 2, 3, 6, "ኵሉ", null),
+        createInterlinear("Gen", 2, 3, 7, "ግብሩ", null),
+        createInterlinear("Gen", 2, 3, 8, "ብእኣ", null),
+        createInterlinear("Gen", 2, 3, 9, "ስለ", null),
+        createInterlinear("Gen", 2, 3, 10, "ዝዐረፈ", null),
+        createInterlinear("Gen", 2, 3, 11, "ነታ", null),
+        createInterlinear("Gen", 2, 3, 12, "ሳብዐይቲ", null),
+        createInterlinear("Gen", 2, 3, 13, "መዓልቲ", null),
+        createInterlinear("Gen", 2, 3, 14, "ባረኻን", null),
+        createInterlinear("Gen", 2, 3, 15, "ቀደሳን", null));
+
+    when(dao.list(eq(Scripture.class), any(Query.List.class))).thenReturn(
+        QueryResult.of(Scripture.class,
+            ImmutableList.of(
+                new Scripture().setBook("Gen").setChapter(2).setVerse(3).setLanguage(Language.GEEZ)
+                    .setText("ኣምላኽ ከኣ ኻብቲ ዝፈጠሮን ዝገበሮን ኵሉ ግብሩ ብእኣ ስለ ዝዐረፈ፡ ነታ ሳብዐይቲ መዓልቲ ባረኻን ቀደሳን።")),
+            1, null));
+
+    assertThat(scriptureStore.getScriptures(VERSION, Language.GEEZ, "Gen 2:3", View.Interlinear).getItems())
+        .containsExactly(new InterlinearScripture(interlinears).setLanguage(Language.GEEZ));
+  }
+
+  @Test
+  public void getScriptures_interlinear_legacy() {
+    ImmutableList<Interlinear> interlinears = ImmutableList.of(
+        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H7225").setWord("בְּרֵאשִׁ֖ית"),
+        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H1254").setWord("בָּרָ֣א"),
+        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H0430").setWord("אֱלֹהִ֑ים"));
+    when(interlinearStore.getInterlinear(any(VerseRange.class))).thenReturn(interlinears);
+    assertThat(scriptureStore.getScriptures(VERSION, INTERLINEAR, "Gen 1:1").getItems())
+        .containsExactly(new InterlinearScripture(interlinears));
+  }
+
+  @Test
+  public void getScriptures_interlinearNotSupported_legacy() {
+    assertThat(scriptureStore.getScriptures(VERSION, INTERLINEAR, "Jasher 1:1").getItems())
         .containsExactly(
-            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(17),
-            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(18),
-            new Scripture().setVersion(INTERLINEAR).setBook("Gen").setChapter(5).setVerse(19)); */
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
+    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jasher 5:17-19").getItems())
+        .containsExactly(
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
+            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(19).setText("[Fetched OXFORD From Web]"));
+  }
+
+  @Test
+  public void getScriptures_interlinear_derived_legacy() {
+    ImmutableList<Interlinear> interlinears = ImmutableList.of(
+        createInterlinear("Jub", 6, 45, 1, "וכל", null),
+        createInterlinear("Jub", 6, 45, 2, "הימים", null),
+        createInterlinear("Jub", 6, 45, 3, "אשר", null),
+        createInterlinear("Jub", 6, 45, 4, "נועדו", null),
+        createInterlinear("Jub", 6, 45, 5, "הם", null),
+        createInterlinear("Jub", 6, 45, 6, "שתים", null),
+        createInterlinear("Jub", 6, 45, 7, "וחמישים", null),
+        createInterlinear("Jub", 6, 45, 8, "שבתות", null),
+        createInterlinear("Jub", 6, 45, 9, "ימים", null),
+        createInterlinear("Jub", 6, 45, 10, "עד", null),
+        createInterlinear("Jub", 6, 45, 11, "מלאת", null),
+        createInterlinear("Jub", 6, 45, 12, "שנה", null),
+        createInterlinear("Jub", 6, 45, 13, "תמימה", null));
+
+    when(dao.list(eq(Scripture.class), any(Query.List.class))).thenReturn(
+        QueryResult.of(Scripture.class,
+            ImmutableList.of(
+                new Scripture().setBook("Jub").setChapter(6).setVerse(45)
+                    .setText("וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה:")),
+            1, null));
+
+    assertThat(scriptureStore.getScriptures(VERSION, INTERLINEAR, "Jub 6:45").getItems())
+        .containsExactly(new InterlinearScripture(interlinears));
   }
 
   @Test

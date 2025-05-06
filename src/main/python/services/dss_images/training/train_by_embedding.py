@@ -28,18 +28,15 @@ fragment_map = {}
 line_spacing = 60
 min_space = 5
 max_space = 10
+columns = [2, 4, 7, 9, 13, 14, 16, 17, 18, 20, 26, 27, 36, 40, 44, 45, 47, 48, 53]
 override_letter_cache = False
 
 
-def cache_letter_boxes(override_letter_cache=False):
+def cache_letter_boxes(columns, override_letter_cache=False):
     if os.path.exists(letter_box_file) and not override_letter_cache:
         return
 
-    fragments = [
-        'isaiah-column-2', 'isaiah-column-4', 'isaiah-column-7', 'isaiah-column-9',
-        'isaiah-column-14', 'isaiah-column-20', 'isaiah-column-27',
-        'isaiah-column-36', 'isaiah-column-40', 'isaiah-column-44',
-        'isaiah-column-45', 'isaiah-column-47', 'isaiah-column-48', 'isaiah-column-53']
+    fragments = list(map(lambda c: f'isaiah-column-{c}', columns))
     # Open the file for write.
     print('Writing file: ', letter_box_file)
     with open(letter_box_file, "w", encoding="utf-8") as f:
@@ -185,7 +182,7 @@ if __name__ == '__main__':
     # cv2.waitKey()
 
     cache_bible()
-    cache_letter_boxes(override_letter_cache)
+    cache_letter_boxes(columns, override_letter_cache)
 
     # Read each training file line and put it in an array.
     lines = []
@@ -248,5 +245,8 @@ if __name__ == '__main__':
     print(' '.join(command))
     subprocess.run(command)
     command = ['cp', 'data/embedding.traineddata', f'/opt/homebrew/share/tessdata/{MODEL_NAME}.traineddata']
+    print(' '.join(command))
+    subprocess.run(command)
+    command = ['cp', 'data/embedding.traineddata', f'../tessdata_best/{MODEL_NAME}.traineddata']
     print(' '.join(command))
     subprocess.run(command)

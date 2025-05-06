@@ -10,6 +10,7 @@ com.digitald4.biblical.ReadTheWordCtrl =
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.language = $location.search()['lang'];
+  this.scriptureView = $location.search()['view'] || 'Text';
   this.highlight = $location.search()['highlight'];
   this.views = {READ: 1, SEARCH_AND_REPLACE: 2, UPLOAD: 3};
   this.view = this.views.READ;
@@ -20,6 +21,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {
   this.locationProvider.search('reference', this.reference.value);
   this.locationProvider.search('version', this.globalData.scriptureVersion);
   this.locationProvider.search('lang', this.globalData.language);
+  this.locationProvider.search('view', this.scriptureView);
   this.locationProvider.search('pageToken', page);
 }
 
@@ -27,6 +29,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.setReference = function(referen
   this.locationProvider.search('reference', reference);
   this.locationProvider.search('version', this.globalData.scriptureVersion);
   this.locationProvider.search('lang', this.globalData.language);
+  this.locationProvider.search('view', this.scriptureView);
   this.locationProvider.search('pageToken', undefined);
 }
 
@@ -38,6 +41,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
     searchText: this.reference.value,
     version: this.globalData.scriptureVersion,
     lang: this.language,
+    view: this.scriptureView,
     pageSize: 50,
     pageToken: this.pageToken
   };

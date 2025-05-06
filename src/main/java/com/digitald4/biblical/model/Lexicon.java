@@ -49,7 +49,7 @@ public class Lexicon extends ModelObject<String> implements Searchable {
 
   @ApiResourceProperty
   public String restored() {
-    return HebrewConverter.toRestoredHebrew(word);
+    return HebrewConverter.toRestored(word);
   }
 
   @ApiResourceProperty

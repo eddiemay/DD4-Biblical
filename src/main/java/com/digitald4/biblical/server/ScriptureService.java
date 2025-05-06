@@ -6,6 +6,7 @@ import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.ScriptureStore.GetOrSearchResponse;
 import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.service.Empty;
 import com.digitald4.common.server.service.EntityServiceBulkImpl;
@@ -39,9 +40,11 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "scriptures")
   public GetOrSearchResponse getScriptures(
       @Named("reference") String reference, @Named("version") @Nullable String version,
-      @Named("lang") @Nullable String lang) throws ServiceException {
+      @Named("lang") @Nullable String lang, @Named("view") @Nullable View view)
+      throws ServiceException {
     try {
-      return scriptureStore.getScriptures(version, lang, reference);
+      return view == null ? scriptureStore.getScriptures(version, lang, reference)
+          : scriptureStore.getScriptures(version, lang, reference, view);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -50,20 +53,25 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "fetch")
   public GetOrSearchResponse fetch(@Named("searchText") String searchText,
       @Named("version") @Nullable String version, @Named("lang") @Nullable String lang,
-      @Named("pageSize") @DefaultValue("50") int pageSize, @Named("pageToken") @DefaultValue("1") int pageToken,
-      @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy) throws ServiceException {
+      @Named("view") @Nullable View view, @Named("pageSize") @DefaultValue("50") int pageSize,
+      @Named("pageToken") @DefaultValue("1") int pageToken,
+      @Named("orderBy") @DefaultValue(ScriptureStore.DEFAULT_ORDER_BY) String orderBy)
+      throws ServiceException {
     try {
-      return scriptureReferenceProcessor.matchesPattern(searchText)
-          ? scriptureStore.getScriptures(version, lang, searchText)
-          : GetOrSearchResponse.searchResult(
-              scriptureStore.search(Query.forSearch(searchText, orderBy, pageSize, pageToken)));
+      if (scriptureReferenceProcessor.matchesPattern(searchText)) {
+        return view == null ? scriptureStore.getScriptures(version, lang, searchText)
+            : scriptureStore.getScriptures(version, lang, searchText, view);
+      }
+
+      return GetOrSearchResponse.searchResult(
+          scriptureStore.search(Query.forSearch(searchText, orderBy, pageSize, pageToken)));
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
-  public Empty reindex(@Named("version") String version, @Named("lang") @Nullable String lang,
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindexScriptures")
+  public Empty reindexScriptures(@Named("version") String version, @Named("lang") @Nullable String lang,
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
       scriptureStore.reindex(version, lang, book, chapter);
@@ -74,7 +82,8 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   }
 
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "migrateScriptures")
-  public AtomicInteger migrateScriptures(@Named("version") String version, @Named("lang") @Nullable String lang,
+  public AtomicInteger migrateScriptures(
+      @Named("version") String version, @Named("lang") @Nullable String lang,
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
       return new AtomicInteger(scriptureStore.migrate(version, lang, book, chapter));
@@ -126,6 +135,16 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
   public ImmutableList<Interlinear> translate(@Named("text") String text) throws ServiceException {
     try {
       return machineTranslator.translate(text);
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "invalidateMTCache")
+  public Empty invalidateMTCache() throws ServiceException {
+    try {
+      machineTranslator.invalidateCache();
+      return Empty.getInstance();
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }

@@ -38,6 +38,18 @@ public class HebrewConverterTest {
   }
 
   @Test
+  public void toContantsOnly_geez() {
+    assertThat(HebrewConverter.toConstantsOnly("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።"))
+        .isEqualTo("ከለአተ አመለኸተ አበ ቀደመየ አየሀለወኸ");
+  }
+
+  @Test
+  public void toFullHebrew_geez() {
+    assertThat(HebrewConverter.toFullHebrew("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።"))
+        .isEqualTo("ከለአተ አመለኸተ አበ ቀደመየ አየሀለወኸ");
+  }
+
+  @Test
   public void toFullHebrew_waw() {
     assertThat(HebrewConverter.toFullHebrew("יֻלַּד")).isEqualTo("יולד");
     assertThat(HebrewConverter.toFullHebrew("יֹשְׁבֵי֙")).isEqualTo("יושבי");
@@ -60,5 +72,18 @@ public class HebrewConverterTest {
     assertThat(HebrewConverter.toFullHebrew("וַיְדַבֵּ֥ר")).isEqualTo("וידבר"); // dabar, and he spoke
     assertThat(HebrewConverter.toFullHebrew("דַּבֵּ֞ר")).isEqualTo("דבר"); // dabar, speak
     assertThat(HebrewConverter.toFullHebrew("דִּבֵּר")).isEqualTo("דיבר"); // dibar, he spoke
+  }
+
+  public static void printHexString(String input) {
+    StringBuilder hexString = new StringBuilder();
+    for (int i = 0; i < input.length(); i++) {
+      char c = input.charAt(i);
+      String hex = Integer.toHexString(c);
+      if (!hexString.isEmpty()) {
+        hexString.append(" ");
+      }
+      hexString.append(hex.toUpperCase());
+    }
+    System.out.println(hexString);
   }
 }

@@ -1,7 +1,7 @@
 package com.digitald4.biblical.store;
 
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
-import static com.digitald4.biblical.util.HebrewConverter.toRestoredHebrew;
+import static com.digitald4.biblical.util.HebrewConverter.toRestored;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Arrays.stream;
@@ -18,7 +18,6 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
 import com.digitald4.common.storage.DAOCloudDS.Context;
 import com.digitald4.common.storage.SearchIndexerAppEngineImpl;
 import com.google.appengine.api.search.Document;
-import com.google.appengine.api.search.Document.Builder;
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.Index;
 import com.google.appengine.api.search.IndexSpec;
@@ -78,7 +77,7 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
       builder
           .addField(Field.newBuilder().setName("unfinalized").setHTML(unfinalize(constantsOnly)))
           .addField(Field.newBuilder().setName("constantsOnly").setHTML(constantsOnly))
-          .addField(Field.newBuilder().setName("restored").setHTML(toRestoredHebrew(text)));
+          .addField(Field.newBuilder().setName("restored").setHTML(toRestored(text)));
     }
 
     return builder;

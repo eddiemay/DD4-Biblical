@@ -7,6 +7,8 @@ public interface ScriptureReferenceProcessor {
   boolean matchesPattern(String reference);
   ImmutableList<VerseRange> computeVerseRanges(String reference);
 
+  enum View {Text, Interlinear, Interlaced};
+
   class VerseRange {
     private final BibleBook book;
     private final int chapter;

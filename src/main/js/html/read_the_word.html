@@ -14,19 +14,35 @@
         </a>
         <fieldset data-ng-show="$ctrl.view == $ctrl.views.READ">
           <div class="columns">
+            <div class="colx2-left">
+              <button data-ng-click="$ctrl.reference.shown=true">Book</button>
+            </div>
+          </div>
+          <div class="columns">
             <div class="colx3-left-double">
-              <label><button data-ng-click="$ctrl.reference.shown=true">Book</button></label>
               <input type="text" data-ng-model="$ctrl.reference.value" class="full-width"
                      placeholder="Gen 2:3 or Exo 20:8-11 or Law NT" data-on-enter="$ctrl.getOrSearch()">
             </div>
             <div class="colx3-right">
+              <button data-ng-click="$ctrl.getOrSearch()">Show</button>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="colx3-left">
               <label>Version</label>
               <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.getOrSearch()"
                       data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
+            </div>
+            <div class="colx3-center">
               <label>Language</label>
               <select data-ng-model="$ctrl.globalData.language" data-ng-change="$ctrl.getOrSearch()"
                       data-ng-options="language.code as language.name for language in $ctrl.globalData.languages"></select>
-              <button data-ng-click="$ctrl.getOrSearch()">Show</button>
+            </div>
+            <div class="colx3-right">
+              <label>View</label>
+              <select data-ng-model="$ctrl.scriptureView" data-ng-change="$ctrl.getOrSearch()"
+                      data-ng-options="view for view in $ctrl.globalData.views"></select>
+
             </div>
           </div>
         </fieldset>

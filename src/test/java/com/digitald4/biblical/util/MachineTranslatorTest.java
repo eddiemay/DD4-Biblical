@@ -64,7 +64,16 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("ראה").setStrongsId("H7200").setTranslation("see"),
       new TokenWord().setWord("שמ").setStrongsId("H8034").setTranslation("name"),
       new TokenWord().setWord("גד").setStrongsId("H1410").setTranslation("Gad"),
-      new TokenWord().setWord("יהודה").setStrongsId("H3063").setTranslation("Judah"));
+      new TokenWord().setWord("יהודה").setStrongsId("H3063").setTranslation("Judah"),
+      new TokenWord().setWord("ከለአ").setTranslation("other"),
+      new TokenWord().setWord("ተ").setTranslation("s").setTokenType(TokenType.SUFFIX_ONLY),
+      new TokenWord().setWord("አ").setTranslation("the ").setTokenType(TokenType.PREFIX_ONLY),
+      new TokenWord().setWord("መለኸ").setTranslation("mighty one"),
+      new TokenWord().setWord("አበ").setTranslation("at"),
+      new TokenWord().setWord("ቀደመ").setTranslation("before"),
+      new TokenWord().setWord("የ").setTranslation(" me").setTokenType(TokenType.SUFFIX_ONLY),
+      new TokenWord().setWord("አየሀለወ").setTranslation("there is no"),
+      new TokenWord().setWord("ኸ").setTranslation(" of you").setTokenType(TokenType.SUFFIX_ONLY));
 
   private final TokenWordStore tokenWordStore =
       new TokenWordStore(() -> TOKEN_WORDS, ImmutableMap::of);
@@ -137,6 +146,22 @@ public class MachineTranslatorTest {
         new SubToken().setWord("נתנ").setTranslation("given").setStrongsId("H5414").setTransliteration("natan"),
         new SubToken().setWord("ה'").setTranslation("Yah").setStrongsId("H3050").setTransliteration("Yah"),
         new SubToken().setWord("לכ").setTranslation("to you").setStrongsId("H0853").setTransliteration("lac"));
+  }
+
+  @Test
+  public void translate_geez() {
+    ImmutableList<Interlinear> translation = machineTranslator.translate("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።");
+    assertThat(translation.stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList())).containsExactly(
+        new SubToken().setWord("ከለአ").setTranslation("other"),
+        new SubToken().setWord("ተ").setTranslation("s"),
+        new SubToken().setWord("አ").setTranslation("the "),
+        new SubToken().setWord("መለኸ").setTranslation("mighty one"),
+        new SubToken().setWord("ተ").setTranslation("s"),
+        new SubToken().setWord("አበ").setTranslation("at"),
+        new SubToken().setWord("ቀደመ").setTranslation("before"),
+        new SubToken().setWord("የ").setTranslation(" me"),
+        new SubToken().setWord("አየሀለወ").setTranslation("there is no"),
+        new SubToken().setWord("ኸ").setTranslation(" of you"));
   }
 
   @Test

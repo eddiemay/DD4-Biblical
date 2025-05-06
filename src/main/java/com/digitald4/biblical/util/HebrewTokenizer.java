@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import org.json.JSONObject;
 
 public class HebrewTokenizer {
-  private enum SearchState {PREFIX, WORD_MATCH_STRONGS, WORD, SUFFIX};
+  public enum SearchState {PREFIX, WORD_MATCH_STRONGS, WORD, SUFFIX};
   private final TokenWordStore tokenWordStore;
 
   @Inject
@@ -80,13 +80,13 @@ public class HebrewTokenizer {
   public static boolean hasGoodOption(SearchState state, ImmutableList<TokenWord> options, String strongsId) {
     return switch (state) {
       case WORD_MATCH_STRONGS -> options.stream().anyMatch(o ->
-          (o.tokenType() == TokenType.WORD || o.getTokenType() == TokenType.WORD_STRONGS_MATCH_ONLY)
+          (o.tokenType() == TokenType.WORD || o.tokenType() == TokenType.WORD_STRONGS_MATCH_ONLY)
               && Objects.equals(strongsId, o.getStrongsId()));
       case WORD -> options.stream().anyMatch(o -> o.tokenType() == TokenType.WORD);
       case PREFIX -> options.stream().map(TokenWord::tokenType)
           .anyMatch(tt -> tt == TokenType.PREFIX || tt == TokenType.PREFIX_ONLY);
-      case SUFFIX -> options.stream().anyMatch(o -> o.getTokenType() == TokenType.SUFFIX
-          || o.getTokenType() == TokenType.SUFFIX_ONLY || o.getTokenType() == TokenType.PREFIX && o.asSuffix() != null);
+      case SUFFIX -> options.stream().anyMatch(o -> o.tokenType() == TokenType.SUFFIX
+          || o.tokenType() == TokenType.SUFFIX_ONLY || o.tokenType() == TokenType.PREFIX && o.asSuffix() != null);
     };
   }
 
@@ -177,13 +177,13 @@ public class HebrewTokenizer {
       return tokenType;
     }
 
+    public TokenType tokenType() {
+      return tokenType == null ? TokenType.WORD : tokenType;
+    }
+
     public TokenWord setTokenType(TokenType tokenType) {
       this.tokenType = tokenType;
       return this;
-    }
-
-    public TokenType tokenType() {
-      return tokenType == null ? TokenType.WORD : tokenType;
     }
 
     public String getTransliteration() {

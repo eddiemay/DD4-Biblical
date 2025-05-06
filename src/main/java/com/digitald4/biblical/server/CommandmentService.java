@@ -2,7 +2,6 @@ package com.digitald4.biblical.server;
 
 import com.digitald4.biblical.model.Commandment;
 import com.digitald4.biblical.store.CommandmentStore;
-import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.service.EntityServiceImpl;
 import com.digitald4.common.storage.LoginResolver;
 import com.digitald4.common.storage.QueryResult;
@@ -20,12 +19,10 @@ import javax.inject.Inject;
     )
 )
 public class CommandmentService extends EntityServiceImpl<Commandment, Long> {
-  private final CommandmentStore store;
 
   @Inject
   CommandmentService(CommandmentStore store, LoginResolver loginResolver) {
     super(store, loginResolver);
-    this.store = store;
   }
 
   @Override // Overriding this method because of the default order by.
@@ -35,15 +32,6 @@ public class CommandmentService extends EntityServiceImpl<Commandment, Long> {
       @DefaultValue("bookNum,chapter,verse") @Named("orderBy") String orderBy,
       @Nullable @Named("idToken") String idToken) throws ServiceException {
     return super.search(searchText, pageSize, pageToken, orderBy, idToken);
-  }
-
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
-  public void reindex() throws ServiceException {
-    try {
-      store.reindex();
-    } catch (DD4StorageException e) {
-      throw new ServiceException(e.getErrorCode(), e);
-    }
   }
 
   @Override

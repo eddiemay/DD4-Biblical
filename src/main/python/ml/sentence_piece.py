@@ -2,9 +2,10 @@ import json
 import numpy
 import os
 import sentencepiece as spm
+import time
 from urllib import request
 
-lang = 'greek'
+lang = 'gez'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 BOOK_INFO_URL = API_BASE + 'books/v1/get?id={}'
 SEARCH_URL = API_BASE + 'scriptures/v1/fetch?searchText={}+{}&lang={}&version=ISR'
@@ -21,6 +22,7 @@ def create_file(file):
     print('Writing file: ', file)
     with open(file, "w", encoding="utf-8") as f:
         for book in books_nt if lang == 'greek' else books_ot:
+            time.sleep(1)
             # Get the info about the book to obtain the number of chapters.
             if book == 'Psa':
                 chapters = 150
@@ -35,7 +37,7 @@ def create_file(file):
                     chapters = response['chapterCount']
 
             # For each chapter make a request to get all the verses.
-            api_lang = 'he-re' if lang == 'heb' else lang
+            api_lang = f'{lang}-re' if lang == 'he' or lang == 'gez' else lang
             for chapter in range(1, chapters + 1):
                 search_url = SEARCH_URL.format(book, chapter, api_lang)
                 print('Sending request: ', search_url)
@@ -88,13 +90,15 @@ if __name__ == '__main__':
     dict = sorted(dict.items(), key=lambda item: item[1])
 
     dictionary = {}
-    read_dictionary(dictionary, '../services/translation/files/heb_vocab_prefixes.json')
+    read_dictionary(dictionary, '../services/translation/files/heb_prefixes.json')
     read_dictionary(dictionary, '../services/translation/files/heb_vocab_overrides.json')
     read_dictionary(dictionary, '../services/translation/files/heb_vocab_lexicon_ancient.json')
     read_dictionary(dictionary, '../services/translation/files/heb_vocab_lexicon_ancient.json')
     read_dictionary(dictionary, '../services/translation/files/heb_vocab_lexicon_strongs.json')
     read_dictionary(dictionary, '../services/translation/files/gk_vocab_overrides.json')
     read_dictionary(dictionary, '../services/translation/files/gk_vocab_lexicon_strongs.json')
+    read_dictionary(dictionary, '../services/translation/files/gez_prefixes.json')
+    read_dictionary(dictionary, '../services/translation/files/gez_vocab.json')
 
     grouped_by_root = {}
     for token in dictionary.values():
@@ -104,6 +108,8 @@ if __name__ == '__main__':
 
     results = []
     for d in dict:
+        if d[0] == '▁':
+            continue
         result = {"piece": d[0], "count": d[1]}
         words = grouped_by_root.get(d[0].replace('▁', ''))
         if words is not None:

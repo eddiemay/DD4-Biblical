@@ -28,7 +28,7 @@
               <a data-ng-click="$ctrl.setSelectedTab(tab)" title="{{tab.name}}">{{tab.name}}</a>
             </li>
           </ul>
-          <div class="tabs-content">
+          <div class="tabs-content" dir="rtl">
             <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textFile">
               <textarea data-ng-model="$ctrl.textFile" cols="52" rows="7" style="font-size: 24pt" disabled>
               </textarea>

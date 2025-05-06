@@ -10,6 +10,7 @@ import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.model.BasicUser;
 import com.digitald4.common.storage.DAOFileDBImpl;
@@ -40,18 +41,19 @@ public class ScriptureServiceTest {
   public void getOrSearch_scriptureSingle() throws Exception {
     when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:3")).thenReturn(
         ScriptureStore.GetOrSearchResponse.getResult(
-            ImmutableList.of(new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
-                .setText("Elohim blessed the seventh day.")),
+            ImmutableList.of(new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2)
+                .setVerse(3).setText("Elohim blessed the seventh day.")),
             null, null));
 
-    QueryResult<Scripture> result = scriptureService.fetch("Genesis 2:3", "ISR", EN, 200, 1, null);
+    QueryResult<Scripture> result = scriptureService.fetch(
+        "Genesis 2:3", "ISR", EN, null, 200, 1, null);
 
     assertThat(result.getTotalSize()).isEqualTo(1);
   }
 
   @Test
   public void getOrSearch_scriptureRange() throws Exception {
-    when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:2-3")).thenReturn(
+    when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:2-3", View.Text)).thenReturn(
         ScriptureStore.GetOrSearchResponse.getResult(
             ImmutableList.of(
                 new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(2)
@@ -60,14 +62,14 @@ public class ScriptureServiceTest {
                     .setText("Elohim blessed the seventh day.")),
             null, null));
 
-    QueryResult<Scripture> result = scriptureService.fetch("Genesis 2:2-3", "ISR", EN, 200, 1, null);
+    QueryResult<Scripture> result = scriptureService.fetch("Genesis 2:2-3", "ISR", EN, View.Text, 200, 1, null);
 
     assertThat(result.getTotalSize()).isEqualTo(2);
   }
 
   @Test
   public void getOrSearch_scriptureMultiBooks() throws Exception {
-    when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:3, Exodus 20:8")).thenReturn(
+    when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:3, Exodus 20:8", View.Text)).thenReturn(
         ScriptureStore.GetOrSearchResponse.getResult(
             ImmutableList.of(
                 new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2).setVerse(3)
@@ -76,7 +78,7 @@ public class ScriptureServiceTest {
                     .setText("Remember the sabbath day, keep it holy.")),
             null, null));
 
-    QueryResult<Scripture> result = scriptureService.fetch("Genesis 2:3, Exodus 20:8", "ISR", EN, 200, 1, null);
+    QueryResult<Scripture> result = scriptureService.fetch("Genesis 2:3, Exodus 20:8", "ISR", EN, View.Text, 200, 1, null);
 
     assertThat(result.getTotalSize()).isEqualTo(2);
   }
@@ -93,7 +95,7 @@ public class ScriptureServiceTest {
             2, i.getArgument(0)));
 
     QueryResult<Scripture> result = scriptureService.fetch(
-        "Elohim blessed seventh", null, EN, 200, 1, ScriptureStore.DEFAULT_ORDER_BY);
+        "Elohim blessed seventh", null, EN, View.Text, 200, 1, ScriptureStore.DEFAULT_ORDER_BY);
 
     assertThat(result.getOrderBy()).isEqualTo(ScriptureStore.DEFAULT_ORDER_BY);
     assertThat(((Query.Search) result.query()).getSearchText()).isEqualTo("Elohim blessed seventh");
@@ -108,7 +110,7 @@ public class ScriptureServiceTest {
                     .setText("Elohim blessed the seventh day.")),
             1, i.getArgument(0)));
 
-    QueryResult<Scripture> result = scriptureService.fetch("Elohim blessed seventh", "ISR", EN, 200, 1, null);
+    QueryResult<Scripture> result = scriptureService.fetch("Elohim blessed seventh", "ISR", EN, View.Text, 200, 1, null);
 
     assertThat(result.getOrderBy()).isEqualTo(ScriptureStore.DEFAULT_ORDER_BY);
     assertThat(((Query.Search) result.query()).getSearchText()).isEqualTo(

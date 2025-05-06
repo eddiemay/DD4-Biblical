@@ -17,6 +17,7 @@ import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.biblical.util.HebrewTokenizer;
 import com.digitald4.biblical.util.InterlinearFetcher;
+import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.LexiconFetcher;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.biblical.util.MachineTranslator;
@@ -32,6 +33,7 @@ import com.digitald4.biblical.util.ScriptureFetcherRouter;
 import com.digitald4.biblical.util.ScriptureFetcherSefariaOrg;
 import com.digitald4.biblical.util.ScriptureFetcherStepBibleOrg;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
@@ -53,7 +55,8 @@ public class TranslationTool {
   }
 
   public void translateAndPrint(String reference) {
-    scriptureStore.getScriptures("WLC", ScriptureVersion.INTERLINEAR, reference).getItems().stream()
+    scriptureStore.getScriptures("WLC", Language.EN, reference, View.Interlinear).getItems()
+        .stream()
         .map(s -> (InterlinearScripture) s)
         .forEach(this::printTranslation);
   }

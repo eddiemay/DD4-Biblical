@@ -231,7 +231,7 @@
 			"range": "24:4-25:5"
 		}, {
 			"id": 18,
-			"width": 250,
+			"width": 245,
 			"x": 10595,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah18.jpg",
 			"range": "22:24-24:4"
@@ -243,8 +243,8 @@
 			"range": "21:15-22:24"
 		}, {
 			"id": 16,
-			"width": 257,
-			"x": 11098,
+			"width": 255,
+			"x": 11095,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah16.jpg",
 			"range": "19:23-21:15"
 		}, {
@@ -261,7 +261,7 @@
 			"range": "16:14-18:7"
 		}, {
 			"id": 13,
-			"width": 256,
+			"width": 254,
 			"x": 11879,
 			"imageURL": "http://tiles.imj.org.il/columns/isaiah/isaiah13.jpg",
 			"range": "14:29-16:14"

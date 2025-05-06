@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class ScriptureVersion {
-  public static final String INTERLINEAR = "Interlinear";
+  @Deprecated public static final String INTERLINEAR = "Interlinear";
   private final String name;
   private final String version;
   private final int versionNum;

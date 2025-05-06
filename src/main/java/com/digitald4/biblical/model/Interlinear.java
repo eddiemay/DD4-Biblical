@@ -1,6 +1,7 @@
 package com.digitald4.biblical.model;
 
 import com.digitald4.biblical.util.HebrewConverter;
+import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.digitald4.common.storage.Annotations.NonIndexed;
 import com.digitald4.common.util.FormatText;
 import com.google.api.server.spi.config.ApiResourceProperty;
@@ -221,7 +222,8 @@ public class Interlinear {
     private String word;
     private String translation;
     private String strongsId;
-    private String transliteration;
+    private String transliteration = "";
+    private TokenType tokenType;
 
     public String getWord() {
       return word;
@@ -267,6 +269,19 @@ public class Interlinear {
     @Override
     public boolean equals(Object obj) {
       return obj instanceof SubToken && toString().equals(obj.toString());
+    }
+
+    public TokenType getTokenType() {
+      return tokenType;
+    }
+
+    public SubToken setTokenType(TokenType tokenType) {
+      this.tokenType = tokenType;
+      return this;
+    }
+
+    public boolean isWord() {
+      return tokenType == TokenType.WORD || getTokenType() == TokenType.WORD_STRONGS_MATCH_ONLY;
     }
   }
 }

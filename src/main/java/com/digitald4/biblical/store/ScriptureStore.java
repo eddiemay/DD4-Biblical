@@ -3,7 +3,7 @@ package com.digitald4.biblical.store;
 import static com.digitald4.biblical.model.ScriptureVersion.INTERLINEAR;
 import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
-import static com.digitald4.biblical.util.HebrewConverter.toRestoredHebrew;
+import static com.digitald4.biblical.util.HebrewConverter.toRestored;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.digitald4.common.storage.Query.forList;
 import static com.digitald4.biblical.util.HebrewConverter.toAncient;
@@ -21,12 +21,14 @@ import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.AuditScripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.model.ScriptureVersion;
+import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureFetcher;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.LanguageRequest;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.VerseRange;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.storage.DAO;
@@ -76,6 +78,21 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
   }
 
   public GetOrSearchResponse getScriptures(String version, String language, String reference) {
+    View view = View.Text;
+    if (Language.INTERLACED.equals(language)) {
+      language = Language.EN;
+      view = View.Interlaced;
+    } else if (INTERLINEAR.equalsIgnoreCase(language)) {
+      language = Language.EN;
+      view = View.Interlinear;
+    }
+
+    return getScriptures(version, language, reference, view);
+  }
+
+  public GetOrSearchResponse getScriptures(
+      String version, String language, String reference, View view) {
+
     ImmutableList<VerseRange> verseRanges = scriptureRefProcessor.computeVerseRanges(reference);
     String prevChapter = null;
     String nextChapter = null;
@@ -90,28 +107,29 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
 
     return GetOrSearchResponse.getResult(
         verseRanges.stream()
-            .flatMap(verseRange -> getScriptures(version, language, verseRange).stream())
+            .flatMap(verseRange -> getScriptures(version, language, verseRange, view).stream())
             .collect(toImmutableSet()),
         prevChapter,
         nextChapter);
   }
 
-  private ImmutableList<Scripture> getScriptures(String version, String language, VerseRange verseRange) {
+  private ImmutableList<Scripture> getScriptures(String version, String language, VerseRange verseRange, View view) {
     String book = verseRange.getBook().name();
     int chapter = verseRange.getChapter();
     int startVerse = verseRange.getStartVerse();
     int endVerse = verseRange.getEndVerse();
 
-    if (INTERLINEAR.equalsIgnoreCase(version) || INTERLINEAR.equalsIgnoreCase(language)) {
+    if (View.Interlinear == view) {
       ImmutableMap<Integer, String> dssReferences = !book.equals(BibleBook.ISAIAH)
           ? ImmutableMap.of()
           : list(new LanguageRequest("DSS", Language.HEBREW, false), book, chapter, startVerse, endVerse)
               .getItems().stream()
               .collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
 
-      ImmutableList<Interlinear> interlinears = verseRange.getBook().getNumber() < 67
+      boolean standardLang = ImmutableList.of(Language.EN, Language.HEBREW, Language.GK).contains(language);
+      ImmutableList<Interlinear> interlinears = verseRange.getBook().getNumber() < 67 && standardLang
           ? interlinearStore.getInterlinear(verseRange)
-          : list(new LanguageRequest("Sefaria", Language.HEBREW, false), book, chapter, startVerse, endVerse)
+          : list(new LanguageRequest(version, Language.EN.equals(language) ? Language.HEBREW : language, false), book, chapter, startVerse, endVerse)
               .getItems().stream()
               .flatMap(s -> {
                 AtomicInteger index = new AtomicInteger();
@@ -127,14 +145,19 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
             .peek(machineTranslator::translate)
             .collect(groupingBy(Interlinear::getVerse)).values().stream()
             .map(InterlinearScripture::new)
-            .peek(s -> InterlinearStore.fillDss(s, dssReferences.get(s.getVerse())))
+            .peek(s -> {
+              if (!standardLang) {
+                s.setLanguage(language);
+              }
+              InterlinearStore.fillDss(s, dssReferences.get(s.getVerse()));
+            })
             .sorted(comparing(Scripture::getVerse))
             .collect(toImmutableList());
       }
     }
 
     HashMap<String, String> verseMap = new HashMap<>();
-    return expandSelection(version, language, verseRange.getBook())
+    return expandSelection(version, language, verseRange.getBook(), view)
         .stream()
         .flatMap(languageRequest -> {
           if ("Audit".equals(languageRequest.getVersion())) {
@@ -161,7 +184,11 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
           } else if (Language.HEBREW_RESTORED.equals(languageRequest.getLanguage())) {
             return list(new LanguageRequest(version, Language.HEBREW, false), book, chapter, startVerse, endVerse)
                 .getItems().stream()
-                .peek(s -> s.setLanguage(Language.HEBREW_RESTORED).setText(toRestoredHebrew(s.getText())));
+                .peek(s -> s.setLanguage(Language.HEBREW_RESTORED).setText(toRestored(s.getText())));
+          } else if (Language.GEEZ_RESTORED.equals(languageRequest.getLanguage())) {
+            return list(new LanguageRequest(version, Language.GEEZ, false), book, chapter, startVerse, endVerse)
+                .getItems().stream()
+                .peek(s -> s.setLanguage(Language.GEEZ_RESTORED).setText(toRestored(s.getText())));
           } else if (Language.GREEK.equals(languageRequest.getLanguage())) {
             return list(new LanguageRequest(version, Language.GK, false), book, chapter, startVerse, endVerse)
                 .getItems().stream()
@@ -174,8 +201,16 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
   }
 
   private static ImmutableList<LanguageRequest> expandSelection(
-      String version, String language, BibleBook book) {
-    if (Language.INTERLACED.equals(language)) {
+      String version, String language, BibleBook book, View view) {
+    if (view == View.Interlaced) {
+      // If the user has selected a specific language, use that for the interlaced.
+      if (!Language.EN.equals(language)) {
+        return ImmutableList.of(
+            new LanguageRequest(version, Language.EN, true),
+            new LanguageRequest(version, language, true));
+      }
+
+      // Else fall back to the default for the book.
       return book.name().equals(BibleBook.ISAIAH)
           ? ImmutableList.of(
               new LanguageRequest(version, Language.EN, true),
@@ -199,7 +234,7 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
   }
 
   private String getScripturesTextAllVersions(String lang, VerseRange verseRange) {
-    return getScriptures(null, lang, verseRange).stream()
+    return getScriptures(null, lang, verseRange, View.Text).stream()
         .map(script -> String.format("(%s) %s %d:%d %s",
             script.getVersion(), script.getBook(), script.getChapter(), script.getVerse(), script.getText()))
         .collect(joining("\n"));

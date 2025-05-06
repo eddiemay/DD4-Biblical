@@ -46,7 +46,7 @@ public class InterlinearService extends EntityServiceImpl<Interlinear, String> {
     this.bibleBookStore = bibleBookStore;
   }
 
-  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindex")
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "reindexInterlinear")
   public AtomicInteger reindexInterlinear(
       @Named("book") String book, @Named("chapter") int chapter) throws ServiceException {
     try {
