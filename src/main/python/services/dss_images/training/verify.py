@@ -14,7 +14,7 @@ from scipy import stats
 from utility import image_to_boxes_data, post_process_boxes, romanize, unfinalize
 from utility import draw_letter_boxes_and_text
 
-BEST_MODEL='Hebrew_Font_Embedding_Label_19'
+BEST_MODEL='Hebrew_Font_Embedding_Label_17'
 output_all = False
 threshold_names = {
     cv2.THRESH_BINARY: 'THRESH_BINARY',
@@ -88,7 +88,8 @@ def evaluate(eval):
 
 
 def verify_(name, img_file, txt, model, display, multithread, use_best):
-    result = {'name': name, 'evaluated': []}
+    result = {'name': name}
+    evaluated = []
     img = cv2.imread(img_file)
 
     if display:
@@ -99,7 +100,7 @@ def verify_(name, img_file, txt, model, display, multithread, use_best):
         with open('verify_best_preprocessors.json', 'r') as f:
             for l in f:
                 js = json.loads(l)
-                result['evaluated'].append(
+                evaluated.append(
                     {'text': txt, 'image': img, 'parameters': js['parameters']})
     else:
         for isGray in [False, True]:
@@ -109,23 +110,25 @@ def verify_(name, img_file, txt, model, display, multithread, use_best):
                     for blur_size in [3, 5] if blur is not None else [None]:
                         for threshold_type in [None, cv2.THRESH_BINARY, cv2.THRESH_BINARY_INV, cv2.THRESH_TRUNC]:
                             for threshold in threshold_values if threshold_type is not None else [None]:
-                                result['evaluated'].append(
+                                evaluated.append(
                                     {'text': txt, 'image': img, 'parameters': {
                                         'model': model, 'gray': isGray, 'bf': bf,
                                         'blur': blur, 'blur_size': blur_size,
                                         'threshold': threshold,
                                         'threshold_type': threshold_type}})
 
-    print(f'Evaluating {name} with {len(result['evaluated'])} preprocessors')
+    print(f'Evaluating {name} with {len(evaluated)} preprocessors')
     if multithread:
         with Pool() as pool:
-            result['evaluated'] = pool.map(evaluate, result['evaluated'])
+            evaluated = pool.map(evaluate, evaluated)
     else:
-        result['evaluated'] = list(map(evaluate, result['evaluated']))
+        evaluated = list(map(evaluate, evaluated))
 
-    best = result['evaluated'][np.argmax(list(map(lambda e: e['percent'], result['evaluated'])))]
+    best = evaluated[np.argmax(list(map(lambda e: e['percent'], evaluated)))]
     result['best'] = best
-    print(f'{name}, {model}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
+    print(f'{name}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
+    top = list(reversed(sorted(evaluated, key=lambda r:r['percent'])))[:7]
+    result['top'] = top
 
     if display:
         print(f'expected:\n{txt}\n{get_letter_counts(txt)}\n'
@@ -166,12 +169,10 @@ def verify_(name, img_file, txt, model, display, multithread, use_best):
 
         cv2.imshow('Best Image', best['image'])
         plt.figure(num=f'{name} {model}')
-        sr = list(
-            reversed(sorted(result['evaluated'], key=lambda r:r['percent'])))
         for i in range(6):
             # cv2.imshow(sr[i]['name'], sr[i]['image'])
-            plt.subplot(3, 2, i + 1), plt.imshow(sr[i]['image'])
-            plt.title(f'{sr[i]['name']} {sr[i]["percent"]}%')
+            plt.subplot(3, 2, i + 1), plt.imshow(top[i]['image'])
+            plt.title(f'{top[i]['name']} {top[i]["percent"]}%')
             plt.xticks([]), plt.yticks([])
         cv2.waitKey(1)
         plt.show()
@@ -204,13 +205,13 @@ def verify_fragment(scroll, fragment, model='heb', display=False, multithread=Tr
 
 
 def verify_frag(column):
-    return verify_fragment('isaiah', column + 1, BEST_MODEL,
+    return verify_fragment('isaiah', column, BEST_MODEL,
                            multithread=False, use_best=False)
 
 
-def output(output_file, row_title, values, best_values):
-    print(f'{row_title}:{' ,' + values if output_all else ''} {list(map(str, best_values))}')
-    output_file.write(f'{row_title}{',' + ','.join(list(map(str, values))) if output_all else ''},{','.join(list(map(str, best_values)))}\n')
+def output(output_file, row_title, values):
+    print(f'{row_title}: {list(map(str, values))}')
+    output_file.write(f'{row_title},{",".join(list(map(str, values)))}\n')
 
 
 def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread=True):
@@ -224,42 +225,30 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
 
     if use_column_multithread and not use_best:
         with Pool() as pool:
-            results = pool.map(verify_frag, range(54))
+            results = pool.map(verify_frag, range(1, 54 + 1))
     else:
         results = list(map(
-            lambda c:verify_fragment('Isaiah', c + 1, model, use_best=use_best), range(54)
+            lambda c:verify_fragment('Isaiah', c, model, use_best=use_best), range(1, 54 + 1)
         ))
     results = sorted(results, key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
-    titles = list(map(lambda e:e['name'], results[0]['evaluated']))
+    decimals = 2
 
     with open('verify.csv', 'w') as csv:
-        output(csv, 'Fragment', titles, ['Best', 'Best Percent'])
-        percents = []
+        output(csv, 'Fragment', ['Percent', 'Best'])
         for result in results:
-            rp = np.array(list(map(lambda e:e['percent'], result['evaluated'])))
-            percents.append(rp)
-            output(csv, result["name"], rp, [result["best"]["name"], result["best"]["percent"]])
-        output(csv, '', [], [])
-        percents = np.array(percents)
-        best_percents = np.array(list(map(lambda r:r['best']['percent'], results)))
-        best_indexes = np.array(list(map(lambda r:titles.index(r['best']['name']), results)))
-        means = np.round(np.mean(percents, axis=0), 2)
-        bests_mean = np.round(np.mean(best_percents), 2)
-        output(csv, 'Means',means, [titles[np.argmax(means)], bests_mean])
-        medians = np.round(np.median(percents, axis=0), 2)
-        output(csv, 'Medians', medians, [titles[np.argmax(medians)], np.round(np.median(best_percents), 2)])
-        modes = stats.mode(np.round(percents / 5) * 5, axis=0).mode
-        output(csv, 'Modes', modes, [titles[stats.mode(best_indexes).mode], stats.mode(np.round(best_percents / 5) * 5).mode])
-        stds = np.round(np.std(percents, axis=0), 2)
-        bests_std = np.round(np.std(best_percents), 2)
-        output(csv, 'Stds', stds, [titles[np.argmin(stds)], bests_std])
-        zLows = np.round(means - stds * 3, 2)
-        output(csv, 'Z-Lows', zLows, [titles[np.argmax(zLows)], np.round(bests_mean - bests_std * 3, 2)])
-        zHighs = np.round(means + stds * 3, 2)
-        bests_zScoreHigh = np.round(bests_mean + bests_std * 3, 2)
-        output(csv, 'Z-Highs', zHighs, [titles[np.argmin(np.absolute(bests_zScoreHigh - zHighs))], bests_zScoreHigh])
+            output(csv, result["name"], [result["best"]["percent"], result["best"]["name"]])
+        output(csv, '', [])
+        percents = np.array(list(map(lambda r:r['best']['percent'], results)))
+        mean = np.round(np.mean(percents), decimals)
+        output(csv, 'Mean', [mean])
+        output(csv, 'Median', [np.round(np.median(percents), decimals)])
+        output(csv, 'Mode', [stats.mode(np.round(percents / 5) * 5).mode])
+        std = np.round(np.std(percents), decimals)
+        output(csv, 'Std', [std])
+        output(csv, 'Z-Low', [np.round(mean - std * 3, decimals)])
+        output(csv, 'Z-High', [np.round(mean + std * 3, decimals)])
         print(f"Pool time: {pool_time - start_time} seconds")
         print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
@@ -268,20 +257,24 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
         for result in results:
             # Find the entry for this fragment.
             by_fragment = bests_by_fragment.get(result['name'])
-            preprocessor_names = {}
+            by_name = {}
             if by_fragment is None:
                 by_fragment = []
             else:
                 for best in by_fragment:
-                    preprocessor_names[best['preprocessor_name']] = 1
+                    by_name[best['preprocessor_name']] = best
             # Append the 7 best from this run and skip any that are already part of the set.
-            for eval in list(reversed(sorted(result['evaluated'], key=lambda r:r['percent'])))[:7]:
-                if preprocessor_names.get(eval['name']) is None:
+            for eval in result['top'][:7]:
+                if by_name.get(eval['name']) is None:
                     by_fragment.append({
                         'preprocessor_name': eval['name'],
                         'percent': eval['percent'],
                         'parameters': eval['parameters']
                     })
+                elif by_name[eval['name']]['percent'] <= eval['percent']:
+                    by_name[eval['name']]['percent'] = eval['percent']
+                    by_name[eval['name']]['parameters'] = eval['parameters']
+
             # Sort the results from greatest percentage and only keep the top 7.
             bests_by_fragment[result['name']] = list(
                 reversed(sorted(by_fragment, key=lambda r:r['percent'])))[:7]
@@ -307,7 +300,7 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=False)
+    output_column_stats(use_best=True)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
