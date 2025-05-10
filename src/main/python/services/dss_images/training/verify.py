@@ -14,7 +14,7 @@ from scipy import stats
 from utility import image_to_boxes_data, post_process_boxes, romanize, unfinalize
 from utility import draw_letter_boxes_and_text
 
-BEST_MODEL='Hebrew_Font_Embedding_Label_17'
+BEST_MODEL='Hebrew_Font_Embedding_Label_19'
 output_all = False
 threshold_names = {
     cv2.THRESH_BINARY: 'THRESH_BINARY',
@@ -87,10 +87,16 @@ def evaluate(eval):
     return eval
 
 
-def verify_(name, img_file, txt, model, display, multithread, use_best):
+def verify(verify_request):
+    name = verify_request['name']
+    img = verify_request['img']
+    txt = verify_request['text']
+    model = verify_request['model']
+    display = verify_request['display']
+    multithread = verify_request['multithread']
+    use_best = verify_request['use_best']
     result = {'name': name}
     evaluated = []
-    img = cv2.imread(img_file)
 
     if display:
         cv2.imshow(f'Original Image', img)
@@ -100,6 +106,8 @@ def verify_(name, img_file, txt, model, display, multithread, use_best):
         with open('verify_best_preprocessors.json', 'r') as f:
             for l in f:
                 js = json.loads(l)
+                if model is not None:
+                    js['parameters']['model'] = model
                 evaluated.append(
                     {'text': txt, 'image': img, 'parameters': js['parameters']})
     else:
@@ -126,7 +134,7 @@ def verify_(name, img_file, txt, model, display, multithread, use_best):
 
     best = evaluated[np.argmax(list(map(lambda e: e['percent'], evaluated)))]
     result['best'] = best
-    print(f'{name}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
+    print(f'{name}, {best["parameters"]["model"]}, {best["name"]}, {best["ld"]}, {best["percent"]}%')
     top = list(reversed(sorted(evaluated, key=lambda r:r['percent'])))[:7]
     result['top'] = top
 
@@ -180,16 +188,20 @@ def verify_(name, img_file, txt, model, display, multithread, use_best):
     return result
 
 
-def verify(img_file, txt_file, model='heb', display=False, multithread=True, use_best=True):
+def to_verify_request(img_file, txt_file, model=None, display=False, multithread=True, use_best=True):
     with open(txt_file, 'r') as f:
         txt = unfinalize(f.read().strip())
-    verify_(img_file, img_file, txt, model, display, multithread, use_best)
+    img = cv2.imread(img_file)
 
 
-def verify_fragment(scroll, fragment, model='heb', display=False, multithread=True, use_best=True):
-    img_file= f'../images/{scroll}/columns/column_9_{fragment}.jpg'
+    return {'name': img_file, 'img': img, 'text': txt, 'model': model,
+            'display': display, 'multithread': multithread, 'use_best': use_best}
+
+
+def to_isa_verify_request(column, model=None, display=False, multithread=True, use_best=True):
+    img = cv2.imread(f'../images/isaiah/columns/column_9_{column}.jpg')
     txt_file = '../books/1Q_Isaiah_a.txt'
-    roman_numeral = romanize(fragment)
+    roman_numeral = romanize(column)
     with open(txt_file, 'r') as f:
         lines = f.readlines()
         txt = ''
@@ -200,13 +212,9 @@ def verify_fragment(scroll, fragment, model='heb', display=False, multithread=Tr
             l += 1
             txt += lines[l].strip() + '\n'
 
-    return verify_(f'{scroll}-{fragment}', img_file, unfinalize(txt),
-                   model, display, multithread, use_best)
-
-
-def verify_frag(column):
-    return verify_fragment('isaiah', column, BEST_MODEL,
-                           multithread=False, use_best=False)
+    return {'name': f'isaiah-{column}', 'img': img, 'text': unfinalize(txt),
+            'model': model, 'display': display, 'multithread': multithread,
+            'use_best': use_best}
 
 
 def output(output_file, row_title, values):
@@ -223,13 +231,16 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
             j = json.loads(line)
             bests_by_fragment[j.get('fragment')] = j['bests']
 
-    if use_column_multithread and not use_best:
+    requests = list(map(
+        lambda c:to_isa_verify_request(
+            c + 1, model, False, not use_column_multithread, use_best),
+        range(54)))
+
+    if use_column_multithread:
         with Pool() as pool:
-            results = pool.map(verify_frag, range(1, 54 + 1))
+            results = pool.map(verify, requests)
     else:
-        results = list(map(
-            lambda c:verify_fragment('Isaiah', c, model, use_best=use_best), range(1, 54 + 1)
-        ))
+        results = list(map(verify, requests))
     results = sorted(results, key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
@@ -300,7 +311,7 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=True)
+    # output_column_stats(use_best=True)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
@@ -311,11 +322,11 @@ if __name__ == '__main__':
     for fragment in [16, 7, 48, 1, 54]:
         print(f'\nIsaiah-{fragment}')
         for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
-            verify_fragment('isaiah', fragment, model, model == BEST_MODEL, use_best=False)
+            verify(to_isa_verify_request(fragment, model, model == BEST_MODEL, use_best=True))
 
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
                    'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
                    'dss_isa_9_6_7-11_embedded.jpg']
     for img_file in image_files:
         for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
-            verify(img_file, 'dss_isa_6_7-11.txt', model, model == BEST_MODEL)
+            verify(to_verify_request(img_file,'dss_isa_6_7-11.txt', model, model == BEST_MODEL))
