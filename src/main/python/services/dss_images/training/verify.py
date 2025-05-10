@@ -5,6 +5,7 @@ import numpy as np
 import pytesseract
 import time
 
+from dask.distributed import Client
 from diff_match_patch import diff_match_patch
 from dss_ocr import image_to_string
 from matplotlib import pyplot as plt
@@ -37,6 +38,12 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
+class MultithreadModel:
+    PREPROCESSOR = 0
+    COLUMN = 1
+    DISTRIBUTED = 2
 
 
 def get_letter_counts(txt):
@@ -89,28 +96,21 @@ def evaluate(eval):
 
 def verify(verify_request):
     name = verify_request['name']
-    img = verify_request['img']
+    img = verify_request['image']
     txt = verify_request['text']
     model = verify_request['model']
     display = verify_request['display']
     multithread = verify_request['multithread']
-    use_best = verify_request['use_best']
     result = {'name': name}
-    evaluated = []
+    evaluated = list(map(
+        lambda pp: {'text': txt, 'image': img, 'parameters': pp['parameters']},
+        verify_request['preprocessors']))
 
     if display:
         cv2.imshow(f'Original Image', img)
         cv2.waitKey(1)
 
-    if use_best:
-        with open('verify_best_preprocessors.json', 'r') as f:
-            for l in f:
-                js = json.loads(l)
-                if model is not None:
-                    js['parameters']['model'] = model
-                evaluated.append(
-                    {'text': txt, 'image': img, 'parameters': js['parameters']})
-    else:
+    if len(evaluated) == 0:
         for isGray in [False, True]:
             for bf in [None, 7, 14, 21, 28, 35]:
                 for blur in [None, 'median', 'gaussian']:
@@ -188,18 +188,24 @@ def verify(verify_request):
     return result
 
 
-def to_verify_request(img_file, txt_file, model=None, display=False, multithread=True, use_best=True):
-    with open(txt_file, 'r') as f:
-        txt = unfinalize(f.read().strip())
+def to_verify_request(name, img_file, txt, model=None, display=False, multithread=True, use_best=True):
     img = cv2.imread(img_file)
+    preprocessors = []
+
+    if use_best:
+        with open('verify_best_preprocessors.json', 'r') as f:
+            for l in f:
+                preprocessor = json.loads(l)
+                if model is not None:
+                    preprocessor['parameters']['model'] = model
+                preprocessors.append(preprocessor)
 
 
-    return {'name': img_file, 'img': img, 'text': txt, 'model': model,
-            'display': display, 'multithread': multithread, 'use_best': use_best}
+    return {'name': name, 'image': img, 'text': txt, 'model': model,
+            'display': display, 'multithread': multithread, 'preprocessors': preprocessors}
 
 
 def to_isa_verify_request(column, model=None, display=False, multithread=True, use_best=True):
-    img = cv2.imread(f'../images/isaiah/columns/column_9_{column}.jpg')
     txt_file = '../books/1Q_Isaiah_a.txt'
     roman_numeral = romanize(column)
     with open(txt_file, 'r') as f:
@@ -212,9 +218,9 @@ def to_isa_verify_request(column, model=None, display=False, multithread=True, u
             l += 1
             txt += lines[l].strip() + '\n'
 
-    return {'name': f'isaiah-{column}', 'img': img, 'text': unfinalize(txt),
-            'model': model, 'display': display, 'multithread': multithread,
-            'use_best': use_best}
+    return to_verify_request(
+        f'isaiah-{column}', f'../images/isaiah/columns/column_9_{column}.jpg',
+        unfinalize(txt), model, display, multithread, use_best)
 
 
 def output(output_file, row_title, values):
@@ -222,7 +228,7 @@ def output(output_file, row_title, values):
     output_file.write(f'{row_title},{",".join(list(map(str, values)))}\n')
 
 
-def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread=True):
+def output_column_stats(model=None, use_best=False, multithread_model=MultithreadModel.COLUMN):
     start_time = time.time()
     # Load the best by fragment from file.
     bests_by_fragment = {}
@@ -233,14 +239,20 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
 
     requests = list(map(
         lambda c:to_isa_verify_request(
-            c + 1, model, False, not use_column_multithread, use_best),
+            c + 1, model, False, multithread_model == MultithreadModel.PREPROCESSOR, use_best),
         range(54)))
 
-    if use_column_multithread:
+    if multithread_model == MultithreadModel.COLUMN:
         with Pool() as pool:
             results = pool.map(verify, requests)
+    elif multithread_model == MultithreadModel.DISTRIBUTED:
+        client = Client('127.0.0.1:8786')
+        client.upload_file('dss_ocr.py')
+        client.upload_file('utility.py')
+        results = client.gather(client.map(verify, requests))
     else:
         results = list(map(verify, requests))
+
     results = sorted(results, key=lambda r:r['best']['percent'])
     pool_time = time.time()
 
@@ -311,7 +323,7 @@ def output_column_stats(model=BEST_MODEL, use_best=False, use_column_multithread
 
 
 if __name__ == '__main__':
-    # output_column_stats(use_best=True)
+    output_column_stats(use_best=True, multithread_model=MultithreadModel.DISTRIBUTED)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
@@ -327,6 +339,8 @@ if __name__ == '__main__':
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
                    'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
                    'dss_isa_9_6_7-11_embedded.jpg']
+    with open('dss_isa_6_7-11.txt', 'r') as f:
+        txt = unfinalize(f.read().strip())
     for img_file in image_files:
         for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
-            verify(to_verify_request(img_file,'dss_isa_6_7-11.txt', model, model == BEST_MODEL))
+            verify(to_verify_request(img_file, img_file, txt, model, model == BEST_MODEL))

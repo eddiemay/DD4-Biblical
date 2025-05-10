@@ -3,7 +3,7 @@ import json
 import pytesseract
 from pytesseract import Output
 from urllib import request
-from verify import verify_fragment
+from verify import verify, to_isa_verify_request
 from utility import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
@@ -34,13 +34,15 @@ def send_json_req(url, data):
         return response
 
 
-def label(scroll, fragment, model='fragment', display=True, upload=None):
+def label(scroll, fragment, display=True, upload=None):
     filename = f'{scroll}-column-{fragment}'
 
-    result = verify_fragment(scroll, fragment, model, multithread=True)
+    request = to_isa_verify_request(fragment, display=display)
+    result = verify(request)
 
-    img = result['evaluated'][0]['image']
+    img = request['image']
     best_img = result['best']['image']
+    model = result['best']['parameters']['model']
 
     d = pytesseract.image_to_data(best_img, lang=model, output_type=Output.DICT)
 
@@ -112,4 +114,4 @@ def label(scroll, fragment, model='fragment', display=True, upload=None):
 
 
 if __name__ == '__main__':
-    label('isaiah', 16, upload=Upload.ROWS_AND_LETTERS)
+    label('isaiah', 16, upload=None)
