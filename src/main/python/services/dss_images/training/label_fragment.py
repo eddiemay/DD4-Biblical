@@ -3,7 +3,7 @@ import json
 import pytesseract
 from pytesseract import Output
 from urllib import request
-from verify import verify, to_isa_verify_request
+from verify import verify, to_isa_verify_request, process_image
 from utility import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
@@ -41,8 +41,9 @@ def label(scroll, fragment, display=True, upload=None):
     result = verify(request)
 
     img = request['image']
-    best_img = result['best']['image']
+    best_img, _ = process_image(img, result['best']['parameters'])
     model = result['best']['parameters']['model']
+    model = f"dabar.cloud/{model}" if model.startswith("Heb") else model
 
     d = pytesseract.image_to_data(best_img, lang=model, output_type=Output.DICT)
 

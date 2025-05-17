@@ -5,11 +5,9 @@ import requests, json
 TRANSLATE_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/translate'
 
 
-def image_to_string(image_or_filename, translate=False, model='fragment'):
-    text = pytesseract.image_to_string(
-        image_or_filename, lang=model,
-        # config='-c tessedit_char_whitelist=אבגדהוזחטיכלמנסעפצקרשת'
-        )
+def image_to_string(image_or_filename, translate=False, model='Hebrew_Font_Embedding_Label_19'):
+    model = f"dabar.cloud/{model}" if model.startswith("Heb") else model
+    text = pytesseract.image_to_string(image_or_filename, lang=model)
     # print(text)
 
     translation = ''
@@ -32,5 +30,5 @@ def image_to_string(image_or_filename, translate=False, model='fragment'):
 
 
 if __name__ == '__main__':
-    print(image_to_string('Torah-4-yom-3.png'))
-    print(image_to_string('Torah-4-yom-3.png', lang='Guttman_Stam'))
+    print(image_to_string('dss_isa_9_6_7-11.png'))
+    print(image_to_string('dss-isa_6_7-11.tif', lang='Guttman_Stam'))

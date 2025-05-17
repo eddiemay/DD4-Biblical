@@ -1,14 +1,16 @@
 import gradio
-# from PIL import Image
 from dss_ocr import image_to_string
 
-filename = 'Torah-yom-3.png'
+filename = 'dss-isa_6_7-11.tif'
 
-print(image_to_string(filename))
-# print(image_to_string(Image.open(filename)))
+def process(file):
+  return image_to_string(file, translate=True)
+
+
+print(process(filename))
 
 ui = gradio.Interface(
-  image_to_string,
-  inputs=gradio.Image(label="Scroll Fragment"),
-  outputs=gradio.Textbox(label="Hebrew Text", lines=32))
+    process,
+    inputs=gradio.Image(label="Scroll Fragment"),
+    outputs=gradio.Textbox(label="Hebrew Text", lines=32))
 ui.launch()

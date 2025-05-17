@@ -13,6 +13,7 @@ roman_numerals = {'M':1000, 'CM':900, 'D':500, 'CD':400, 'C':100, 'XC':90,
 
 
 def image_to_boxes_data(img, model=None):
+    model = f"dabar.cloud/{model}" if model.startswith("Heb") else model
     boxes = []
     h = img.shape[0]
     for b in pytesseract.image_to_boxes(img, lang=model).splitlines():

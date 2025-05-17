@@ -16,6 +16,7 @@ from utility import image_to_boxes_data, post_process_boxes, romanize, unfinaliz
 from utility import draw_letter_boxes_and_text
 
 BEST_MODEL='Hebrew_Font_Embedding_Label_19'
+DASK_SCHEDULER = 'localhost:8786'
 output_all = False
 threshold_names = {
     cv2.THRESH_BINARY: 'THRESH_BINARY',
@@ -40,10 +41,11 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-class MultithreadModel:
-    PREPROCESSOR = 0
-    COLUMN = 1
-    DISTRIBUTED = 2
+class Multithread:
+    COLUMN_LOCAL = 1
+    COLUMN_DISTRIBUTED = 2
+    PREPROCESSOR_LOCAL = 3
+    PREPROCESSOR_DISTRIBUTED = 4
 
 
 def get_letter_counts(txt):
@@ -63,10 +65,7 @@ def diff_line_mode(text1, text2):
     return diffs
 
 
-def evaluate(eval):
-    txt = eval['text']
-    img = eval['image']
-    params = eval['parameters']
+def process_image(img, params):
     name = ''
     if params['gray']:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -85,11 +84,19 @@ def evaluate(eval):
         img = cv2.threshold(img, params['threshold'], 255, threshold_type)[1]
         name += f'-{threshold_names[threshold_type]}_{params['threshold']}'
 
+    return img, name
+
+
+def evaluate(eval):
+    txt = eval['text']
+    params = eval['parameters']
+    img, name = process_image(eval['image'], params)
+
     ocr = unfinalize(image_to_string(img, model=params['model']).strip())
     ld = Levenshtein.distance(txt, ocr)
     percent = round((len(txt) - ld) * 100 / len(txt), 2)
     eval['name'], eval['image'], eval['ocr'], eval['ld'], eval['percent'] =(
-        name, img, ocr, ld, percent)
+        name, None, ocr, ld, percent)
 
     return eval
 
@@ -111,8 +118,8 @@ def verify(verify_request):
         cv2.waitKey(1)
 
     if len(evaluated) == 0:
-        for isGray in [False, True]:
-            for bf in [None, 7, 14, 21, 28, 35]:
+        for isGray in [False]:
+            for bf in [None, 7]:
                 for blur in [None, 'median', 'gaussian']:
                     threshold_values = [130, 135, 145] if blur == 'median' else [132]
                     for blur_size in [3, 5] if blur is not None else [None]:
@@ -126,9 +133,14 @@ def verify(verify_request):
                                         'threshold_type': threshold_type}})
 
     print(f'Evaluating {name} with {len(evaluated)} preprocessors')
-    if multithread:
+    if multithread == Multithread.PREPROCESSOR_LOCAL:
         with Pool() as pool:
             evaluated = pool.map(evaluate, evaluated)
+    elif multithread == Multithread.PREPROCESSOR_DISTRIBUTED:
+        client = Client(DASK_SCHEDULER)
+        client.upload_file('dss_ocr.py')
+        client.upload_file('utility.py')
+        evaluated = client.gather(client.map(evaluate, evaluated))
     else:
         evaluated = list(map(evaluate, evaluated))
 
@@ -152,8 +164,10 @@ def verify(verify_request):
             elif diff[0] == 1:
                 diff_str += f'{bcolors.OKGREEN}{diff[1]}{bcolors.ENDC}'
         print(diff_str)
-
-        d = pytesseract.image_to_data(best['image'], lang=model, output_type=Output.DICT)
+        model = best['parameters']['model']
+        model = f"dabar.cloud/{model}" if model.startswith("Heb") else model
+        best_image, _ = process_image(img, best['parameters'])
+        d = pytesseract.image_to_data(best_image, lang=model, output_type=Output.DICT)
 
         word_img = img.copy()
         for i in range(len(d['level'])):
@@ -170,16 +184,16 @@ def verify(verify_request):
         # cv2.imshow('Row locations',  line_img)
 
         # run tesseract, returning the bounding boxes
-        boxes = image_to_boxes_data(best['image'], model=model)
+        boxes = image_to_boxes_data(best_image, model=model)
         # cv2.imshow('Letter locations', draw_letter_boxes_and_text(img, boxes))
         cv2.imshow('Post Processed Letter Locations',
                    draw_letter_boxes_and_text(img, post_process_boxes(boxes)))
 
-        cv2.imshow('Best Image', best['image'])
+        cv2.imshow('Best Image', best_image)
         plt.figure(num=f'{name} {model}')
         for i in range(6):
             # cv2.imshow(sr[i]['name'], sr[i]['image'])
-            plt.subplot(3, 2, i + 1), plt.imshow(top[i]['image'])
+            plt.subplot(3, 2, i + 1), plt.imshow(process_image(img, top[i]['parameters'])[0])
             plt.title(f'{top[i]['name']} {top[i]["percent"]}%')
             plt.xticks([]), plt.yticks([])
         cv2.waitKey(1)
@@ -188,7 +202,7 @@ def verify(verify_request):
     return result
 
 
-def to_verify_request(name, img_file, txt, model=None, display=False, multithread=True, use_best=True):
+def to_verify_request(name, img_file, txt, model=None, multithread=Multithread.PREPROCESSOR_LOCAL, use_best=True, display=False):
     img = cv2.imread(img_file)
     preprocessors = []
 
@@ -205,7 +219,7 @@ def to_verify_request(name, img_file, txt, model=None, display=False, multithrea
             'display': display, 'multithread': multithread, 'preprocessors': preprocessors}
 
 
-def to_isa_verify_request(column, model=None, display=False, multithread=True, use_best=True):
+def to_isa_verify_request(column, model=None, multithread=Multithread.PREPROCESSOR_LOCAL, use_best=True, display=False):
     txt_file = '../books/1Q_Isaiah_a.txt'
     roman_numeral = romanize(column)
     with open(txt_file, 'r') as f:
@@ -220,7 +234,7 @@ def to_isa_verify_request(column, model=None, display=False, multithread=True, u
 
     return to_verify_request(
         f'isaiah-{column}', f'../images/isaiah/columns/column_9_{column}.jpg',
-        unfinalize(txt), model, display, multithread, use_best)
+        unfinalize(txt), model, multithread, use_best, display)
 
 
 def output(output_file, row_title, values):
@@ -228,7 +242,7 @@ def output(output_file, row_title, values):
     output_file.write(f'{row_title},{",".join(list(map(str, values)))}\n')
 
 
-def output_column_stats(model=None, use_best=False, multithread_model=MultithreadModel.COLUMN):
+def output_column_stats(model=None, use_best=False, multithread=Multithread.COLUMN_LOCAL):
     start_time = time.time()
     # Load the best by fragment from file.
     bests_by_fragment = {}
@@ -238,15 +252,14 @@ def output_column_stats(model=None, use_best=False, multithread_model=Multithrea
             bests_by_fragment[j.get('fragment')] = j['bests']
 
     requests = list(map(
-        lambda c:to_isa_verify_request(
-            c + 1, model, False, multithread_model == MultithreadModel.PREPROCESSOR, use_best),
+        lambda c:to_isa_verify_request(c + 1, model, multithread, use_best),
         range(54)))
 
-    if multithread_model == MultithreadModel.COLUMN:
+    if multithread == Multithread.COLUMN_LOCAL:
         with Pool() as pool:
             results = pool.map(verify, requests)
-    elif multithread_model == MultithreadModel.DISTRIBUTED:
-        client = Client('127.0.0.1:8786')
+    elif multithread == Multithread.COLUMN_DISTRIBUTED:
+        client = Client(DASK_SCHEDULER)
         client.upload_file('dss_ocr.py')
         client.upload_file('utility.py')
         results = client.gather(client.map(verify, requests))
@@ -257,26 +270,9 @@ def output_column_stats(model=None, use_best=False, multithread_model=Multithrea
     pool_time = time.time()
 
     decimals = 2
-
+    overall_bests = []
     with open('verify.csv', 'w') as csv:
         output(csv, 'Fragment', ['Percent', 'Best'])
-        for result in results:
-            output(csv, result["name"], [result["best"]["percent"], result["best"]["name"]])
-        output(csv, '', [])
-        percents = np.array(list(map(lambda r:r['best']['percent'], results)))
-        mean = np.round(np.mean(percents), decimals)
-        output(csv, 'Mean', [mean])
-        output(csv, 'Median', [np.round(np.median(percents), decimals)])
-        output(csv, 'Mode', [stats.mode(np.round(percents / 5) * 5).mode])
-        std = np.round(np.std(percents), decimals)
-        output(csv, 'Std', [std])
-        output(csv, 'Z-Low', [np.round(mean - std * 3, decimals)])
-        output(csv, 'Z-High', [np.round(mean + std * 3, decimals)])
-        print(f"Pool time: {pool_time - start_time} seconds")
-        print(f"Column comparison time: {time.time() - start_time} seconds\n")
-
-    if not use_best:
-        # Save the best parameters for each scroll.
         for result in results:
             # Find the entry for this fragment.
             by_fragment = bests_by_fragment.get(result['name'])
@@ -301,7 +297,28 @@ def output_column_stats(model=None, use_best=False, multithread_model=Multithrea
             # Sort the results from greatest percentage and only keep the top 7.
             bests_by_fragment[result['name']] = list(
                 reversed(sorted(by_fragment, key=lambda r:r['percent'])))[:7]
+            overall_best = bests_by_fragment.get(result['name'])[0]
+            overall_bests.append(overall_best['percent'])
+            output(csv, result["name"],
+                   [result["best"]["percent"], result["best"]["name"],
+                    overall_best["percent"], overall_best["preprocessor_name"], overall_best['parameters']['model']])
+        output(csv, '', [])
+        percents = np.array(list(map(lambda r:r['best']['percent'], results)))
+        overall_bests = np.array(overall_bests)
+        mean = np.round(np.mean(percents), decimals)
+        overall_mean = np.round(np.mean(overall_bests), decimals)
+        output(csv, 'Mean', [mean, overall_mean])
+        output(csv, 'Median', [np.round(np.median(percents), decimals), np.round(np.median(overall_bests), decimals)])
+        output(csv, 'Mode', [stats.mode(np.round(percents / 5) * 5).mode, stats.mode(np.round(overall_bests / 5) * 5).mode])
+        std = np.round(np.std(percents), decimals)
+        overall_std = np.round(np.std(overall_bests), decimals)
+        output(csv, 'Std', [std, overall_std])
+        output(csv, 'Z-Low', [np.round(mean - std * 3, decimals), np.round(overall_mean - overall_std * 3, decimals)])
+        output(csv, 'Z-High', [np.round(mean + std * 3, decimals), np.round(overall_mean + overall_std * 3, decimals)])
+        print(f"Pool time: {pool_time - start_time} seconds")
+        print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
+    if not use_best:
         bests = {}
         with open('verify_best_by_fragment.json', "w", encoding="utf-8") as f:
             for b in sorted(bests_by_fragment):
@@ -323,18 +340,18 @@ def output_column_stats(model=None, use_best=False, multithread_model=Multithrea
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=True, multithread_model=MultithreadModel.DISTRIBUTED)
+    # output_column_stats(use_best=False, model=BEST_MODEL, multithread=Multithread.COLUMN_DISTRIBUTED)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
-              'Hebrew_Paleo_14', 'heb_Paleo_14', 'Hebrew_Label_13', 'Heb_Label_13',
+              'Hebrew_Paleo_14', 'Heb_Paleo_14', 'Hebrew_Label_13', 'Heb_Label_13',
               'Hebrew_Font_Label_13', 'Hebrew_Font_Label_14',
               'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]
 
     for fragment in [16, 7, 48, 1, 54]:
         print(f'\nIsaiah-{fragment}')
         for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
-            verify(to_isa_verify_request(fragment, model, model == BEST_MODEL, use_best=True))
+            verify(to_isa_verify_request(fragment, model, use_best=True, display=model == BEST_MODEL))
 
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
                    'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
@@ -343,4 +360,4 @@ if __name__ == '__main__':
         txt = unfinalize(f.read().strip())
     for img_file in image_files:
         for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
-            verify(to_verify_request(img_file, img_file, txt, model, model == BEST_MODEL))
+            verify(to_verify_request(img_file, img_file, txt, model, display=model == BEST_MODEL))
