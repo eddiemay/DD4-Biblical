@@ -118,8 +118,8 @@ def verify(verify_request):
         cv2.waitKey(1)
 
     if len(evaluated) == 0:
-        for isGray in [False]:
-            for bf in [None, 7]:
+        for isGray in [False, True]:
+            for bf in [None, 7, 14, 21, 28, 35]:
                 for blur in [None, 'median', 'gaussian']:
                     threshold_values = [130, 135, 145] if blur == 'median' else [132]
                     for blur_size in [3, 5] if blur is not None else [None]:
@@ -262,7 +262,8 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
         client = Client(DASK_SCHEDULER)
         client.upload_file('dss_ocr.py')
         client.upload_file('utility.py')
-        results = client.gather(client.map(verify, requests))
+        names = list(map(lambda r:r['name'], requests))
+        results = client.gather(client.map(verify, requests, key=names))
     else:
         results = list(map(verify, requests))
 
@@ -340,7 +341,7 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
 
 
 if __name__ == '__main__':
-    # output_column_stats(use_best=False, model=BEST_MODEL, multithread=Multithread.COLUMN_DISTRIBUTED)
+    output_column_stats(use_best=False, model=BEST_MODEL, multithread=Multithread.COLUMN_DISTRIBUTED)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
@@ -351,7 +352,7 @@ if __name__ == '__main__':
     for fragment in [16, 7, 48, 1, 54]:
         print(f'\nIsaiah-{fragment}')
         for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
-            verify(to_isa_verify_request(fragment, model, use_best=True, display=model == BEST_MODEL))
+            verify(to_isa_verify_request(fragment, model, use_best=True, display=model==BEST_MODEL))
 
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
                    'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
@@ -360,4 +361,4 @@ if __name__ == '__main__':
         txt = unfinalize(f.read().strip())
     for img_file in image_files:
         for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
-            verify(to_verify_request(img_file, img_file, txt, model, display=model == BEST_MODEL))
+            verify(to_verify_request(img_file, img_file, txt, model, display=model==BEST_MODEL))
