@@ -1,8 +1,5 @@
-import asyncio
-import json
 import main
 from fastmcp import Client
-from urllib import parse
 
 client = Client(main.mcp)
 
