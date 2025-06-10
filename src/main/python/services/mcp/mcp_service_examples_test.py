@@ -1,5 +1,6 @@
 import asyncio
-from mcp_service_base_test import call_tool, get_prompt
+import json
+from mcp_service_base_test import call_tool, get_prompt, read_resource
 
 
 def test_add():
@@ -14,6 +15,18 @@ def test_greet():
       "greet", {"name": "World"}))[0].text == 'Hello World!'
   assert asyncio.run(call_tool(
       "greet", {"name": "From MCP"}))[0].text == 'Hello From MCP!'
+
+
+def test_user_profile():
+  user = json.loads(asyncio.run(read_resource(f"users://101/profile"))[0].text)
+  assert user['id'] == 101
+  assert user['name'] == "Alice"
+  assert user['status'] == "active"
+
+  user = json.loads(asyncio.run(read_resource(f"users://102/profile"))[0].text)
+  assert user['id'] == 102
+  assert user['name'] == "Bob"
+  assert user['status'] == "inactive"
 
 
 def test_summarize():
