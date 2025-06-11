@@ -13,6 +13,6 @@
 # limitations under the License.
 
 runtime: python311
-service: chatbot # Will be served at http://hello.our-project-id.appspot.com/
+service: chatbot # Will be served at http://chatbot-dot-dd4-biblical.appspot.com/
 includes:
   - env_variables.yaml

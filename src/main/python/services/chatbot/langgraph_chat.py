@@ -1,14 +1,20 @@
 import json
 import os
 import re
-import urllib
 from openai import OpenAI
-from urllib import request
+from urllib import parse, request
 
-llm_name = "gpt-4o"
-SEARCH_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/fetch?searchText={}&lang=en&version=ISR'
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+model = "gpt-4.1"
+FETCH_URL =\
+  'https://dabar.cloud/_api/scriptures/v1/fetch?searchText={}&lang=en&version=ISR'
+
+api_key = os.environ.get("OPENAI_API_KEY")
+if api_key is None:
+  print("Need to create an .env file and put OPENAI_API_KEY=[OPENAI_API_KEY]")
+  print("For GCP create env_variables.yaml and follow instructions at " 
+        "https://stackoverflow.com/questions/22669528")
+client = OpenAI(api_key=api_key)
 
 
 class Agent:
@@ -26,9 +32,9 @@ class Agent:
 
   def execute(self):
     completion = client.chat.completions.create(
-      model=llm_name,
-      temperature=0,
-      messages=self.messages)
+        model=model,
+        temperature=0,
+        messages=self.messages)
     return completion.choices[0].message.content
 
 
@@ -63,9 +69,9 @@ Answer: And Elohim blessed the seventh day and set it apart, because on it He re
 
 
 def fetch_scripture(reference):
-  search_url = SEARCH_URL.format(urllib.parse.quote(reference))
-  print('Sending request: ', search_url)
-  with request.urlopen(search_url) as url:
+  fetch_url = FETCH_URL.format(parse.quote(reference))
+  print('Sending request: ', fetch_url)
+  with request.urlopen(fetch_url) as url:
     response = json.load(url)
     # print('Response: ', response)
     scriptures = response['items']
@@ -81,17 +87,17 @@ action_re = re.compile('^Action: (\w+): (.*)$')
 agents = {}
 
 
-def query(question, sessionId, max_turns=7):
+def query(question, session_id, max_turns=7):
   i = 0
   results = []
   next_prompt = question
   while i < max_turns:
     i += 1
-    agent = agents.get(sessionId)
+    agent = agents.get(session_id)
     if agent is None:
-      print('\nStarting new session: ', sessionId)
+      print('\nStarting new session: ', session_id)
       agent = Agent(prompt)
-      agents[sessionId] = agent
+      agents[session_id] = agent
 
     result = agent(next_prompt)
     results.append(result)
