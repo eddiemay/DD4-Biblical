@@ -1,20 +1,27 @@
 import json
 import os
 import re
-from openai import OpenAI
+from langchain_openai import ChatOpenAI
 from urllib import parse, request
 
-
-model = "gpt-4.1"
+gpt_model = "gpt-4.1"
+deepseek_model = "deepseek-r1:32b"
+model = gpt_model
 FETCH_URL =\
   'https://dabar.cloud/_api/scriptures/v1/fetch?searchText={}&lang=en&version=ISR'
 
-api_key = os.environ.get("OPENAI_API_KEY")
-if api_key is None:
-  print("Need to create an .env file and put OPENAI_API_KEY=[OPENAI_API_KEY]")
-  print("For GCP create env_variables.yaml and follow instructions at " 
-        "https://stackoverflow.com/questions/22669528")
-client = OpenAI(api_key=api_key)
+if model.startswith("gpt"):
+  api_key = os.environ.get("OPENAI_API_KEY")
+  if api_key is None:
+    print("Need to create an .env file and put OPENAI_API_KEY=[OPENAI_API_KEY]")
+    print("For GCP create env_variables.yaml and follow instructions at " 
+          "https://stackoverflow.com/questions/22669528")
+  llm = ChatOpenAI(model=model, api_key=api_key)
+else:
+  from langchain_ollama import ChatOllama
+  llm = ChatOllama(model=model)
+
+llm.temperature = 0
 
 
 class Agent:
@@ -31,11 +38,7 @@ class Agent:
     return result
 
   def execute(self):
-    completion = client.chat.completions.create(
-        model=model,
-        temperature=0,
-        messages=self.messages)
-    return completion.choices[0].message.content
+    return llm.invoke(self.messages).content
 
 
 prompt = """
