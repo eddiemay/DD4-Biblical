@@ -1,7 +1,7 @@
 import asyncio
 import json
 from urllib import parse
-from mcp_service_base_test import read_resource
+from mcp_service_base_test import call_tool, read_resource
 
 
 def test_fetch_scripture():
@@ -35,3 +35,20 @@ def test_fetch_scriptures():
   assert "You do not murder." in scriptures[0]['text']
   assert "You do not commit adultery." in scriptures[1]['text']
   assert "You do not steal." in scriptures[2]['text']
+
+
+def notest_similarity_compare():
+  result = asyncio.run(call_tool(
+      "similarity_compare", {"a": "I like dogs", "b": "I like puppies"}))
+  score = float(result[0].text)
+  assert score < .8
+
+  result = asyncio.run(call_tool(
+      "similarity_compare", {"a": "I like dogs", "b": "I love dogs"}))
+  score = float(result[0].text)
+  assert score > .88
+
+  result = asyncio.run(call_tool(
+      "similarity_compare", {"a": "I like dogs", "b": "It's prime time"}))
+  score = float(result[0].text)
+  assert score < .2

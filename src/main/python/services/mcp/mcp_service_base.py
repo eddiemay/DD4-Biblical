@@ -1,3 +1,3 @@
 from fastmcp import FastMCP
 
-mcp = FastMCP("Demo 🚀")
+mcp = FastMCP("Dabar.cloud MCP Server 📖.🌩️")

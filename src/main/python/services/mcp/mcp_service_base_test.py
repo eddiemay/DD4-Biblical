@@ -1,7 +1,7 @@
-import main
+import mcp_server
 from fastmcp import Client
 
-client = Client(main.mcp)
+client = Client(mcp_server.mcp)
 
 async def call_tool(name: str, arguments: dict):
   print(f"Testing {name} with arguments {dict}")

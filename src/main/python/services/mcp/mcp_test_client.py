@@ -1,4 +1,6 @@
 import asyncio
+import json
+
 from fastmcp import Client
 from urllib import parse
 
@@ -8,8 +10,8 @@ async def interact_with_server():
   # Option 1: Connect to a server run via `python my_server.py` (uses stdio)
   # client = Client("main.py")
 
-  # Option 2: Connect to a server run via `fastmcp run ... --transport sse --port 8080`
-  client = Client("http://localhost:8080/sse") # Use the correct URL/port
+  # Option 2: Connect to a server run via `python mcp_server.py`
+  client = Client("https://mcp-server-738844874589.us-central1.run.app/mcp") # Use the correct URL/port
 
   # print(f"Client configured to connect to: {client.target}")
 
@@ -19,6 +21,7 @@ async def interact_with_server():
       # Call the 'greet' tool
       greet_result = await client.call_tool("greet", {"name": "Remote Client"})
       print(f"greet result: {greet_result}")
+      assert greet_result[0].text == "Hello Remote Client!"
 
       # Read the 'config' resource
       # config_data = await client.read_resource("data://config")
@@ -28,8 +31,15 @@ async def interact_with_server():
       profile_102 = await client.read_resource("users://102/profile")
       print(f"User 102 profile: {profile_102}")
 
-      scripture = await client.read_resource(f"scriptures://{parse.quote('Gen 15:13')}/fetch")
+      ''' # Call the 'similarity_compare' tool
+      compare_result = await client.call_tool("similarity_compare", {"a": "Remote Client", "b": "Local Client"})
+      print(f"compare result: {compare_result}")
+      assert float(compare_result[0].text) < .8 '''
+
+      scripture = (await client.read_resource(f"scriptures://{parse.quote('Gen 15:13')}/fetch"))[0].text
+      scripture = json.loads(scripture)[0]
       print(f"Scripture: {scripture}")
+      assert "Know for certain that your seed are to be sojourners in a land that is not theirs" in scripture['text']
 
   except Exception as e:
     print(f"An error occurred: {e}")

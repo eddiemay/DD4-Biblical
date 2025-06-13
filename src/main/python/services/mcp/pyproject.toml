@@ -1,0 +1,10 @@
+[project]
+name = "dabar-mcp-server"
+version = "0.1.0"
+description = "Dabar.cloud MCP server"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp>=2.5.1",
+    "sentence_transformers>=3.6.0"
+]
