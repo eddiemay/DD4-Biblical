@@ -8,15 +8,15 @@ async def interact_with_server():
   print("--- Creating Client ---")
 
   # Option 1: Connect to a server run via `python my_server.py` (uses stdio)
-  # client = Client("main.py")
+  # client = Client("mcp_server.py")
 
   # Option 2: Connect to a server run via `python mcp_server.py`
-  client = Client("https://mcp-server-738844874589.us-central1.run.app/mcp") # Use the correct URL/port
+  # client =  # Use the correct URL/port
 
   # print(f"Client configured to connect to: {client.target}")
 
   try:
-    async with client:
+    async with Client("mcp_server.py") as client:
       print("--- Client Connected ---")
       # Call the 'greet' tool
       greet_result = await client.call_tool("greet", {"name": "Remote Client"})
@@ -31,10 +31,10 @@ async def interact_with_server():
       profile_102 = await client.read_resource("users://102/profile")
       print(f"User 102 profile: {profile_102}")
 
-      ''' # Call the 'similarity_compare' tool
+      # Call the 'similarity_compare' tool
       compare_result = await client.call_tool("similarity_compare", {"a": "Remote Client", "b": "Local Client"})
       print(f"compare result: {compare_result}")
-      assert float(compare_result[0].text) < .8 '''
+      assert float(compare_result[0].text) < .8
 
       scripture = (await client.read_resource(f"scriptures://{parse.quote('Gen 15:13')}/fetch"))[0].text
       scripture = json.loads(scripture)[0]
