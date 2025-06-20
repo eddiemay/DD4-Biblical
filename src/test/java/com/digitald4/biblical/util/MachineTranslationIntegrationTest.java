@@ -11,6 +11,7 @@ import com.digitald4.biblical.store.InterlinearStore;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.tools.TranslationTool;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.google.common.collect.ImmutableList;
@@ -21,8 +22,9 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 public class MachineTranslationIntegrationTest {
-  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
-  private static final DAOFileBasedImpl fileDao = new DAOFileBasedImpl("data/interlinear.db").loadFromFile();
+  private static final ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
+  private static DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
+  private static final DAOFileBasedImpl fileDao = new DAOFileBasedImpl(changeTracker,"data/interlinear.db").loadFromFile();
   private static final APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private static final InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
@@ -68,16 +70,16 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:18 and to rule in day and in night and to the separation between the light and between the darkness and he see Mighty Ones for good",
         "Genesis 1:19 and there came to be evening and there came to be morning day fourth",
         "Genesis 1:20 and he said Mighty Ones let abound the waters creeping soul live and bird he fly upon the land upon face firmament the heavens",
-        "Genesis 1:21 and he create Mighty Ones you the dragons the greats and you all soul the live the that moves which abound the waters to kind of them and you all bird wing to kind of it and he see Mighty Ones for good",
+        "Genesis 1:21 and he create Mighty Ones you the dragons the greats and you all soul the live the moves which abound the waters to kind of them and you all bird wing to kind of it and he see Mighty Ones for good",
         "Genesis 1:22 and he bless them Mighty Ones to say increase and multiply and fill of him you the waters in seas and the bird let multiply in land",
         "Genesis 1:23 and there came to be evening and there came to be morning day fifth",
-        "Genesis 1:24 and he said Mighty Ones you bring out the land soul live to kind beast and creeping and his life land to kind and there came to be so",
-        "Genesis 1:25 and he make Mighty Ones you lives the land to kind and you the beast to kind and you all creeping the land to kind of it and he see Mighty Ones for good",
-        "Genesis 1:26 and he said Mighty Ones we make man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the land and in all the creeping the that move upon the land",
+        "Genesis 1:24 and he said Mighty Ones you bring out the land soul live to kind beast and move and his life land to kind and there came to be so",
+        "Genesis 1:25 and he make Mighty Ones you lives the land to kind and you the beast to kind and you all move the land to kind of it and he see Mighty Ones for good",
+        "Genesis 1:26 and he said Mighty Ones we make man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the land and in all the move the move upon the land",
         "Genesis 1:27 and he create Mighty Ones you the man in image of him in image Mighty Ones create him male and female create them",
-        "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the land and subdue of him and rule in fish the sea and in bird the heavens and in all live the that moves upon the land",
+        "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the land and subdue of him and rule in fish the sea and in bird the heavens and in all live the moves upon the land",
         "Genesis 1:29 and he said Mighty Ones behold gives of to them you all herb sow seed which upon face all the land and you all the tree which in it fruit tree sow seed to them let there be to food",
-        "Genesis 1:30 and to all lives the land and to all bird the heavens and to all that move upon the land which in it soul live you all green herb to food and there came to be so",
+        "Genesis 1:30 and to all lives the land and to all bird the heavens and to all move upon the land which in it soul live you all green herb to food and there came to be so",
         "Genesis 1:31 and he see Mighty Ones you all which make and behold good very and there came to be evening and there came to be morning day the sixth",
         "Genesis 2:1 and he completed the heavens and the land and all hosts",
         "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which make and he shabated in day the seventh from all work of him which make",
@@ -108,8 +110,8 @@ public class MachineTranslationIntegrationTest {
     assertThat(translations).containsExactly(
         "Ecc 12:1 and remember you creators of you in days of youths of you until which not he come of him days of the evil and the reaching of him years which you said none for me beast desire",
         "Ecc 12:2 until which not you darken the sun and the light and the moon and the stars and dwell of him the clouds after the rain",
-        "Ecc 12:3 in day that which he moved of him that which and rebellious the house and the you pervert of him mans of the army and cease of him the daub of uss for little of him and darken of him mountain of himI s in windows",
-        "Ecc 12:4 and shut of him doors in street in low voice the grinding and he up to voice the bird and he worship of him all daughters the song",
+        "Ecc 12:3 in day that which he moved of him that which and rebellious the house and the you pervert of him mans of the army and cease of him the daub of uss for little of him and darken of him the saws in windows",
+        "Ecc 12:4 and shut of him doors in street in low sound the grinding and he up to sound the bird and he worship of him all daughters the song",
         "Ecc 12:5 also from high fear of him and fears in way and he despise the almond and he burden the grasshopper and you bullock the desire for walk the man unto house ever of him and about of him in street the mourners",
         "Ecc 12:6 until which not he far [UNK] sorrow the silver and you run springs the gold and you break pitcher upon the fountain and we run the wheel unto the pit",
         "Ecc 12:7 and he return the dust upon the land like that which was and the spirit you return unto the Mighty Ones which given",

@@ -1,14 +1,11 @@
 import gradio
 import urllib.request, json
-from sentence_transformers import SentenceTransformer
-from sentence_transformers import util
 from transformers.utils import logging
+from sentence_compare import similarity_compare
 logging.set_verbosity_error()
 
 # Search URL for Maccabees Ministries scriptures. Will fetch scriptures as a json object.
-SEARCH_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/search?searchText={}&lang=en&version={}'
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
+SEARCH_URL = 'https://dabar.cloud/_api/scriptures/v1/fetch?searchText={}&lang=en&version={}'
 
 
 # Candidate helper class that holds a scripture, the comparison text and the resulting match score.
@@ -76,9 +73,7 @@ def compare(reference, standard_version, compare_version):
         standard_texts.append(candidate.standardText)
         compare_texts.append(candidate.compareText)
 
-    embeddings1 = model.encode(standard_texts, convert_to_tensor=True)
-    embeddings2 = model.encode(compare_texts, convert_to_tensor=True)
-    cosine_scores = util.cos_sim(embeddings1, embeddings2)
+    cosine_scores = similarity_compare(standard_texts, compare_texts)
 
     for i in range(len(candidates)):
         candidates[i].score = cosine_scores[i][i]

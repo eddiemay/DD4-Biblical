@@ -1,10 +1,9 @@
 import time
 import urllib.request, json
-from sentence_transformers import SentenceTransformer
-from sentence_transformers import util
+from sentence_compare import similarity_compare
 
-# Search URL for Mackabee Ministries scriptures. Will fetch scriptures as a json object.
-SEARCH_URL = 'https://dd4-biblical.appspot.com/_api/scriptures/v1/search?searchText={}&lang=en&version={}'
+# Fetch URL for Mackabee Ministries scriptures. Will fetch scriptures as a json object.
+FETCH_URL = 'https://dabar.cloud/_api/scriptures/v1/fetch?searchText={}&lang=en&version={}'
 STANDARD_VERSION = 'RSKJ' # Normally RSKJ (Restored King James Version) as our standard text, may also use NRSV.
 COMPARISON_VERSION = 'SEP' # Will use the Septuagint "SEP" version for most comparisons, also have DSS available for Isa
 
@@ -40,7 +39,7 @@ if __name__ == '__main__':
     candidates = []
     candidateMap = {}
     # first connect to the api and get the standard translation
-    with urllib.request.urlopen(SEARCH_URL.format(urllib.parse.quote(REFERENCES), STANDARD_VERSION)) as url:
+    with urllib.request.urlopen(FETCH_URL.format(urllib.parse.quote(REFERENCES), STANDARD_VERSION)) as url:
         response = json.load(url)
         # print(response)
 
@@ -52,7 +51,7 @@ if __name__ == '__main__':
 
     api_call_2_start = time.perf_counter()
     # Then fetch the comparison text
-    with urllib.request.urlopen(SEARCH_URL.format(urllib.parse.quote(REFERENCES), COMPARISON_VERSION)) as url:
+    with urllib.request.urlopen(FETCH_URL.format(urllib.parse.quote(REFERENCES), COMPARISON_VERSION)) as url:
         response = json.load(url)
         # print(response)
 
@@ -74,13 +73,8 @@ if __name__ == '__main__':
         standardTexts.append(candidate.standardText)
         compareTexts.append(candidate.compareText)
 
-    model_load_start = time.perf_counter()
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-
     process_start = time.perf_counter()
-    embeddings1 = model.encode(standardTexts, convert_to_tensor=True)
-    embeddings2 = model.encode(compareTexts, convert_to_tensor=True)
-    cosine_scores = util.cos_sim(embeddings1, embeddings2)
+    cosine_scores = similarity_compare(standardTexts, compareTexts)
 
     for i in range(len(candidates)):
         candidates[i].score = cosine_scores[i][i]
@@ -88,5 +82,5 @@ if __name__ == '__main__':
 
     end_time = time.perf_counter()
     print("\n Processed: {} verses\n".format(len(candidates)))
-    print("Total time: {} seconds\n\t1st Api Call: {} seconds\n\t2nd Api Call: {} seconds\n\tModel Load Time: {} seconds\n\tProcessing Time: {} seconds\n"
-          .format(end_time - start_time, api_call_2_start - start_time, model_load_start - api_call_2_start, process_start - model_load_start, end_time - process_start))
+    print("Total time: {} seconds\n\t1st Api Call: {} seconds\n\t2nd Api Call: {} seconds\n\tProcessing Time: {} seconds\n"
+          .format(end_time - start_time, api_call_2_start - start_time, process_start - api_call_2_start, end_time - process_start))

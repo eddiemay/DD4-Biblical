@@ -7,6 +7,7 @@ com.digitald4.biblical.ReadTheWordCtrl =
   this.bookService = bookService;
   this.interlinearService = interlinearService;
   this.scriptureService = scriptureService;
+  this.scripture_views = ['Text', 'Interlaced', 'Interlinear'];
   this.reference = {value: $location.search()['reference']};
   this.pageToken = $location.search()['pageToken'] || 1;
   this.language = $location.search()['lang'];
@@ -15,6 +16,10 @@ com.digitald4.biblical.ReadTheWordCtrl =
   this.views = {READ: 1, SEARCH_AND_REPLACE: 2, UPLOAD: 3};
   this.view = this.views.READ;
   this.showReference();
+  var strongsId = $location.search()['strongsId'];
+  if (strongsId) {
+    this.lexiconRequest = {strongsId: strongsId, view: $location.search()['lexiconView']};
+  }
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {
@@ -23,6 +28,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.getOrSearch = function(page) {
   this.locationProvider.search('lang', this.globalData.language);
   this.locationProvider.search('view', this.scriptureView);
   this.locationProvider.search('pageToken', page);
+  this.locationProvider.search('strongsId', undefined);
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.setReference = function(reference) {
@@ -31,6 +37,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.setReference = function(referen
   this.locationProvider.search('lang', this.globalData.language);
   this.locationProvider.search('view', this.scriptureView);
   this.locationProvider.search('pageToken', undefined);
+  this.locationProvider.search('strongsId', undefined);
 }
 
 com.digitald4.biblical.ReadTheWordCtrl.prototype.showReference = function() {
@@ -123,7 +130,7 @@ com.digitald4.biblical.ReadTheWordCtrl.prototype.showStrongsRefs = function(page
   if (this.globalData.matchWord) request.word = this.interlinear.word;
   if (this.globalData.matchConstantsOnly) request.hebrewWord = this.interlinear.constantsOnly;
   this.interlinearService.getReferences(request, response => {
-    this.references = processPagination(response);
+    this.references = this.interlinearService.processPagination(response);
   });
 }
 

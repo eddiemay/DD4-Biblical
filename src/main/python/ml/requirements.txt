@@ -3,12 +3,17 @@ gradio
 idx2numpy
 jq
 keras
+langchain_ollama
 langchain_openai
 langchain_community
+langchain-huggingface
+langgraph
+lark
 levenshtein
 opencv-python
 pytesseract
 sentence_transformers
 tensorflow
 tensorflow_text
+tf-keras
 transformers

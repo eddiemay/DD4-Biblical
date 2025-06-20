@@ -4,6 +4,7 @@ import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
 
 import java.util.Comparator;
@@ -57,7 +58,8 @@ public class ScriptureFetcher {
     }
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    var changeTracker = new ChangeTracker(null, null, null, null);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
     new ScriptureFetcher(apiConnector, bibleBookStore).fetch(version, start, end);

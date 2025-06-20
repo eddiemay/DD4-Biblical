@@ -118,8 +118,8 @@ def verify(verify_request):
         cv2.waitKey(1)
 
     if len(evaluated) == 0:
-        for isGray in [False, True]:
-            for bf in [None, 7, 14, 21, 28, 35]:
+        for isGray in [False]:
+            for bf in [None, 7]:
                 for blur in [None, 'median', 'gaussian']:
                     threshold_values = [130, 135, 145] if blur == 'median' else [132]
                     for blur_size in [3, 5] if blur is not None else [None]:
@@ -341,7 +341,7 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=False, model=BEST_MODEL, multithread=Multithread.COLUMN_DISTRIBUTED)
+    output_column_stats(use_best=False, model='script/Hebrew', multithread=Multithread.COLUMN_DISTRIBUTED)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',

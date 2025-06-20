@@ -4,6 +4,7 @@ import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
 
 import java.util.stream.IntStream;
@@ -45,7 +46,8 @@ public class ScriptureMigrater {
     }
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
     new ScriptureMigrater(apiConnector, bibleBookStore).migrate(

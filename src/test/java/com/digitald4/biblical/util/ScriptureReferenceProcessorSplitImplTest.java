@@ -1,14 +1,16 @@
 package com.digitald4.biblical.util;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import org.junit.Test;
 
-import static com.google.common.truth.Truth.assertThat;
-
 public class ScriptureReferenceProcessorSplitImplTest {
-  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  public static final ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private static final BibleBook GENESIS = bibleBookStore.get("Genesis");
   private static final BibleBook KINGS_2 = bibleBookStore.get("2 Kings");

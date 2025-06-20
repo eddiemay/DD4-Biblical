@@ -14,6 +14,7 @@ import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.model.Company;
 import com.digitald4.common.report.PDFReport;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.DAOApiImpl;
 import com.digitald4.common.storage.DAOFileBasedImpl;
@@ -235,7 +236,8 @@ public class CalendarPDF extends PDFReport {
   }
 
   public static void main(String[] args) throws Exception {
-    DAOFileBasedImpl fileDAO = new DAOFileBasedImpl("data/biblical-events.db").loadFromFile();
+    ChangeTracker changeTracker = new ChangeTracker( null, null, null, null);
+    DAO fileDAO = new DAOFileBasedImpl(changeTracker, "data/biblical-events.db").loadFromFile();
 
     /* APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAO apiDAO = new DAOApiImpl(apiConnector);

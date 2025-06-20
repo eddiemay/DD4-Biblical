@@ -3,11 +3,13 @@ package com.digitald4.biblical.model;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.digitald4.biblical.store.BibleBookStore;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import org.junit.Test;
 
 public class ScriptureVersionTest {
-  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();;
+  private static final ChangeTracker changeTracker = new ChangeTracker( null, null, null, null);
+  private static DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
   @Test

@@ -13,6 +13,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.model.BasicUser;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.Query;
 import com.digitald4.common.storage.QueryResult;
@@ -24,7 +25,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 public class ScriptureServiceTest {
-  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private static final ScriptureReferenceProcessor scriptureRefProcessor =
       new ScriptureReferenceProcessorSplitImpl(bibleBookStore);

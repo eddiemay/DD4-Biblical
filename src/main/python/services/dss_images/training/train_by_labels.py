@@ -8,15 +8,13 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
-from train_by_embedding import cache_letter_boxes
-from train_by_embedding import letter_box_file
+from train_by_embedding import cache_letter_boxes, columns, letter_box_file
 
 BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
 ITERATIONS = 4092
-fragments = [2, 4, 7, 9, 13, 14, 16, 17, 18, 20, 26, 27, 36, 40, 44, 45, 47, 48, 53]
 override_letter_cache = False
-MODEL_NAME = f'{BASE_MODEL}_Label_{len(fragments)}'
+MODEL_NAME = f'{BASE_MODEL}_Label_{len(columns)}'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
 row_map = {}
@@ -222,7 +220,7 @@ def display(sample):
 
 if __name__ == '__main__':
     start_time = time.time()
-    cache_letter_boxes(fragments, override_letter_cache)
+    cache_letter_boxes(columns, override_letter_cache)
     # for r in range(1, 8):
         # output_row('isaiah', 44, r)
     # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 25, 'res': 10}))
@@ -250,7 +248,7 @@ if __name__ == '__main__':
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
     image_start = time.time()
-    for frag in fragments:
+    for frag in columns:
         for r in range(1, 33):
             process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r})
             if r % 3 == 1:

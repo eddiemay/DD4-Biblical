@@ -34,14 +34,13 @@ public class LessonStoreTest {
 
   private final static ScriptureMarkupProcessor SCRIPTURE_MARKUP_PROCESSOR = new ScriptureMarkupProcessor();
   @Mock private final Clock clock = mock(Clock.class);
-  private DAO dao;
   private LessonStore lessonStore;
   private LessonStore.LessonVersionStore versionStore;
 
   @Before
   public void setup() {
     AtomicLong TIME = new AtomicLong(60000L);
-    dao = new DAOTestingImpl(new ChangeTracker(() -> dao, null, null, null, clock));
+    DAO dao = new DAOTestingImpl(new ChangeTracker(null, null, null, clock));
     lessonStore = new LessonStore(() -> dao);
     versionStore = new LessonStore.LessonVersionStore(() -> dao, lessonStore, SCRIPTURE_MARKUP_PROCESSOR);
     when(clock.millis()).thenAnswer(i -> TIME.incrementAndGet());

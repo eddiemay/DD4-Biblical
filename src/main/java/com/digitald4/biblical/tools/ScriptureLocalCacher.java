@@ -8,6 +8,7 @@ import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.ScriptureFetcherRouter;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import java.util.Comparator;
 import java.util.stream.IntStream;
@@ -49,7 +50,8 @@ public class ScriptureLocalCacher {
     }
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    var changeTracker = new ChangeTracker( null, null, null, null);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     ScriptureStore scriptureStore = new ScriptureStore(
         () -> daoFileDB, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore),

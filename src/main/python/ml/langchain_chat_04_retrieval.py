@@ -1,58 +1,56 @@
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from pprint import pprint
+from langchain_ollama import ChatOllama
+from langchain_chat_03_vectorize import CHROMA_PATH, embedding, model
 
-CHROMA_PATH = "chatbot/chroma/"
-
-embedding = OpenAIEmbeddings()
 vectordb = Chroma(
     persist_directory=CHROMA_PATH,
     embedding_function=embedding
 )
 
-print(vectordb._collection.count())
+llm = ChatOllama(model=model, temperature=0)
 
-question = "what did they say about four hundred years?"
+if __name__ == '__main__':
+    print(vectordb._collection.count())
 
-docs = vectordb.similarity_search(question, k=3)
-pprint(docs)
-for d in docs:
-    print(d.metadata['reference'])
+    question = "How many years did Adam live?"
 
-print("")
-docs = vectordb.similarity_search(
-    question,
-    k=3,
-    filter={"book":"Genesis"})
-pprint(docs)
+    docs = vectordb.similarity_search(question, k=3)
+    pprint(docs)
+    for d in docs:
+        print(d.metadata['reference'])
 
-for d in docs:
-    print(d.metadata['reference'])
+    print("")
+    docs = vectordb.similarity_search(
+        question,
+        k=3,
+        filter={"book":"Genesis"})
+    pprint(docs)
+    for d in docs:
+        print(d.metadata['reference'])
 
-from langchain_openai import OpenAI
-from langchain.retrievers.self_query.base import SelfQueryRetriever
-from langchain.chains.query_constructor.base import AttributeInfo
+    from langchain.retrievers.self_query.base import SelfQueryRetriever
+    from langchain.chains.query_constructor.base import AttributeInfo
 
-metadata_field_info = [
-    AttributeInfo(
-        name="book",
-        description="The scripture the chunk is from, should be one of `Genesis`, or `Exodus`",
-        type="string",
+    metadata_field_info = [
+        AttributeInfo(
+            name="book",
+            description="The scripture the chunk is from, should be one of `Genesis` or `Exodus`",
+            type="string",
+        )
+    ]
+
+    document_content_description = "Bible scriptures"
+    retriever = SelfQueryRetriever.from_llm(
+        llm,
+        vectordb,
+        document_content_description,
+        metadata_field_info,
+        verbose=True
     )
-]
 
-document_content_description = "Bible scriptures"
-llm = OpenAI(model='gpt-3.5-turbo-instruct', temperature=0)
-retriever = SelfQueryRetriever.from_llm(
-    llm,
-    vectordb,
-    document_content_description,
-    metadata_field_info,
-    verbose=True
-)
-
-print("")
-docs = retriever.invoke(question)
-pprint(docs)
-for d in docs:
-    print(d.metadata)
+    print("")
+    docs = retriever.invoke(question)
+    pprint(docs)
+    for d in docs:
+        print(d.metadata)

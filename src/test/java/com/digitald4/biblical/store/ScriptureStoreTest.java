@@ -44,7 +44,8 @@ public class ScriptureStoreTest {
   @Mock private final InterlinearStore interlinearStore = mock(InterlinearStore.class);
   @Mock private final MachineTranslator machineTranslator = mock(MachineTranslator.class);
 
-  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
+  private static DAOFileDBImpl daoFileDB  = new DAOFileDBImpl(changeTracker);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private final ScriptureReferenceProcessor scriptureRefProcessor =
       new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
@@ -56,7 +57,7 @@ public class ScriptureStoreTest {
         scriptureRefProcessor, scriptureFetcher, interlinearStore, machineTranslator);
 
     when(dao.list(eq(Scripture.class), any(Query.List.class))).then(i -> getScriptures(i.getArgument(1)));
-    when(dao.create(anyCollectionOf(Scripture.class))).then(i -> i.getArgument(0));
+    when(dao.persist(any())).then(i -> i.getArgument(0));
     when(scriptureFetcher.fetch(anyString(), anyString(), any(BibleBook.class), anyInt())).then(i ->
         fetchFromWeb(i.getArgument(0), i.getArgument(1), i.getArgument(2), i.getArgument(3)));
   }

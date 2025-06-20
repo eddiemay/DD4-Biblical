@@ -46,6 +46,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.util.Calculate;
@@ -435,8 +436,9 @@ public class DiffStats {
   public static void main(String[] args) throws IOException {
     long startTime = System.currentTimeMillis();
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
-    DAOFileBasedImpl dao = new DAOFileBasedImpl(DB_FILE).loadFromFile();
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    var changeTracker = new ChangeTracker(null, null, null, null);
+    DAOFileBasedImpl dao = new DAOFileBasedImpl(changeTracker, DB_FILE).loadFromFile();
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
     ScriptureReferenceProcessor referenceProcessor = new ScriptureReferenceProcessorSplitImpl(bibleBookStore);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);

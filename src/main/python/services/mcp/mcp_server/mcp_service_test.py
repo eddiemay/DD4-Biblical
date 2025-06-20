@@ -1,10 +1,34 @@
 import asyncio
 import json
+import mcp_server
+from fastmcp import Client
 from urllib import parse
-from mcp_service_base_test import call_tool, read_resource
+
+client = Client(mcp_server.mcp)
+
+async def call_tool(name: str, arguments: dict):
+  print(f"Testing {name} with arguments {dict}")
+  async with client:
+    result = await client.call_tool(name, arguments)
+    print(result)
+    return result
 
 
-def test_fetch_scripture():
+async def read_resource(url: str):
+  async with client:
+    result = await client.read_resource(url)
+    print(result)
+    return result
+
+
+async def get_prompt(name: str, arguments: dict):
+  async with client:
+    result = await client.get_prompt(name, arguments)
+    print(result)
+    return result
+
+
+def test_fetch_scripture_resource():
   scriptures = json.loads(asyncio.run(read_resource(
       f"scriptures://{parse.quote('Gen 2:3')}/fetch"))[0].text)
 
@@ -18,7 +42,7 @@ def test_fetch_scripture():
   assert "And Elohim blessed the seventh day and set it apart" in scripture['text']
 
 
-def test_fetch_scripture_multi():
+def test_fetch_scripture_resource_multi():
   scriptures = json.loads(asyncio.run(read_resource(
       f"scriptures://{parse.quote('Exo 20:13-15')}/fetch"))[0].text)
 
@@ -37,9 +61,9 @@ def test_fetch_scripture_multi():
   assert "You do not steal." in scriptures[2]['text']
 
 
-def test_fetch_scriptures():
+def test_fetch_scripture():
   scripture = json.loads(asyncio.run(call_tool(
-      "fetch_scriptures", {"reference": "Gen 2:3"}))[0].text)
+      "fetch_scripture", {"reference": "Gen 2:3"}))[0].text)
 
   assert scripture['version'] == 'ISR'
   assert scripture['language'] == 'en'
@@ -49,9 +73,9 @@ def test_fetch_scriptures():
   assert "And Elohim blessed the seventh day and set it apart" in scripture['text']
 
 
-def test_fetch_scriptures_multi():
+def test_fetch_scripture_multi():
   scriptures = json.loads(asyncio.run(call_tool(
-      "fetch_scriptures", {"reference": "Exo 20:13-15"}))[0].text)
+      "fetch_scripture", {"reference": "Exo 20:13-15"}))[0].text)
 
   assert len(scriptures) == 3
   verse = 13

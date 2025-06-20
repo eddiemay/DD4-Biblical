@@ -7,7 +7,6 @@ com.digitald4.biblical.BiblicalCtrl = function($location, apiConnector, globalDa
       {name: 'Hebrew', code: 'he'}, {name: 'Hebrew Haser', code: 'he-haser'},
       {name: 'Restored Hebrew', code: 'he-re'}, {name: 'Pictograph', code: 'anc-he'},
       {name: 'Greek', code: 'gk'}, {name: 'Geez', code: 'gez'}];
-  globalData.views = ['Text', 'Interlaced', 'Interlinear'];
   globalData.scriptureVersion = $location.search()['version'] || globalData.scriptureVersion;
   globalData.language = $location.search()['lang'] || this.globalData.languages[0].code;
   globalData.matchConstantsOnly = true;

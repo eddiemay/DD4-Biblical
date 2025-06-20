@@ -5,7 +5,6 @@ import static com.google.common.truth.Truth.assertThat;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
-import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -13,7 +12,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class HebrewTokenizerTest {
-  private static final DAOInMemoryImpl inMemoryImpl = new DAOInMemoryImpl();
   private static final HebrewTokenizer tokenizer = new HebrewTokenizer(
       new TokenWordStore(() -> ImmutableSet.of(
           new TokenWord().setWord("ב").setTokenType(TokenType.PREFIX_ONLY),

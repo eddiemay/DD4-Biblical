@@ -104,15 +104,15 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     }
     scriptureService.search = function(request, success, error) {
       scriptureService.sendRequest({action: 'fetch', params: request},
-          response => success(processPagination(response)), error);
+          response => success(scriptureService.processPagination(response)), error);
     }
     scriptureService.searchAndReplace = function(request, success, error) {
       scriptureService.sendRequest({action: 'searchAndReplace', method: 'POST', params: request},
-          response => success(processPagination(response)), error);
+          response => success(scriptureService.processPagination(response)), error);
     }
     scriptureService.uploadScripture = function(request, success, error) {
       scriptureService.sendRequest({action: 'uploadScripture', method: 'POST', data: request},
-          response => success(processPagination(response)), error);
+          response => success(scriptureService.processPagination(response)), error);
     }
     scriptureService.getScrollCoords = function(scripture, success, error) {
       const errorCallback = error || notifyError;

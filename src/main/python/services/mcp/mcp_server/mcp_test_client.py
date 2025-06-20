@@ -18,19 +18,6 @@ async def interact_with_server():
   try:
     async with Client("mcp_server.py") as client:
       print("--- Client Connected ---")
-      # Call the 'greet' tool
-      greet_result = await client.call_tool("greet", {"name": "Remote Client"})
-      print(f"greet result: {greet_result}")
-      assert greet_result[0].text == "Hello Remote Client!"
-
-      # Read the 'config' resource
-      # config_data = await client.read_resource("data://config")
-      # print(f"config resource: {config_data}")
-
-      # Read user profile 102
-      profile_102 = await client.read_resource("users://102/profile")
-      print(f"User 102 profile: {profile_102}")
-
       # Call the 'similarity_compare' tool
       compare_result = await client.call_tool("similarity_compare", {"a": "Remote Client", "b": "Local Client"})
       print(f"compare result: {compare_result}")
@@ -40,6 +27,18 @@ async def interact_with_server():
       scripture = json.loads(scripture)[0]
       print(f"Scripture: {scripture}")
       assert "Know for certain that your seed are to be sojourners in a land that is not theirs" in scripture['text']
+
+      scripture = (await client.call_tool("fetch_scripture", {"reference": "Gen 2:3"}))[0].text
+      scripture = json.loads(scripture)
+      print(f"Scripture: {scripture}")
+      assert "Elohim blessed the seventh day and set it apart" in scripture['text']
+
+      strongsDef = (await client.call_tool("fetch_strongs_def", {"strongs_id": "H5307"}))[0].text
+      strongsDef = json.loads(strongsDef)
+      print(f"Strong's Def: {strongsDef}")
+      assert strongsDef['id'] == "H5307"
+      assert strongsDef['restored'] == "נפל"
+      assert strongsDef['referenceCount'] == 435
 
   except Exception as e:
     print(f"An error occurred: {e}")

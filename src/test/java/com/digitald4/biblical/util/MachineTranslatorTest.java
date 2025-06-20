@@ -8,13 +8,11 @@ import com.digitald4.biblical.model.Interlinear.SubToken;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
-import com.digitald4.common.storage.DAOInMemoryImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 public class MachineTranslatorTest {
-  private static final DAOInMemoryImpl inMemoryDao = new DAOInMemoryImpl();
   private static final ImmutableList<TokenWord> TOKEN_WORDS = ImmutableList.of(
       new TokenWord().setWord("ב").setTranslation("in ").setTokenType(TokenType.PREFIX_ONLY),
       new TokenWord().setWord("ה").setTranslation("the ").setAsSuffix("").setTokenType(TokenType.PREFIX),

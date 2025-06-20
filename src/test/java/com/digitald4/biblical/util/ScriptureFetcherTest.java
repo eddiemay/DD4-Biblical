@@ -18,12 +18,12 @@ public class ScriptureFetcherTest {
   @Mock protected final APIConnector apiConnector = mock(APIConnector.class);
   @Mock final SearchIndexer searchIndexer = mock(SearchIndexer.class);
   protected ScriptureStore scriptureStore;
-  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+  private static final DAOFileDBImpl daoFileDB = new DAOFileDBImpl(null);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
 
   @Before
   public void setup() {
-    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker(null, null, null, searchIndexer, null));
+    DAOTestingImpl dao = new DAOTestingImpl(new ChangeTracker( null, null, searchIndexer, null));
     scriptureStore = new ScriptureStore(
         () -> dao, null, bibleBookStore, new ScriptureReferenceProcessorSplitImpl(bibleBookStore),
         new ScriptureFetcherRouter(apiConnector), null, null);

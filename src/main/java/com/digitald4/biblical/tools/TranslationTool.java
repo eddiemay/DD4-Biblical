@@ -127,7 +127,8 @@ public class TranslationTool {
   }
 
   public static void main(String[] args) {
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
+    ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
 
     APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
     DAOApiImpl apiDao = new DAOApiImpl(apiConnector);

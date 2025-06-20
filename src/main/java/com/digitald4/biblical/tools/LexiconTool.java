@@ -27,6 +27,7 @@ import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
+import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOApiImpl;
 import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
@@ -398,8 +399,9 @@ public class LexiconTool {
 
   public static void main(String[] args) throws IOException {
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50).loadIdToken();
-    DAOFileDBImpl daoFileDB = new DAOFileDBImpl();
-    DAOFileBasedImpl interlinearDao = new DAOFileBasedImpl("data/interlinear-references.db").loadFromFile();
+    var changeTracker = new ChangeTracker(null, null, null, null);
+    DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
+    DAOFileBasedImpl interlinearDao = new DAOFileBasedImpl(changeTracker, "data/interlinear-references.db").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
