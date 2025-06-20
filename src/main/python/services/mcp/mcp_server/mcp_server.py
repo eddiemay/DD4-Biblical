@@ -1,4 +1,3 @@
-import asyncio
 import json
 from fastmcp import FastMCP
 from urllib import parse, request
@@ -108,10 +107,3 @@ def fetch_strongs_translations(strongs_id: str) -> list:
 
 if __name__ == "__main__":
   mcp.run(transport='stdio')
-  '''asyncio.run(
-      mcp.run_async(
-          transport="sse",
-          host="0.0.0.0",
-          port=8080,
-          path="/mcp",
-          log_level="debug"))'''

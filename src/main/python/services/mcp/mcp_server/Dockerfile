@@ -17,4 +17,4 @@ RUN uv sync --frozen
 EXPOSE $PORT
 
 # Run the FastMCP server
-CMD ["uv", "run", "mcp_server.py"]
+CMD ["uv", "run", "main.py"]
