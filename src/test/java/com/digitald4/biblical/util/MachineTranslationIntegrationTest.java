@@ -82,7 +82,7 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:30 and to all lives the land and to all bird the heavens and to all move upon the land which in it soul live you all green herb to food and there came to be so",
         "Genesis 1:31 and he see Mighty Ones you all which make and behold good very and there came to be evening and there came to be morning day the sixth",
         "Genesis 2:1 and he completed the heavens and the land and all hosts",
-        "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which make and he shabated in day the seventh from all work of him which make",
+        "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which make and he cease in day the seventh from all work of him which make",
         "Genesis 2:3 and he bless Mighty Ones you day the seventh and he sanctify him for in it shabbat from all work of him which create Mighty Ones to accomplish"
     );
   } // נוח
