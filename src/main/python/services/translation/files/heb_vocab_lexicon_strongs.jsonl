@@ -471,8 +471,8 @@
 {"strongsId":"H0427","translation":"oak","root":"אלה"}
 {"strongsId":"H0428","translation":"these","root":"אלה"}
 {"strongsId":"H0429","translation":"these","root":"אלה"}
-{"strongsId":"H0430","translation":"god","root":"אלוהימ"}
-{"strongsId":"H0430","translation":"god","root":"אלהימ"}
+** {"strongsId":"H0430","translation":"god","root":"אלוהימ"}
+** {"strongsId":"H0430","translation":"god","root":"אלהימ"}
 {"strongsId":"H0431","translation":"behold","root":"אלו"}
 {"strongsId":"H0432","translation":"but if","root":"אלו"}
 {"strongsId":"H0433","translation":"God","root":"אלוה"}
@@ -2534,7 +2534,7 @@
 {"strongsId":"H2318","translation":"renew","root":"חדש"}
 {"strongsId":"H2319","translation":"new","root":"חדש"}
 {"strongsId":"H2320","translation":"month","root":"חודש"}
-{"strongsId":"H2320","translation":"month","root":"חדש"}
+** {"strongsId":"H2320","translation":"month","root":"חדש"}
 {"strongsId":"H2321","translation":"Hodesh","root":"חדש"}
 {"strongsId":"H2322","translation":"Hadashah","root":"חדשה"}
 {"strongsId":"H2323","translation":"new","root":"חדת"}
@@ -8375,7 +8375,7 @@
 {"strongsId":"H7670","translation":"destruction","root":"שברונ"}
 {"strongsId":"H7671","translation":"Shebarim","root":"שברימ"}
 {"strongsId":"H7672","translation":"astonied","root":"שבש"}
-{"strongsId":"H7673","translation":"cease","root":"שבת"}
+** {"strongsId":"H7673","translation":"cease","root":"שבת"}
 {"strongsId":"H7674","translation":"loss of time","root":"שבת"}
 {"strongsId":"H7675","translation":"seat","root":"שבת"}
 {"strongsId":"H7676","translation":"sabbath","root":"שבת"}

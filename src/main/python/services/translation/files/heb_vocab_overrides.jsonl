@@ -87,6 +87,8 @@
 {"strongsId":"H1098","root":"בליל","translation":"fodder","tokenType":"WORD_STRONGS_MATCH_ONLY"}
 {"strongsId":"H1121","root":"בני","translation":"sons of"}
 {"strongsId":"H1121","root":"בנימ","translation":"sons"}
+{"strongsId":"H1166","translation":"marry","root":"בעל"}
+{"strongsId":"H1166","translation":"married","root":"בעול"}
 {"strongsId":"H1238","root":"בוקק","translation":"voider"}
 {"strongsId":"H1254","root":"בורא","translation":"creator"}
 {"strongsId":"H1254","root":"ברוא","translation":"created"}
@@ -110,6 +112,9 @@
 {"strongsId":"H1512","root":"גחנ","translation":"belly"}
 {"strongsId":"H1589","root":"גנוב","translation":"stolen"}
 {"strongsId":"H1639","root":"גרוע","translation":"diminished"}
+{"strongsId":"H1644","root":"גרש","translation":"cast out"}
+{"strongsId":"H1644","root":"גורש","translation":"casting out"}
+{"strongsId":"H1644","root":"גרוש","translation":"casted out"}
 {"strongsId":"H1647","root":"גרשומ","translation":"Gershom"}
 {"strongsId":"H1710","root":"דגת","translation":"fish"}
 {"strongsId":"H1730","root":"דד","translation":"beloved"}
@@ -363,6 +368,7 @@
 {"strongsId":"H5344","root":"נקב","translation":"designate"}
 {"strongsId":"H5344","root":"קב","translation":"curse"}
 {"strongsId":"H5344","root":"קוב","translation":"cursed"}
+{"strongsId":"H5362","root":"תקופ","translation":"end"}
 {"strongsId":"H5375","root":"שא","translation":"lift up"}
 {"strongsId":"H5377","root":"שיא","translation":"deceived"}
 {"strongsId":"H5391","root":"נשוכ","translation":"bit"}
@@ -393,6 +399,7 @@
 {"strongsId":"H5543","root":"סלוא","translation":"Sallu"}
 {"strongsId":"H5545","root":"סלוח","translation":"forgiven"}
 {"strongsId":"H5608","root":"סופר","translation":"scribe"}
+{"strongsId":"H5608","root":"ספור","translation":"scribed"}
 {"strongsId":"H5619","root":"סקול","translation":"stone"}
 {"strongsId":"H5628","root":"סרוח","translation":"hung"}
 {"strongsId":"H5637","root":"סרר","translation":"rebellious"}
@@ -518,6 +525,7 @@
 {"strongsId":"H7200","root":"ראוה","translation":"saw"}
 {"strongsId":"H7200","root":"יראה","translation":"he see"}
 {"strongsId":"H7200","root":"רוא","translation":"saw"}
+{"strongsId":"H7214","root":"ראמ","translation":"rhino"}
 {"strongsId":"H7218","root":"רואש","translation":"head"}
 {"strongsId":"H7223","root":"ראשנ","translation":"first"}
 {"strongsId":"H7235","root":"רבו","translation":"multiply"}
@@ -559,12 +567,11 @@
 {"strongsId":"H7533","root":"רצוצ","translation":"oppressed"}
 {"strongsId":"H7554","root":"רוקע","translation":"speader"}
 {"strongsId":"H7561","root":"רשיע","translation":"condemned"}
+{"strongsId":"H7561","root":"רתיח","translation":"boiling"}
 {"strongsId":"H7637","root":"שביע","translation":"seventh"}
 {"strongsId":"H7710","root":"שדופ","translation":"blasted"}
 {"strongsId":"H7760","root":"סמ","translation":"put"}
 {"strongsId":"H7760","root":"שמ","translation":"put"}
-{"strongsId":"H7673","root":"שבת","translation":"shabbat"}
-{"strongsId":"H7673","root":"שבות","translation":"shabated"}
 {"strongsId":"H7674","root":"שבת","translation":"shabbat"}
 {"strongsId":"H7675","root":"שבת","translation":"shabbat"}
 {"strongsId":"H7676","root":"שבת","translation":"shabbat"}

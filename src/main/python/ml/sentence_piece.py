@@ -90,15 +90,23 @@ if __name__ == '__main__':
     dict = sorted(dict.items(), key=lambda item: item[1])
 
     dictionary = {}
-    read_dictionary(dictionary, '../services/translation/files/heb_prefixes.json')
-    read_dictionary(dictionary, '../services/translation/files/heb_vocab_overrides.json')
-    read_dictionary(dictionary, '../services/translation/files/heb_vocab_lexicon_ancient.json')
-    read_dictionary(dictionary, '../services/translation/files/heb_vocab_lexicon_ancient.json')
-    read_dictionary(dictionary, '../services/translation/files/heb_vocab_lexicon_strongs.json')
-    read_dictionary(dictionary, '../services/translation/files/gk_vocab_overrides.json')
-    read_dictionary(dictionary, '../services/translation/files/gk_vocab_lexicon_strongs.json')
-    read_dictionary(dictionary, '../services/translation/files/gez_prefixes.json')
-    read_dictionary(dictionary, '../services/translation/files/gez_vocab.json')
+    read_dictionary(dictionary,
+                    '../services/translation/files/heb_prefixes.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/heb_vocab_overrides.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/heb_vocab_lexicon_ancient.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/heb_vocab_lexicon_ancient.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/heb_vocab_lexicon_strongs.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/gk_vocab_overrides.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/gk_vocab_lexicon_strongs.jsonl')
+    read_dictionary(dictionary,
+                    '../services/translation/files/gez_prefixes.jsonl')
+    read_dictionary(dictionary, '../services/translation/files/gez_vocab.jsonl')
 
     grouped_by_root = {}
     for token in dictionary.values():
