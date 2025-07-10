@@ -130,8 +130,13 @@ public class Interlinear {
   }
 
   @ApiResourceProperty
+  public String restored() {
+    return HebrewConverter.toRestored(word);
+  }
+
+  @ApiResourceProperty
   public String ancient() {
-    return HebrewConverter.toAncientRtl(constantsOnly);
+    return HebrewConverter.toAncientRtl(restored());
   }
 
   @NonIndexed

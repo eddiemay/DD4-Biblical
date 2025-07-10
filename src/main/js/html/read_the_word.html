@@ -15,7 +15,9 @@
         <fieldset data-ng-show="$ctrl.view == $ctrl.views.READ">
           <div class="columns">
             <div class="colx2-left">
-              <button data-ng-click="$ctrl.reference.shown=true">Book</button>
+              <button data-ng-click="$ctrl.reference.shown=true">Books
+                <img src="images/icons/books-icon-32.png" alt="books" width="16">
+              </button>
             </div>
           </div>
           <div class="columns">
@@ -204,7 +206,7 @@
         </li>
       </ul>
       <div class="block-content form">
-        <h2>References for Strong's {{$ctrl.strongsId}} {{$ctrl.interlinear.constantsOnly}}</h2>
+        <h2>References for Strong's {{$ctrl.strongsId}} {{$ctrl.interlinear.restored}}</h2>
         <h4>{{$ctrl.references.start}} to {{$ctrl.references.end}} of {{$ctrl.references.totalSize}}</h4>
         <fieldset>
           <h4>Match Criteria</h4>
@@ -223,7 +225,7 @@
               {{reference.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(reference.version, reference.book, reference.chapter, reference.verse)">{{reference.verse}}</a>
             <a href="" data-ng-click="$ctrl.setReference(reference.reference)"><img src="images/icons/link_arrow.png" height="14"></a>
           </h3>
-          <p>{{reference.constantsOnly}} {{reference.translation}}</p>
+          <p>{{reference.restored}} {{reference.translation}}</p>
         </div>
         <fieldset>
           <span data-ng-repeat="page in $ctrl.references.pages">
