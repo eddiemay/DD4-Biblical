@@ -237,7 +237,7 @@ public class CalendarPDF extends PDFReport {
 
   public static void main(String[] args) throws Exception {
     ChangeTracker changeTracker = new ChangeTracker( null, null, null, null);
-    DAO fileDAO = new DAOFileBasedImpl(changeTracker, "data/biblical-events.db").loadFromFile();
+    DAO fileDAO = new DAOFileBasedImpl(changeTracker, "data/biblical-events.jsonl").loadFromFile();
 
     /* APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100).loadIdToken();
     DAO apiDAO = new DAOApiImpl(apiConnector);

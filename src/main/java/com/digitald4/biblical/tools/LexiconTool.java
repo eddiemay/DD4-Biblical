@@ -401,7 +401,7 @@ public class LexiconTool {
     APIConnector apiConnector = new APIConnector(API_URL, API_VERSION, 50).loadIdToken();
     var changeTracker = new ChangeTracker(null, null, null, null);
     DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
-    DAOFileBasedImpl interlinearDao = new DAOFileBasedImpl(changeTracker, "data/interlinear-references.db").loadFromFile();
+    DAOFileBasedImpl interlinearDao = new DAOFileBasedImpl(changeTracker, "data/interlinear-references.jsonl").loadFromFile();
     LexiconFetcher lexiconFetcher = new LexiconFetcherBlueLetterImpl(apiConnector);
     InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
     BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);

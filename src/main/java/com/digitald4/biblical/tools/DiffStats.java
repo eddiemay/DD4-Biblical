@@ -71,7 +71,7 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Diff;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
 
 public class DiffStats {
-  private final static String DB_FILE = "data/Isaiah-Hebrew.db";
+  private final static String DB_FILE = "data/Isaiah-Hebrew.jsonl";
 
   private final ScriptureStore scriptureStore;
   private final InterlinearStore interlinearStore;

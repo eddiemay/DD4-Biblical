@@ -24,7 +24,7 @@ import org.junit.Test;
 public class MachineTranslationIntegrationTest {
   private static final ChangeTracker changeTracker = new ChangeTracker(null, null, null, null);
   private static DAOFileDBImpl daoFileDB = new DAOFileDBImpl(changeTracker);
-  private static final DAOFileBasedImpl fileDao = new DAOFileBasedImpl(changeTracker,"data/interlinear.db").loadFromFile();
+  private static final DAOFileBasedImpl fileDao = new DAOFileBasedImpl(changeTracker,"data/interlinear.jsonl").loadFromFile();
   private static final APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 50);
   private static final BibleBookStore bibleBookStore = new BibleBookStore(() -> daoFileDB);
   private static final InterlinearFetcher interlinearFetcher = new ScriptureFetcherBibleHub(apiConnector);
