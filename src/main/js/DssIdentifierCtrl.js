@@ -35,34 +35,20 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     imagesByLetter: {name: 'Images By Letter', isEnabled: () => true},
   }
 
-  this.textDiffs = [
-    {rowNum: 1, expected: 'ABC', actual: 'ACDC'},
-    {rowNum: 2, expected: 'William', actual: 'Willy'},
-    {rowNum: 3, expected: 'Mr StealYourGirl', actual: 'Mr still your girl'}
-  ];
-
   this.textFile = "Please select a scroll and fragment."
 
-  this.textDiffs.forEach(textDiff => {
-    var diffMatch = new diff_match_patch();
-    textDiff.diff = diffMatch.diff_main(textDiff.expected, textDiff.actual);
-    textDiff.diff.forEach(diff => {
-      if (diff['0'] == -1) {
-        diff._class = 'diff-delete';
-      } else if (diff['0'] == 1) {
-        diff._class = 'diff-insert';
-      }
-    });
-  });
-
-  var canvas = document.getElementById("scroll_view");
-  if (!canvas.getContext) {
+  this.canvas = document.getElementById("scroll_view");
+  if (!this.canvas.getContext) {
     alert('Canvas not supported, will not be able to view scroll');
     return;
   }
 
   this.addEventListeners();
+}
 
+com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function() {
+  var canvas = this.canvas;
+  var $window = this.$window;
   canvas.addEventListener('click', event => {
     // event.preventDefault();
     this.saveSelected();
@@ -105,7 +91,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     this.x = x;
     this.y = y;
     this.dialogStyle = {top: $window.visualViewport.pageTop - 20};
-    $scope.$apply();
+    this.$scope.$apply();
     this.drawScroll();
   });
 
@@ -205,7 +191,24 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     }
   });
 
-  this.canvas = canvas;
+  var letterCanvas = document.getElementById("letters");
+  letterCanvas.addEventListener('click', event => {
+    this.saveSelected();
+
+    var rect = letterCanvas.getBoundingClientRect();
+    var x = event.x - rect.left,
+        y = event.y - rect.top;
+
+    for (var b = 0; b < this.letterBoxes.length; b++)  {
+      var letterBox = this.letterBoxes[b];
+      var byLCoords = letterBox._byLetterCoords;
+      if (byLCoords.x1 < x && byLCoords.x2 > x && byLCoords.y1 < y && byLCoords.y2 > y) {
+        this.selectedBox = letterBox;
+        this.drawScroll();
+        return;
+      }
+    }
+  });
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
@@ -241,27 +244,6 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
       this.addLetterStat(letterBox);
     });
   }
-}
-
-com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function() {
-  var letterCanvas = document.getElementById("letters");
-  letterCanvas.addEventListener('click', event => {
-    this.saveSelected();
-
-    var rect = letterCanvas.getBoundingClientRect();
-    var x = event.x - rect.left,
-        y = event.y - rect.top;
-
-    for (var b = 0; b < this.letterBoxes.length; b++)  {
-      var letterBox = this.letterBoxes[b];
-      var byLCoords = letterBox._byLetterCoords;
-      if (byLCoords.x1 < x && byLCoords.x2 > x && byLCoords.y1 < y && byLCoords.y2 > y) {
-        this.selectedBox = letterBox;
-        this.drawScroll();
-        return;
-      }
-    }
-  });
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.setSelectedTab = function(tab) {

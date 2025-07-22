@@ -91,6 +91,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 						CalendarValidatorService.class,
 						CommandmentService.class,
 						LetterBoxService.class,
+						FamilyTreeNodeService.class,
 						FileService.class,
 						HighScoreService.class,
 						InterlinearService.class,

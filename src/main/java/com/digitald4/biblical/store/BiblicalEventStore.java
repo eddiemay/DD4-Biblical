@@ -7,11 +7,15 @@ import static java.util.Comparator.reverseOrder;
 
 import com.digitald4.biblical.model.BiblicalEvent;
 import com.digitald4.biblical.model.BiblicalEvent.Dependency.Relationship;
+import com.digitald4.biblical.model.FamilyTreeNode;
 import com.digitald4.biblical.util.ScriptureMarkupProcessor;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.GenericStore;
 import com.digitald4.common.storage.Query;
+import com.digitald4.common.storage.Query.Filter;
+import com.digitald4.common.storage.Transaction.Op;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
@@ -22,11 +26,13 @@ import java.util.function.UnaryOperator;
 
 public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
   private final ScriptureMarkupProcessor scriptureMarkupProcessor;
+  private final FamilyTreeNodeStore familyTreeNodeStore;
   @Inject
-  public BiblicalEventStore(
-      Provider<DAO> daoProvider, ScriptureMarkupProcessor scriptureMarkupProcessor) {
+  public BiblicalEventStore(Provider<DAO> daoProvider,
+      ScriptureMarkupProcessor scriptureMarkupProcessor, FamilyTreeNodeStore familyTreeNodeStore) {
     super(BiblicalEvent.class, daoProvider);
     this.scriptureMarkupProcessor = scriptureMarkupProcessor;
+    this.familyTreeNodeStore = familyTreeNodeStore;
   }
 
   public ImmutableList<BiblicalEvent> getAll() {
@@ -64,70 +70,46 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
         .collect(toImmutableList());
   }
 
-  @Override
-  public BiblicalEvent create(BiblicalEvent biblicalEvent) {
-    return super.create(preprocess(biblicalEvent));
-  }
-
-  @Override
-  public ImmutableList<BiblicalEvent> create(Iterable<BiblicalEvent> entities) {
-    return super.create(stream(entities).map(this::preprocess).collect(toImmutableList()));
-  }
-
-  @Override
-  public BiblicalEvent update(Long id, UnaryOperator<BiblicalEvent> updater) {
-    AtomicBoolean timesChanged = new AtomicBoolean();
-    BiblicalEvent result = super.update(
-        id,
-        current -> {
-          BiblicalEvent updated = preprocess(updater.apply(current));
-          if (Objects.equals(id, updated.getDepEventId())) {
-            throw new DD4StorageException("Dependent Loop detected", DD4StorageException.ErrorCode.BAD_REQUEST);
-          }
-          timesChanged.set(
-              updated.getYear() != current.getYear()
-                  || !Objects.equals(updated.getEndYear(), current.getEndYear()));
-          return updated;
-        });
-
-    if (timesChanged.get()) {
-      updateDependents(result);
-    }
-
-    return result;
-  }
-
-  public void updateDependents(BiblicalEvent parentEvent) {
-    list(Query.forList().setFilters(Query.Filter.of("depEventId", parentEvent.getId()))).getItems()
-        .forEach(event -> {
-          int startYear = event.getYear();
-          int endYear = event.getEndYear();
-          BiblicalEvent updated = updateYears(event, parentEvent);
-          if (startYear != updated.getYear() || endYear != updated.getEndYear()) {
-            super.update(event.getId(), current -> updated);
-            updateDependents(updated);
-          }
-        });
-  }
-
-  @Override
-  public ImmutableList<BiblicalEvent> update(Iterable<Long> ids, UnaryOperator<BiblicalEvent> updater) {
-    return stream(ids).map(id -> update(id, updater)).collect(toImmutableList());
-  }
-
   public ImmutableList<BiblicalEvent> migrate() {
     return update(
         list(Query.forList()).getItems().stream().map(BiblicalEvent::getId).collect(toImmutableList()),
         UnaryOperator.identity());
   }
 
-  public BiblicalEvent preprocess(BiblicalEvent event) {
+  @Override
+  protected Op<BiblicalEvent> preprocess(Op<BiblicalEvent> op) {
+    preprocess(op.getEntity());
+    return op;
+  }
+
+  @VisibleForTesting BiblicalEvent preprocess(BiblicalEvent event) {
     return updateYears(
         event.setSummary(scriptureMarkupProcessor.replaceScriptures(event.getSummary())),
         event.getDepEventId() != null ? get(event.getDepEventId()) : null);
   }
 
-  private static BiblicalEvent updateYears(BiblicalEvent event, BiblicalEvent parentEvent) {
+  @Override
+  protected Op<BiblicalEvent> postprocess(Op<BiblicalEvent> op) {
+    var parentEvent = op.getEntity();
+    var start = op.getCurrent();
+    if (parentEvent.getYear() != start.getYear() || parentEvent.getEndYear() != start.getEndYear()) {
+      list(Query.forList(Filter.of("depEventId", parentEvent.getId()))).getItems()
+          .forEach(event -> {
+            int startYear = event.getYear();
+            int endYear = event.getEndYear();
+            BiblicalEvent updated = updateYears(event, parentEvent);
+            if (startYear != updated.getYear() || endYear != updated.getEndYear()) {
+              update(event.getId(), current -> updated);
+            }
+          });
+      familyTreeNodeStore.migrate(familyTreeNodeStore.list(
+          Query.forList(Filter.of("eventId", parentEvent.getId()))).getItems());
+    }
+    return op;
+  }
+
+  @VisibleForTesting
+  static BiblicalEvent updateYears(BiblicalEvent event, BiblicalEvent parentEvent) {
     int offsetYears = (event.getOffset() == null) ? 0 : event.getOffset().years();
     int duration = (event.getDuration() == null) ? 0 : event.getDuration().years();
     int startYear = offsetYears;

@@ -52,6 +52,9 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .service('commandmentService', function(apiConnector) {
     return new com.digitald4.common.JSONService('commandment', apiConnector)
   })
+  .service('familyTreeNodeService', function(apiConnector) {
+    return new com.digitald4.common.JSONService('familyTreeNode', apiConnector)
+  })
   .service('highScoreService', function(apiConnector) {
     var highScoreService = new com.digitald4.common.JSONService('highscore', apiConnector);
     highScoreService.list = function(game, config, pageSize, pageToken, success, error) {

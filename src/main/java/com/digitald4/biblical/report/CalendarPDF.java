@@ -245,7 +245,7 @@ public class CalendarPDF extends PDFReport {
     fileDAO.saveToFile(); */
 
     Company company = new Company().setName("Mackabee Ministries");
-    BiblicalEventStore biblicalEventStore = new BiblicalEventStore(() -> fileDAO, null);
+    BiblicalEventStore biblicalEventStore = new BiblicalEventStore(() -> fileDAO, null, null);
     byte[] bytes = new CalendarPDF(() -> company, biblicalEventStore).createPDF(2024).toByteArray();
 
     BufferedOutputStream output = new BufferedOutputStream(Files.newOutputStream(Paths.get("data/Calendar.pdf")));

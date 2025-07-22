@@ -21,7 +21,7 @@ public class BiblicalEvent extends ModelObject<Long> {
   private Duration offset;
   private int year;
   private Duration duration;
-  private Integer endYear;
+  private int endYear;
 
   public BiblicalEvent setId(Long id) {
     super.setId(id);
@@ -114,14 +114,14 @@ public class BiblicalEvent extends ModelObject<Long> {
     return this;
   }
 
-  public Integer getEndYear() {
-    if (endYear == null) {
+  public int getEndYear() {
+    if (endYear == 0) {
       return add(getYear(), getDuration());
     }
     return endYear;
   }
 
-  public BiblicalEvent setEndYear(Integer endYear) {
+  public BiblicalEvent setEndYear(int endYear) {
     this.endYear = endYear;
     return this;
   }

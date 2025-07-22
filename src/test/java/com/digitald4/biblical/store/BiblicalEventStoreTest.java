@@ -11,6 +11,7 @@ import com.digitald4.biblical.model.BiblicalEvent.Dependency.Relationship;
 import com.digitald4.biblical.model.BiblicalEvent.Duration;
 import com.digitald4.biblical.util.ScriptureMarkupProcessor;
 import com.digitald4.common.storage.DAO;
+import com.digitald4.common.storage.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,8 +22,8 @@ public class BiblicalEventStoreTest {
 
   @Before
   public void setup() {
-    biblicalEventStore = new BiblicalEventStore(() -> dao, SCRIPTURE_MARKUP_PROCESSOR);
-    when(dao.persist(any())).thenAnswer(i -> i.getArgument(0));
+    biblicalEventStore = new BiblicalEventStore(() -> dao, SCRIPTURE_MARKUP_PROCESSOR, null);
+    when(dao.persist(any())).thenAnswer(i -> i.getArgument(0, Transaction.class).prePersist());
     // when(dao.create(any(ImmutableList.class))).thenAnswer(i -> i.getArgumentAt(0, ImmutableList.class));
   }
 

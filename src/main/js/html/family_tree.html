@@ -1,0 +1,103 @@
+<section class="grid_12">
+  <div class="block-border">
+    <div class="block-content form">
+      <h1>Family Tree</h1>
+      <div class="block-content form">
+        <button data-ng-click="$ctrl.saveAll()">Save</button>
+        <div style="max-height: 750px;max-width:100%;overflow: scroll;">
+          <canvas id="family_canvas" width="{{$ctrl.canvasWidth}}" height="{{$ctrl.canvasHeight}}"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View node dialog start -->
+  <div data-ng-if="$ctrl.viewDialogShown" id="eventModal" style="display: block;">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li>
+          <a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+            <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+          </a>
+        </li>
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
+          <a href="" data-ng-click="$ctrl.showEditDialog($ctrl.event)" title="Edit Event">Edit</a>
+        </li>
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
+          <a href="" data-ng-click="$ctrl.showAddDialog($ctrl.event.id)" title="Edit Event">Add Successor</a>
+        </li>
+      </ul>
+      <div class="block-content form">
+        <h2>{{$ctrl.event.display}}</h2>
+        <div data-bind-html-compile="$ctrl.event.summary"></div>
+        <div class="columns">
+          <div class="colx2-left">
+            <label>Version</label>
+            <select data-ng-model="$ctrl.globalData.scriptureVersion" data-ng-change="$ctrl.scriptureVersionChanged()"
+                    data-ng-options="version for version in $ctrl.globalData.scriptureVersions"></select>
+          </div>
+          <button class="float-right" data-ng-click="$ctrl.closeDialog()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- View node dialog end -->
+
+  <!-- Edit note dialog start -->
+  <div data-ng-if="$ctrl.editDialogShown" id="editModal" style="display: block;">
+    <div class="modal-window block-border">
+      <ul class="action-tabs right">
+        <li><a href="" data-ng-click="$ctrl.closeDialog()" title="Close window">
+          <img src="images/icons/fugue/cross-circle.png" width="16" height="16" alt="Close window">
+        </a></li>
+      </ul>
+      <div class="block-content form">
+        <div class="columns">
+          <label>Name</label>
+          <input type="text" data-ng-model="$ctrl.editTreeNode.name" class="full-width">
+          <input type="checkbox" data-ng-model="$ctrl.editTreeNode.female">Female
+        </div>
+        <div class="columns">
+          <label>Father</label>
+          <select data-ng-model="$ctrl.editTreeNode.fatherId"
+                  data-ng-options="treeNode.id as treeNode.name for treeNode in $ctrl.familyTreeNodes | filter: {female: '!true'} | orderBy:'name'">
+          </select>
+          <input type="checkbox" data-ng-model="$ctrl.editTreeNode.indirect">Indirect
+        </div>
+        <div class="columns">
+          <label>Mother</label>
+          <select data-ng-model="$ctrl.editTreeNode.motherId"
+                  data-ng-options="treeNode.id as treeNode.name for treeNode in $ctrl.familyTreeNodes | filter: {female: 'true'} | orderBy:'name'">
+          </select>
+        </div>
+        <div class="columns" data-ng-show="$ctrl.editTreeNode.female">
+          <label>Husband</label>
+          <select data-ng-model="$ctrl.editTreeNode.husbandId"
+                  data-ng-options="treeNode.id as treeNode.name for treeNode in $ctrl.familyTreeNodes | filter: {female: '!true'} | orderBy:'name'">
+          </select>
+        </div>
+        <div class="columns">
+          <label>Timeline Event</label>
+          <select data-ng-model="$ctrl.editTreeNode.eventId"
+                  data-ng-options="event.id as event.title for event in $ctrl.allEvents">
+          </select>
+        </div>
+        <div class="columns">
+          <label>Summary</label>
+          <textarea data-ng-model="$ctrl.editTreeNode.summary" rows="2" class="full-width"></textarea>
+        </div>
+        <div class="columns">
+          <div class="colx2-left">
+            <button data-ng-click="$ctrl.closeDialog()">Cancel</button>
+          </div>
+          <div class="colx2-right">
+            <button data-ng-if="$ctrl.editTreeNode.id" data-ng-click="$ctrl.saveSelected()">Save</button>
+            <button data-ng-if="!$ctrl.editTreeNode.id" data-ng-click="$ctrl.saveSelected()">Create</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Edit node dialog end -->
+</section>

@@ -28,6 +28,10 @@ com.digitald4.biblical.router = function($routeProvider) {
 			controller: com.digitald4.biblical.TimelineCtrl,
 			controllerAs: '$ctrl',
 			templateUrl: 'js/html/timeline.html'
+		}).when('/family_tree', {
+			controller: com.digitald4.biblical.FamilyTreeCtrl,
+			controllerAs: '$ctrl',
+			templateUrl: 'js/html/family_tree.html'
 		}).when('/games', {
 			controller: com.digitald4.biblical.GamesCtrl,
 			controllerAs: '$ctrl',
