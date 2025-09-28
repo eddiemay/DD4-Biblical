@@ -8,9 +8,10 @@
 {"translation":"s","root":"ተ","tokenType":"SUFFIX_ONLY"}
 {"translation":"the ","root":"አ","tokenType":"PREFIX_ONLY"}
 {"translation":"to cause ","root":"ኸ","tokenType":"PREFIX"}
-{"translation":" me","root":"የ","tokenType":"SUFFIX_ONLY"}
+{"translation":"he ","root":"የ","tokenType":"PREFIX","asSuffix":" me"}
 {"translation":"in ","root":"በ","tokenType":"PREFIX_ONLY"}
 {"translation":" of them","root":"መ","tokenType":"SUFFIX"}
+{"translation":" them","root":"አለመ","tokenType":"SUFFIX"}
 {"translation":"that which ","root":"ዘ","tokenType":"PREFIX"}
 {"translation":" exist","root":"ወነ","tokenType":"SUFFIX"}
 {"translation":" it is","root":"አየ","tokenType":"SUFFIX"}
@@ -21,3 +22,5 @@
 {"translation":" of he","root":"ረ","tokenType":"SUFFIX"}
 {"translation":"for ","root":"ለ","tokenType":"PREFIX_ONLY"}
 {"translation":"he ","root":"ነሰ","tokenType":"PREFIX"}
+{"translation":":","root":"፣","tokenType":"SUFFIX"}
+{"translation":"and ","root":"ወ","tokenType":"PREFIX"}

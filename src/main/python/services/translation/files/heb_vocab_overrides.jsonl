@@ -118,6 +118,7 @@
 {"strongsId":"H1647","root":"גרשומ","translation":"Gershom"}
 {"strongsId":"H1710","root":"דגת","translation":"fish"}
 {"strongsId":"H1730","root":"דד","translation":"beloved"}
+{"strongsId":"H1732","root":"דויד","translation":"David"}
 {"strongsId":"H1787","root":"דשונ","translation":"Dishon"}
 {"strongsId":"H1814","root":"דליק","translation":"pursue"}
 {"strongsId":"H1957","root":"הזה","translation":"this"}
@@ -151,10 +152,12 @@
 {"strongsId":"H2232","root":"זריע","translation":"sowing"}
 {"strongsId":"H2232","root":"זורע","translation":"sow"}
 {"strongsId":"H2236","root":"זורק","translation":"sprinkled"}
+{"strongsId":"H2280","root":"חבוש","translation":"saddled"}
 {"strongsId":"H2282","root":"חוג","translation":"feast"}
 {"strongsId":"H2290","root":"חגרה","translation":"covering"}
 {"strongsId":"H2296","root":"חגר","translation":"belt"}
 {"strongsId":"H2296","root":"חגור","translation":"belt"}
+{"strongsId":"H2320","root":"חדש","translation":"month"}
 {"strongsId":"H2332","root":"חוה","translation":"Chawah (Eve)"}
 {"strongsId":"H2356","root":"חיר","translation":"cave"}
 {"strongsId":"H2388","root":"חזיק","translation":"strength"}
@@ -180,6 +183,7 @@
 {"strongsId":"H2729","root":"חריד","translation":"fearing"}
 {"strongsId":"H2834","root":"חשופ","translation":"uncovered"}
 {"strongsId":"H2856","root":"חת","translation":"seal"}
+{"strongsId":"H2859","root":"חותנ","translation":"in-law"}
 {"strongsId":"H2873","root":"טבוח","translation":"killed"}
 {"strongsId":"H2883","root":"טובע","translation":"sunk"}
 {"strongsId":"H2903","root":"טטפת","translation":"frontlets"}
@@ -601,6 +605,7 @@
 {"strongsId":"H8130","root":"שונא","translation":"hater"}
 {"strongsId":"H8141","root":"שנה","translation":"year"}
 {"strongsId":"H8141","root":"שנימ","translation":"years"}
+** Need this to not peg Strongs H1316 Bashan
 {"strongsId":"H8141","root":"בשנה","translation":"in year"}
 {"strongsId":"H8147","root":"שני","translation":"two"}
 {"strongsId":"H8147","root":"שנימ","translation":"twos"}

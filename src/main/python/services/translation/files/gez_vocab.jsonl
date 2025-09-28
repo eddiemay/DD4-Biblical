@@ -28,6 +28,7 @@
 {"translation":"inside","root":"ወሸጠ"}
 {"translation":"gate","root":"ደገተተ"}
 {"translation":"exist","root":"ነበ"}
+{"translation":"dwell","root":"ነበረ"}
 {"translation":"stranger","root":"ሰደተኘ"}
 {"translation":"some","root":"ገለ"}
 {"translation":"through","root":"አኰ"}
@@ -38,9 +39,9 @@
 {"translation":"as this","root":"ኸመዘ"}
 {"translation":"as this","root":"ከመዘ"}
 {"translation":"said","root":"አለ"}
-{"translation":"said","root":"በለ"}
+{"translation":"he said","root":"በለ"}
 {"translation":"he spoke","root":"ተዘረበ"}
-{"translation":"of","root":"ከበ"}
+{"translation":"out of","root":"ከበ"}
 {"translation":"I","root":"አነ"}
 {"translation":"I brought out","root":"ዘወጸአከ"}
 {"translation":"slavery","root":"በረነተ"}
@@ -57,11 +58,11 @@
 {"translation":"beginning","root":"መጀመረ"}
 {"translation":"high","root":"ለዐለ"}
 {"translation":"existing","root":"ዘለወ"}
-{"translation":"existing","root":"ዘለ"}
+{"translation":"desire","root":"ዘለ"}
 {"translation":"existing","root":"ተከኸ"}
 {"translation":"down","root":"ተሐተ"}
 {"translation":"from the","root":"ኸበ"}
-{"translation":"from","root":"ከአ"}
+{"translation":"said","root":"ከአ"}
 {"translation":"water","root":"መየ"}
 {"translation":"carve","root":"መሰለ"}
 {"translation":"image","root":"ሰአለ"}
@@ -128,8 +129,11 @@
 {"translation":"money","root":"ገነዘበ"}
 {"translation":"all","root":"ኰለ"}
 {"translation":"people","root":"ሀዘበ"}
+{"translation":"nation","root":"ሀዘበተ"}
 {"translation":"sound","root":"ጐደ"}
 {"translation":"sound","root":"ደሀየ"}
+{"translation":"praise","root":"መሰገነ"}
+{"translation":"rejoice","root":"ደሰወ"}
 {"translation":"intensitie","root":"ሀለሀለ"}
 {"translation":"mountain","root":"ኸረ"}
 {"translation":"see","root":"ረአ"}
@@ -137,13 +141,35 @@
 {"translation":"flood","root":"አየሀ"}
 {"translation":"came to be","root":"ኰነ"}
 {"translation":"took","root":"ወሰደ"}
-{"translation":"let","root":"የኸነ"}
+{"translation":"let it be","root":"የኸነ"}
 {"translation":"tribe","root":"ነገደ"}
 {"translation":"recorded","root":"ቘጸረ"}
 {"translation":"alter","root":"መሰወአ"}
 {"translation":"him","root":"አአ"}
 {"translation":"food","root":"በዐለ"}
 {"translation":"trembled","root":"አነቀጠቀጠ"}
+{"translation":"first born","root":"በዀረ"}
+{"translation":"release","root":"ሀለለ"}
+{"translation":"truth","root":"ሐቀ"}
+{"translation":"afflicted","root":"ጸገአ"}
+{"translation":"refuse","root":"ዐበ"}
+{"translation":"light","root":"በረሀነ"}
+{"translation":"it was","root":"ዀነ"}
+{"translation":"empty","root":"ጠረየነ"}
+{"translation":"darkness","root":"ጸለመተ"}
+{"translation":"abyss","root":"መዐመቐ"}
+{"translation":"spirit","root":"መነፈሰ"}
+{"translation":"hovering","root":"የዘመበ"}
+{"translation":"evening","root":"መሸተ"}
+{"translation":"morning","root":"በገሐተወነ"}
+{"translation":"he called","root":"አወጸአለ"}
+{"translation":"night","root":"ለየተ"}
+{"translation":"good","root":"ጸበቐ"}
+{"translation":"divided","root":"ፈለየ"}
+{"translation":"separate","root":"ዘፈለ"}
+{"translation":"firmament","root":"ጠፈረ"}
+{"translation":"between","root":"መነገ"}
+{"translation":"likewise","root":"ከመአወነ"}
 *** Proper names ***
 {"translation":"Adam","root":"አደመ"}
 {"translation":"Seth","root":"ሰተ"}
@@ -189,13 +215,21 @@
 {"translation":"Abraham","root":"አበረሀመ"}
 {"translation":"Isaac","root":"የሰሀቀ"}
 {"translation":"Jacob","root":"የአቀበ"}
+{"translation":"Leah","root":"ለየ"}
 {"translation":"Ruban","root":"ረበለ"}
+{"translation":"Simeon","root":"ሰመአነ"}
+{"translation":"Levi","root":"ለወ"}
+{"translation":"Yuda","root":"የሀደ"}
+{"translation":"Issachar","root":"የሰከረ"}
+{"translation":"Zebulun of him","root":"ዘበለነነ"}
 {"translation":"Yasharael","root":"አሰረአለ"}
 {"translation":"Mosheh","root":"መሰ"}
 {"translation":"Aaron","root":"አረነ"}
 *** Numbers ***
-{"translation":"one","root":"ሐደ"}.
-{"translation":"two","root":"ከለተ"}.
+{"translation":"first","root":"ሐነተ"}
+{"translation":"one","root":"ሐደ"}
+{"translation":"two","root":"ከለተ"}
+{"translation":"second","root":"ከለአየ"}
 {"translation":"three","root":"ሰለስተ"}
 {"translation":"four","root":"አረበዐተ"}
 {"translation":"five","root":"ሐመሸተ"}
