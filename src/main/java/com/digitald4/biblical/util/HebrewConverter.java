@@ -162,7 +162,7 @@ public class HebrewConverter {
           }
         })
         .filter(c -> c != '׀' && c != '[' && c != ']' && c != '(' && c != ')' && c != '‸' && c != ';' && c != '·'
-            && c != '፤' && c != ',' && c != '.' && c != '፡' && c != '።' && c != '፥' && c != '፣' && !foundEnd.get())
+            && c != '፤' && c != ',' && c != '.' && c != '፡' && c != '።' && c != '፥' && c != '፣' && c != '፧' && !foundEnd.get())
         .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
   }
 
@@ -243,7 +243,7 @@ public class HebrewConverter {
     for (int i = 0; i < normalized.length(); i++) {
       char c = normalized.charAt(i);
       // Check if the character is Ethiopia Geez.
-      if (c > 0x1200 && c < 0x1347 /* && c != 'ማ' */) {
+      if (c > 0x1200 && c < 0x137F /* && c != 'ማ' */) {
         // Calculate the base consonant by subtracting the vowel offset
         c -= ((c - 0x1200) % 8);
       }
