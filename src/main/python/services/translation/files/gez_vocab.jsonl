@@ -198,7 +198,6 @@
 {"translation":"as it is","root":"ከመአ"}
 {"translation":"clean","root":"ቐጸ"}
 {"translation":"hair","root":"ሰዐረ"}
-{"translation":"fruit","root":"ፍረ"}
 {"translation":"fruit","root":"ፈረ"}
 {"translation":"flock","root":"ዘበነ"}
 {"translation":"great","root":"ዐበየ"}
@@ -207,9 +206,9 @@
 {"translation":"behold","root":"አነሀ"}
 {"translation":"many","root":"በዘሐ"}
 {"translation":"life","root":"ሀየወ"}
-{"translation":"soul","root":"ነፍሰ"}
-{"translation":"birds","root":"ዐወፍ"}
-{"translation":"bird","root":"ከነፊ"}
+{"translation":"soul","root":"ነፈሰ"}
+{"translation":"birds","root":"ዐወፈ"}
+{"translation":"bird","root":"ከነፈ"}
 {"translation":"fish","root":"ነዐሰ"}
 {"translation":"host","root":"ሰረወ"}
 {"translation":"complete","root":"ፈጸ"}
@@ -224,7 +223,7 @@
 {"translation":"far","root":"ሐቐ"}
 {"translation":"weak","root":"ደወ"}
 {"translation":"death","root":"መወተ"}
-{"translation":"fear","root":"ፍረሀ"}
+{"translation":"fear","root":"ፈረሀ"}
 {"translation":"silver","root":"በረረነ"}
 {"translation":"gold","root":"ወረቀነ"}
 {"translation":"upon","root":"ለዐለአ"}
