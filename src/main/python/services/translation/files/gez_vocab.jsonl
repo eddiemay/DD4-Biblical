@@ -1,13 +1,19 @@
 {"translation":"day","root":"መዐለ"}
+{"translation":"appointed time","root":"መዐለተተ"}
 {"translation":"day","root":"ዐለተ"}
 {"translation":"Shabbat","root":"ሰነበተ"}
 {"translation":"holy set-apart","root":"ከተቀደሰ"}
 {"translation":"set-apart","root":"ቀደሰ"}
 {"translation":"blessed","root":"በረኸ"}
+{"translation":"bless","root":"በረሀ"}
+{"translation":"blessing","root":"መበረሀ"}
 {"translation":"remember","root":"ዘከረ"}
 {"translation":"work","root":"ዐየ"}
+{"translation":"kind","root":"ዐየነ"}
 {"translation":"action","root":"ተገበረከ"}
 {"translation":"all","root":"ዀለ"}
+{"translation":"all","root":"ኸለ"}
+{"translation":"all","root":"ከለ"}
 {"translation":"do","root":"ገበረ"}
 ** {"translation":"that","root":"አተ"}
 {"translation":"the seventh","root":"ሰበዐየተ"}
@@ -28,11 +34,20 @@
 {"translation":"inside","root":"ወሸጠ"}
 {"translation":"gate","root":"ደገተተ"}
 {"translation":"exist","root":"ነበ"}
+{"translation":"exist","root":"ኸወነ"}
+{"translation":"draw near","root":"ቐረበ"}
+{"translation":"come","root":"መጸ"}
+{"translation":"stand","root":"ቈመ"}
+{"translation":"darkness","root":"ጠቐ"}
 {"translation":"dwell","root":"ነበረ"}
 {"translation":"stranger","root":"ሰደተኘ"}
 {"translation":"some","root":"ገለ"}
 {"translation":"through","root":"አኰ"}
 {"translation":"animal","root":"መለ"}
+{"translation":"creature","root":"ነሰሰ"}
+{"translation":"beast","root":"አረወ"}
+{"translation":"creep","root":"ለመመ"}
+** {"translation":"live stock","root":"ለመመተ"}
 {"translation":"word","root":"ቐለ"}
 {"translation":"word","root":"ነገረ"}
 {"translation":"this","root":"አዘ"}
@@ -40,25 +55,34 @@
 {"translation":"as this","root":"ከመዘ"}
 {"translation":"said","root":"አለ"}
 {"translation":"he said","root":"በለ"}
+{"translation":"they said","root":"በለወ"}
 {"translation":"he spoke","root":"ተዘረበ"}
+{"translation":"speak","root":"ዘረበ"}
+{"translation":"speak","root":"ነጀረ"}
+{"translation":"swarming","root":"ወነጀረጀረ"}
 {"translation":"out of","root":"ከበ"}
 {"translation":"I","root":"አነ"}
 {"translation":"I brought out","root":"ዘወጸአከ"}
+{"translation":"go out","root":"ወጸአ"}
+{"translation":"he called","root":"አወጸአለ"}
 {"translation":"slavery","root":"በረነተ"}
 {"translation":"house","root":"በተ"}
 {"translation":"land","root":"መደረ"}
+{"translation":"soil","root":"ረተ"}
 {"translation":"other","root":"ከለአ"}
 {"translation":"before","root":"ቀደመ"}
 {"translation":"there is no","root":"አየሀለወ"}
 {"translation":"between","root":"መንጎ"}
 {"translation":"woman","root":"ሰበይት"}
 {"translation":"he","root":"ንሱ"}
+{"translation":"name","root":"ሰመ"}
 {"translation":"sky","root":"ሰመየ"}
 {"translation":"created","root":"ፈጠረ"}
 {"translation":"beginning","root":"መጀመረ"}
 {"translation":"high","root":"ለዐለ"}
 {"translation":"existing","root":"ዘለወ"}
 {"translation":"desire","root":"ዘለ"}
+{"translation":"chosen one","root":"መፈለጠ"}
 {"translation":"existing","root":"ተከኸ"}
 {"translation":"down","root":"ተሐተ"}
 {"translation":"from the","root":"ኸበ"}
@@ -66,6 +90,7 @@
 {"translation":"water","root":"መየ"}
 {"translation":"carve","root":"መሰለ"}
 {"translation":"image","root":"ሰአለ"}
+{"translation":"image","root":"መለከዐ"}
 {"translation":"anything","root":"ዘበለ"}
 {"translation":"for","root":"ነአ"}
 {"translation":"sea","root":"በሐረ"}
@@ -85,6 +110,7 @@
 {"translation":"generation","root":"ወለደ"}
 {"translation":"bow down","root":"ሰገደለ"}
 {"translation":"serve","root":"ገለገለ"}
+{"translation":"worship","root":"ዐዘበ"}
 {"translation":"jealous","root":"ቀነአ"}
 {"translation":"sin","root":"ሐጠአ"}
 {"translation":"sin","root":"ሐጠየ"}
@@ -96,7 +122,6 @@
 {"translation":"until","root":"ኸሰዐ"}
 {"translation":"until","root":"ከሰዐ"}
 {"translation":"third","root":"ሰለሰየ"}
-{"translation":"fourth","root":"ረበዐየ"}
 {"translation":"who punishes","root":"ዘቐጸዐ"}
 {"translation":"visiting","root":"ነዘጸለአ"}
 {"translation":"commandment","root":"ተአዘዘ"}
@@ -106,8 +131,6 @@
 {"translation":"thousand","root":"አሸሐ"}
 {"translation":"keep","root":"ሐለ"}
 {"translation":"decide","root":"ፈተ"}
-{"translation":"name","root":"መ"}
-{"translation":"his name","root":"ሰመ"}
 {"translation":"vain","root":"ኸነተ"}
 {"translation":"cut","root":"ቀጸ"}
 {"translation":"complete","root":"ሐደገ"}
@@ -162,15 +185,51 @@
 {"translation":"hovering","root":"የዘመበ"}
 {"translation":"evening","root":"መሸተ"}
 {"translation":"morning","root":"በገሐተወነ"}
-{"translation":"he called","root":"አወጸአለ"}
 {"translation":"night","root":"ለየተ"}
 {"translation":"good","root":"ጸበቐ"}
 {"translation":"divided","root":"ፈለየ"}
 {"translation":"separate","root":"ዘፈለ"}
 {"translation":"firmament","root":"ጠፈረ"}
 {"translation":"between","root":"መነገ"}
+{"translation":"like","root":"ከመ"}
+{"translation":"like","root":"ኸመ"}
 {"translation":"likewise","root":"ከመአወነ"}
+{"translation":"just as","root":"ከከመ"}
+{"translation":"as it is","root":"ከመአ"}
 {"translation":"clean","root":"ቐጸ"}
+{"translation":"hair","root":"ሰዐረ"}
+{"translation":"fruit","root":"ፍረ"}
+{"translation":"fruit","root":"ፈረ"}
+{"translation":"flock","root":"ዘበነ"}
+{"translation":"great","root":"ዐበየ"}
+{"translation":"lesser","root":"ነአሸተ"}
+{"translation":"bind","root":"ሰለጠ"}
+{"translation":"behold","root":"አነሀ"}
+{"translation":"many","root":"በዘሐ"}
+{"translation":"life","root":"ሀየወ"}
+{"translation":"soul","root":"ነፍሰ"}
+{"translation":"birds","root":"ዐወፍ"}
+{"translation":"bird","root":"ከነፊ"}
+{"translation":"fish","root":"ነዐሰ"}
+{"translation":"host","root":"ሰረወ"}
+{"translation":"complete","root":"ፈጸ"}
+{"translation":"because","root":"ሰለ"}
+{"translation":"man","root":"ሰበ"}
+{"translation":"union","root":"ባዕታ"}
+{"translation":"male","root":"በዐተየ"}
+{"translation":"female","root":"ነሰተየተ"}
+{"translation":"protect","root":"ሐመለ"}
+{"translation":"food","root":"መገበ"}
+{"translation":"afar","root":"ረሐቐ"}
+{"translation":"far","root":"ሐቐ"}
+{"translation":"weak","root":"ደወ"}
+{"translation":"death","root":"መወተ"}
+{"translation":"fear","root":"ፍረሀ"}
+{"translation":"silver","root":"በረረነ"}
+{"translation":"gold","root":"ወረቀነ"}
+{"translation":"upon","root":"ለዐለአ"}
+{"translation":"burnt offerings","root":"ዘሐረረ"}
+{"translation":"sheep","root":"በገዐ"}
 *** Proper names ***
 {"translation":"Adam","root":"አደመ"}
 {"translation":"Seth","root":"ሰተ"}
@@ -230,11 +289,15 @@
 {"translation":"first","root":"ሐነተ"}
 {"translation":"one","root":"ሐደ"}
 {"translation":"two","root":"ከለተ"}
+{"translation":"two","root":"ኸለተ"}
 {"translation":"second","root":"ከለአየ"}
 {"translation":"three","root":"ሰለስተ"}
 {"translation":"four","root":"አረበዐተ"}
+{"translation":"fourth","root":"ረበዐየ"}
 {"translation":"five","root":"ሐመሸተ"}
+{"translation":"fifth","root":"ሐመሰየ"}
 {"translation":"six","root":"ሸደሸተ"}
+{"translation":"sixth","root":"ሰደሰየ"}
 {"translation":"seven","root":"ሸበዐተ"}
 {"translation":"eight","root":"ሸመነተ"}
 {"translation":"nine","root":"ተሸዐተ"}

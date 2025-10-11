@@ -1,13 +1,15 @@
 var FT_NODE_WIDTH = 100;
 var FT_NODE_HEIGHT = 50;
-com.digitald4.biblical.FamilyTreeCtrl = function($http, $scope, $window, familyTreeNodeService, biblicalEventService) {
+com.digitald4.biblical.FamilyTreeCtrl = function($http, $scope, $window, globalData, familyTreeNodeService, biblicalEventService) {
   this.$http = $http;
   this.$scope = $scope;
   this.$window = $window;
+  this.globalData = globalData;
+  this.globalData.scriptureVersion = globalData.scriptureVersion || 'ISR';
   this.familyTreeNodeService = familyTreeNodeService;
   this.biblicalEventService = biblicalEventService;
-  this.canvasWidth = 4096;
-  this.canvasHeight = 8192;
+  this.canvasWidth = 8192;
+  this.canvasHeight = 16384;
 
   this.canvas = document.getElementById("family_canvas");
   if (!this.canvas.getContext) {
@@ -36,7 +38,7 @@ com.digitald4.biblical.FamilyTreeCtrl.prototype.addEventListeners = function() {
           if (this.selectedNodes.indexOf(treeNode) == -1) {
             this.selectedNodes.push(treeNode);
           } else {
-            this.selectedNodes.splice(treeNode, 1);
+            this.selectedNodes.splice(this.selectedNodes.indexOf(treeNode), 1);
           }
         } else {
           this.selectedNodes = [treeNode];
@@ -53,28 +55,20 @@ com.digitald4.biblical.FamilyTreeCtrl.prototype.addEventListeners = function() {
     var x = event.x - rect.left,
         y = event.y - rect.top;
 
-    this.editTreeNode = undefined;
+    this.viewNode = this.editTreeNode = undefined;
     this.familyTreeNodes.forEach(treeNode => {
       if (treeNode.x - FT_NODE_WIDTH / 2 <= x && treeNode.x + FT_NODE_WIDTH / 2 >= x &&
           treeNode.y - FT_NODE_HEIGHT / 2 <= y && treeNode.y + FT_NODE_HEIGHT / 2 >= y) {
-        this.editTreeNode = treeNode;
+        this.viewNode = treeNode;
         this.drawScroll();
+        this.viewDialogShown = true;
       }
     });
 
-    if (!this.editTreeNode) {
-      this.editTreeNode = {x: x, y: y};
+    if (!this.viewNode) {
+      this.showEditDialog({x: x, y: y});
     }
 
-    if (!this.allEvents) {
-      this.biblicalEventService.listAll(response => {
-        this.allEvents = response.items;
-        this.allEvents.splice(0, 0, {id: undefined, title: ''});
-      });
-    }
-
-    this.editDialogShown = true;
-    this.dialogStyle = {top: $window.visualViewport.pageTop - 20};
     this.$scope.$apply();
   });
 
@@ -128,6 +122,30 @@ com.digitald4.biblical.FamilyTreeCtrl.prototype.refresh = function() {
   // this.img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/isaiah/columns/column_10_54.jpg`;
 }
 
+com.digitald4.biblical.FamilyTreeCtrl.prototype.addChild = function(parentNode) {
+  this.showEditDialog({x: parentNode.x, y: parentNode.y + FT_NODE_HEIGHT + 20,
+      fatherId: parentNode.female ? undefined : parentNode.id, motherId: parentNode.female ? parentNode.id : undefined,
+      summary: parentNode.summary});
+}
+
+com.digitald4.biblical.FamilyTreeCtrl.prototype.addSibling = function(siblingNode) {
+  this.showEditDialog({x: siblingNode.x + FT_NODE_WIDTH + 10, y: siblingNode.y,
+      fatherId: siblingNode.fatherId, motherId: siblingNode.motherId, summary: siblingNode.summary});
+}
+
+com.digitald4.biblical.FamilyTreeCtrl.prototype.showEditDialog = function(editNode) {
+  this.editTreeNode = editNode;
+  this.viewDialogShown = false;
+  this.editDialogShown = true;
+  this.dialogStyle = {top: this.$window.visualViewport.pageTop - 20};
+  if (!this.allEvents) {
+    this.biblicalEventService.listAll(response => {
+      this.allEvents = response.items;
+      this.allEvents.splice(0, 0, {id: undefined, title: ''});
+    });
+  }
+}
+
 com.digitald4.biblical.FamilyTreeCtrl.prototype.saveAll = function() {
   var modified = [];
   this.familyTreeNodes.forEach(treeNode => {
@@ -151,6 +169,12 @@ com.digitald4.biblical.FamilyTreeCtrl.prototype.saveAll = function() {
 com.digitald4.biblical.FamilyTreeCtrl.prototype.saveSelected = function() {
   var saveNode = this.editTreeNode;
   saveNode._state = 'saving';
+
+  if (!saveNode.id && saveNode.fatherId && !saveNode.indirect) {
+    // If we are creating a new entry and the father has been assigned.
+    // The child 20 pixels below the father.
+    saveNode.y = this.nodesById[saveNode.fatherId].y + FT_NODE_HEIGHT + 20;
+  }
   this.familyTreeNodeService.create(saveNode, result => {
     saveNode._state = undefined;
     if (!saveNode.id) {
@@ -171,6 +195,10 @@ com.digitald4.biblical.FamilyTreeCtrl.prototype.saveSelected = function() {
     notifyError(error);
     this.drawScroll();
   });
+}
+
+com.digitald4.biblical.FamilyTreeCtrl.prototype.scriptureVersionChanged = function() {
+  this.viewNode.summary = this.viewNode.summary + ' ';
 }
 
 com.digitald4.biblical.FamilyTreeCtrl.prototype.closeDialog = function() {

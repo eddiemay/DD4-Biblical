@@ -38,7 +38,7 @@ public class TokenWordStore {
   }
 
   public synchronized void init() {
-    if (tokenWordsByWord != null) {
+    if (tokenWordsByStrongsId != null) {
       return;
     }
 
@@ -95,7 +95,7 @@ public class TokenWordStore {
   }
 
   public ImmutableList<TokenWord> getOptions(String word) {
-    if (tokenWordsByWord == null) {
+    if (tokenWordsByStrongsId == null) {
       init();
     }
 
@@ -115,7 +115,7 @@ public class TokenWordStore {
   }
 
   public ImmutableCollection<TokenWord> getAll() {
-    if (tokenWordsByWord == null) {
+    if (tokenWordsByStrongsId == null) {
       init();
     }
 

@@ -21,15 +21,18 @@
           </a>
         </li>
         <li data-ng-if="appCtrl.isUserLoggedIn()">
-          <a href="" data-ng-click="$ctrl.showEditDialog($ctrl.event)" title="Edit Event">Edit</a>
+          <a href="" data-ng-click="$ctrl.showEditDialog($ctrl.viewNode)" title="Edit Event">Edit</a>
         </li>
         <li data-ng-if="appCtrl.isUserLoggedIn()">
-          <a href="" data-ng-click="$ctrl.showAddDialog($ctrl.event.id)" title="Edit Event">Add Successor</a>
+          <a href="" data-ng-click="$ctrl.addChild($ctrl.viewNode)" title="Add Successor">Add Successor</a>
+        </li>
+        <li data-ng-if="appCtrl.isUserLoggedIn()">
+          <a href="" data-ng-click="$ctrl.addSibling($ctrl.viewNode)" title="Add Sibling">Add Sibling</a>
         </li>
       </ul>
       <div class="block-content form">
-        <h2>{{$ctrl.event.display}}</h2>
-        <div data-bind-html-compile="$ctrl.event.summary"></div>
+        <h2>{{$ctrl.viewNode.name}}</h2>
+        <div data-bind-html-compile="$ctrl.viewNode.summary"></div>
         <div class="columns">
           <div class="colx2-left">
             <label>Version</label>

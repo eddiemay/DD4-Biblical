@@ -31,7 +31,7 @@ HolyDay.HOLY_DAYS = {
   ATONEMENT_DAY: new HolyDay('Atonement Day', 'atonement-day', date => date.getMonth() == 7 && date.getDay() == 10,
       'Leviticus 23:27-32'),
 
-  FESTIVAL_BOOTHS: new HolyDay('Festival of Booths', 'festival-booths',
+  FESTIVAL_SUKKOT: new HolyDay('Festival of Sukkot', 'festival-sukkot',
       date => date.getMonth() == 7 && date.getDay() >= 15 && date.getDay() <= 21, 'Leviticus 23:34-43'),
   SOLEMN_ASSEMBLY: new HolyDay('Solemn Day of Assembly', 'solemn-assembly',
       date => date.getMonth() == 7 && date.getDay() == (15 + 7), 'Leviticus 23:36'),

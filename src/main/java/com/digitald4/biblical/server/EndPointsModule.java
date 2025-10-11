@@ -105,7 +105,7 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 	@Provides
 	public static Iterable<TokenWord> tokenWordProvider() {
 		APIConnector apiConnector = new APIConnector(Constants.API_URL, Constants.API_VERSION, 100);
-		return Constants.VOCAB_FILES.stream()
+		return Constants.VOCAB_FILES.parallelStream()
 				.map(file -> String.format("http://translation-dot-dd4-biblical.appspot.com/files/%s", file))
 				.map(apiConnector::sendGet)
 				.flatMap(result -> stream(result.split("\n")))

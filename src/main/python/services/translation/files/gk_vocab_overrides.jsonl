@@ -1,8 +1,20 @@
+{"translation":"ing","root":"ς","tokenType":"SUFFIX_ONLY"}
 {"translation":"","root":"ν","tokenType":"SUFFIX_ONLY"}
+{"translation":"un","root":"α","tokenType":"PREFIX_ONLY"}
+{"translation":" of you","root":"εις","tokenType":"SUFFIX_ONLY"}
+{"translation":" of","root":"ειν","tokenType":"SUFFIX_ONLY"}
+{"translation":" of we","root":"ωμεν","tokenType":"SUFFIX_ONLY"}
+{"translation":" of he","root":"εν","tokenType":"SUFFIX_ONLY"}
+{"translation":" of him","root":"εσθαι","tokenType":"SUFFIX_ONLY"}
+{"translation":" of I","root":"ον","tokenType":"SUFFIX_ONLY"}
+{"translation":"of the","root":"της"}
+{"translation":" of","root":"ης","tokenType":"SUFFIX_ONLY"}
+{"translation":" of we","root":"οντες","tokenType":"SUFFIX_ONLY"}
 {"strongsId":"G0281","translation":"truly","root":"αμην"}
 {"strongsId":"G0305","translation":"he went up","root":"ανεβη"}
 {"strongsId":"G0444","translation":"men","root":"ανθρωπους"}
 {"strongsId":"G0455","translation":"opening","root":"ανοιξας"}
+{"strongsId":"G0565","translation":"go","root":"απελθ"}
 {"strongsId":"G0846","translation":"to him","root":"αυτω"}
 {"strongsId":"G0846","translation":"them","root":"αυτους"}
 {"strongsId":"G0846","translation":"them","root":"αυτων"}
@@ -13,6 +25,7 @@
 {"strongsId":"G1106","translation":"opinion","root":"γνωμη"}
 {"strongsId":"G1161","translation":"then","root":"δε"}
 {"strongsId":"G1161","translation":"now","root":"δ’"}
+{"strongsId":"G1163","translation":"necessary","root":"εδει"}
 {"strongsId":"G1321","translation":"teaching","root":"διδαξη"}
 {"strongsId":"G1321","translation":"taught","root":"εδιδασκεν"}
 {"strongsId":"G1380","translation":"think","root":"δοκω"}
@@ -22,14 +35,24 @@
 {"strongsId":"G1646","translation":"least","root":"ελαχιστων"}
 {"strongsId":"G1699","translation":"my","root":"εμην"}
 {"strongsId":"G1785","translation":"commandments","root":"εντολων"}
-{"strongsId":"G2064","translation":"I have come","root":"ηλθον"}
+{"strongsId":"G1859","translation":"feast","root":"εορτη"}
+{"strongsId":"G2064","translation":"come","root":"ηλθ"}
+{"strongsId":"G2090","translation":"prepare","root":"ετοιμασ"}
+{"strongsId":"G2219","translation":"leavened","root":"ζυμω"}
+{"strongsId":"G2309","translation":"want","root":"θελ"}
 {"strongsId":"G2316","translation":"God","root":"Θεον"}
 {"strongsId":"G2316","translation":"god","root":"Θεος"}
+{"strongsId":"G2380","translation":"kill","root":"θυ"}
+{"strongsId":"G2380","translation":"kill","root":"εθυ"}
+{"strongsId":"G2424","translation":"יהושע","root":"Ιησους"}
+{"strongsId":"G2424","translation":"יהושע","root":"Ιησου"}
 {"strongsId":"G2523","translation":"having sat down","root":"καθισαντος"}
 {"strongsId":"G2564","translation":"is called","root":"κληθησεται"}
 {"strongsId":"G2647","translation":"to abolish","root":"καταλυσαι"}
 {"strongsId":"G2816","translation":"will inherit","root":"κληρονομησουσιν"}
 {"strongsId":"G3004","translation":"saying","root":"λεγων"}
+{"strongsId":"G3004","translation":"saying","root":"λεγοντες"}
+{"strongsId":"G3004","translation":"said","root":"λεγουσιν"}
 {"strongsId":"G3089","translation":"shall break","root":"λυση"}
 {"strongsId":"G3101","translation":"disciples","root":"μαθηται"}
 {"strongsId":"G3107","translation":"blessed are","root":"μακάριοι"}
@@ -56,6 +79,9 @@
 {"strongsId":"G4160","translation":"shall keep","root":"ποιηση"}
 {"strongsId":"G4239","translation":"meek","root":"πραεις"}
 {"strongsId":"G4334","translation":"came","root":"προσηλθαν"}
+{"strongsId":"G4334","translation":"came","root":"προσηλθον"}
 {"strongsId":"G4396","translation":"prophets","root":"προφητας"}
+{"strongsId":"G4413","translation":"first","root":"πρωτη"}
 {"strongsId":"G4434","translation":"poor","root":"πτωχοι"}
 {"strongsId":"G4750","translation":"mouth","root":"στομα"}
+{"strongsId":"G5315","translation":"eat","root":"φαγ"}

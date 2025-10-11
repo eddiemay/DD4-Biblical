@@ -4,16 +4,16 @@ import com.digitald4.common.model.ModelObject;
 
 public class FamilyTreeNode extends ModelObject<Long> {
   private String name;
-  private Boolean female;
-  private StringBuilder summary;
   private String strongsId;
   private Long eventId;
   private Long fatherId;
   private Boolean indirect;
   private Long motherId;
   private Long husbandId;
+  private Boolean female;
   private int x;
   private int y;
+  private StringBuilder summary;
   private Integer birthYear;
   private Integer deathYear;
 
