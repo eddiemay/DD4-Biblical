@@ -163,13 +163,14 @@
 {"strongsId":"H2388","root":"חזיק","translation":"strength"}
 {"strongsId":"H2398","root":"חוטא","translation":"sinner"}
 {"strongsId":"H2416","root":"חיתו","translation":"his life"}
+{"strongsId":"H2421","root":"חיה","translation":"life"}
 {"strongsId":"H2490","root":"חלל","translation":"profame"}
 {"strongsId":"H2502","root":"חלוצ","translation":"armed"}
 {"strongsId":"H2502","root":"חלוצימ","translation":"army"}
-{"strongsId":"H2421","root":"חיה","translation":"life"}
 {"strongsId":"H2505","root":"חלק","translation":"portion"}
 {"strongsId":"H2505","root":"חליק","translation":"portioning"}
 {"strongsId":"H2522","root":"חולש","translation":"prostrator"}
+{"strongsId":"H2526","root":"חמ","translation":"Kam"}
 {"strongsId":"H2530","root":"חמוד","translation":"desired"}
 {"strongsId":"H2543","root":"חמר","translation":"donkey"}
 {"strongsId":"H2550","root":"חמול","translation":"pity"}
@@ -362,6 +363,7 @@
 {"strongsId":"H5265","root":"נסוע","translation":"journey"}
 {"strongsId":"H5265","root":"סע","translation":"set out"}
 {"strongsId":"H5301","root":"פח","translation":"blew"}
+{"strongsId":"H5303","root":"נפיל","translation":"fallen"}
 {"strongsId":"H5307","root":"פל","translation":"fall"}
 {"strongsId":"H5307","root":"פיל","translation":"falling"}
 {"strongsId":"H5307","root":"פול","translation":"fell"}
@@ -397,6 +399,7 @@
 {"strongsId":"H5462","root":"סגיר","translation":"isolate"}
 {"strongsId":"H5462","root":"סוגר","translation":"shut"}
 {"strongsId":"H5467","root":"סדומ","translation":"Sodom"}
+{"strongsId":"H5468","root":"סדרמ","translation":"orders"}
 {"strongsId":"H5493","root":"סיר","translation":"remove"}
 {"strongsId":"H5496","root":"סית","translation":"persuade"}
 {"strongsId":"H5503","root":"סחר","translation":"go around"}
@@ -570,6 +573,7 @@
 {"strongsId":"H7453","root":"רעה","translation":"neighbor"}
 {"strongsId":"H7493","root":"רעיש","translation":"shook"}
 {"strongsId":"H7495","root":"רופא","translation":"healer"}
+{"strongsId":"H7497","root":"רפאימ","translation":"Rephaim"}
 {"strongsId":"H7523","root":"רצח","translation":"slay"}
 {"strongsId":"H7523","root":"רוצח","translation":"slayer"}
 {"strongsId":"H7533","root":"רצוצ","translation":"oppressed"}
@@ -627,5 +631,6 @@
 {"strongsId":"H8435","root":"תולדה","translation":"generation"}
 {"strongsId":"H8449","root":"תר","translation":"turtledove"}
 {"strongsId":"H8478","root":"תחת","translation":"under"}
+{"strongsId":"H8504","root":"תכלת","translation":"violet"}
 {"strongsId":"H8551","root":"תמוכ","translation":"took hold"}
 {"strongsId":"H8591","root":"תעתע","translation":"deceiver"}

@@ -59,14 +59,14 @@ public class EndPointsModule extends com.digitald4.common.server.EndPointsModule
 		UserStore<BasicUser> userStore = new GenericUserStore<>(BasicUser.class, getProvider(DAO.class));
 		bind(new TypeLiteral<UserStore<BasicUser>>(){}).toInstance(userStore);
 		bind(new TypeLiteral<UserStore<? extends com.digitald4.common.model.User>>(){}).toInstance(userStore);
+		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){}).asEagerSingleton();
+
+		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
 
 		bind(new TypeLiteral<Store<HighScore, Long>>(){})
 				.toInstance(new GenericStore<>(HighScore.class, getProvider(DAO.class)));
 		bind(new TypeLiteral<Store<LetterBox, Long>>(){})
 				.toInstance(new GenericStore<>(LetterBox.class, getProvider(DAO.class)));
-		bind(LoginResolver.class).to(new TypeLiteral<SessionStore<BasicUser>>(){}).asEagerSingleton();
-
-		bind(APIConnector.class).toInstance(new APIConnector(null, null, 100));
 
 		bind(BibleBookStore.class).asEagerSingleton();
 		bind(SearchIndexer.class).to(SearchIndexImpl.class).asEagerSingleton();

@@ -243,7 +243,7 @@ public class HebrewConverter {
     for (int i = 0; i < normalized.length(); i++) {
       char c = normalized.charAt(i);
       // Check if the character is Ethiopia Geez.
-      if (c > 0x1200 && c < 0x137F /* && c != 'ማ' */) {
+      if (c > 0x1200 && c < 0x137F && !(c == 'ማ' && i != 0 && output.charAt(i - 1) == 'ሰ')) {
         // Calculate the base consonant by subtracting the vowel offset
         c -= ((c - 0x1200) % 8);
       }

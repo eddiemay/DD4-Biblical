@@ -1,15 +1,12 @@
 package com.digitald4.biblical.store;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.stream;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 
 import com.digitald4.biblical.model.BiblicalEvent;
 import com.digitald4.biblical.model.BiblicalEvent.Dependency.Relationship;
-import com.digitald4.biblical.model.FamilyTreeNode;
 import com.digitald4.biblical.util.ScriptureMarkupProcessor;
-import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.GenericStore;
 import com.digitald4.common.storage.Query;
@@ -20,8 +17,6 @@ import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 
 public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
@@ -82,8 +77,8 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
     return op;
   }
 
-  @VisibleForTesting BiblicalEvent preprocess(BiblicalEvent event) {
-    return updateYears(
+  @VisibleForTesting void preprocess(BiblicalEvent event) {
+    updateYears(
         event.setSummary(scriptureMarkupProcessor.replaceScriptures(event.getSummary())),
         event.getDepEventId() != null ? get(event.getDepEventId()) : null);
   }
@@ -92,7 +87,7 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
   protected Op<BiblicalEvent> postprocess(Op<BiblicalEvent> op) {
     var parentEvent = op.getEntity();
     var start = op.getCurrent();
-    if (parentEvent.getYear() != start.getYear() || parentEvent.getEndYear() != start.getEndYear()) {
+    if (start != null && (parentEvent.getYear() != start.getYear() || parentEvent.getEndYear() != start.getEndYear())) {
       list(Query.forList(Filter.of("depEventId", parentEvent.getId()))).getItems()
           .forEach(event -> {
             int startYear = event.getYear();
@@ -115,20 +110,12 @@ public class BiblicalEventStore extends GenericStore<BiblicalEvent, Long> {
     int startYear = offsetYears;
     if (parentEvent != null) {
       Relationship relationship = event.getDepRelationship();
-      switch (relationship) {
-        case START_TO_START:
-          startYear = parentEvent.getYear() + offsetYears;
-          break;
-        case FINISH_TO_START:
-          startYear = parentEvent.getEndYear() + offsetYears;
-          break;
-        case START_TO_FINISH:
-          startYear = parentEvent.getYear() + offsetYears - duration;
-          break;
-        case FINISH_TO_FINISH:
-          startYear = parentEvent.getEndYear() + offsetYears - duration;
-          break;
-      }
+      startYear = switch (relationship) {
+        case START_TO_START -> parentEvent.getYear() + offsetYears;
+        case FINISH_TO_START -> parentEvent.getEndYear() + offsetYears;
+        case START_TO_FINISH -> parentEvent.getYear() + offsetYears - duration;
+        case FINISH_TO_FINISH -> parentEvent.getEndYear() + offsetYears - duration;
+      };
     }
 
     return event.setYear(startYear).setEndYear(startYear + duration);

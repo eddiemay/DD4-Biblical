@@ -16,12 +16,13 @@ books_ot = ['Gen', 'Exo', 'Lev', 'Num', 'Deut', 'Josh', 'Jdg', 'Ruth', '1Sam', '
 books_nt = ['Matt', 'Mark', 'Luke', 'John', 'Act', 'Rom', '1Cor', '2Cor', 'Gal',
             'Eph', 'Phil', 'Col', '1Th', '2Th', '1Tim', '2Tim', 'Titus', 'Phm',
             'Heb', 'Jas', '1Pet', '2Pet', '1Jo', '2Jo', '3Jo', 'Jude', 'Rev']
+books_all = books_ot + books_nt
 
 
 def create_file(file):
     print('Writing file: ', file)
     with open(file, "w", encoding="utf-8") as f:
-        for book in books_nt if lang == 'greek' else books_ot:
+        for book in books_nt if lang == 'greek' else books_all if lang == 'gez' else books_ot:
             time.sleep(1)
             # Get the info about the book to obtain the number of chapters.
             if book == 'Psa':
@@ -56,7 +57,7 @@ def train(file):
         create_file(file)
     spm.SentencePieceTrainer.train(
         input=file, model_type='bpe',
-        model_prefix=f'sentence_piece_{lang}', vocab_size=48069)
+        model_prefix=f'sentence_piece_{lang}', vocab_size=11000)
 
 
 def read_dictionary(dictionary, file):
@@ -68,6 +69,31 @@ def read_dictionary(dictionary, file):
             id = f'{token.get("strongsId")}-{token["root"]}'
             if dictionary.get(id) is None:
                 dictionary[id] = token
+
+
+def translate(dict):
+    results = []
+    for d in dict:
+        if d[0] == '▁':
+            continue
+        result = {"piece": d[0], "count": d[1]}
+        words = grouped_by_root.get(d[0].replace('▁', ''))
+        if words is not None:
+            result["translations"] =(
+                '|'.join(list(map(lambda t: t["translation"], words))))
+            for word in words:
+                if word.get('asSuffix') is not None:
+                    result["translations"] =(
+                        result["translations"] + '|' + word.get('asSuffix'))
+            result["strongIds"] =(
+                ' '.join(list(map(lambda t: t.get('strongsId', ''), words))))
+        else:
+            result["translations"] = ''
+            result["strongIds"] = ''
+        print(f'{result["piece"]},{result["count"]},{result["translations"]},{result["strongIds"]}')
+        results.append(result)
+
+    return results
 
 
 if __name__ == '__main__':
@@ -114,26 +140,7 @@ if __name__ == '__main__':
             grouped_by_root[token["root"]] = []
         grouped_by_root[token["root"]].append(token)
 
-    results = []
-    for d in dict:
-        if d[0] == '▁':
-            continue
-        result = {"piece": d[0], "count": d[1]}
-        words = grouped_by_root.get(d[0].replace('▁', ''))
-        if words is not None:
-            result["translations"] =(
-                '|'.join(list(map(lambda t: t["translation"], words))))
-            for word in words:
-                if word.get('asSuffix') is not None:
-                    result["translations"] =(
-                        result["translations"] + '|' + word.get('asSuffix'))
-            result["strongIds"] =(
-                ' '.join(list(map(lambda t: t.get('strongsId', ''), words))))
-        else:
-            result["translations"] = ''
-            result["strongIds"] = ''
-        print(f'{result["piece"]},{result["count"]},{result["translations"]},{result["strongIds"]}')
-        results.append(result)
+    results = translate(dict)
 
     with open(f'sentence_piece_{lang}.csv', 'w') as csv:
         csv.write('Piece,Count,Translations,Strong Ids\n')
@@ -142,5 +149,23 @@ if __name__ == '__main__':
 
     # print(dictionary)
     # print(grouped_by_root)
+
+    all_words = content.split()
+    unique_words, word_counts = numpy.unique(numpy.array(all_words), return_counts=True)
+    word_dict = []
+    for i in range(0, len(unique_words)):
+        word_dict.append({0: unique_words[i], 1: word_counts[i]})
+    # word_dict = dict(zip(unique_words, word_counts))
+    word_dict = sorted(word_dict, key=lambda item: item[1])
+    results = translate(word_dict)
+
+    with open(f'sentence_word_piece_{lang}.csv', 'w') as csv:
+        csv.write('Piece,Count,Translations,Strong Ids\n')
+        for result in reversed(results):
+            csv.write(f'{result["piece"]},{result["count"]},{result["translations"]},{result["strongIds"]}\n')
+    # for word in results:
+        # print(word)
+
+
 
 

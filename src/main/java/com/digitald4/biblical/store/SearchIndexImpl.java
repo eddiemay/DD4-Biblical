@@ -78,6 +78,8 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
           .addField(Field.newBuilder().setName("unfinalized").setHTML(unfinalize(constantsOnly)))
           .addField(Field.newBuilder().setName("constantsOnly").setHTML(constantsOnly))
           .addField(Field.newBuilder().setName("restored").setHTML(toRestored(text)));
+    } else {
+      builder.addField(Field.newBuilder().setName("restored").setHTML(toRestored(text)));
     }
 
     return builder;

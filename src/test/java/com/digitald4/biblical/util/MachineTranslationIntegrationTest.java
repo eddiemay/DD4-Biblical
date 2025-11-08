@@ -3,11 +3,8 @@ package com.digitald4.biblical.util;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.Truth.assertThat;
 import static java.util.stream.Collectors.joining;
-import static org.mockito.Mockito.mock;
 
-import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
-import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.store.InterlinearStore;
@@ -21,16 +18,11 @@ import com.digitald4.common.storage.DAOFileBasedImpl;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.SearchIndexerFakeImpl;
-import com.digitald4.common.storage.testing.DAOTestingImpl;
 import com.google.common.collect.ImmutableList;
 
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mock;
 
 public class MachineTranslationIntegrationTest {
   private static final SearchIndexer fakeSearchIndexer = new SearchIndexerFakeImpl();
@@ -160,12 +152,27 @@ public class MachineTranslationIntegrationTest {
     );
   }
 
+  @Test @Ignore
+  public void geezLetterCount() {
+    assertThat(scriptureStore.getScriptures("ISR", "gez", "Gen 1:1-2:30, Exo 15,20, Matt 5", View.Text).getItems().stream()
+        .map(s -> HebrewConverter.toRestored(s.getText().toString()))
+        .flatMapToInt(String::chars)
+        .distinct()
+        .filter(c -> c != ' ')
+        .sorted()
+        .mapToObj(c -> (char) c)
+        .collect(toImmutableList())).hasSize(22);
+  }
+
   @Test
   public void geezTranslation() {
-    assertThat(translate("Lev 8:1,5", "gez"))
+    assertThat(translate("Lev 8:1,5, Num 28:21, Psa 83:18, Exo 16:36", "gez"))
         .containsExactly(
             "Leviticus 8:1 יהוה and to Mosheh as this said he spoke",
-            "Leviticus 8:5 Mosheh and the assembly was יהוה to do that which command word this it is he said");
+            "Leviticus 8:5 Mosheh and the assembly was יהוה to do that which command word this it is he said",
+            "Numbers 28:21 the of them seven lamb each lamb tenth mouth man",
+            "Psalms 83:18 you master that which name of you alone at high all land high like that which it was of you let know to them",
+            "Exodus 16:36 Gomer however tenth mouth mouth it is");
   }
 
   @Test
@@ -174,29 +181,29 @@ public class MachineTranslationIntegrationTest {
             "Exodus 20:1 יהוה and this words this all as this said he spoke",
         "Exodus 20:2 out of land Mitsrayim out of house slavery I brought out of you I יהוה the Mighty One of you it is",
         "Exodus 20:3 others the Mighty Ones at before me there is no of you",
-        "Exodus 20:4 at high at sky out of existing at down and at land from the existing at water said at down land from the existing carve of him image anything of him for of you not do",
-        "Exodus 20:5 not bow down of them not serve of them of him and I יהוה the Mighty One of you jealous the Mighty One it is so visiting of him sins fathers at son until third until fourth of him generation who punishes",
-        "Exodus 20:6 to that which decide exist of him commandments me to that which keep exist however until thousands mercys that which do it is",
-        "Exodus 20:7 יהוה name in vain to that which high I cause cut of him the he complete of him it is so name יהוה the Mighty One of you in vain not high",
+        "Exodus 20:4 at high at sky out of existing at down and at land from the existing at water said at down land from the existing carve of him image anything of him for of you not you do",
+        "Exodus 20:5 not you bow down of them not you serve of them of him and I יהוה the Mighty One of you jealous the Mighty One it is so visiting of him sins fathers at son until third until fourth of him generation who punishes",
+        "Exodus 20:6 to that which decide exist of him commandments me to that which keep exist however until the thousand mercys that which do it is",
+        "Exodus 20:7 יהוה name in vain to that which high I cause cut of him the he complete of him it is so name יהוה the Mighty One of you in vain not you high",
         "Exodus 20:8 days Shabbat holy set-apart remember",
         "Exodus 20:9 six days work action all do",
-        "Exodus 20:10 was the seventh however of the יהוה the Mighty One of you Shabbat it is by her you of him son of you daughter of you servant of you servants of you animal of you at inside gate of you that which dwell stranger of him some through work not work",
-        "Exodus 20:11 יהוה in six days sky of him land of him sea of him in them desire all of him entered of he it is so in the seventh days said he rested thus יהוה to days Shabbat blessed of him set-apart of him",
-        "Exodus 20:12 father יהוה the Mighty One of you that which give of you land age of you in order that prolong at of you mother of you honor",
-        "Exodus 20:13 not kill",
-        "Exodus 20:14 not commit adultery",
-        "Exodus 20:15 not steal",
-        "Exodus 20:16 at in neighbour in lies not testify",
-        "Exodus 20:17 house in neighbour not covet wife in neighbour servant servants bull of him donkey money in neighbour anything all and not covet",
-        "Exodus 20:18 all of them people and to sound of him intensities of him sound Mighty Ones of him was mountain of him to existing of him seen the complete people this Mosheh seen and trembled afar of them and weak he said",
-        "Exodus 20:19 to Mosheh and you word of him to name of him I the Mighty One however in order that I cause to death the he speak of him they said",
-        "Exodus 20:20 Mosheh and the of them people sins in order that I cause to do fears at before of you of them to exist the Mighty One in order that to worship of them it is that which come so not fear he said of them",
+        "Exodus 20:10 was the seventh however of the יהוה the Mighty One of you Shabbat it is by her you of him son of you daughter of you servant of you servants of you animal of you at inside gate of you that which dwell stranger of him some through work not you work",
+        "Exodus 20:11 יהוה in six days sky of him land of him sea of him in them desire all of him made it is so in the seventh days said he rested thus יהוה to days Shabbat blessed of him set-apart of him",
+        "Exodus 20:12 father יהוה the Mighty One of you that which give of you land age of you in order that prolong at of you mother of you the honor",
+        "Exodus 20:13 not you kill",
+        "Exodus 20:14 not you commit adultery",
+        "Exodus 20:15 not you steal",
+        "Exodus 20:16 at in neighbour in lies not you testify",
+        "Exodus 20:17 house in neighbour not you covet wife in neighbour servant servants bull of him donkey money in neighbour anything all and not you covet",
+        "Exodus 20:18 all of them people and to sound of him intensities of him sound Mighty Ones of him was mountain of him to existing of him seen them people this Mosheh seen and trembled afar of them and weak he said",
+        "Exodus 20:19 to Mosheh and you word of him to name of him I the Mighty One however in order that not to death the he speak of him they said",
+        "Exodus 20:20 Mosheh and the of them people sins in order that not to do fears at before of you of them to exist the Mighty One in order that to worship of them it is that which come so not you fear he said of them",
         "Exodus 20:21 was people at afar stand Mosheh exists the Mighty One existing darkness draw near",
         "Exodus 20:22 יהוה and to Mosheh he said to son Yasharael as this he said of them I from the sky like the he spoke of you of you of them foods of them see of you of them",
-        "Exodus 20:23 Mosheh me the Mighty Ones not do the Mighty Ones silver the Mighty Ones gold for of yous of them not do",
-        "Exodus 20:24 alter from soil his  of hekeep me at upon and burnt offerings altersss of you alters praise of you the sheep of you at of him of he of you [UNK] sky at that which remember of you of him all house exist of you [UNK] honor of you of you it is",
-        "Exodus 20:25 alter so of him Is do of you of him me [UNK] Is [UNK] [UNK] [UNK] so [UNK] so of him not to son",
-        "Exodus 20:26 exist alter me me at upon [UNK] [UNK] in carve of him [UNK]");
+        "Exodus 20:23 Mosheh me the Mighty Ones not you do the Mighty Ones silver of him the Mighty Ones gold of him for of yous of them not you do",
+        "Exodus 20:24 alter from soil stretch out of him me at upon and burnt offerings altersss of you alters praise of you the sheep of you [UNK] man name me at that which remember of you of him all house exist of you come honor of you of you it is",
+        "Exodus 20:25 alter so of him you do of you of him me [UNK] you [UNK] [UNK] you so [UNK] so of him not you to son",
+        "Exodus 20:26 exist alter me me at upon nakeds of you not ascendhis in carve of him not you climb");
   }
 
   @Test
@@ -207,10 +214,10 @@ public class MachineTranslationIntegrationTest {
   }
 
   @Test
-  public void geezTranslation_Gen() {
+  public void geezTranslation_randomFew() {
     assertThat(translate("Gen 35:23, Exo 15:2", "gez")).containsExactly(
         "Genesis 35:23 son Leah Ruban first born Jacob of him Simeon of him Levi of him Yuda of him Issachar of him Zebulun of him",
-        "Exodus 15:2 יהוה [UNK] from commit adultery of he me of him it is [UNK] [UNK] said came to be of him [UNK] this the Mighty One me it is so to out of of he it is [UNK] the Mighty One at me it is out of out of of him it is");
+        "Exodus 15:2 יהוה [UNK] [UNK] it is [UNK] [UNK] said came to be of him [UNK] this the Mighty One me it is so [UNK] it is [UNK] the Mighty One at me it is out of out of of him it is");
   }
 
   @Test
@@ -240,8 +247,8 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:23 evening came to be morning came to be fifths days",
         "Genesis 1:24 the Mighty One and land life soul existing in in kinds the creature of him creeps of him beasts land of him in in kinds to go out he said likewise came to be",
         "Genesis 1:25 the Mighty One said beasts land in in kinds of him the creature in in kinds of him all creeps land and in in kinds do the Mighty One and good like that which it was seen",
-        "Genesis 1:26 the Mighty One said in image of him like carve of him man to do fish sea of him to birds sky of him to the creature of him existthat which  of him land of him at land creep to anything all creeps of him he servant he said",
-        "Genesis 1:27 the Mighty One and in image man created in image the Mighty One created to male of him the female of him entered of he created of them",
+        "Genesis 1:26 the Mighty One said in image of him as carve of him man to do fish sea of him to birds sky of him to the creature of him existthat which  of him land of him at land creep to anything all creeps of him he servant he said",
+        "Genesis 1:27 the Mighty One and in image man created in image the Mighty One created to male of him the female of him made created of them",
         "Genesis 1:28 the Mighty One said blessed of them the Mighty One and fruit me of him to many of him to land and animalthe  exist Mighty One exist fish sea of him to birds sky of him at land creep to anything all the creature of him said servant he said of them",
         "Genesis 1:29 the Mighty One and behold at high all land that which see existing all the protects of him that which that which see that which see existing fruit so of the all himand  of them of him give of them said of you so food let it be of them",
         "Genesis 1:30 to all beasts land of him to all of him the birds sky of him life soul to existing at land creep to anything all and all for animal of them hair to food of them give me of them said of you he said as it is and it was",

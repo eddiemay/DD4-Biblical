@@ -1,12 +1,13 @@
 package com.digitald4.biblical.tools;
 
+import static java.util.Comparator.comparing;
+
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.store.BibleBookStore;
 import com.digitald4.biblical.util.Constants;
 import com.digitald4.common.server.APIConnector;
 import com.digitald4.common.storage.ChangeTracker;
 import com.digitald4.common.storage.DAOFileDBImpl;
-
 import java.util.stream.IntStream;
 
 public class ScriptureMigrater {
@@ -29,6 +30,7 @@ public class ScriptureMigrater {
     bibleBookStore.getBibleBooks(version).stream()
         .filter(book -> startBook == null || book.getNumber() >= startBook.getNumber())
         .filter(book -> endBook == null || book.getNumber() <= endBook.getNumber())
+        .sorted(comparing(BibleBook::getNumber))
         .forEach(book -> {
           System.out.printf("\n%s %d =>", book.name(), book.getChapterCount());
           IntStream.range(1, book.getChapterCount() + 1).forEach(chapter -> {
@@ -41,7 +43,7 @@ public class ScriptureMigrater {
 
   public static void main(String[] args) {
     if (args.length == 0) {
-      System.err.println("Usage: version [book1] [book2] [...]");
+      System.err.println("Usage: version [startBook] [endBook]");
       System.exit(1);
     }
 

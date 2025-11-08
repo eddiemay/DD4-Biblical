@@ -1,4 +1,6 @@
-{"translation":"not ","root":"አየተ","tokenType":"PREFIX_ONLY"}
+{"translation":"not you ","root":"አየተ","tokenType":"PREFIX_ONLY"}
+{"translation":"not ","root":"ኸየ","tokenType":"PREFIX"}
+{"translation":" it is","root":"አየ","tokenType":"SUFFIX"}
 {"translation":"to ","root":"ነ","tokenType":"PREFIX","asSuffix":" of him"}
 {"translation":" of you","root":"ኸነ","tokenType":"SUFFIX_ONLY"}
 {"translation":" of you","root":"ከነ","tokenType":"SUFFIX_ONLY"}
@@ -6,19 +8,18 @@
 {"translation":"to ","root":"ኸ","tokenType":"PREFIX","asSuffix":" of you"}
 {"translation":"to ","root":"ተ","tokenType":"PREFIX","asSuffix":"s"}
 {"translation":"the ","root":"አ","tokenType":"PREFIX_ONLY"}
-{"translation":"he ","root":"የ","tokenType":"PREFIX","asSuffix":" me"}ከለ
+{"translation":"he ","root":"የ","tokenType":"PREFIX","asSuffix":" me"}
 {"translation":"in ","root":"በ","tokenType":"PREFIX_ONLY"}
 {"translation":"from ","root":"መ","tokenType":"PREFIX","asSuffix":" of them"}
 {"translation":" them","root":"አለመ","tokenType":"SUFFIX"}
 {"translation":"like","root":"ከመ","tokenType":"PREFIX","asSuffix":" of them"}
 {"translation":"that which ","root":"ዘ","tokenType":"PREFIX"}
 {"translation":" exist","root":"ወነ","tokenType":"SUFFIX"}
-{"translation":" it is","root":"አየ","tokenType":"SUFFIX"}
 {"translation":"his ","root":"ሰ","tokenType":"PREFIX"}
-{"translation":"I cause ","root":"ኸየ","tokenType":"PREFIX"}
 {"translation":"was ","root":"አተ","tokenType":"PREFIX"}
+{"translation":" to them","root":"ጠ","tokenType":"SUFFIX"}
 {"translation":" of him","root":"ዐ","tokenType":"SUFFIX"}
-{"translation":" of he","root":"ረ","tokenType":"SUFFIX"}
+** {"translation":" of he","root":"ረ","tokenType":"SUFFIX"}
 {"translation":"for ","root":"ለ","tokenType":"PREFIX","asSuffix":" of him"}
 {"translation":"he ","root":"ነሰ","tokenType":"PREFIX"}
 {"translation":":","root":"፣","tokenType":"SUFFIX"}

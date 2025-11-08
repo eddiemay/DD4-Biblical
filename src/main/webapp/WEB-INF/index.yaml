@@ -9,6 +9,10 @@ indexes:
       - name: month
       - name: day
       - name: year
+  - kind: BiblicalEvent
+    properties:
+      - name: month
+      - name: day
   - kind: HighScore
     properties:
     - name: game
