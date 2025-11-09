@@ -95,7 +95,7 @@ public class MachineTranslationIntegrationTest {
         "Isaiah 9:6 for child born to of us son given to of us and you will be the government upon shoulder of him and he call name of him wonderful counselor God mighty I in he forever prince peace",
         "Psalms 83:18 and know of him for you are name of you יהוה to alone of you high upon all the land",
         "Exodus 12:11 and like this you and eat of him him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eats him in haste passover he to יהוה",
-        "Genesis 10:1 and these generations sons of Noah Shem Ham and Japheth and born of him to them sons after the flood",
+        "Genesis 10:1 and these generations sons of Noah Shem Kam and Japheth and born of him to them sons after the flood",
         "Leviticus 25:4 and in year the sevenths shabbat shabbat of it let there be to land shabbat to יהוה field of you not you sow and vineyard of you not you prune",
         "Exodus 20:2 I יהוה Mighty Ones of you which the bring outss of you from land Mizraim from house servants",
         "Leviticus 23:14 and bread and corn and fruitful field not you and eat of him until bone the day this until the brought of yous you offering Mighty Ones of yous statutes ever to generationss of yous in all dwellingss of yous"
