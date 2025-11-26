@@ -1,26 +1,26 @@
-{"translation":"not you ","root":"አየተ","tokenType":"PREFIX_ONLY"}
-{"translation":"not ","root":"ኸየ","tokenType":"PREFIX"}
-{"translation":" it is","root":"አየ","tokenType":"SUFFIX"}
-{"translation":"to ","root":"ነ","tokenType":"PREFIX","asSuffix":" of him"}
-{"translation":" of you","root":"ኸነ","tokenType":"SUFFIX_ONLY"}
-{"translation":" of you","root":"ከነ","tokenType":"SUFFIX_ONLY"}
-{"translation":"to ","root":"ከ","tokenType":"PREFIX","asSuffix":" of you"}
-{"translation":"to ","root":"ኸ","tokenType":"PREFIX","asSuffix":" of you"}
-{"translation":"to ","root":"ተ","tokenType":"PREFIX","asSuffix":"s"}
-{"translation":"the ","root":"አ","tokenType":"PREFIX_ONLY"}
-{"translation":"he ","root":"የ","tokenType":"PREFIX","asSuffix":" me"}
-{"translation":"in ","root":"በ","tokenType":"PREFIX_ONLY"}
-{"translation":"from ","root":"መ","tokenType":"PREFIX","asSuffix":" of them"}
-{"translation":" them","root":"አለመ","tokenType":"SUFFIX"}
-{"translation":"like","root":"ከመ","tokenType":"PREFIX","asSuffix":" of them"}
-{"translation":"that which ","root":"ዘ","tokenType":"PREFIX"}
-{"translation":" exist","root":"ወነ","tokenType":"SUFFIX"}
-{"translation":"his ","root":"ሰ","tokenType":"PREFIX"}
-{"translation":"was ","root":"አተ","tokenType":"PREFIX"}
-{"translation":" to them","root":"ጠ","tokenType":"SUFFIX"}
-{"translation":" of him","root":"ዐ","tokenType":"SUFFIX"}
-** {"translation":" of he","root":"ረ","tokenType":"SUFFIX"}
-{"translation":"for ","root":"ለ","tokenType":"PREFIX","asSuffix":" of him"}
-{"translation":"he ","root":"ነሰ","tokenType":"PREFIX"}
-{"translation":":","root":"፣","tokenType":"SUFFIX"}
-{"translation":"and ","root":"ወ","tokenType":"PREFIX"}
+{"root":"አየተ","translation":"not you ","tokenType":"PREFIX_ONLY"}
+{"root":"ኸየ","translation":"not ","tokenType":"PREFIX"}
+{"root":"አየ","translation":" it is","tokenType":"SUFFIX"}
+{"root":"ነ","translation":"to ","tokenType":"PREFIX","asSuffix":" of him"}
+{"root":"ኸነ","translation":" of you","tokenType":"SUFFIX_ONLY"}
+{"root":"ከነ","translation":" of you","tokenType":"SUFFIX_ONLY"}
+{"root":"ከ","translation":"to ","tokenType":"PREFIX","asSuffix":" of you"}
+{"root":"ኸ","translation":"to ","tokenType":"PREFIX","asSuffix":" of you"}
+{"root":"ተ","translation":"to ","tokenType":"PREFIX","asSuffix":"s"}
+{"root":"አ","translation":"the ","tokenType":"PREFIX_ONLY"}
+{"root":"የ","translation":"he ","tokenType":"PREFIX","asSuffix":" me"}
+{"root":"በ","translation":"in ","tokenType":"PREFIX_ONLY"}
+{"root":"መ","translation":"from ","tokenType":"PREFIX","asSuffix":" of them"}
+{"root":"አለመ","translation":" them","tokenType":"SUFFIX"}
+{"root":"ከመ","translation":"like","tokenType":"PREFIX","asSuffix":" of them"}
+{"root":"ዘ","translation":"that which ","tokenType":"PREFIX"}
+{"root":"ወነ","translation":" exist","tokenType":"SUFFIX"}
+{"root":"ሰ","translation":"his ","tokenType":"PREFIX"}
+{"root":"አተ","translation":"was ","tokenType":"PREFIX"}
+{"root":"ጠ","translation":" to them","tokenType":"SUFFIX"}
+{"root":"ዐ","translation":" of him","tokenType":"SUFFIX"}
+** {"root":"ረ","translation":" of he","tokenType":"SUFFIX"}
+{"root":"ለ","translation":"for ","tokenType":"PREFIX","asSuffix":" of him"}
+{"root":"ነሰ","translation":"he ","tokenType":"PREFIX"}
+{"root":"፣","translation":":","tokenType":"SUFFIX"}
+{"root":"ወ","translation":"and ","tokenType":"PREFIX"}

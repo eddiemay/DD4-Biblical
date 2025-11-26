@@ -1,87 +1,114 @@
-{"translation":"ing","root":"ς","tokenType":"SUFFIX_ONLY"}
-{"translation":"","root":"ν","tokenType":"SUFFIX_ONLY"}
-{"translation":"un","root":"α","tokenType":"PREFIX_ONLY"}
-{"translation":" of you","root":"εις","tokenType":"SUFFIX_ONLY"}
-{"translation":" of","root":"ειν","tokenType":"SUFFIX_ONLY"}
-{"translation":" of we","root":"ωμεν","tokenType":"SUFFIX_ONLY"}
-{"translation":" of he","root":"εν","tokenType":"SUFFIX_ONLY"}
-{"translation":" of him","root":"εσθαι","tokenType":"SUFFIX_ONLY"}
-{"translation":" of I","root":"ον","tokenType":"SUFFIX_ONLY"}
-{"translation":"of the","root":"της"}
-{"translation":" of","root":"ης","tokenType":"SUFFIX_ONLY"}
-{"translation":" of we","root":"οντες","tokenType":"SUFFIX_ONLY"}
-{"strongsId":"G0281","translation":"truly","root":"αμην"}
-{"strongsId":"G0305","translation":"he went up","root":"ανεβη"}
-{"strongsId":"G0444","translation":"men","root":"ανθρωπους"}
-{"strongsId":"G0455","translation":"opening","root":"ανοιξας"}
-{"strongsId":"G0565","translation":"go","root":"απελθ"}
-{"strongsId":"G0846","translation":"to him","root":"αυτω"}
-{"strongsId":"G0846","translation":"them","root":"αυτους"}
-{"strongsId":"G0846","translation":"them","root":"αυτων"}
-{"strongsId":"G0846","translation":"they","root":"αυτοι"}
-{"strongsId":"G0932","translation":"kingdom","root":"βασιλεια"}
-{"strongsId":"G1063","translation":"for","root":"γαρ"}
-{"strongsId":"G1096","translation":"come to pass","root":"γενηται"}
-{"strongsId":"G1106","translation":"opinion","root":"γνωμη"}
-{"strongsId":"G1161","translation":"then","root":"δε"}
-{"strongsId":"G1161","translation":"now","root":"δ’"}
-{"strongsId":"G1163","translation":"necessary","root":"εδει"}
-{"strongsId":"G1321","translation":"teaching","root":"διδαξη"}
-{"strongsId":"G1321","translation":"taught","root":"εδιδασκεν"}
-{"strongsId":"G1380","translation":"think","root":"δοκω"}
-{"strongsId":"G1510","translation":"to be","root":"εστιν"}
-{"strongsId":"G1520","translation":"one","root":"μιαν"}
-{"strongsId":"G1532","translation":"out of","root":"εξ"}
-{"strongsId":"G1646","translation":"least","root":"ελαχιστων"}
-{"strongsId":"G1699","translation":"my","root":"εμην"}
-{"strongsId":"G1785","translation":"commandments","root":"εντολων"}
-{"strongsId":"G1859","translation":"feast","root":"εορτη"}
-{"strongsId":"G2064","translation":"come","root":"ηλθ"}
-{"strongsId":"G2090","translation":"prepare","root":"ετοιμασ"}
-{"strongsId":"G2219","translation":"leavened","root":"ζυμω"}
-{"strongsId":"G2309","translation":"want","root":"θελ"}
-{"strongsId":"G2316","translation":"God","root":"Θεον"}
-{"strongsId":"G2316","translation":"god","root":"Θεος"}
-{"strongsId":"G2380","translation":"kill","root":"θυ"}
-{"strongsId":"G2380","translation":"kill","root":"εθυ"}
-{"strongsId":"G2424","translation":"יהושע","root":"Ιησους"}
-{"strongsId":"G2424","translation":"יהושע","root":"Ιησου"}
-{"strongsId":"G2523","translation":"having sat down","root":"καθισαντος"}
-{"strongsId":"G2564","translation":"is called","root":"κληθησεται"}
-{"strongsId":"G2647","translation":"to abolish","root":"καταλυσαι"}
-{"strongsId":"G2816","translation":"will inherit","root":"κληρονομησουσιν"}
-{"strongsId":"G3004","translation":"saying","root":"λεγων"}
-{"strongsId":"G3004","translation":"saying","root":"λεγοντες"}
-{"strongsId":"G3004","translation":"said","root":"λεγουσιν"}
-{"strongsId":"G3089","translation":"shall break","root":"λυση"}
-{"strongsId":"G3101","translation":"disciples","root":"μαθηται"}
-{"strongsId":"G3107","translation":"blessed are","root":"μακάριοι"}
-{"strongsId":"G3543","translation":"think","root":"νομισητε"}
-{"strongsId":"G3551","translation":"law","root":"νομον"}
-{"strongsId":"G3551","translation":"law","root":"νομου"}
-{"strongsId":"G3588","translation":"the","root":"οι"}
-{"strongsId":"G3588","translation":"the","root":"το"}
-{"strongsId":"G3588","translation":"the","root":"τη"}
-{"strongsId":"G3588","translation":"to","root":"τω"}
-{"strongsId":"G3588","translation":"of the","root":"των"}
-{"strongsId":"G3588","translation":"their","root":"τους"}
-{"strongsId":"G3708","translation":"having seen","root":"ιδων"}
-{"strongsId":"G3739","translation":"whoever","root":"ος"}
-{"strongsId":"G3756","translation":"not","root":"ουκ"}
-{"strongsId":"G3772","translation":"heavens","root":"ουρανων"}
-{"strongsId":"G3794","translation":"crowds","root":"οχλους"}
-{"strongsId":"G3870","translation":"will be comforted","root":"παρακληθήσονται"}
-{"strongsId":"G3928","translation":"shall pass away","root":"παρελθη"}
-{"strongsId":"G3956","translation":"all things","root":"παντα"}
-{"strongsId":"G3996","translation":"morning","root":"πενθουντες"}
-{"strongsId":"G4137","translation":"to fulfill","root":"πληρωσαι"}
-{"strongsId":"G4151","translation":"spirit","root":"πνευματι"}
-{"strongsId":"G4160","translation":"shall keep","root":"ποιηση"}
-{"strongsId":"G4239","translation":"meek","root":"πραεις"}
-{"strongsId":"G4334","translation":"came","root":"προσηλθαν"}
-{"strongsId":"G4334","translation":"came","root":"προσηλθον"}
-{"strongsId":"G4396","translation":"prophets","root":"προφητας"}
-{"strongsId":"G4413","translation":"first","root":"πρωτη"}
-{"strongsId":"G4434","translation":"poor","root":"πτωχοι"}
-{"strongsId":"G4750","translation":"mouth","root":"στομα"}
-{"strongsId":"G5315","translation":"eat","root":"φαγ"}
+{"root":"ς","translation":"","tokenType":"SUFFIX_ONLY"}
+{"root":"ν","translation":"","tokenType":"SUFFIX_ONLY"}
+{"root":"υ","translation":"","tokenType":"SUFFIX_ONLY"}
+{"root":"ουση","translation":"ing","tokenType":"SUFFIX_ONLY"}
+{"root":"α","translation":"un","tokenType":"PREFIX_ONLY"}
+{"root":"εις","translation":" of you","tokenType":"SUFFIX_ONLY"}
+{"root":"ειν","translation":" of","tokenType":"SUFFIX_ONLY"}
+{"root":"ωμεν","translation":" of we","tokenType":"SUFFIX_ONLY"}
+{"root":"εν","translation":" of she","tokenType":"SUFFIX_ONLY"}
+{"root":"επι","translation":"on ","tokenType":"PREFIX_ONLY"}
+{"root":"εσθαι","translation":" of him","tokenType":"SUFFIX_ONLY"}
+{"root":"ον","translation":" of I","tokenType":"SUFFIX_ONLY"}
+{"root":"της","translation":"of the"}
+{"root":"ης","translation":" of","tokenType":"SUFFIX_ONLY"}
+{"root":"νται","translation":" of them","tokenType":"SUFFIX_ONLY"}
+{"root":"οντες","translation":" of we","tokenType":"SUFFIX_ONLY"}
+{"strongsId":"G0243","root":"αλλος","translation":"other"}
+{"strongsId":"G0243","root":"αλλη","translation":"other"}
+{"strongsId":"G0281","root":"αμην","translation":"truly"}
+{"strongsId":"G0305","root":"ανεβη","translation":"he went up"}
+{"strongsId":"G0393","root":"ανατειλαντος","translation":"upon rising"}
+{"strongsId":"G0444","root":"ανθρωπους","translation":"men"}
+{"strongsId":"G0455","root":"ανοιξας","translation":"opening"}
+{"strongsId":"G0565","root":"απελθ","translation":"go"}
+{"strongsId":"G0759","root":"αρωματα","translation":"spices"}
+{"strongsId":"G0846","root":"αυτω","translation":"to him"}
+{"strongsId":"G0846","root":"αυτους","translation":"them"}
+{"strongsId":"G0846","root":"αυτων","translation":"them"}
+{"strongsId":"G0846","root":"αυτοι","translation":"they"}
+{"strongsId":"G0901","root":"βαθεως","translation":"deeply"}
+{"strongsId":"G0932","root":"βασιλεια","translation":"kingdom"}
+{"strongsId":"G1063","root":"γαρ","translation":"for"}
+{"strongsId":"G1096","root":"γενηται","translation":"come to pass"}
+{"strongsId":"G1106","root":"γνωμη","translation":"opinion"}
+{"strongsId":"G1161","root":"δε","translation":"then"}
+{"strongsId":"G1161","root":"δ’","translation":"now"}
+{"strongsId":"G1163","root":"εδει","translation":"necessary"}
+{"strongsId":"G1321","root":"διδαξη","translation":"teaching"}
+{"strongsId":"G1321","root":"εδιδασκεν","translation":"taught"}
+{"strongsId":"G1380","root":"δοκω","translation":"think"}
+{"strongsId":"G1510","root":"εστιν","translation":"to be"}
+{"strongsId":"G1520","root":"μιαν","translation":"one"}
+{"strongsId":"G1532","root":"εξ","translation":"out of"}
+{"strongsId":"G1646","root":"ελαχιστων","translation":"least"}
+{"strongsId":"G1699","root":"εμην","translation":"my"}
+{"strongsId":"G1785","root":"εντολων","translation":"commandments"}
+{"strongsId":"G1859","root":"εορτη","translation":"feast"}
+{"strongsId":"G2020","root":"επιφωσκ","translation":"dawn"}
+{"strongsId":"G2020","root":"φωσκ","translation":"light"}
+{"strongsId":"G2064","root":"ηλθ","translation":"come"}
+{"strongsId":"G2064","root":"ερχο","translation":"come"}
+{"strongsId":"G2090","root":"ετοιμασ","translation":"prepare"}
+{"strongsId":"G2090","root":"ητοιμασαν","translation":"prepared"}
+{"strongsId":"G2219","root":"ζυμω","translation":"leavened"}
+{"strongsId":"G2246","root":"ηλιου","translation":"sun"}
+{"strongsId":"G2309","root":"θελ","translation":"want"}
+{"strongsId":"G2316","root":"Θεον","translation":"God"}
+{"strongsId":"G2316","root":"Θεος","translation":"god"}
+{"strongsId":"G2334","root":"θεωρησαι","translation":"to see"}
+{"strongsId":"G2380","root":"θυ","translation":"kill"}
+{"strongsId":"G2380","root":"εθυ","translation":"kill"}
+{"strongsId":"G2424","root":"Ιησους","translation":"יהושע"}
+{"strongsId":"G2424","root":"Ιησου","translation":"יהושע"}
+{"strongsId":"G2491","root":"Ιωαννης","translation":"John"}
+{"strongsId":"G2523","root":"καθισαντος","translation":"having sat down"}
+{"strongsId":"G2564","root":"κληθησεται","translation":"is called"}
+{"strongsId":"G2647","root":"καταλυσαι","translation":"to abolish"}
+{"strongsId":"G2816","root":"κληρονομησουσιν","translation":"will inherit"}
+{"strongsId":"G3004","root":"λεγων","translation":"saying"}
+{"strongsId":"G3004","root":"λεγοντες","translation":"saying"}
+{"strongsId":"G3004","root":"λεγουσιν","translation":"said"}
+{"strongsId":"G3089","root":"λυση","translation":"shall break"}
+{"strongsId":"G3101","root":"μαθηται","translation":"disciples"}
+{"strongsId":"G3107","root":"μακάριοι","translation":"blessed are"}
+{"strongsId":"G3137","root":"Μαρια","translation":"Maria"}
+{"strongsId":"G3137","root":"Μαριαμ","translation":"Mariam"}
+{"strongsId":"G3418","root":"μνημα","translation":"memorial"}
+{"strongsId":"G3419","root":"μνημειον","translation":"memorial"}
+{"strongsId":"G3419","root":"μνημειου","translation":"memorial"}
+{"strongsId":"G3543","root":"νομισητε","translation":"think"}
+{"strongsId":"G3551","root":"νομον","translation":"law"}
+{"strongsId":"G3551","root":"νομου","translation":"law"}
+{"strongsId":"G3588","root":"οι","translation":"the"}
+{"strongsId":"G3588","root":"η","translation":"the"}
+{"strongsId":"G3588","root":"το","translation":"the"}
+{"strongsId":"G3588","root":"του","translation":"the"}
+{"strongsId":"G3588","root":"τη","translation":"the"}
+{"strongsId":"G3588","root":"τω","translation":"to"}
+{"strongsId":"G3588","root":"των","translation":"of the"}
+{"strongsId":"G3588","root":"τους","translation":"their"}
+{"strongsId":"G3708","root":"ιδων","translation":"having seen"}
+{"strongsId":"G3722","root":"ορθρου","translation":"morning"}
+{"strongsId":"G3739","root":"ος","translation":"whoever"}
+{"strongsId":"G3756","root":"ουκ","translation":"not"}
+{"strongsId":"G3772","root":"ουρανων","translation":"heavens"}
+{"strongsId":"G3794","root":"οχλους","translation":"crowds"}
+{"strongsId":"G3870","root":"παρακληθήσο","translation":"comfort"}
+{"strongsId":"G3928","root":"παρελθη","translation":"shall pass away"}
+{"strongsId":"G3956","root":"παντα","translation":"all things"}
+{"strongsId":"G3996","root":"πενθουντες","translation":"morning"}
+{"strongsId":"G4137","root":"πληρωσαι","translation":"to fulfill"}
+{"strongsId":"G4151","root":"πνευματι","translation":"spirit"}
+{"strongsId":"G4160","root":"ποιηση","translation":"shall keep"}
+{"strongsId":"G4239","root":"πραεις","translation":"meek"}
+{"strongsId":"G4334","root":"προσηλθαν","translation":"came"}
+{"strongsId":"G4334","root":"προσηλθον","translation":"came"}
+{"strongsId":"G4396","root":"προφητας","translation":"prophets"}
+{"strongsId":"G4413","root":"πρωτη","translation":"first"}
+{"strongsId":"G4434","root":"πτωχοι","translation":"poor"}
+{"strongsId":"G4521","root":"σαββατων","translation":"sabbaton"}
+{"strongsId":"G4750","root":"στομα","translation":"mouth"}
+{"strongsId":"G5028","root":"ταφο","translation":"tomb"}
+{"strongsId":"G5315","root":"φαγ","translation":"eat"}
+{"strongsId":"G5342","root":"φερουσαι","translation":"bringing"}

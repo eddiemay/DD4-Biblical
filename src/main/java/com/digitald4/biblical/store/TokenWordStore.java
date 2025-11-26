@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.Streams;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -50,24 +51,24 @@ public class TokenWordStore {
         .filter(tw -> !tw.getWord().isEmpty())
         .flatMap(tw -> {
           try {
-            if (tw.getWord().endsWith("ה") && tw.getWord().length() > 2) {
+            if (tw.getWord().length() > 2 && tw.getWord().endsWith("ה")) {
               Lexicon lexicon = lexicons.get(tw.getStrongsId());
               // If this words ends with a ה and not a proper noun such as a name, add a second entry without the ה.
               if (lexicon == null || !"proper masculine noun".equals(lexicon.getPartOfSpeech())) {
                 return Stream.of(tw.copy().setWord(tw.getWord().substring(0, tw.getWord().length() - 1)), tw);
               }
-            } else if (tw.getWord().charAt(0) >= 'α' && tw.getWord().charAt(0) <= 'ω') {
-              // For Greek words add a second capitalized entry.
-              return Stream.of(
-                  tw.copy().setWord(toCapitalized(tw.getWord()))
-                      .setTranslation(toCapitalized(tw.getTranslation())),
-                  tw);
+            } else if (tw.getWord().length() > 3 && (tw.getWord().endsWith("ς") || tw.getWord().endsWith("ν") || tw.getWord().endsWith("υ"))) {
+              return Stream.of(tw.copy().setWord(tw.getWord().substring(0, tw.getWord().length() - 1)), tw);
             }
             return Stream.of(tw);
           } catch (StringIndexOutOfBoundsException e) {
             throw new DD4StorageException("Error processing " + tw, e);
           }
         })
+        // For Greek words add a second capitalized entry.
+        .flatMap(tw -> tw.getWord().charAt(0) >= 'α' && tw.getWord().charAt(0) <= 'ω' ? Stream.of(
+            tw.copy().setWord(toCapitalized(tw.getWord())).setTranslation(toCapitalized(tw.getTranslation())), tw)
+            : Stream.of(tw))
         .distinct()
         .peek(tw -> {
           if (tw.tokenType() == TokenType.WORD) {

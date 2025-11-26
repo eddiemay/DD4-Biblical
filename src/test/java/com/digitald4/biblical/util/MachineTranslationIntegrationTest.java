@@ -126,18 +126,22 @@ public class MachineTranslationIntegrationTest {
   public void translateMattChapter5() {
     assertThat(translate("Matt 5:17-19", "gk")).containsExactly(
         "Matthew 5:17 Not think that come of I to abolish the law or their prophets not come of I to abolish but to fulfill",
-        "Matthew 5:18 truly for speak you till whosoever shall pass away which heaven also or earth jot of he or one tittle no not shall pass away from his law till whosoever all things come to pass",
+        "Matthew 5:18 truly for saying you till whosoever shall pass away which heaven also the earth jot of she or one tittle no not shall pass away from the law till whosoever all things come to pass",
         "Matthew 5:19 Whoever if therefore shall break one of the commandments these of the least also teaching so their men least is called by the kingdom of the heavens whoever now whosoever shall keep also teaching this great is called by the kingdom of the heavens"
     );
   }
 
   @Test
   public void translateGreek() {
-    assertThat(translate("Matt 26:17, Mark 14:12, Luke 22:7, John 13:1", "gk")).containsExactly(
-            "Matthew 26:17 The then first of the unleavened came the disciples to יהושע saying Where want of you prepare of we thee eat of the Passover",
-            "Mark 14:12 Also the first day of the unleavened when the Passover kill of I said to him the disciples there Where want of you go of we prepare of we that eat of the Passover",
-            "Luke 22:7 Come of he then or day of the unleavened by or necessary kill of him the Passover",
-            "John 13:1 Before then theing feasting his Passover knowing which יהושע that come of he there or hour that [UNK] of his [UNK] this unto the [UNK] [UNK] their [UNK] their by to [UNK] into end [UNK] them");
+    assertThat(translate("Matt 26:17,28:1, Mark 14:12,16:2, Luke 22:7,24:1 John 13:1,20:1", "gk")).containsExactly(
+        "Matthew 26:17 The then first of the unleavened came the disciples to יהושע saying Where want of you prepare of we thee eat of the Passover",
+        "Matthew 28:1 In the end then sabbaton the dawning into one sabbaton come of she Mariam the Magdalene also the other Maria to see the tomb",
+        "Mark 14:12 Also the first day of the unleavened when the Passover kill of I said to him the disciples them Where want of you go of we prepare of we that eat of the Passover",
+        "Mark 16:2 also exceeding in the morning the one of the sabbaton come of them on the memorial upon rising the sun",
+        "Luke 22:7 Come of she then the day of the unleavened by the necessary kill of him the Passover",
+        "Luke 24:1 The then one of the sabbaton morning deeply on the memorial come of I bringing un prepared spices",
+        "John 13:1 Before then the feast the Passover know which יהושע that come of she them the hour that [UNK] of the world this unto the [UNK] [UNK] their his own their by to [UNK] into end [UNK] them",
+        "John 20:1 The then one of the sabbaton Maria the Magdalene [UNK] in the morning darkness yet [UNK] into the memorial also [UNK] the stone [UNK] of the memorial");
 
   }
 

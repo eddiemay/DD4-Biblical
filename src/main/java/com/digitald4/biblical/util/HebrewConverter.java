@@ -162,7 +162,8 @@ public class HebrewConverter {
           }
         })
         .filter(c -> c != '׀' && c != '[' && c != ']' && c != '(' && c != ')' && c != '‸' && c != ';' && c != '·'
-            && c != '፤' && c != ',' && c != '.' && c != '፡' && c != '።' && c != '፥' && c != '፣' && c != '፧' && !foundEnd.get())
+            && c != '፤' && c != ',' && c != '.' && c != '፡' && c != '።' && c != '፥' && c != '፣' && c != '፧' && c != '*'
+            && !foundEnd.get())
         .mapToObj(c -> String.valueOf((char) c)).collect(joining()).trim();
   }
 

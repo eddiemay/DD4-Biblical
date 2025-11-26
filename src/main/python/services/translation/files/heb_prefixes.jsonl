@@ -1,33 +1,33 @@
 *** Prefixes ***
-{"translation":"I ","root":"א","tokenType":"PREFIX_ONLY"}
-{"translation":"in ","root":"ב","tokenType":"PREFIX_ONLY"}
-{"translation":"the ","root":"ה","tokenType":"PREFIX","asSuffix":""}
-{"translation":"and ","root":"ו","tokenType":"PREFIX","asSuffix":" of him"}
-{"translation":"he ","root":"י","tokenType":"PREFIX","asSuffix":"s of"}
-{"translation":"like ","root":"כ","tokenType":"PREFIX","asSuffix":" of you"}
-{"translation":"to ","root":"ל","tokenType":"PREFIX_ONLY"}
-{"translation":"from ","root":"מ","tokenType":"PREFIX","asSuffix":"s"}
-{"translation":"we ","root":"נ","tokenType":"PREFIX","asSuffix":" us"}
-{"translation":"that which ","root":"ש","tokenType":"PREFIX_ONLY"}
-{"translation":"you ","root":"ת","tokenType":"PREFIX","asSuffix":"s"}
+{"root":"א","translation":"I ","tokenType":"PREFIX_ONLY"}
+{"root":"ב","translation":"in ","tokenType":"PREFIX_ONLY"}
+{"root":"ה","translation":"the ","tokenType":"PREFIX","asSuffix":""}
+{"root":"ו","translation":"and ","tokenType":"PREFIX","asSuffix":" of him"}
+{"root":"י","translation":"he ","tokenType":"PREFIX","asSuffix":"s of"}
+{"root":"כ","translation":"like ","tokenType":"PREFIX","asSuffix":" of you"}
+{"root":"ל","translation":"to ","tokenType":"PREFIX_ONLY"}
+{"root":"מ","translation":"from ","tokenType":"PREFIX","asSuffix":"s"}
+{"root":"נ","translation":"we ","tokenType":"PREFIX","asSuffix":" us"}
+{"root":"ש","translation":"that which ","tokenType":"PREFIX_ONLY"}
+{"root":"ת","translation":"you ","tokenType":"PREFIX","asSuffix":"s"}
 *** Suffixes ***
-{"translation":"s","root":"ימ","tokenType":"SUFFIX_ONLY"}
-{"translation":"s","root":"ית","tokenType":"SUFFIX_ONLY"}
-{"translation":"s","root":"ות","tokenType":"SUFFIX_ONLY"}
-{"translation":"s of him","root":"תו","tokenType":"SUFFIX_ONLY"}
-{"translation":"s of you","root":"תכ","tokenType":"SUFFIX_ONLY"}
-{"translation":"them","root":"המ","tokenType":"SUFFIX","asSuffix":" of them"}
-{"translation":"them","root":"תמ","tokenType":"SUFFIX","asSuffix":"s"}
-** {"translation":"them","root":"כמ","tokenType":"SUFFIX","asSuffix":" of y'all"}
-{"translation":"of us","root":"נו","tokenType":"SUFFIX","asSuffix":" of us"}
-{"translation":"and we ","root":"ונ","tokenType":"PREFIX","asSuffix":" of it"}
-{"translation":"it ","root":"נה","tokenType":"PREFIX","asSuffix":" of it"}
-{"translation":"","root":"הו","tokenType":"SUFFIX_ONLY","asSuffix":" of it"}
-{"translation":" of you","root":"כ","tokenType":"SUFFIX_ONLY"}
-{"translation":"s of you","root":"יכ","tokenType":"SUFFIX_ONLY"}
-{"translation":"to him","root":"לו","tokenType":"PREFIX"}
-{"translation":" of him","root":"יו","tokenType":"SUFFIX_ONLY"}
+{"root":"ימ","translation":"s","tokenType":"SUFFIX_ONLY"}
+{"root":"ית","translation":"s","tokenType":"SUFFIX_ONLY"}
+{"root":"ות","translation":"s","tokenType":"SUFFIX_ONLY"}
+{"root":"תו","translation":"s of him","tokenType":"SUFFIX_ONLY"}
+{"root":"תכ","translation":"s of you","tokenType":"SUFFIX_ONLY"}
+{"root":"המ","translation":"them","tokenType":"SUFFIX","asSuffix":" of them"}
+{"root":"תמ","translation":"them","tokenType":"SUFFIX","asSuffix":"s"}
+** {"root":"כמ","translation":"them","tokenType":"SUFFIX","asSuffix":" of y'all"}
+{"root":"נו","translation":"of us","tokenType":"SUFFIX","asSuffix":" of us"}
+{"root":"ונ","translation":"and we ","tokenType":"PREFIX","asSuffix":" of it"}
+{"root":"נה","translation":"it ","tokenType":"PREFIX","asSuffix":" of it"}
+{"root":"הו","translation":"","tokenType":"SUFFIX_ONLY","asSuffix":" of it"}
+{"root":"כ","translation":" of you","tokenType":"SUFFIX_ONLY"}
+{"root":"יכ","translation":"s of you","tokenType":"SUFFIX_ONLY"}
+{"root":"לו","translation":"to him","tokenType":"PREFIX"}
+{"root":"יו","translation":" of him","tokenType":"SUFFIX_ONLY"}
 ** Supp words
-{"translation":"in","root":"בה"}
-{"translation":"in it","root":"בו"}
-{"translation":"for me","root":"לי"}
+{"root":"בה","translation":"in"}
+{"root":"בו","translation":"in it"}
+{"root":"לי","translation":"for me"}

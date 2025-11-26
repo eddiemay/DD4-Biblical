@@ -87,8 +87,8 @@
 {"strongsId":"H1098","root":"בליל","translation":"fodder","tokenType":"WORD_STRONGS_MATCH_ONLY"}
 {"strongsId":"H1121","root":"בני","translation":"sons of"}
 {"strongsId":"H1121","root":"בנימ","translation":"sons"}
-{"strongsId":"H1166","translation":"marry","root":"בעל"}
-{"strongsId":"H1166","translation":"married","root":"בעול"}
+{"strongsId":"H1166","root":"בעל","translation":"marry"}
+{"strongsId":"H1166","root":"בעול","translation":"married"}
 {"strongsId":"H1238","root":"בוקק","translation":"voider"}
 {"strongsId":"H1254","root":"בורא","translation":"creator"}
 {"strongsId":"H1254","root":"ברוא","translation":"created"}
@@ -384,6 +384,7 @@
 {"strongsId":"H5414","root":"תנ","translation":"set"}
 {"strongsId":"H5414","root":"תננ","translation":"give"}
 {"strongsId":"H5414","root":"תת","translation":"give"}
+{"strongsId":"H5414","root":"נותנ","translation":"giver"}
 {"strongsId":"H5422","root":"תצ","translation":"broken down"}
 {"strongsId":"H5423","root":"נתוק","translation":"broken"}
 {"strongsId":"H5435","root":"סבא","translation":"liquor"}
