@@ -10,10 +10,10 @@ import numpy as np
 np.random.seed(7) # To make repeatable
 LEARNING_RATE = 0.01
 EPOCHS = 20
-TRAIN_IMAGE_FILENAME = 'mnist/train-images-idx3-ubyte'
-TRAIN_LABEL_FILENAME = 'mnist/train-labels-idx1-ubyte'
-TEST_IMAGE_FILENAME = 'mnist/t10k-images-idx3-ubyte'
-TEST_LABEL_FILENAME = 'mnist/t10k-labels-idx1-ubyte'
+TRAIN_IMAGE_FILENAME = '../../../../data/mnist/train-images-idx3-ubyte'
+TRAIN_LABEL_FILENAME = '../../../../data/mnist/train-labels-idx1-ubyte'
+TEST_IMAGE_FILENAME = '../../../../data/mnist/t10k-images-idx3-ubyte'
+TEST_LABEL_FILENAME = '../../../../data/mnist/t10k-labels-idx1-ubyte'
 
 # Function to read dataset.
 def read_mnist():
@@ -69,7 +69,7 @@ def show_learning(epoch_no, train_acc, test_acc):
   global chart_y_test
   print('epoch no:', epoch_no, ', train_acc: ',
         '%6.4f' % train_acc, ', test_acc: ', '%6.4f' % test_acc)
-  chart_x.append(epoch_no + 1)
+  chart_x.append(epoch_no)
   chart_y_train.append(1.0 - train_acc)
   chart_y_test.append(1.0 - test_acc)
 
@@ -128,7 +128,7 @@ def adjust_weights(x):
     output_layer_w[i] -= hidden_output_array * LEARNING_RATE * error
 
 # Network training loop.
-for i in range(EPOCHS): # Train EPOCHS iterations
+for i in range(1, EPOCHS + 1): # Train EPOCHS iterations
   np.random.shuffle(index_list) # Randomize order
   correct_training_results = 0
   for j in index_list: # Train on all examples
