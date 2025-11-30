@@ -10,10 +10,10 @@ import numpy as np
 np.random.seed(7) # To make repeatable
 LEARNING_RATE = 0.01
 EPOCHS = 20
-TRAIN_IMAGE_FILENAME = '../../../../data/mnist/train-images-idx3-ubyte'
-TRAIN_LABEL_FILENAME = '../../../../data/mnist/train-labels-idx1-ubyte'
-TEST_IMAGE_FILENAME = '../../../../data/mnist/t10k-images-idx3-ubyte'
-TEST_LABEL_FILENAME = '../../../../data/mnist/t10k-labels-idx1-ubyte'
+TRAIN_IMAGE_FILENAME = '../../../../data/MNIST/raw/train-images-idx3-ubyte'
+TRAIN_LABEL_FILENAME = '../../../../data/MNIST/raw/train-labels-idx1-ubyte'
+TEST_IMAGE_FILENAME = '../../../../data/MNIST/raw/t10k-images-idx3-ubyte'
+TEST_LABEL_FILENAME = '../../../../data/MNIST/raw/t10k-labels-idx1-ubyte'
 
 # Function to read dataset.
 def read_mnist():
