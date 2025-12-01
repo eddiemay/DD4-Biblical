@@ -6,10 +6,10 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 from urllib.parse import urlparse
 from pathlib import Path
-from dd4_ml import DD4PyTorchModel
+from dd4_ml import DD4PyTorchModel, DD4Subset, random_split
 
 
 path = '../../../../data/flower_data'
@@ -44,10 +44,8 @@ def download_dataset():
 
 
 class OxfordFlowersDataset(Dataset):
-  def __init__(self, subset=None, transform=None):
+  def __init__(self):
     self.img_dir = os.path.join(path, 'jpg')
-    self.subset = subset
-    self.transform = transform
 
     if not os.path.exists(os.path.join(path, 'imagelabels.mat')):
       download_dataset()
@@ -59,7 +57,7 @@ class OxfordFlowersDataset(Dataset):
 
   # How many total samples
   def __len__(self):
-    return len(self.subset) if self.subset else len(self.labels)
+    return len(self.labels)
 
   # How to get image and label number 'idx'
   def __getitem__(self, idx):
@@ -70,9 +68,6 @@ class OxfordFlowersDataset(Dataset):
     # Loads the image
     image = Image.open(img_path)
     label = self.labels[idx]
-
-    if self.transform:
-      image = self.transform(image)
     return image, label
 
 test_transform = transforms.Compose([
@@ -92,7 +87,7 @@ train_transform = transforms.Compose([
   transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-dataset = OxfordFlowersDataset(transform=test_transform)
+dataset = OxfordFlowersDataset()
 
 # Split into train/val/test: 70/15/15
 train_size = int(0.7 * len(dataset))
@@ -100,12 +95,12 @@ val_size = int(0.15 * len(dataset))
 test_size = len(dataset) - train_size - val_size
 
 train_dataset, val_dataset, test_dataset = random_split(
-    dataset, [train_size, val_size, test_size])
+    dataset,
+    [train_size, val_size, test_size],
+    [train_transform, test_transform, test_transform])
 
 # Create DataLoaders with appropriate settings
-train_loader = DataLoader(
-    OxfordFlowersDataset(subset=train_dataset, transform=train_transform),
-    batch_size=32, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
@@ -124,10 +119,10 @@ if __name__ == '__main__':
       train_loader=train_loader,
       val_loader=val_loader,
       loss_function=nn.CrossEntropyLoss(),
-      in_features=3*224*224, hidden_features=128, out_features=102,
+      in_features=3*224*224, hidden_features=256, out_features=102,
       checkpoint_path='oxford_flower.pt'
   )
 
   train_start_time = time.time()
-  model.train_model(5, torch.optim.Adam(model.parameters(), lr=0.001))
+  model.train_model(100, torch.optim.Adam(model.parameters(), lr=0.001))
   print(f'Total time {(time.time() - train_start_time)} seconds')

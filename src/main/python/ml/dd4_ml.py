@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 
 class DD4PyTorchModel(nn.Module):
@@ -67,7 +67,7 @@ class DD4PyTorchModel(nn.Module):
     correct = 0
     total = 0
     batches = 0
-    # running_val_loss = 0
+    running_val_loss = 0
 
     with torch.no_grad():
       for inputs, targets in self.val_loader:
@@ -76,23 +76,23 @@ class DD4PyTorchModel(nn.Module):
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
-        # val_loss = self.loss_function(outputs, targets)
-        # batches += 1
-        # running_val_loss += val_loss.item()
+        val_loss = self.loss_function(outputs, targets)
+        batches += 1
+        running_val_loss += val_loss.item()
 
-    # avg_val_loss = running_val_loss / batches
-    return 100. * correct / total
+    avg_val_loss = running_val_loss / batches
+    return 100. * correct / total, avg_val_loss
 
   def train_model(self, epochs, optimizer):
     # Training loop
     for epoch in range(1, epochs + 1):
       print('\nEpoch: ', epoch)
       self.train_epoch(epoch, optimizer)
-      accuracy = self.evaluate()
-      print(f'Validation Accuracy: {accuracy:.2f}%')
+      accuracy, val_loss = self.evaluate()
+      print(f' Validation Loss: {val_loss:.3f} | Accuracy: {accuracy:.2f}%')
       # --- Checkpoint ---
       if self.checkpoint_path and accuracy > self.best_val_accuracy:
-        print(f"Validation improved from {self.best_val_accuracy:.2f}% → {accuracy:.2f}%. Saving model.")
+        print(f" Validation improved from {self.best_val_accuracy:.2f}% → {accuracy:.2f}%. Saving model.")
         self.best_val_accuracy = accuracy
         torch.save({
           'epoch': epoch,
@@ -100,3 +100,27 @@ class DD4PyTorchModel(nn.Module):
           'optimizer_state_dict': optimizer.state_dict(),
           'val_accuracy': accuracy
         }, self.checkpoint_path)
+
+
+class DD4Subset(Dataset):
+  def __init__(self, subset, transform):
+    self.subset = subset
+    self.transform = transform
+
+  # How many total samples
+  def __len__(self):
+    return len(self.subset)
+
+  # How to get image and label number 'idx'
+  def __getitem__(self, idx):
+    image, label = self.subset[idx]
+    if self.transform:
+      image = self.transform(image)
+    return image, label
+
+def random_split(dataset, lengths, transforms):
+  splits = torch.utils.data.random_split(dataset, lengths)
+  subsets = []
+  for split, transform in zip(splits, transforms):
+    subsets.append(DD4Subset(split, transform))
+  return subsets
