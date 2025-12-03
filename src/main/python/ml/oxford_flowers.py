@@ -1,15 +1,16 @@
+import matplotlib.pyplot as plt
 import os
 import requests
 import scipy
 import time
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset
-from urllib.parse import urlparse
-from pathlib import Path
 from dd4_ml import DD4PyTorchModel, DD4Subset, random_split
+from pathlib import Path
+from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
+from urllib.parse import urlparse
 
 
 path = '../../../../data/flower_data'
@@ -73,16 +74,18 @@ class OxfordFlowersDataset(Dataset):
 test_transform = transforms.Compose([
   transforms.Resize(256), # Resize image to 256 pixels tall, keeping the aspect ratio
   transforms.CenterCrop(224), # Extract 224x224 center square
-  transforms.ToTensor(),
-  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 train_transform = transforms.Compose([
   transforms.RandomHorizontalFlip(p=0.5),
-  transforms.RandomRotation(degrees=10),
+  transforms.RandomRotation(degrees=30),
   transforms.ColorJitter(brightness=0.2),
-  transforms.Resize(256), # Resize image to 256 pixels tall, keeping the aspect ratio
-  transforms.CenterCrop(224), # Extract 224x224 center square
+  transforms.RandomResizedCrop(224),
+  # transforms.Resize(256), # Resize image to 256 pixels tall, keeping the aspect ratio
+  # transforms.CenterCrop(224), # Extract 224x224 center square
+])
+
+to_tensor_transform = transforms.Compose([
   transforms.ToTensor(),
   transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
@@ -100,9 +103,9 @@ train_dataset, val_dataset, test_dataset = random_split(
     [train_transform, test_transform, test_transform])
 
 # Create DataLoaders with appropriate settings
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+train_loader = DataLoader(DD4Subset(train_dataset, to_tensor_transform), batch_size=32, shuffle=True)
+val_loader = DataLoader(DD4Subset(val_dataset, to_tensor_transform), batch_size=32, shuffle=False)
+test_loader = DataLoader(DD4Subset(test_dataset, to_tensor_transform), batch_size=32, shuffle=False)
 
 # Verify everything works
 print(f'Train: {len(train_loader)} batches')
@@ -114,12 +117,43 @@ for name, loader in [('Train', train_loader), ('Val', val_loader), ('Test', test
   images, labels = next(iter(loader))
   print(f'{name} batch: {images.shape}')
 
+
+def visualize_augmentations(name, dataset, idx=0, num_version=8):
+  # See what the augmentation actually does to your images
+  fig, axes = plt.subplots(2, 4, figsize=(12, 6))
+  axes = axes.flatten()
+
+  for i in range(num_version):
+    img, label = dataset[idx]
+
+    # Denormalize for display
+    # img = denormalize(img)
+
+    axes[i].imshow(img) # CHW -> HWC
+    # axes[1].set_title(f'Version {i + 1}')
+    # axes[1].axis('off')
+
+  plt.suptitle(f'{name} index {idx}, 8 different augmentations')
+  plt.tight_layout()
+  plt.show()
+
 if __name__ == '__main__':
+  for name, dataset in [('Train', train_dataset),
+                        # ('Val', val_dataset), ('Test', test_dataset)
+                      ]:
+    for idx in range(4):
+      visualize_augmentations(name, dataset, idx)
+
   model = DD4PyTorchModel(
       train_loader=train_loader,
       val_loader=val_loader,
       loss_function=nn.CrossEntropyLoss(),
-      in_features=3*224*224, hidden_features=256, out_features=102,
+      layers = nn.Sequential(
+          nn.Linear(3*224*224, 1024),
+          nn.ReLU(),
+          nn.Dropout(.5),
+          nn.Linear(1024, 102)
+      ),
       checkpoint_path='oxford_flower.pt'
   )
 

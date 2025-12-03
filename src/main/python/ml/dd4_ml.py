@@ -5,8 +5,9 @@ from torch.utils.data import DataLoader, Dataset
 
 class DD4PyTorchModel(nn.Module):
   def __init__(self, train_loader:DataLoader=None,
-      val_loader:DataLoader=None, loss_function=None, in_features=None,
-      hidden_features=None, out_features=None, checkpoint_path=None):
+      val_loader:DataLoader=None, loss_function=None, layers=None,
+      in_features=None, hidden_features=None, out_features=None,
+      checkpoint_path=None):
     super().__init__()
     if torch.cuda.is_available():
       self.device = torch.device('cuda')
@@ -21,7 +22,7 @@ class DD4PyTorchModel(nn.Module):
     self.train_loader = train_loader
     self.val_loader = val_loader
     self.flatten = nn.Flatten()
-    self.layers = nn.Sequential(
+    self.layers = layers if layers else nn.Sequential(
         nn.Linear(in_features, hidden_features),
         nn.ReLU(),
         nn.Linear(hidden_features, out_features)
