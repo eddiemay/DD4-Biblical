@@ -213,6 +213,8 @@ com.digitald4.biblical.TimelineCtrl.prototype.saveEvent = function() {
   if (this.editEvent.summary) edits.push('summary')
   if (this.editEvent.depEventId) edits.push('depEventId');
   if (this.editEvent.depRelationship) edits.push('depRelationship');
+  if (this.editEvent.month) edits.push('month')
+  if (this.editEvent.day) edits.push('day')
   if (this.editEvent.offset.value) {
     this.editEvent.offset = {value: this.editEvent.offset.value};
     edits.push('offset');
