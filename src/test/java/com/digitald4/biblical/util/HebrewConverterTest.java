@@ -39,13 +39,13 @@ public class HebrewConverterTest {
 
   @Test
   public void toContantsOnly_geez() {
-    assertThat(HebrewConverter.toConstantsOnly("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።"))
+    assertThat(HebrewConverter.toGeezConstants(HebrewConverter.removePunctuation("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።")))
         .isEqualTo("ከለአተ አመለኸተ አበ ቀደመየ አየሀለወኸ");
   }
 
   @Test
   public void toFullHebrew_geez() {
-    assertThat(HebrewConverter.toFullHebrew("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።"))
+    assertThat(HebrewConverter.toGeezConstants(HebrewConverter.removePunctuation("ካልኦት ኣማልኽቲ ኣብ ቅድመይ ኣይሀልዉኻ።")))
         .isEqualTo("ከለአተ አመለኸተ አበ ቀደመየ አየሀለወኸ");
   }
 

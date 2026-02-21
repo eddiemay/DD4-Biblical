@@ -2,6 +2,7 @@ package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
+import static com.digitald4.biblical.util.HebrewConverter.toGeezConstants;
 import static com.digitald4.biblical.util.HebrewConverter.toRestored;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
@@ -37,6 +38,9 @@ public class MachineTranslator {
 
     SubToken subToken = new SubToken().setWord(word);
     ImmutableList<TokenWord> options = tokenWordStore.getOptions(word);
+    if (options.isEmpty()) {
+      options = tokenWordStore.getOptions(toGeezConstants(word));
+    }
     if (options.isEmpty()) {
       return subToken.setTranslation("[UNK]").setTransliteration(HebrewConverter.transliterate(word, isSuffix));
     }

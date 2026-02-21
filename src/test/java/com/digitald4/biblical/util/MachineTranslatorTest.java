@@ -69,9 +69,15 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("መለኸ").setTranslation("mighty one"),
       new TokenWord().setWord("አበ").setTranslation("at"),
       new TokenWord().setWord("ቀደመ").setTranslation("before"),
-      new TokenWord().setWord("የ").setTranslation(" me").setTokenType(TokenType.SUFFIX_ONLY),
+      new TokenWord().setWord("የ").setTranslation("he ").setAsSuffix(" me").setTokenType(TokenType.PREFIX),
       new TokenWord().setWord("አየሀለወ").setTranslation("there is no"),
-      new TokenWord().setWord("ኸ").setTranslation(" of you").setTokenType(TokenType.SUFFIX_ONLY));
+      new TokenWord().setWord("ኸ").setTranslation(" of you").setTokenType(TokenType.SUFFIX_ONLY),
+      new TokenWord().setWord("ሴም").setTranslation("Shem"),
+      new TokenWord().setWord("ሰመ").setTranslation("name"),
+      new TokenWord().setWord("ካም").setTranslation("Cam"),
+      new TokenWord().setWord("ከመ").setTranslation("like"),
+      new TokenWord().setWord("ያፌት").setTranslation("Yepheth"),
+      new TokenWord().setWord("ፈተ").setTranslation("decide"));
 
   private final TokenWordStore tokenWordStore =
       new TokenWordStore(() -> TOKEN_WORDS, ImmutableMap::of);
@@ -160,6 +166,19 @@ public class MachineTranslatorTest {
         new SubToken().setWord("የ").setTranslation(" me"),
         new SubToken().setWord("አየሀለወ").setTranslation("there is no"),
         new SubToken().setWord("ኸ").setTranslation(" of you"));
+  }
+
+  @Test
+  public void translate_geez_full_modern() {
+    ImmutableList<Interlinear> translation = machineTranslator.translate("ስም ሴም ከም ካም ያፈተ ያፌት");
+    assertThat(translation.stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList())).containsExactly(
+        new SubToken().setWord("ሰመ").setTranslation("name"),
+        new SubToken().setWord("ሴም").setTranslation("Shem"),
+        new SubToken().setWord("ከመ").setTranslation("like"),
+        new SubToken().setWord("ካም").setTranslation("Cam"),
+        new SubToken().setWord("የ").setTranslation("he "),
+        new SubToken().setWord("ፈተ").setTranslation("decide"),
+        new SubToken().setWord("ያፌት").setTranslation("Yepheth"));
   }
 
   @Test

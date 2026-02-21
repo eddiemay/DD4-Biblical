@@ -1,5 +1,6 @@
 package com.digitald4.biblical.util;
 
+import static com.digitald4.biblical.util.HebrewConverter.toGeezConstants;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Arrays.stream;
@@ -46,30 +47,32 @@ public class HebrewTokenizer {
     int strLen = word.length();
     for (int len = strLen; len > 0; len--) {
       for (int start = 0; start + len <= strLen; start++) {
-        String subword = word.substring(start, start + len);
-        ImmutableList<TokenWord> options = tokenWordStore.getOptions(subword);
-        if (!options.isEmpty() && hasGoodOption(state, options, strongsId)) {
-          ImmutableList<String> pretokens;
-          if (start > 0) {
-            pretokens = tokenizeWord(word.substring(0, start), strongsId, SearchState.PREFIX);
-            if (pretokens.isEmpty()) {
-              continue;
+        for (boolean constantsOnly : new boolean[]{false, true}) {
+          String subword = (constantsOnly ? toGeezConstants(word) : word).substring(start, start + len);
+          ImmutableList<TokenWord> options = tokenWordStore.getOptions(subword);
+          if (!options.isEmpty() && hasGoodOption(state, options, strongsId)) {
+            ImmutableList<String> pretokens;
+            if (start > 0) {
+              pretokens = tokenizeWord(word.substring(0, start), strongsId, SearchState.PREFIX);
+              if (pretokens.isEmpty()) {
+                continue;
+              }
+            } else {
+              pretokens = ImmutableList.of();
             }
-          } else {
-            pretokens = ImmutableList.of();
-          }
 
-          ImmutableList<String> postTokens;
-          if (start + len < strLen) {
-            postTokens = tokenizeWord(word.substring(start + len), strongsId, SearchState.SUFFIX);
-            if (postTokens.isEmpty()) {
-              continue;
+            ImmutableList<String> postTokens;
+            if (start + len < strLen) {
+              postTokens = tokenizeWord(word.substring(start + len), strongsId, SearchState.SUFFIX);
+              if (postTokens.isEmpty()) {
+                continue;
+              }
+            } else {
+              postTokens = ImmutableList.of();
             }
-          } else {
-            postTokens = ImmutableList.of();
-          }
 
-          return ImmutableList.<String>builder().addAll(pretokens).add(subword).addAll(postTokens).build();
+            return ImmutableList.<String>builder().addAll(pretokens).add(subword).addAll(postTokens).build();
+          }
         }
       }
     }

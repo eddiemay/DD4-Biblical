@@ -239,10 +239,17 @@ public class HebrewConverter {
   }
 
   public static String toConstantsOnly(String text) {
-    String normalized = FormatText.removeAccents(removePunctuation(text));
+    return FormatText.removeAccents(removePunctuation(text));
+  }
+
+  public static String toConstantsOnly(StringBuilder text) {
+    return toConstantsOnly(text.toString());
+  }
+
+  public static String toGeezConstants(String text) {
     StringBuilder output = new StringBuilder();
-    for (int i = 0; i < normalized.length(); i++) {
-      char c = normalized.charAt(i);
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
       // Check if the character is Ethiopia Geez.
       if (c > 0x1200 && c < 0x137F && !(c == 'ማ' && i != 0 && output.charAt(i - 1) == 'ሰ')) {
         // Calculate the base consonant by subtracting the vowel offset
@@ -250,12 +257,7 @@ public class HebrewConverter {
       }
       output.append(c);
     }
-
     return output.toString();
-  }
-
-  public static String toConstantsOnly(StringBuilder text) {
-    return toConstantsOnly(text.toString());
   }
 
   public static String toFullHebrew(String text) {

@@ -11,10 +11,9 @@
 {"root":"ש","translation":"that which ","tokenType":"PREFIX_ONLY"}
 {"root":"ת","translation":"you ","tokenType":"PREFIX","asSuffix":"s"}
 *** Suffixes ***
-{"root":"ימ","translation":"s","tokenType":"SUFFIX_ONLY"}
 {"root":"ית","translation":"s","tokenType":"SUFFIX_ONLY"}
 {"root":"ות","translation":"s","tokenType":"SUFFIX_ONLY"}
-{"root":"תו","translation":"s of him","tokenType":"SUFFIX_ONLY"}
+{"root":"ימ","translation":"s","tokenType":"SUFFIX_ONLY"}
 {"root":"תכ","translation":"s of you","tokenType":"SUFFIX_ONLY"}
 {"root":"המ","translation":"them","tokenType":"SUFFIX","asSuffix":" of them"}
 {"root":"תמ","translation":"them","tokenType":"SUFFIX","asSuffix":"s"}
@@ -27,6 +26,8 @@
 {"root":"יכ","translation":"s of you","tokenType":"SUFFIX_ONLY"}
 {"root":"לו","translation":"to him","tokenType":"PREFIX"}
 {"root":"יו","translation":" of him","tokenType":"SUFFIX_ONLY"}
+** {"root":"ה","translation":" of her","tokenType":"SUFFIX_ONLY"}
+{"root":"תו","translation":"s of him","tokenType":"SUFFIX_ONLY"}
 ** Supp words
 {"root":"בה","translation":"in"}
 {"root":"בו","translation":"in it"}

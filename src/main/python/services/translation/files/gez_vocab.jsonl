@@ -16,6 +16,7 @@
 {"root":"ከለ","translation":"all"}
 {"root":"ገበረ","translation":"do"}
 ** {"root":"አተ","translation":"that"}
+{"root":"መሰ","translation":"with"}
 {"root":"ሰበዐየተ","translation":"the seventh"}
 {"root":"ገነ","translation":"however"}
 {"root":"ነየ","translation":"of the"}
@@ -64,9 +65,6 @@
 {"root":"ከመአወነ","translation":"likewise"}
 {"root":"ከከመ","translation":"just as"}
 {"root":"ከመአ","translation":"as it is"}
-{"root":"አለ","translation":"said"}
-{"root":"በለ","translation":"he said"}
-{"root":"በለወ","translation":"they said"}
 {"root":"ተዘረበ","translation":"he spoke"}
 {"root":"ዘረበ","translation":"speak"}
 {"root":"ነጀረ","translation":"speak"}
@@ -88,7 +86,6 @@
 {"root":"መንጎ","translation":"between"}
 {"root":"ሰበይት","translation":"woman"}
 {"root":"ንሱ","translation":"he"}
-{"root":"ሰመ","translation":"name"}
 {"root":"ሰማየ","translation":"sky"}
 {"root":"ፈጠረ","translation":"created"}
 {"root":"ገየረ","translation":"made"}
@@ -111,9 +108,12 @@
 {"root":"አበተተመ","translation":"in them"}
 {"root":"ገይሩ","translation":"he did it"}
 {"root":"አመ","translation":"so"}
-{"root":"ከኣ","translation":"and"}
+{"root":"አለ","translation":"and"}
 {"root":"ኸአ","translation":"and"}
 {"root":"ደመ","translation":"and"}
+{"root":"ከኣ","translation":"said"}
+{"root":"በለ","translation":"he said"}
+{"root":"በለወ","translation":"they said"}
 {"root":"ዐረፈ","translation":"he rested"}
 {"root":"ነወሐ","translation":"rest"}
 {"root":"ኸነወሐሰ","translation":"prolong"}
@@ -262,9 +262,10 @@
 {"root":"መተሰለ","translation":"Methuselah"}
 {"root":"ለመከ","translation":"Lamech"}
 {"root":"ነሀ","translation":"Noah"}
-{"root":"ሰመ","translation":"Shem"}
-** {"root":"ከመ","translation":"Cam"}
-{"root":"የፌተ","translation":"Yepheth"}
+{"root":"ሰመ","translation":"name"}
+{"root":"ሴም","translation":"Shem"}
+{"root":"ካም","translation":"Cam"}
+{"root":"ያፌት","translation":"Yepheth"}
 {"root":"ገመረ","translation":"Gomer"}
 {"root":"መገገ","translation":"Magog"}
 {"root":"መደየ","translation":"Madai"}
@@ -304,7 +305,7 @@
 {"root":"የሰከረ","translation":"Issachar"}
 {"root":"ዘበለነነ","translation":"Zebulun of him"}
 {"root":"አሰረአለ","translation":"Yasharael"}
-{"root":"መሰ","translation":"Mosheh"}
+{"root":"ሙሴ","translation":"Mosheh"}
 {"root":"አረነ","translation":"Aaron"}
 {"root":"የሰሰ","translation":"יהושע"}
 *** Numbers ***

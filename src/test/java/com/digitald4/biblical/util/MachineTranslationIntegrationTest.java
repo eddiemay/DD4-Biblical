@@ -172,7 +172,7 @@ public class MachineTranslationIntegrationTest {
   public void geezTranslation() {
     assertThat(translate("Lev 8:1,5, Num 28:21, Psa 83:18, Exo 16:36", "gez"))
         .containsExactly(
-            "Leviticus 8:1 יהוה and to Mosheh as this said he spoke",
+            "Leviticus 8:1 יהוה and to Mosheh as this and he spoke",
             "Leviticus 8:5 Mosheh and the assembly was יהוה to do that which command word this it is he said",
             "Numbers 28:21 the of them seven lamb each lamb tenth mouth man",
             "Psalms 83:18 you master that which name of you alone at high all land high like that which it was of you let know to them",
@@ -182,7 +182,7 @@ public class MachineTranslationIntegrationTest {
   @Test
   public void geezTranslation_greatWords() {
     assertThat(translate("Exo 20", "gez")).containsExactly(
-            "Exodus 20:1 יהוה and this words this all as this said he spoke",
+            "Exodus 20:1 יהוה and this words this all as this and he spoke",
         "Exodus 20:2 out of land Mitsrayim out of house slavery I brought out of you I יהוה the Mighty One of you it is",
         "Exodus 20:3 others the Mighty Ones at before me there is no of you",
         "Exodus 20:4 at high at sky out of existing at down and at land from the existing at water said at down land from the existing carve of him image anything of him for of you not you do",
@@ -192,19 +192,19 @@ public class MachineTranslationIntegrationTest {
         "Exodus 20:8 days Shabbat holy set-apart remember",
         "Exodus 20:9 six days work action all do",
         "Exodus 20:10 was the seventh however of the יהוה the Mighty One of you Shabbat it is by her you of him son of you daughter of you servant of you servants of you animal of you at inside gate of you that which dwell stranger of him some through work not you work",
-        "Exodus 20:11 יהוה in six days sky of him land of him sea of him in them desire all of him made it is so in the seventh days said he rested thus יהוה to days Shabbat blessed of him set-apart of him",
+        "Exodus 20:11 יהוה in six days sky of him land of him sea of him in them desire all of him he did it it is so in the seventh days said he rested thus יהוה to days Shabbat blessed of him set-apart of him",
         "Exodus 20:12 father יהוה the Mighty One of you that which give of you land age of you in order that prolong at of you mother of you the honor",
         "Exodus 20:13 not you kill",
         "Exodus 20:14 not you commit adultery",
         "Exodus 20:15 not you steal",
         "Exodus 20:16 at in neighbour in lies not you testify",
         "Exodus 20:17 house in neighbour not you covet wife in neighbour servant servants bull of him donkey money in neighbour anything all and not you covet",
-        "Exodus 20:18 all of them people and to sound of him intensities of him sound Mighty Ones of him was mountain of him to existing of him seen them people this Mosheh seen and trembled afar of them and weak he said",
+        "Exodus 20:18 all of them people and to sound of him intensities of him sound Mighty Ones of him was mountain of him to existing of him seen them people this with seen and trembled afar of them and weak he said",
         "Exodus 20:19 to Mosheh and you word of him to name of him I the Mighty One however in order that not to death the he speak of him they said",
         "Exodus 20:20 Mosheh and the of them people sins in order that not to do fears at before of you of them to exist the Mighty One in order that to worship of them it is that which come so not you fear he said of them",
         "Exodus 20:21 was people at afar stand Mosheh exists the Mighty One existing darkness draw near",
         "Exodus 20:22 יהוה and to Mosheh he said to son Yasharael as this he said of them I from the sky like the he spoke of you of you of them foods of them see of you of them",
-        "Exodus 20:23 Mosheh me the Mighty Ones not you do the Mighty Ones silver of him the Mighty Ones gold of him for of yous of them not you do",
+        "Exodus 20:23 with me the Mighty Ones not you do the Mighty Ones silver of him the Mighty Ones gold of him for of yous of them not you do",
         "Exodus 20:24 alter from soil stretch out of him me at upon and burnt offerings altersss of you alters praise of you the sheep of you [UNK] man name me at that which remember of you of him all house exist of you come honor of you of you it is",
         "Exodus 20:25 alter so of him you do of you of him me [UNK] you [UNK] [UNK] you so [UNK] so of him not you to son",
         "Exodus 20:26 exist alter me me at upon nakeds of you not ascendhis in carve of him not you climb");
@@ -222,6 +222,15 @@ public class MachineTranslationIntegrationTest {
     assertThat(translate("Gen 35:23, Exo 15:2", "gez")).containsExactly(
         "Genesis 35:23 son Leah Ruban first born Jacob of him Simeon of him Levi of him Yuda of him Issachar of him Zebulun of him",
         "Exodus 15:2 יהוה [UNK] [UNK] it is [UNK] [UNK] said came to be of him [UNK] this the Mighty One me it is so [UNK] it is [UNK] the Mighty One at me it is out of out of of him it is");
+  }
+
+  @Test
+  public void geezTranslation_fullModernFirstPass() {
+    assertThat(translate("Gen 2:11,3:22,5:32,10:1", "gez")).containsExactly(
+        "Genesis 2:11 name was one [UNK] it is he the gold existing all land Havilah [UNK]",
+        "Genesis 3:22 יהוה the Mighty One and behold Adam like one from the of him good of him [UNK] separate to them [UNK] and [UNK] and mother [UNK] out of so lifes took and not he said of him to desire them said life [UNK] not dwell and",
+        "Genesis 5:32 Noah said son five hundred years came to be Noah and to Shem of him to Cam of him to Yepheth of him generation",
+        "Genesis 10:1 generation son Noah this it is Shem Cam Yepheth forss of them and after water flood son to generation of him of them");
   }
 
   @Test
@@ -247,15 +256,15 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:19 evening came to be morning came to be fourths days",
         "Genesis 1:20 the Mighty One and waters life soul existing swarming anything the creature he go out at high land at down firmament sky said the birds he to fruit he said",
         "Genesis 1:21 the Mighty One and the of them greats the creature sea of him the waters that which go out in in kinds life soul existing swarming anything all of him bird existing of him in in kinds of him all of him the birds of him created the Mighty One said good like that which it was seen",
-        "Genesis 1:22 the Mighty One and fruit me of him to many of him to waters sea animalthe and the birds said at land he many said blessed of them",
+        "Genesis 1:22 the Mighty One and fruit me of him to many of him to waters sea animalthe and the birds said at land he many and blessed of them",
         "Genesis 1:23 evening came to be morning came to be fifths days",
         "Genesis 1:24 the Mighty One and land life soul existing in in kinds the creature of him creeps of him beasts land of him in in kinds to go out he said likewise came to be",
         "Genesis 1:25 the Mighty One said beasts land in in kinds of him the creature in in kinds of him all creeps land and in in kinds do the Mighty One and good like that which it was seen",
         "Genesis 1:26 the Mighty One said in image of him as carve of him man to do fish sea of him to birds sky of him to the creature of him existthat which  of him land of him at land creep to anything all creeps of him he servant he said",
-        "Genesis 1:27 the Mighty One and in image man created in image the Mighty One created to male of him the female of him made created of them",
+        "Genesis 1:27 the Mighty One and in image man created in image the Mighty One created to male of him the female of him he did it created of them",
         "Genesis 1:28 the Mighty One said blessed of them the Mighty One and fruit me of him to many of him to land and animalthe  exist Mighty One exist fish sea of him to birds sky of him at land creep to anything all the creature of him said servant he said of them",
-        "Genesis 1:29 the Mighty One and behold at high all land that which see existing all the protects of him that which that which see that which see existing fruit so of the all himand  of them of him give of them said of you so food let it be of them",
-        "Genesis 1:30 to all beasts land of him to all of him the birds sky of him life soul to existing at land creep to anything all and all for animal of them hair to food of them give me of them said of you he said as it is and it was",
+        "Genesis 1:29 the Mighty One and behold at high all land that which see existing all the protects of him that which that which see that which see existing fruit so of the all himand  of them of him give of them and of you so food let it be of them",
+        "Genesis 1:30 to all beasts land of him to all of him the birds sky of him life soul to existing at land creep to anything all and all for animal of them hair to food of them give me of them and of you he said as it is and it was",
         "Genesis 1:31 the Mighty One said that which do anything all seen behold many good came to be evening came to be morning came to be sixths days",
         "Genesis 2:1 as it is sky of him land of him all hosts of them of him to complete of them",
         "Genesis 2:2 the Mighty One said the that which do do house the seventh days complete of them in the seventh days and from thes that which do all do he rested",
