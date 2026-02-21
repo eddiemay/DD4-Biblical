@@ -11,7 +11,7 @@ from train_by_font import cache_bible
 from train_by_font import training_text_file
 from utility import unfinalize
 
-letter_box_file = 'letter_boxes.json'
+letter_box_file = 'letter_boxes.jsonl'
 BASE_MODEL = 'Hebrew_Font'
 MODEL_NAME = f'{BASE_MODEL}_Embedding'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'

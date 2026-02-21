@@ -9,13 +9,7 @@ class DD4PyTorchModel(nn.Module):
       in_features=None, hidden_features=None, out_features=None,
       checkpoint_path=None):
     super().__init__()
-    if torch.cuda.is_available():
-      self.device = torch.device('cuda')
-    elif torch.backends.mps.is_available():
-      self.device = torch.device('mps')
-    else:
-      self.device = torch.device('cpu')
-    print('using device:', self.device)
+    self.device = get_best_device()
 
     self.batch_size = train_loader.batch_size
     self.loss_function = loss_function
@@ -125,3 +119,13 @@ def random_split(dataset, lengths, transforms):
   for split, transform in zip(splits, transforms):
     subsets.append(DD4Subset(split, transform))
   return subsets
+
+def get_best_device():
+  if torch.cuda.is_available():
+    device = torch.device('cuda')
+  elif torch.backends.mps.is_available():
+    device = torch.device('mps')
+  else:
+    device = torch.device('cpu')
+  print('using device:', device)
+  return device

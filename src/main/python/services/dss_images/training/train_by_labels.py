@@ -9,10 +9,11 @@ import subprocess
 import time
 from pathlib import Path
 from train_by_embedding import cache_letter_boxes, columns, letter_box_file
+from verify import process_image
 
 BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
-ITERATIONS = 4092
+ITERATIONS = 8192
 override_letter_cache = False
 MODEL_NAME = f'{BASE_MODEL}_Label_{len(columns)}'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
@@ -83,7 +84,8 @@ def get_box_text(row_box, bottom, ratio):
         boxes.append({'value': value, 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
         prev_x2 = letter_box['x2']
 
-    boxes.append({'value': '\t', 'x1': x2, 'y1': y1, 'x2': math.ceil(x2 + 2 * ratio), 'y2': y2})
+    boxes.append(
+        {'value': '\t', 'x1': x2, 'y1': y1, 'x2': math.ceil(x2 + 2 * ratio), 'y2': y2})
     return boxes
 
 
@@ -123,9 +125,10 @@ def process(sample):
     img = img_map.get(img_filename)
     if img is None:
         img = cv2.imread(img_filename)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        gblur = cv2.GaussianBlur(gray, (3,3), sigmaX=30, sigmaY=300)
-        otsu = cv2.threshold(gblur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        img, _ = process_image(img, {
+            'blur': 'median',
+            'blur_size': 3,
+        })
         img_map[img_filename] = img
 
     top = math.floor(start_row_box['y1'] * ratio)
@@ -188,6 +191,16 @@ def process(sample):
     return sample
 
 
+def add_salt_and_pepper(img, amount=0.01):
+    noisy = img.copy()
+    rand = np.random.rand(*img.shape[:2])
+
+    noisy[rand < amount / 2] = 0
+    noisy[rand > 1 - amount / 2] = 255
+
+    return noisy
+
+
 def output_files(sample):
     file_base_name = FILE_BASE_NAME.format(
         sample['filename'],sample['res'],sample['srow'],sample['erow'])
@@ -195,7 +208,8 @@ def output_files(sample):
     with open(f'{output_directory}/{file_base_name}.gt.txt', 'w') as output_file:
         output_file.writelines([sample['text']])
 
-    cv2.imwrite(f'{output_directory}/{file_base_name}.tif', sample['image'])
+    cv2.imwrite(f'{output_directory}/{file_base_name}.tif',
+                add_salt_and_pepper(sample['image']))
 
     with open(f'{output_directory}/{file_base_name}.box', 'w') as box_file:
         for box in sample['boxes']:

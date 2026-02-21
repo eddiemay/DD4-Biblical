@@ -67,19 +67,19 @@ def diff_line_mode(text1, text2):
 
 def process_image(img, params):
     name = ''
-    if params['gray']:
+    if params.get('gray') is not None and params['gray']:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         name += 'gray'
-    if params['bf'] is not None:
+    if params.get('bf') is not None:
         img = cv2.bilateralFilter(img, params['bf'], 75, 75)
         name += f'-bf{params['bf']}'
-    if params['blur'] == 'median':
+    if params.get('blur') == 'median':
         img = cv2.medianBlur(img, params['blur_size'])
         name += f'-median{params['blur_size']}'
-    elif params['blur'] == 'gaussian':
+    elif params.get('blur') == 'gaussian':
         img = cv2.GaussianBlur(img, [params['blur_size'], params['blur_size']], sigmaX=30, sigmaY=300)
         name += f'-gaussian{params['blur_size']}'
-    if params['threshold_type'] is not None:
+    if params.get('threshold_type') is not None:
         threshold_type = params['threshold_type']
         img = cv2.threshold(img, params['threshold'], 255, threshold_type)[1]
         name += f'-{threshold_names[threshold_type]}_{params['threshold']}'
@@ -192,9 +192,10 @@ def verify(verify_request):
         cv2.imshow('Best Image', best_image)
         plt.figure(num=f'{name} {model}')
         for i in range(6):
+            ii = i % len(top)
             # cv2.imshow(sr[i]['name'], sr[i]['image'])
-            plt.subplot(3, 2, i + 1), plt.imshow(process_image(img, top[i]['parameters'])[0])
-            plt.title(f'{top[i]['name']} {top[i]["percent"]}%')
+            plt.subplot(3, 2, i + 1), plt.imshow(process_image(img, top[ii]['parameters'])[0])
+            plt.title(f'{top[ii]['name']} {top[ii]["percent"]}%')
             plt.xticks([]), plt.yticks([])
         cv2.waitKey(1)
         plt.show()
@@ -207,12 +208,14 @@ def to_verify_request(name, img_file, txt, model=None, multithread=Multithread.P
     preprocessors = []
 
     if use_best:
-        with open('verify_best_preprocessors.json', 'r') as f:
+        with open('verify_best_preprocessors.jsonl', 'r') as f:
             for l in f:
                 preprocessor = json.loads(l)
                 if model is not None:
                     preprocessor['parameters']['model'] = model
                 preprocessors.append(preprocessor)
+    elif use_best is None:
+        preprocessors = [{'parameters': {'model': model}}]
 
 
     return {'name': name, 'image': img, 'text': txt, 'model': model,
@@ -246,7 +249,7 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
     start_time = time.time()
     # Load the best by fragment from file.
     bests_by_fragment = {}
-    with open('verify_best_by_fragment.json', "r", encoding="utf-8") as f:
+    with open('verify_best_by_fragment.jsonl', "r", encoding="utf-8") as f:
         for line in f:
             j = json.loads(line)
             bests_by_fragment[j.get('fragment')] = j['bests']
@@ -314,14 +317,14 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
         std = np.round(np.std(percents), decimals)
         overall_std = np.round(np.std(overall_bests), decimals)
         output(csv, 'Std', [std, overall_std])
-        output(csv, 'Z-Low', [np.round(mean - std * 3, decimals), np.round(overall_mean - overall_std * 3, decimals)])
-        output(csv, 'Z-High', [np.round(mean + std * 3, decimals), np.round(overall_mean + overall_std * 3, decimals)])
+        output(csv, 'Z-Low', [np.round(mean - std * 1.96, decimals), np.round(overall_mean - overall_std * 1.96, decimals)])
+        output(csv, 'Z-High', [np.round(mean + std * 1.96, decimals), np.round(overall_mean + overall_std * 1.96, decimals)])
         print(f"Pool time: {pool_time - start_time} seconds")
         print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
     if not use_best:
         bests = {}
-        with open('verify_best_by_fragment.json', "w", encoding="utf-8") as f:
+        with open('verify_best_by_fragment.jsonl', "w", encoding="utf-8") as f:
             for b in sorted(bests_by_fragment):
                 json.dump({'fragment': b, 'bests': bests_by_fragment[b]}, f)
                 f.write("\n")
@@ -334,26 +337,27 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
                     else:
                         bests[name]['count'] = bests[name]['count'] + 1
 
-        with open('verify_best_preprocessors.json', "w", encoding="utf-8") as f:
+        with open('verify_best_preprocessors.jsonl', "w", encoding="utf-8") as f:
             for b in sorted(bests):
                 json.dump(bests[b], f)
                 f.write("\n")
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=False, model='script/Hebrew', multithread=Multithread.COLUMN_DISTRIBUTED)
+    output_column_stats(use_best=None, model='Hebrew_Font_Embedding_Label_19_mb', multithread=Multithread.COLUMN_LOCAL)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
               'Hebrew_Paleo_14', 'Heb_Paleo_14', 'Hebrew_Label_13', 'Heb_Label_13',
               'Hebrew_Font_Label_13', 'Hebrew_Font_Label_14',
-              'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]
+              'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17',
+              'Hebrew_Font_Embedding_Label_19_16K', BEST_MODEL]
 
-    for fragment in [16, 7, 48, 1, 54]:
+    for fragment in [48, 16, 7, 1, 54]:
         print(f'\nIsaiah-{fragment}')
-        for model in ['Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding', 'Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
-            verify(to_isa_verify_request(fragment, model, use_best=True, display=model==BEST_MODEL))
-
+        for model in ['Hebrew_Font_Embedding_Label_19_mb', 'Hebrew_Font_Embedding_Label_19_sp', 'Hebrew_Font_Embedding_Label_19_gblur', 'Hebrew_Font_Embedding_Label_19_otsu', 'Hebrew_Font_Embedding_Label_19_16K', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
+            verify(to_isa_verify_request(fragment, model, use_best=True, display=False))
+# Jody 937-630-2748
     image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
                    'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
                    'dss_isa_9_6_7-11_embedded.jpg']
@@ -361,4 +365,31 @@ if __name__ == '__main__':
         txt = unfinalize(f.read().strip())
     for img_file in image_files:
         for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
-            verify(to_verify_request(img_file, img_file, txt, model, display=model==BEST_MODEL))
+            verify(to_verify_request(img_file, img_file, txt, model, use_best=True, display=model==BEST_MODEL))
+
+
+''' 
+Isaiah-48 No preprocessing
+isaiah-48, Heb_Font, , 1255, 34.29%
+isaiah-48, Hebrew_Font, , 1105, 42.15%
+isaiah-48, Heb_Embedding, , 871, 54.4%
+isaiah-48, Hebrew_Embedding, , 862, 54.87%
+isaiah-48, Hebrew_Font_Embedding, , 851, 55.45%
+isaiah-48, Hebrew_Font_Label_14, , 554, 70.99%
+isaiah-48, Hebrew_Font_Embedding_Label_14, , 529, 72.3%
+isaiah-48, Hebrew_Font_Embedding_Label_17, , 522, 72.67%
+isaiah-48, Hebrew_Font_Embedding_Label_19, , 524, 72.57%
+'''
+
+'''
+Isaiah-48 The 93 best preprocessor combinations we have identified
+isaiah-48, Heb_Font, gray-median3-THRESH_BINARY_135, 917, 51.99%
+isaiah-48, Hebrew_Font, -bf35-median3, 780, 59.16%
+isaiah-48, Heb_Embedding, -bf14-THRESH_BINARY_132, 446, 76.65%
+isaiah-48, Hebrew_Embedding, -bf35-median3-THRESH_BINARY_145, 421, 77.96%
+isaiah-48, Hebrew_Font_Embedding, -bf28-median3-THRESH_BINARY_145, 421, 77.96%
+isaiah-48, Hebrew_Font_Label_14, -bf35-median3-THRESH_BINARY_145, 152, 92.04%
+isaiah-48, Hebrew_Font_Embedding_Label_14, -bf35-median3-THRESH_BINARY_145, 120, 93.72%
+isaiah-48, Hebrew_Font_Embedding_Label_17, -bf35-median3-THRESH_BINARY_145, 114, 94.03%
+isaiah-48, Hebrew_Font_Embedding_Label_19, -bf28-median3-THRESH_BINARY_145, 122, 93.61%
+'''
