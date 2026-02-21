@@ -1,0 +1,1 @@
+gcloud app deploy --project dd4-biblical

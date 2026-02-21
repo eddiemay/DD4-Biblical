@@ -77,7 +77,7 @@ def fetch_scripture(reference):
   with request.urlopen(fetch_url) as url:
     response = json.load(url)
     # print('Response: ', response)
-    scriptures = response['items']
+    scriptures = response.get('items', [])
     return scriptures
 
 

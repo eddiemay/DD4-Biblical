@@ -13,6 +13,7 @@
 # limitations under the License.
 
 runtime: python311
+instance_class: F2
 service: chatbot # Will be served at http://chatbot-dot-dd4-biblical.appspot.com/
 includes:
   - env_variables.yaml

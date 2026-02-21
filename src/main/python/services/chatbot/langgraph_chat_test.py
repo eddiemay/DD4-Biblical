@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langgraph_mcp_chat import query
+from langgraph_chat import query
 
 def _query(question):
   return query(question, '777')[-1]
