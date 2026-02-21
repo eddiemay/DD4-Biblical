@@ -19,7 +19,7 @@ public class ScriptureVersionTest {
     assertThat(bibleBookStore.getBibleBooks("NRSV")).hasSize(83);
     assertThat(bibleBookStore.getBibleBooks("NWT")).hasSize(66);
     assertThat(bibleBookStore.getBibleBooks("KJV1611")).hasSize(81);
-    assertThat(bibleBookStore.getBibleBooks("OXFORD")).hasSize(5);
+    assertThat(bibleBookStore.getBibleBooks("OXFORD")).hasSize(6);
     assertThat(bibleBookStore.getBibleBooks("Sefaria")).hasSize(12);
     assertThat(bibleBookStore.getBibleBooks("CCC")).hasSize(37);
     assertThat(bibleBookStore.getBibleBooks("WLC")).hasSize(39);

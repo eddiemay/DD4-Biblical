@@ -22,7 +22,7 @@ public class ScriptureVersion {
       new ScriptureVersion("New Revised Standard Version", "NRSV", 30,
           ImmutableSet.of("Canon", "OT Additions", "Deuterocanon", "Eastern")),
       new ScriptureVersion("Oxford", "OXFORD", 40,
-          ImmutableSet.of("Ethiopian", "2 Enoch", "Jubilees", "Jasher", "Book of Adam and Eve")),
+          ImmutableSet.of("Ethiopian", "2 Enoch", "Jubilees", "Jasher", "Book of Adam and Eve", "Order of the Ancients")),
       new ScriptureVersion("New World Translation", "NWT", 50, "Canon"),
       new ScriptureVersion("Sefaria", "Sefaria", 60, ImmutableSet.of("Aristeas", "Jubilees", "Judith", "1 Macc",
           "2 Macc", "Manasseh", "Megillat Antiochus", "Sirach", "Susanna", "Tobit", "TofT", "Wisdom of Solomon"),
