@@ -1,8 +1,7 @@
 package com.digitald4.biblical.util;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;

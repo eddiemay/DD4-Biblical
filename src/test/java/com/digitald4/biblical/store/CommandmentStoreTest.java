@@ -2,14 +2,12 @@ package com.digitald4.biblical.store;
 
 import static com.google.common.truth.Truth.assertThat;
 import static junit.framework.TestCase.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import com.digitald4.biblical.model.Commandment;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.storage.ChangeTracker;
-import com.digitald4.common.storage.DAO;
 import com.digitald4.common.storage.DAOFileDBImpl;
 import com.digitald4.common.storage.SearchIndexer;
 import com.digitald4.common.storage.testing.DAOTestingImpl;

@@ -5,7 +5,7 @@ import static com.digitald4.biblical.util.Language.GEEZ;
 import static com.digitald4.biblical.util.Language.HEBREW;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.digitald4.biblical.model.Scripture;
