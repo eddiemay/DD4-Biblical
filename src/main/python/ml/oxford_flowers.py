@@ -6,14 +6,15 @@ import time
 import torch
 import torch.nn as nn
 from PIL import Image
-from dd4_ml import DD4PyTorchModel, DD4Subset, random_split
+from dd4_ml import DD4PyTorchModel, DD4Subset, evaluate, random_split, load_mobilenet_v3_small, train_model
 from pathlib import Path
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from urllib.parse import urlparse
 
-
 path = '../../../../data/flower_data'
+# Determine the number of classes from the training dataset.
+num_classes = 102
 
 def download_file(url, filename):
   try:
@@ -54,7 +55,8 @@ class OxfordFlowersDataset(Dataset):
     labels_mat = scipy.io.loadmat(os.path.join(path, 'imagelabels.mat'))
 
     self.labels = labels_mat['labels'][0] - 1
-    print('Unique flower count:', torch.unique(torch.tensor(self.labels)))
+    self.classes = torch.unique(torch.tensor(self.labels))
+    print('Unique flower count:', self.classes)
 
   # How many total samples
   def __len__(self):
@@ -78,11 +80,10 @@ test_transform = transforms.Compose([
 
 train_transform = transforms.Compose([
   transforms.RandomHorizontalFlip(p=0.5),
+  transforms.RandomVerticalFlip(p=0.5),
   transforms.RandomRotation(degrees=30),
-  transforms.ColorJitter(brightness=0.2),
+  transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
   transforms.RandomResizedCrop(224),
-  # transforms.Resize(256), # Resize image to 256 pixels tall, keeping the aspect ratio
-  # transforms.CenterCrop(224), # Extract 224x224 center square
 ])
 
 to_tensor_transform = transforms.Compose([
@@ -103,9 +104,9 @@ train_dataset, val_dataset, test_dataset = random_split(
     [train_transform, test_transform, test_transform])
 
 # Create DataLoaders with appropriate settings
-train_loader = DataLoader(DD4Subset(train_dataset, to_tensor_transform), batch_size=32, shuffle=True)
-val_loader = DataLoader(DD4Subset(val_dataset, to_tensor_transform), batch_size=32, shuffle=False)
-test_loader = DataLoader(DD4Subset(test_dataset, to_tensor_transform), batch_size=32, shuffle=False)
+train_loader = DataLoader(DD4Subset(train_dataset, to_tensor_transform), batch_size=64, shuffle=True)
+val_loader = DataLoader(DD4Subset(val_dataset, to_tensor_transform), batch_size=64, shuffle=False)
+test_loader = DataLoader(DD4Subset(test_dataset, to_tensor_transform), batch_size=64, shuffle=False)
 
 # Verify everything works
 print(f'Train: {len(train_loader)} batches')
@@ -138,25 +139,62 @@ def visualize_augmentations(name, dataset, idx=0, num_version=8):
   plt.show()
 
 if __name__ == '__main__':
-  for name, dataset in [('Train', train_dataset),
-                        # ('Val', val_dataset), ('Test', test_dataset)
-                      ]:
-    for idx in range(4):
-      visualize_augmentations(name, dataset, idx)
+  train = False
+  for name, ds in [('Train', train_dataset), ('Val', val_dataset)]:
+    for idx in range(0):
+      visualize_augmentations(name, ds, idx)
 
+  loss_function = nn.CrossEntropyLoss()
   model = DD4PyTorchModel(
       train_loader=train_loader,
       val_loader=val_loader,
-      loss_function=nn.CrossEntropyLoss(),
+      loss_function=loss_function,
       layers = nn.Sequential(
           nn.Linear(3*224*224, 1024),
           nn.ReLU(),
-          nn.Dropout(.5),
-          nn.Linear(1024, 102)
+          nn.Linear(1024, 512),
+          nn.ReLU(),
+          nn.Linear(512, 256),
+          nn.ReLU(),
+          nn.Linear(256, num_classes)
       ),
-      checkpoint_path='oxford_flower.pt'
+      checkpoint_path='oxford_flowers.pt'
   )
 
-  train_start_time = time.time()
-  model.train_model(100, torch.optim.Adam(model.parameters(), lr=0.001))
-  print(f'Total time {(time.time() - train_start_time)} seconds')
+  if train:
+    train_start_time = time.time()
+    # model.train_model(3, torch.optim.Adam(model.parameters(), lr=0.001))
+    print(f'PyTorchModel train time {(time.time() - train_start_time)} seconds')
+
+    train_start_time = time.time()
+    train_loader.classes = dataset.classes
+    model = load_mobilenet_v3_small("mobilenet_v3_small-047dcff4.pth", len(train_loader.classes))
+    model.checkpoint_path = None
+    num_epochs = 64
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
+
+    best_val_accuracy, best_epoch, best_model_state = train_model(
+        model, num_epochs, train_loader, val_loader, loss_function, optimizer, scheduler)
+    # course_2_preview(train_loader, val_loader, loss_function, 3)
+    current_best = torch.load('oxford_flowers_mobilenet_v3_small.pt', map_location='cpu')['val_accuracy']
+    print(f"\n--- Best model: {best_val_accuracy:.2f}% validation accuracy, achieved at epoch {best_epoch} ---")
+    if best_val_accuracy > current_best:
+      print(f'Best increased from {current_best} to {best_val_accuracy}. Saving model.')
+      # Load the state of the best model.
+      model.load_state_dict(best_model_state)
+      torch.save({
+        'epoch': best_epoch,
+        'model_state_dict': best_model_state,
+        'optimizer_state_dict': optimizer.state_dict(),
+        'val_accuracy': best_val_accuracy
+      }, 'oxford_flowers_mobilenet_v3_small.pt')
+    print(f'Course 2 train time {(time.time() - train_start_time)} seconds')
+
+  evaluate_start = time.time()
+  reloaded = load_mobilenet_v3_small("oxford_flowers_mobilenet_v3_small.pt", num_classes, True)
+  test_loss, test_accuracy = evaluate(reloaded, test_loader, loss_function)
+  print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%")
+  test_loss, test_accuracy = evaluate(reloaded, val_loader, loss_function)
+  print(f"Val Loss: {test_loss:.4f}, Val Accuracy: {test_accuracy:.2f}%")
+  print(f'Evaluate time {(time.time() - evaluate_start)} seconds')
