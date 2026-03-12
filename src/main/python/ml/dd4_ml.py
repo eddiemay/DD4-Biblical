@@ -1,4 +1,5 @@
 import copy
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
@@ -8,7 +9,7 @@ from torchvision import models as tv_models
 class DD4PyTorchModel(nn.Module):
   def __init__(self, train_loader:DataLoader=None,
       val_loader:DataLoader=None, loss_function=None, layers=None,
-      in_features=None, hidden_features=None, out_features=None,
+      in_features=None, hidden_features=None, out_features=None, model=None,
       checkpoint_path=None):
     super().__init__()
     self.device = get_best_device()
@@ -17,8 +18,9 @@ class DD4PyTorchModel(nn.Module):
     self.loss_function = loss_function
     self.train_loader = train_loader
     self.val_loader = val_loader
-    self.flatten = nn.Flatten()
+    self.model = model
     self.layers = layers if layers else nn.Sequential(
+        nn.Flatten(),
         nn.Linear(in_features, hidden_features),
         nn.ReLU(),
         nn.Linear(hidden_features, out_features)
@@ -27,13 +29,16 @@ class DD4PyTorchModel(nn.Module):
     self.checkpoint_path = checkpoint_path
 
   def forward(self, x):
-    return self.layers(self.flatten(x))
+    return self.layers(x)
 
-  def train_model(self, epochs, optimizer):
-    return train_model(self, epochs, self.train_loader, self.val_loader, self.loss_function, optimizer)
+  def train_model(self, epochs, optimizer, scheduler=None):
+    return train_model(
+        self if self.model is None else self.model, epochs, self.train_loader,
+        self.val_loader, self.loss_function, optimizer, scheduler)
 
-  def evalulate(self):
-    return evaluate(self, self.val_loader, self.loss_function)
+  def evalulate(self, val_loader=None):
+    return evaluate(self if self.model is None else self.model,
+                    val_loader or self.val_loader, self.loss_function)
 
 
 class DD4Subset(Dataset):
@@ -41,16 +46,23 @@ class DD4Subset(Dataset):
     self.subset = subset
     self.transform = transform
 
-  # How many total samples
   def __len__(self):
     return len(self.subset)
 
-  # How to get image and label number 'idx'
   def __getitem__(self, idx):
     image, label = self.subset[idx]
     if self.transform:
       image = self.transform(image)
     return image, label
+
+
+def conv_block(in_c, out_c):
+  return [
+    nn.Conv2d(in_c, out_c, 3, padding=1),
+    nn.BatchNorm2d(out_c),
+    nn.ReLU(),
+    nn.MaxPool2d(2)
+  ]
 
 
 def evaluate(model, val_loader, loss_function):
@@ -95,7 +107,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
   return running_loss / batches
 
 
-def train_model(model, epochs, train_loader, val_loader, loss_function, optimizer, scheduler=None):
+def train_model(model, epochs, train_loader, val_loader, loss_function, optimizer,
+    scheduler=None, checkpoint_path=None):
   best_val_accuracy, best_epoch = 0, 0
   best_model_state = None
   # Training loop
@@ -110,17 +123,17 @@ def train_model(model, epochs, train_loader, val_loader, loss_function, optimize
 
     # --- Checkpoint ---
     if val_accuracy > best_val_accuracy:
+      if checkpoint_path is not None:
+        print(f" Validation improved from {best_val_accuracy:.2f}% → {val_accuracy:.2f}%. Saving model.")
+        torch.save({
+          'epoch': epoch,
+          'model_state_dict': model.state_dict(),
+          'optimizer_state_dict': optimizer.state_dict(),
+          'val_accuracy': val_accuracy
+        }, checkpoint_path)
       best_val_accuracy = val_accuracy
       best_epoch = epoch
       best_model_state = copy.deepcopy(model.state_dict())
-      if model.checkpoint_path is not None:
-        print(f" Validation improved from {best_val_accuracy:.2f}% → {val_accuracy:.2f}%. Saving model.")
-        torch.save({
-          'epoch': best_epoch,
-          'model_state_dict': best_model_state,
-          'optimizer_state_dict': optimizer.state_dict(),
-          'val_accuracy': best_val_accuracy
-        }, model.checkpoint_path)
 
   return best_val_accuracy, best_epoch, best_model_state
 
@@ -163,3 +176,35 @@ def load_mobilenet_v3_small(weights_path:str, num_classes:int, post_load:bool=Fa
   model.device = device
 
   return model
+
+
+def denormalize(img, mean, std):
+  if mean is None or std is None:
+    return img
+
+  mean = torch.tensor(mean).view(-1,1,1)
+  std = torch.tensor(std).view(-1,1,1)
+  return img * std + mean
+
+
+def visualize_augmentations(name, dataset, idx=0, mean=None, std=None, num_version=8):
+  # See what the augmentation actually does to your images
+  fig, axes = plt.subplots(2, 4, figsize=(12, 6))
+  axes = axes.flatten()
+
+  for i in range(num_version):
+    img, label = dataset[idx]
+
+    # Denormalize for display
+    img = denormalize(img, mean, std)
+
+    if img.shape[0] == 1: # If gray scale.
+      axes[i].imshow(img.squeeze(), cmap='gray')
+    else:
+      axes[i].imshow(img.permute(1, 2, 0)) # CHW -> HWC
+    axes[i].set_title(f'Version {i + 1}')
+    axes[i].axis('off')
+
+  plt.suptitle(f'{name} index {idx}, 8 different augmentations')
+  plt.tight_layout()
+  plt.show()

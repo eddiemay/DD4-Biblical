@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import os
 import requests
 import scipy
@@ -6,7 +5,8 @@ import time
 import torch
 import torch.nn as nn
 from PIL import Image
-from dd4_ml import DD4PyTorchModel, DD4Subset, evaluate, random_split, load_mobilenet_v3_small, train_model
+from dd4_ml import (DD4PyTorchModel, evaluate, random_split, train_model,
+                    load_mobilenet_v3_small, visualize_augmentations)
 from pathlib import Path
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 path = '../../../../data/flower_data'
 # Determine the number of classes from the training dataset.
 num_classes = 102
+
 
 def download_file(url, filename):
   try:
@@ -35,6 +36,7 @@ def download_file(url, filename):
       print(f"Failed to retrieve the file. Status code: {response.status_code}")
   except requests.exceptions.RequestException as e:
     print(f"An error occurred: {e}")
+
 
 def download_dataset():
   """Download the Oxford 102 Flowers dataset"""
@@ -73,9 +75,15 @@ class OxfordFlowersDataset(Dataset):
     label = self.labels[idx]
     return image, label
 
+
+mean=[0.485, 0.456, 0.406]
+std=[0.229, 0.224, 0.225]
+
 test_transform = transforms.Compose([
   transforms.Resize(256), # Resize image to 256 pixels tall, keeping the aspect ratio
   transforms.CenterCrop(224), # Extract 224x224 center square
+  transforms.ToTensor(),
+  transforms.Normalize(mean=mean, std=std)
 ])
 
 train_transform = transforms.Compose([
@@ -84,14 +92,12 @@ train_transform = transforms.Compose([
   transforms.RandomRotation(degrees=30),
   transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
   transforms.RandomResizedCrop(224),
-])
-
-to_tensor_transform = transforms.Compose([
   transforms.ToTensor(),
-  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+  transforms.Normalize(mean=mean, std=std)
 ])
 
 dataset = OxfordFlowersDataset()
+print(f'Dataset {len(dataset)} items')
 
 # Split into train/val/test: 70/15/15
 train_size = int(0.7 * len(dataset))
@@ -102,11 +108,14 @@ train_dataset, val_dataset, test_dataset = random_split(
     dataset,
     [train_size, val_size, test_size],
     [train_transform, test_transform, test_transform])
+print(f'Train: {len(train_dataset)} items')
+print(f'Val: {len(val_dataset)} items')
+print(f'Test: {len(test_dataset)} items')
 
 # Create DataLoaders with appropriate settings
-train_loader = DataLoader(DD4Subset(train_dataset, to_tensor_transform), batch_size=64, shuffle=True)
-val_loader = DataLoader(DD4Subset(val_dataset, to_tensor_transform), batch_size=64, shuffle=False)
-test_loader = DataLoader(DD4Subset(test_dataset, to_tensor_transform), batch_size=64, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
 
 # Verify everything works
 print(f'Train: {len(train_loader)} batches')
@@ -118,31 +127,11 @@ for name, loader in [('Train', train_loader), ('Val', val_loader), ('Test', test
   images, labels = next(iter(loader))
   print(f'{name} batch: {images.shape}')
 
-
-def visualize_augmentations(name, dataset, idx=0, num_version=8):
-  # See what the augmentation actually does to your images
-  fig, axes = plt.subplots(2, 4, figsize=(12, 6))
-  axes = axes.flatten()
-
-  for i in range(num_version):
-    img, label = dataset[idx]
-
-    # Denormalize for display
-    # img = denormalize(img)
-
-    axes[i].imshow(img) # CHW -> HWC
-    # axes[1].set_title(f'Version {i + 1}')
-    # axes[1].axis('off')
-
-  plt.suptitle(f'{name} index {idx}, 8 different augmentations')
-  plt.tight_layout()
-  plt.show()
-
 if __name__ == '__main__':
   train = False
   for name, ds in [('Train', train_dataset), ('Val', val_dataset)]:
-    for idx in range(0):
-      visualize_augmentations(name, ds, idx)
+    for idx in range(2):
+      visualize_augmentations(name, ds, idx, mean, std)
 
   loss_function = nn.CrossEntropyLoss()
   model = DD4PyTorchModel(
@@ -169,14 +158,13 @@ if __name__ == '__main__':
     train_start_time = time.time()
     train_loader.classes = dataset.classes
     model = load_mobilenet_v3_small("mobilenet_v3_small-047dcff4.pth", len(train_loader.classes))
-    model.checkpoint_path = None
     num_epochs = 64
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
 
     best_val_accuracy, best_epoch, best_model_state = train_model(
         model, num_epochs, train_loader, val_loader, loss_function, optimizer, scheduler)
-    # course_2_preview(train_loader, val_loader, loss_function, 3)
+
     current_best = torch.load('oxford_flowers_mobilenet_v3_small.pt', map_location='cpu')['val_accuracy']
     print(f"\n--- Best model: {best_val_accuracy:.2f}% validation accuracy, achieved at epoch {best_epoch} ---")
     if best_val_accuracy > current_best:

@@ -19,6 +19,8 @@ val_dataset = torchvision.datasets.MNIST(
     root='../../../../data/', train=False, download=True, transform=transform)
 
 if __name__ == '__main__':
+  print(f'Train {len(train_dataset)} items')
+  print(f'Val {len(val_dataset)} items')
   model = DD4PyTorchModel(
       train_loader=DataLoader(train_dataset, batch_size=256, shuffle=True),
       val_loader=DataLoader(val_dataset, batch_size=1000, shuffle=False),
