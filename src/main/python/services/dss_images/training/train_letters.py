@@ -46,6 +46,7 @@ transform = transforms.Compose([
 train_transform = transforms.Compose([
   transforms.RandomRotation(degrees=10),
   transforms.RandomAffine(degrees=0, translate=(0.05, 0.05), scale=(0.9, 1.1)),
+  transforms.RandomHorizontalFlip(),
   transforms.RandomPerspective(distortion_scale=0.2, p=0.3),
   transforms.ColorJitter(brightness=0.3, contrast=0.3),
   transforms.GaussianBlur(3, sigma=(0.1,1.5)),
@@ -91,6 +92,7 @@ if __name__ == '__main__':
     nn.Flatten(),
     nn.Linear(256, 256),
     nn.ReLU(),
+    nn.Dropout(0.6),
     nn.Linear(256, len(dataset.classes))
   ]
 

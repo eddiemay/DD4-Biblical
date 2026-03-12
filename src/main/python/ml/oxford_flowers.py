@@ -158,7 +158,7 @@ if __name__ == '__main__':
     train_start_time = time.time()
     train_loader.classes = dataset.classes
     model = load_mobilenet_v3_small("mobilenet_v3_small-047dcff4.pth", len(train_loader.classes))
-    num_epochs = 64
+    num_epochs = 10
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
 

@@ -104,7 +104,7 @@ def cache_letter_boxes(columns, override_letter_cache=False):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, WithImage(), override_letter_cache=False)
+  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, ToImage(), override_letter_cache=False)
   print(f'Dataset {len(dataset)} letters')
   for i in range(3):
     image, label = dataset[i]
