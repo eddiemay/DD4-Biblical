@@ -1,21 +1,17 @@
 import cv2
-import json
 import os
 import random
 import shutil
 import subprocess
+from letterbox_utils import DSSLettersDataset
 from multiprocessing import Pool
 from pathlib import Path
-from urllib import request
 from train_by_font import cache_bible
 from train_by_font import training_text_file
 from utility import unfinalize
 
-letter_box_file = 'letter_boxes.jsonl'
 BASE_MODEL = 'Hebrew_Font'
 MODEL_NAME = f'{BASE_MODEL}_Embedding'
-API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1'
 BASE_OUTPUT = 'tesstrain/data/'
 output_directory = f'{BASE_OUTPUT}embedding-ground-truth'
 base_image = cv2.imread('../images/isaiah/columns/column_9_54.jpg')
@@ -28,48 +24,23 @@ fragment_map = {}
 line_spacing = 60
 min_space = 5
 max_space = 10
-columns = [2, 4, 7, 9, 13, 14, 16, 17, 18, 20, 26, 27, 36, 40, 44, 45, 47, 48, 53]
 override_letter_cache = False
-
-
-def cache_letter_boxes(columns, override_letter_cache=False):
-    if os.path.exists(letter_box_file) and not override_letter_cache:
-        return
-
-    fragments = list(map(lambda c: f'isaiah-column-{c}', columns))
-    # Open the file for write.
-    print('Writing file: ', letter_box_file)
-    with open(letter_box_file, "w", encoding="utf-8") as f:
-        for fragment in fragments:
-            letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
-            print('Sending request: ', letterbox_url)
-            with request.urlopen(letterbox_url) as url:
-                response = json.load(url)
-                print('Response: ', response)
-                letterboxes = response['items']
-                # Dump each scripture verse into the file.
-                for letterbox in letterboxes:
-                    json.dump(letterbox, f)
-                    f.write("\n")
 
 
 def get_random_letter_box(letter):
     if not letter_map:
         print('creating letter map')
-        with open(letter_box_file, "r", encoding="utf-8") as f:
-            letters = 0
-            for line in f:
-                letter_box = json.loads(line)
-                if letter_box['type'] == 'Letter':
-                    letters += 1
-                    collection = letter_map.get(letter_box['value'])
-                    if not collection:
-                        collection = []
-                        letter_map[letter_box['value']] = collection
-                    collection.append(letter_box)
-            print(f'{letters} letters')
-            for l in sorted(letter_map):
-                print(f'{l}: {len(letter_map.get(l))}')
+        filter = lambda letter_box:letter_box['type'] == 'Letter'
+        dataset = DSSLettersDataset(filter=filter, override_letter_cache=override_letter_cache)
+        for letter_box, label in dataset:
+            collection = letter_map.get(letter_box['value'])
+            if not collection:
+                collection = []
+                letter_map[letter_box['value']] = collection
+            collection.append(letter_box)
+        print(f'{len(dataset)} letters')
+        for l in sorted(letter_map):
+            print(f'{l}: {len(letter_map.get(l))}')
 
     collection = letter_map.get(letter)
     if collection:
@@ -182,7 +153,6 @@ if __name__ == '__main__':
     # cv2.waitKey()
 
     cache_bible()
-    cache_letter_boxes(columns, override_letter_cache)
 
     # Read each training file line and put it in an array.
     lines = []

@@ -1,5 +1,4 @@
 import cv2
-import json
 import math
 import numpy as np
 import os
@@ -7,8 +6,8 @@ import random
 import shutil
 import subprocess
 import time
+from letterbox_utils import DSSLettersDataset, columns
 from pathlib import Path
-from train_by_embedding import cache_letter_boxes, columns, letter_box_file
 from verify import process_image
 
 BASE_MODEL = 'Hebrew_Font_Embedding'
@@ -27,35 +26,32 @@ def get_row(filename, row):
         print('creating row map')
         letter_boxes = []
         row_boxes = []
-        with open(letter_box_file, "r", encoding="utf-8") as f:
-            rows = 0
-            for line in f:
-                letter_box = json.loads(line)
-                if letter_box['type'] == 'Row':
-                    rows += 1
-                    letter_box['_letterBoxes'] = []
-                    row_boxes.append(letter_box)
-                    row_map[f'{letter_box["filename"]}-{letter_box["value"]}'] = letter_box
-                elif letter_box['type'] == 'Letter':
-                    letter_boxes.append(letter_box)
-            print(f'{rows} total rows')
-            print(f'{len(letter_boxes)} total letters')
-            row_boxes = sorted(row_boxes, key=lambda b: b['y2'])
+        dataset = DSSLettersDataset(override_letter_cache=override_letter_cache)
+        for letter_box, label in dataset:
+            if letter_box['type'] == 'Row':
+                letter_box['_letterBoxes'] = []
+                row_boxes.append(letter_box)
+                row_map[f'{letter_box["filename"]}-{letter_box["value"]}'] = letter_box
+            elif letter_box['type'] == 'Letter':
+                letter_boxes.append(letter_box)
+        print(f'{len(row_boxes)} total rows')
+        print(f'{len(letter_boxes)} total letters')
+        row_boxes = sorted(row_boxes, key=lambda b:b['y2'])
 
-            added_letters = 0
-            for letter_box in letter_boxes:
-                fname = letter_box['filename']
-                y2 = letter_box['y2']
-                for row_box in row_boxes:
-                    if fname == row_box['filename'] and y2 <= row_box['y2']:
-                        row_box['_letterBoxes'].append(letter_box)
-                        added_letters += 1
-                        break
-
-            print(f'{added_letters} letters added')
+        added_letters = 0
+        for letter_box in letter_boxes:
+            fname = letter_box['filename']
+            y2 = letter_box['y2']
             for row_box in row_boxes:
-                row_box['_letterBoxes'] =\
-                    sorted(row_box['_letterBoxes'], key=lambda b: b['x2'], reverse=True)
+                if fname == row_box['filename'] and y2 <= row_box['y2']:
+                    row_box['_letterBoxes'].append(letter_box)
+                    added_letters += 1
+                    break
+
+        print(f'{added_letters} letters added')
+        for row_box in row_boxes:
+            row_box['_letterBoxes'] = sorted(
+                row_box['_letterBoxes'], key=lambda b:b['x2'], reverse=True)
 
     row_box = row_map.get(f'{filename}-{row}')
     if row_box is None and 1 < row < 31:
@@ -84,8 +80,8 @@ def get_box_text(row_box, bottom, ratio):
         boxes.append({'value': value, 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
         prev_x2 = letter_box['x2']
 
-    boxes.append(
-        {'value': '\t', 'x1': x2, 'y1': y1, 'x2': math.ceil(x2 + 2 * ratio), 'y2': y2})
+    boxes.append({'value': '\t', 'x1': x2,
+                  'y1': y1, 'x2': math.ceil(x2 + 2 * ratio), 'y2': y2})
     return boxes
 
 
@@ -234,7 +230,6 @@ def display(sample):
 
 if __name__ == '__main__':
     start_time = time.time()
-    cache_letter_boxes(columns, override_letter_cache)
     # for r in range(1, 8):
         # output_row('isaiah', 44, r)
     # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 25, 'res': 10}))

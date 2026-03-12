@@ -344,7 +344,7 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=None, model='Hebrew_Font_Embedding_Label_19_mb', multithread=Multithread.COLUMN_LOCAL)
+    output_column_stats(use_best=True, model='Hebrew_Font_Embedding_Label_19', multithread=Multithread.COLUMN_LOCAL)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',
