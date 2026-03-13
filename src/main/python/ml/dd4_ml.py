@@ -34,7 +34,7 @@ class DD4PyTorchModel(nn.Module):
   def train_model(self, epochs, optimizer, scheduler=None):
     return train_model(
         self if self.model is None else self.model, epochs, self.train_loader,
-        self.val_loader, self.loss_function, optimizer, scheduler)
+        self.val_loader, self.loss_function, optimizer, scheduler, self.checkpoint_path)
 
   def evalulate(self, val_loader=None):
     return evaluate(self if self.model is None else self.model,
