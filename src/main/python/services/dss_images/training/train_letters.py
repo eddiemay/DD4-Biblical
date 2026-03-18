@@ -9,6 +9,9 @@ from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
   visualize_augmentations, DD4Subset, conv_block
 from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
+
+from src.main.python.services.dss_images.training.letterbox_utils import \
+  get_image
 from verify import process_image
 from letterbox_stats import VISUALIZE_PAGE_SIZE
 
@@ -128,11 +131,11 @@ if __name__ == '__main__':
   model = DD4PyTorchModel(
       train_loader=train_loader, val_loader=val_loader,
       loss_function=loss_function, layers=nn.Sequential(*layers),
-      checkpoint_path='letter_model.pth', best_val_accuracy=97.71
+      checkpoint_path='letter_model.pth', min_val_accuracy=97.71
   )
 
   train_start_time = time.time()
-  num_epochs = 80
+  num_epochs = 0
   optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
   scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
   model.train_model(num_epochs, optimizer, scheduler)

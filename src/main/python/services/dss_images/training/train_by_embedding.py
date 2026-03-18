@@ -3,7 +3,7 @@ import os
 import random
 import shutil
 import subprocess
-from letterbox_utils import DSSLettersDataset
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY
 from multiprocessing import Pool
 from pathlib import Path
 from train_by_font import cache_bible
@@ -30,14 +30,13 @@ override_letter_cache = False
 def get_random_letter_box(letter):
     if not letter_map:
         print('creating letter map')
-        filter = lambda letter_box:letter_box['type'] == 'Letter'
-        dataset = DSSLettersDataset(filter=filter, override_letter_cache=override_letter_cache)
-        for img, label, metadata in dataset:
-            collection = letter_map.get(metadata['value'])
+        dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, override_letter_cache=override_letter_cache)
+        for img, label, letter_box in dataset:
+            collection = letter_map.get(letter_box['value'])
             if not collection:
                 collection = []
-                letter_map[metadata['value']] = collection
-            collection.append(metadata)
+                letter_map[letter_box['value']] = collection
+            collection.append(letter_box)
         print(f'{len(dataset)} letters')
         for l in sorted(letter_map):
             print(f'{l}: {len(letter_map.get(l))}')
