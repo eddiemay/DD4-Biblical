@@ -27,7 +27,7 @@ def get_row(filename, row):
         letter_boxes = []
         row_boxes = []
         dataset = DSSLettersDataset(override_letter_cache=override_letter_cache)
-        for letter_box, label in dataset:
+        for img, label, letter_box in dataset:
             if letter_box['type'] == 'Row':
                 letter_box['_letterBoxes'] = []
                 row_boxes.append(letter_box)

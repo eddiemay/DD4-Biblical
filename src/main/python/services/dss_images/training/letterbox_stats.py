@@ -2,16 +2,16 @@ import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
 from PIL import Image as PilImage
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, WithImage
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY
 
-VISUALIZE_PAGE_SIZE = 32
+VISUALIZE_PAGE_SIZE = 24
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", None)
 
 
 def visualize_abnormals(title, abnormal):
   # See what the augmentation actually does to your images
-  fig, axes = plt.subplots(8, 4, figsize=(12, 6))
+  fig, axes = plt.subplots(int(VISUALIZE_PAGE_SIZE / 4), 4, figsize=(12, 6))
   axes = axes.flatten()
 
   for i, box in enumerate(abnormal.itertuples()):
@@ -49,11 +49,12 @@ def find_abnormals(letter, df, prop):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, WithImage(), override_letter_cache=False)
+  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, override_letter_cache=False)
   print(f'Dataset {len(dataset)} letters')
   letters = []
-  for letter_box, label in dataset:
-    letters.append(letter_box)
+  for img, label, metadata in dataset:
+    metadata['image'] = img
+    letters.append(metadata)
 
   df = pd.DataFrame(letters)
   df["width"] = df["x2"] - df["x1"]

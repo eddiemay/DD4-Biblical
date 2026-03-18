@@ -15,70 +15,52 @@ SINGLE_LETTERS_ONLY =\
 
 
 class DSSLettersDataset(Dataset):
-  def __init__(self, filter=None, transform=None, override_letter_cache:bool=False):
+  def __init__(self, filter=None, transform=None, res=9, override_letter_cache:bool=False):
     self.transform = transform or (lambda x:x)
+    self.res = res
     cache_letter_boxes(columns, override_letter_cache)
-    self.letters:list[dict] = []
+    self.metadata:list[dict] = []
     self.labels = []
+    classes = set()
     with open(letter_box_file, "r", encoding="utf-8") as f:
       for line in f:
         letter_box = json.loads(line)
         if filter is None or filter(letter_box):
-          self.letters.append(letter_box)
+          self.metadata.append(letter_box)
           value = letter_box['value']
-          self.labels.append(ord(value) - ord('א') + 1 if len(value) == 1 else 0)
-      self.classes = torch.unique(torch.tensor(self.labels))
-      print('Unique letter count:', len(self.classes))
+          classes.add(value)
+          self.labels.append(ord(value) - ord('א') if len(value) == 1 and value >= 'א' and value <= 'ת' else 27)
+      self.classes = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
+      print(f'Classes: {self.classes} {len(self.classes)}')
+      print(f'Labels: {torch.unique(torch.tensor(self.labels))} {type(self.labels[0])}')
+      self.images = [None] * len(self.metadata)
 
   def __len__(self):
-    return len(self.letters)
+    return len(self.metadata)
 
   def __getitem__(self, idx):
-    return self.transform(self.letters[idx]), self.labels[idx]
-
-
-class WithImage:
-  file_img_cache = {}
-  def __init__(self, res=9):
-    self.res = res
-
-  def __call__(self, letter):
-    if letter.get('image') is None:
-      file_img = self.file_img_cache.get(letter['filename'])
-      if file_img is None:
-        file_img = cv2.imread(f'../images/isaiah/columns/column_{self.res}_{letter['filename'][14:]}.jpg')
-        self.file_img_cache[letter['filename']] = file_img
-      scale = {10: 2, 9: 1, 8: 0.5}.get(self.res)
-      y1, y2 = int(letter['y1'] * scale), int(letter['y2'] * scale)
-      x1, x2 = int(letter['x1'] * scale), int(letter['x2'] * scale)
-      img = file_img[y1:y2, x1:x2]
-      letter['image'] = img
-    return letter
-
-
-class ToImage:
-  def __init__(self, res=9):
-    self.with_image = WithImage(res)
-
-  def __call__(self, letter):
-    return self.with_image(letter)['image']
+    img = self.images[idx]
+    if img is None:
+      img = get_image(self.metadata[idx], self.res)
+      self.images[idx] = img
+    return self.transform(img), self.labels[idx], self.metadata[idx]
 
 
 class ToPilImage:
-  def __init__(self, res=9):
-    self.with_image = WithImage(res)
-
-  def __call__(self, value):
-    if isinstance(value, dict):
-      if value.get('pilImage') is None:
-        img = value['image'] if value.get('image') is not None else self.with_image(value)['image']
-        value['pilImage'] = PilImage.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-      return value['pilImage']
-    else:
-      # We can not cache the pillow image if is produced from an image, bcz
-      # that image could be different each time.
-      img = value
+  def __call__(self, img):
     return PilImage.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+
+
+file_img_cache = {}
+def get_image(letter_box:dict, res:int=9):
+  file_img = file_img_cache.get(letter_box['filename'])
+  if file_img is None:
+    file_img = cv2.imread(f'../images/isaiah/columns/column_{res}_{letter_box['filename'][14:]}.jpg')
+    file_img_cache[letter_box['filename']] = file_img
+  scale = {10: 2, 9: 1, 8: 0.5}.get(res)
+  y1, y2 = int(letter_box['y1'] * scale), int(letter_box['y2'] * scale)
+  x1, x2 = int(letter_box['x1'] * scale), int(letter_box['x2'] * scale)
+  return file_img[y1:y2, x1:x2]
 
 
 def cache_letter_boxes(columns, override_letter_cache=False):
@@ -104,16 +86,16 @@ def cache_letter_boxes(columns, override_letter_cache=False):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, ToImage(), override_letter_cache=False)
+  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, override_letter_cache=False)
   print(f'Dataset {len(dataset)} letters')
   for i in range(3):
-    image, label = dataset[i]
+    image, label, metadata = dataset[i]
     cv2.imshow(str(label), image)
     cv2.waitKey(3000)
 
-  imageDataset = DSSLettersDataset(filter=None, transform=ToImage())
+  imageDataset = DSSLettersDataset()
   print(f'Dataset {len(imageDataset)} letters')
   for i in range(3):
-    image, label = imageDataset[i]
+    image, label, metadata = imageDataset[i]
     cv2.imshow(str(label), image)
     cv2.waitKey(3000)

@@ -32,12 +32,12 @@ def get_random_letter_box(letter):
         print('creating letter map')
         filter = lambda letter_box:letter_box['type'] == 'Letter'
         dataset = DSSLettersDataset(filter=filter, override_letter_cache=override_letter_cache)
-        for letter_box, label in dataset:
-            collection = letter_map.get(letter_box['value'])
+        for img, label, metadata in dataset:
+            collection = letter_map.get(metadata['value'])
             if not collection:
                 collection = []
-                letter_map[letter_box['value']] = collection
-            collection.append(letter_box)
+                letter_map[metadata['value']] = collection
+            collection.append(metadata)
         print(f'{len(dataset)} letters')
         for l in sorted(letter_map):
             print(f'{l}: {len(letter_map.get(l))}')
