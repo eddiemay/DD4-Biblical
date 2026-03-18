@@ -10,7 +10,7 @@ class DD4PyTorchModel(nn.Module):
   def __init__(self, train_loader:DataLoader=None,
       val_loader:DataLoader=None, loss_function=None, layers=None,
       in_features=None, hidden_features=None, out_features=None, model=None,
-      checkpoint_path=None):
+      checkpoint_path=None, min_val_accuracy=0):
     super().__init__()
     self.device = get_best_device()
 
@@ -27,6 +27,7 @@ class DD4PyTorchModel(nn.Module):
     )
     self.to(self.device)
     self.checkpoint_path = checkpoint_path
+    self.min_val_accuracy = min_val_accuracy
 
   def forward(self, x):
     return self.layers(x)
@@ -34,11 +35,15 @@ class DD4PyTorchModel(nn.Module):
   def train_model(self, epochs, optimizer, scheduler=None):
     return train_model(
         self if self.model is None else self.model, epochs, self.train_loader,
-        self.val_loader, self.loss_function, optimizer, scheduler, self.checkpoint_path)
+        self.val_loader, self.loss_function, optimizer, scheduler,
+        self.checkpoint_path, self.min_val_accuracy)
 
   def evalulate(self, val_loader=None):
     return evaluate(self if self.model is None else self.model,
                     val_loader or self.val_loader, self.loss_function)
+
+  def reload(self, filepath:str):
+    reload(self, filepath)
 
 
 class DD4Subset(Dataset):
@@ -50,10 +55,12 @@ class DD4Subset(Dataset):
     return len(self.subset)
 
   def __getitem__(self, idx):
-    image, label = self.subset[idx]
+    batch = self.subset[idx]
+    image = batch[0]
+    label = batch[1]
     if self.transform:
       image = self.transform(image)
-    return image, label
+    return (image, label) if len(batch) == 2 else (image, label, batch[2])
 
 
 def conv_block(in_c, out_c):
@@ -70,8 +77,8 @@ def evaluate(model, val_loader, loss_function):
   correct, total, batches, running_val_loss = 0, 0, 0, 0
 
   with torch.no_grad():
-    for inputs, targets in val_loader:
-      inputs, targets = inputs.to(model.device), targets.to(model.device)
+    for batch in val_loader:
+      inputs, targets = batch[0].to(model.device), batch[1].to(model.device)
       outputs = model(inputs)
       _, predicted = outputs.max(1)
       total += targets.size(0)
@@ -88,8 +95,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
   model.train()
   running_loss, correct, total, batches = 0, 0, 0, 0
 
-  for data, target in train_loader:
-    data, target = data.to(model.device), target.to(model.device)
+  for batch in train_loader:
+    data, target = batch[0].to(model.device), batch[1].to(model.device)
 
     optimizer.zero_grad()
     output = model(data)
@@ -108,7 +115,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 
 def train_model(model, epochs, train_loader, val_loader, loss_function, optimizer,
-    scheduler=None, checkpoint_path=None):
+    scheduler=None, checkpoint_path=None, min_val_accuracy=0):
   best_val_accuracy, best_epoch = 0, 0
   best_model_state = None
   # Training loop
@@ -122,7 +129,7 @@ def train_model(model, epochs, train_loader, val_loader, loss_function, optimize
       scheduler.step()
 
     # --- Checkpoint ---
-    if val_accuracy > best_val_accuracy:
+    if val_accuracy > best_val_accuracy and val_accuracy > min_val_accuracy:
       if checkpoint_path is not None:
         print(f" Validation improved from {best_val_accuracy:.2f}% → {val_accuracy:.2f}%. Saving model.")
         torch.save({
@@ -136,6 +143,10 @@ def train_model(model, epochs, train_loader, val_loader, loss_function, optimize
       best_model_state = copy.deepcopy(model.state_dict())
 
   return best_val_accuracy, best_epoch, best_model_state
+
+
+def reload(model:nn.Module, filepath:str):
+  model.load_state_dict(torch.load(filepath, map_location=model.device)['model_state_dict'])
 
 
 def random_split(dataset, lengths, transforms):
