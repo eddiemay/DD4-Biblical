@@ -5,12 +5,12 @@ import time
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage
+from PIL import Image as PilImage
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage, get_image
 from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
   visualize_augmentations, DD4Subset, conv_block
 from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
-
 from verify import process_image
 from letterbox_stats import VISUALIZE_PAGE_SIZE
 
@@ -73,10 +73,14 @@ def visualize_incorrect(title, df):
   # See what the augmentation actually does to your images
   fig, axes = plt.subplots(int(VISUALIZE_PAGE_SIZE / 4), 4, figsize=(12, 6))
   axes = axes.flatten()
+  toPilImage = ToPilImage()
 
   for i, row in enumerate(df.itertuples()):
-    img = row.image
-    if img.shape[0] == 1: # If gray scale.
+    img = toPilImage(get_image({'filename': row.filename,
+                     'x1': row.x1, 'y1': row.y1, 'x2': row.x2, 'y2': row.y2}))
+    if isinstance(img, PilImage.Image):
+      axes[i].imshow(img)
+    elif img.shape[0] == 1: # If gray scale.
       axes[i].imshow(img.squeeze(), cmap='gray')
     else:
       axes[i].imshow(img.permute(1, 2, 0))
@@ -173,7 +177,8 @@ if __name__ == '__main__':
           "filename": metadata["filename"][i],
           "x1": metadata["x1"][i].item(),
           "y1": metadata["y1"][i].item(),
-          "image": inputs[i].cpu()
+          "x2": metadata["x2"][i].item(),
+          "y2": metadata["y2"][i].item(),
         })
 
   df = pd.DataFrame(rows)
