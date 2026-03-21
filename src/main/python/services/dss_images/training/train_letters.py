@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
 import time
 import torch
@@ -10,14 +11,13 @@ from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
 from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
 
-from src.main.python.services.dss_images.training.letterbox_utils import \
-  get_image
 from verify import process_image
 from letterbox_stats import VISUALIZE_PAGE_SIZE
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", None)
 torch.manual_seed(42)
+checkpoint_path = 'letter_model.pth'
 mean, std = (0.5,), (0.5,)
 
 # bf7-median3-THRESH_BINARY_135
@@ -91,6 +91,7 @@ def visualize_incorrect(title, df):
 
 
 if __name__ == '__main__':
+  train = False
   dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} items')
 
@@ -131,20 +132,24 @@ if __name__ == '__main__':
   model = DD4PyTorchModel(
       train_loader=train_loader, val_loader=val_loader,
       loss_function=loss_function, layers=nn.Sequential(*layers),
-      checkpoint_path='letter_model.pth', min_val_accuracy=97.71
+      checkpoint_path=checkpoint_path, min_val_accuracy=97.71
   )
 
-  train_start_time = time.time()
-  num_epochs = 0
-  optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
-  scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
-  model.train_model(num_epochs, optimizer, scheduler)
-  print(f'Training time {(time.time() - train_start_time)} seconds')
+  if train or not os.path.exists(checkpoint_path):
+    train_start_time = time.time()
+    num_epochs = 80
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
+    best_val_accuracy, _, _ = model.train_model(num_epochs, optimizer, scheduler)
+    if best_val_accuracy > 0: # If we replaced the save model we should export.
+      model.export("letter_model.onnx", "image", "letter")
+    print(f'Training time {(time.time() - train_start_time)} seconds')
 
-  model.reload('letter_model.pth')
+  model.reload(checkpoint_path)
   test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=False)
   loss, accuracy = model.evalulate(test_loader)
   print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%')
+  # model.export("letter_model.onnx", "image", "letter")
   full_loader = DataLoader(
       DD4Subset(dataset, test_transform), batch_size=1000, shuffle=False)
   loss, accuracy = model.evalulate(full_loader)

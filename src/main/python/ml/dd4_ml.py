@@ -5,7 +5,6 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 from torchvision import models as tv_models
 
-
 class DD4PyTorchModel(nn.Module):
   def __init__(self, train_loader:DataLoader=None,
       val_loader:DataLoader=None, loss_function=None, layers=None,
@@ -44,6 +43,11 @@ class DD4PyTorchModel(nn.Module):
 
   def reload(self, filepath:str):
     reload(self, filepath)
+
+  def export(self, filename:str, input_name:str, output_name:str):
+    return export(self if self.model is None else self.model,
+                  next(iter(self.val_loader))[0],
+                  filename, input_name, output_name)
 
 
 class DD4Subset(Dataset):
@@ -142,11 +146,30 @@ def train_model(model, epochs, train_loader, val_loader, loss_function, optimize
       best_epoch = epoch
       best_model_state = copy.deepcopy(model.state_dict())
 
+  if best_val_accuracy > 0:
+    model.load_state_dict(best_model_state)
   return best_val_accuracy, best_epoch, best_model_state
 
 
 def reload(model:nn.Module, filepath:str):
   model.load_state_dict(torch.load(filepath, map_location=model.device)['model_state_dict'])
+
+
+def export(trained_model:nn.Module, input_sample:any, filename:str, input_name:str, output_name:str):
+  print(input_sample.shape)
+  trained_model.eval()
+  input_sample = input_sample.to(trained_model.device)
+  torch.onnx.export(
+      trained_model,
+      input_sample,
+      filename,
+      export_params=True,
+      opset_version=18,
+      do_constant_folding=True,
+      input_names=[input_name],
+      output_names=[output_name],
+      dynamic_axes={input_name: {0: 'batch_size'}, output_name: {0: 'batch_size'}}
+  )
 
 
 def random_split(dataset, lengths, transforms):
