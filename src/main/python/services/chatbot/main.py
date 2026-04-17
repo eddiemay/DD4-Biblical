@@ -1,13 +1,14 @@
-import langgraph_chat
-from datetime import datetime
 from flask import Flask, request
 from google.cloud import datastore
+from langgraph_chat import Agent, query
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
 
-datastore_client = datastore.Client()
+
+def get_datastore_client():
+  return datastore.Client()
 
 
 @app.route("/")
@@ -34,43 +35,43 @@ def cors_enabled_function():
 
 
 def chat(request):
+    datastore_client = get_datastore_client()
+
     question = request.args.get('question')
     session_id = request.args.get('sessionId')
 
     # 🔍 Get client IP (Cloud Run compatible)
     ip_address = (
         request.headers.get("X-Forwarded-For", "").split(",")[0]
-        or request.remote_addr
-    )
+        or request.remote_addr)
 
     print(f"session_id: {session_id} question: {question} ip: {ip_address}")
 
+    agent = get_agent(datastore_client, session_id, ip_address)
+
     # 🧠 Get model answer
-    answer = langgraph_chat.query(question, session_id)
+    answer = query(agent, question)
 
     # 🗃️ Save to Datastore
-    log_chat_interaction(
-        question=question,
-        answer=answer,
-        session_id=session_id,
-        ip_address=ip_address,
-    )
+    save_agent(datastore_client, session_id, agent)
 
     return answer
 
 
-def log_chat_interaction(question:str, answer:str, session_id:str, ip_address:str):
+def get_agent(datastore_client:datastore.Client, session_id:str, ip_address):
+  entity = datastore_client.get(
+      datastore_client.key("ChatSession", session_id))
+
+  if entity:
+    return Agent.from_dict(entity)
+  else:
+    return Agent(ip_address=ip_address)
+
+
+def save_agent(datastore_client:datastore.Client, session_id:str, agent:Agent):
   entity = datastore.Entity(
-      key=datastore_client.key("ChatInteraction"),
-      exclude_from_indexes=("answer",))
-
-  entity.update({
-    "question": question,
-    "answer": answer,
-    "sessionId": session_id,
-    "ipAddress": ip_address,
-    "timestamp": datetime.utcnow(),
-  })
-
+      key=datastore_client.key("ChatSession", session_id),
+      exclude_from_indexes=("messages",))
+  entity.update(agent.to_dict())
   datastore_client.put(entity)
 

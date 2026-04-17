@@ -1,9 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langgraph_chat import query
+from langgraph_chat import Agent, query
+
+agent = Agent()
 
 def _query(question):
-  return query(question, '777')[-1]
+  return query(agent, question)[-1]
 
 
 def test_gen_2_3():
@@ -29,3 +31,11 @@ def test_sons_of_jabob():
 
 def test_children_of_jabob():
   assert "thirteen" in _query("How many children did he have?")
+
+
+def test_remembers_context():
+  assert "eight" in _query("How many sons did Abraham have?")
+  assert "Terah" in _query("What was his father's name?")
+  assert "Haran" in _query("What was the name of his brother that died?")
+  assert "Nahor" in _query("What was the name of his other brother?")
+  assert "twelve" in _query("What many sons did he have?")
