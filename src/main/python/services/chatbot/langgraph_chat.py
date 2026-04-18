@@ -5,8 +5,6 @@ from datetime import datetime, timezone
 from langchain_openai import ChatOpenAI
 from urllib import parse, request
 
-from typing_extensions import final
-
 gpt_model = "gpt-4.1"
 deepseek_model = "deepseek-r1:32b"
 model = gpt_model
@@ -88,17 +86,20 @@ class Agent:
     )
 
   def __call__(self, message, store=True):
-    if store:
-      self.messages.append({"role": "user", "content": message})
-
+    self.messages.append({"role": "user", "content": message})
     result = self.execute()
-
-    if store:
-      self.messages.append({"role": "assistant", "content": result})
-
+    self.messages.append({"role": "assistant", "content": result})
     return result
 
   def trim_messages(self, max_messages=20):
+    # First remove all thoughts and observations.
+    messages = [self.messages[0]]
+    for message in self.messages[1:]:
+      if (message['role'] != 'assistant' or "Answer:" in message['content']) and "Observation:" not in message['content']:
+        messages.append(message)
+    self.messages = messages
+
+    # Then trim to size.
     if len(self.messages) > max_messages:
       self.messages = (
           [self.messages[0]] +  # keep system
@@ -131,11 +132,10 @@ def query(agent:Agent, question:str) -> list[str]:
   i = 0
   results = []
   next_prompt = question
-  final_answer = None
   while i < MAX_TURNS:
     i += 1
 
-    result = agent(next_prompt, store=(i==1))
+    result = agent(next_prompt, store=True)
     results.append(result)
     print(result)
     actions = []
@@ -157,10 +157,7 @@ def query(agent:Agent, question:str) -> list[str]:
       print("Observation:", observation)
       next_prompt = f"Observation: {observation}"
     if "Answer:" in result:
-      final_answer = result
       break
   print()
-  agent.messages.append({"role": "user", "content": question})
-  agent.messages.append({"role": "assistant", "content": final_answer})
   agent.trim_messages()
   return results
