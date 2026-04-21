@@ -62,8 +62,6 @@ class Agent:
     self.creation_time = creation_time or datetime.now(timezone.utc)
     self.last_modified_time = last_modified_time
     self.messages = messages or []
-    if not self.messages and self.system:
-      self.messages.append({"role": "system", "content": system})
 
   def to_dict(self):
     self.last_modified_time = datetime.now(timezone.utc)
@@ -72,42 +70,38 @@ class Agent:
       "ipAddress": self.ip_address,
       "creationTime": self.creation_time,
       "lastModifiedTime": self.last_modified_time,
-      "messages": self.messages
+      "messages": json.dumps(self.messages)
     }
 
   @classmethod
   def from_dict(cls, data):
+    messages = data.get("messages")
+    if type(messages) == list:
+      messages = json.dumps(messages)
     return cls(
-        system=data.get("system"),
-        ip_address=data.get("ipAddress"),
-        creation_time=data.get("creationTime"),
-        last_modified_time=data.get("lastModifiedTime"),
-        messages=data.get("messages", [])
+        system = data.get("system"),
+        ip_address = data.get("ipAddress"),
+        creation_time = data.get("creationTime"),
+        last_modified_time = data.get("lastModifiedTime"),
+        messages = json.loads(messages) if messages else []
     )
 
-  def __call__(self, message, store=True):
-    self.messages.append({"role": "user", "content": message})
-    result = self.execute()
-    self.messages.append({"role": "assistant", "content": result})
+  def __call__(self, message, role='user'):
+    result = self.execute({"role": role, "content": message})
     return result
 
   def trim_messages(self, max_messages=20):
-    # First remove all thoughts and observations.
-    messages = [self.messages[0]]
-    for message in self.messages[1:]:
-      if (message['role'] != 'assistant' or "Answer:" in message['content']) and "Observation:" not in message['content']:
-        messages.append(message)
-    self.messages = messages
-
     # Then trim to size.
     if len(self.messages) > max_messages:
-      self.messages = (
-          [self.messages[0]] +  # keep system
-          self.messages[-(max_messages - 1):]
-      )
+      self.messages = self.messages[-(max_messages):]
 
-  def execute(self):
-    return llm.invoke(self.messages).content
+  def execute(self, message):
+    messages = []
+    if self.system:
+      messages.append({"role": "system", "content": self.system})
+    messages.extend(self.messages)
+    messages.append(message)
+    return llm.invoke(messages).content
 
 
 def fetch_scripture(reference):
@@ -132,10 +126,13 @@ def query(agent:Agent, question:str) -> list[str]:
   i = 0
   results = []
   next_prompt = question
+  result = None
   while i < MAX_TURNS:
     i += 1
 
-    result = agent(next_prompt, store=True)
+    result = agent(next_prompt, 'user' if i == 1 else 'system')
+    if i == 1:
+      agent.messages.append({"role": 'user', "content": question})
     results.append(result)
     print(result)
     actions = []
@@ -159,5 +156,6 @@ def query(agent:Agent, question:str) -> list[str]:
     if "Answer:" in result:
       break
   print()
+  agent.messages.append({"role": 'assistant', "content": result})
   agent.trim_messages()
   return results
