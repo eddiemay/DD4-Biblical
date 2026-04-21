@@ -86,9 +86,8 @@ class Agent:
         messages = json.loads(messages) if messages else []
     )
 
-  def __call__(self, message, role='user'):
-    result = self.execute({"role": role, "content": message})
-    return result
+  def __call__(self, message):
+    return query(self, message)
 
   def trim_messages(self, max_messages=20):
     # Then trim to size.
@@ -130,7 +129,7 @@ def query(agent:Agent, question:str) -> list[str]:
   while i < MAX_TURNS:
     i += 1
 
-    result = agent(next_prompt, 'user' if i == 1 else 'system')
+    result = agent.execute({"role": 'user' if i == 1 else 'system', "content": next_prompt})
     if i == 1:
       agent.messages.append({"role": 'user', "content": question})
     results.append(result)

@@ -1,6 +1,6 @@
 from flask import Flask, request
 from google.cloud import datastore
-from langgraph_chat import Agent, query
+from langgraph_chat import Agent
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
@@ -50,7 +50,7 @@ def chat(request):
     agent = get_agent(datastore_client, session_id, ip_address)
 
     # 🧠 Get model answer
-    answer = query(agent, question)
+    answer = agent(question)
 
     # 🗃️ Save to Datastore
     save_agent(datastore_client, session_id, agent)

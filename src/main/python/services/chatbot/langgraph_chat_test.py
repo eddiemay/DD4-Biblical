@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langgraph_chat import Agent, query
+from langgraph_chat import Agent
 
 agent = Agent()
 
 def _query(question):
-  return query(agent, question)[-1]
+  return agent(question)[-1]
 
 
 def test_gen_2_3():
