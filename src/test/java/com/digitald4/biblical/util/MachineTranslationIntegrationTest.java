@@ -226,11 +226,13 @@ public class MachineTranslationIntegrationTest {
 
   @Test
   public void geezTranslation_fullModernFirstPass() {
-    assertThat(translate("Gen 2:11,3:22,5:32,10:1", "gez")).containsExactly(
+    assertThat(translate("Gen 2:11,3:22,5:22,32,10:1, Exo 3:1", "gez")).containsExactly(
         "Genesis 2:11 name was one [UNK] it is he the gold existing all land Havilah [UNK]",
         "Genesis 3:22 יהוה the Mighty One and behold Adam like one from the of him good of him [UNK] separate to them [UNK] and [UNK] and mother [UNK] out of so lifes took and not he said of him to desire them said life [UNK] not dwell and",
+        "Genesis 5:22 Enoch to Methuselah with generation and afterwards his three hundred years with the Mighty One complete of him of himhis the sons of him the generation of him said generation",
         "Genesis 5:32 Noah said son five hundred years came to be Noah and to Shem of him to Cam of him to Yepheth of him generation",
-        "Genesis 10:1 generation son Noah this it is Shem Cam Yepheth forss of them and after water flood son to generation of him of them");
+        "Genesis 10:1 generation son Noah this it is Shem Cam Yepheth forss of them and after water flood son to generation of him of them",
+        "Exodus 3:1 Mosheh and the sheep [UNK] [UNK] [UNK] Madai of him [UNK] dwell the of him the sheep I of youin  of youin  of him exist to of theand blessed exist [UNK] [UNK] the Mighty One come");
   }
 
   @Test
