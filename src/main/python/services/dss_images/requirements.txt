@@ -3,4 +3,3 @@ google-cloud-datastore
 numpy
 onnxruntime
 opencv-python-headless
-pillow

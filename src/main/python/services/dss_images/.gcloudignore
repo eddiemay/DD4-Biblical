@@ -12,7 +12,8 @@
 # below:
 .git
 .gitignore
-
+training/
+images/isaiah/large_tiles/
 # Python pycache:
 __pycache__/
 # Ignored by the build system

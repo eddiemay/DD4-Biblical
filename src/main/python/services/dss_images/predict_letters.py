@@ -1,17 +1,13 @@
 import cv2
 import numpy as np
 import onnxruntime as ort
-from PIL import Image as PilImage
 
 mean, std = (0.5,), (0.5,)
 
 
-def to_pil_image(img: np.ndarray) -> PilImage:
-  return PilImage.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+def pad_to_size(img: np.ndarray, target_h: int, target_w: int, fill=0) -> np.ndarray:
+  h, w = img.shape[:2]
 
-
-def pad_to_size(img: PilImage, target_h: int, target_w: int, fill=0) -> PilImage:
-  w, h = img.size
   pad_w = max(0, target_w - w)
   pad_h = max(0, target_h - h)
 
@@ -20,40 +16,33 @@ def pad_to_size(img: PilImage, target_h: int, target_w: int, fill=0) -> PilImage
   top = pad_h // 2
   bottom = pad_h - top
 
-  return PilImage.fromarray(
-      cv2.copyMakeBorder(
-          np.array(img),
-          top, bottom, left, right,
-          borderType=cv2.BORDER_CONSTANT,
-          value=fill
-      )
+  return cv2.copyMakeBorder(
+      img, top, bottom, left, right,
+      borderType=cv2.BORDER_CONSTANT,
+      value=fill
   )
 
 
-def center_crop(img: PilImage, target_h: int, target_w: int) -> PilImage:
-  w, h = img.size
-  left = max(0, (w - target_w) // 2)
+def center_crop(img: np.ndarray, target_h: int, target_w: int) -> np.ndarray:
+  h, w = img.shape[:2]
+
   top = max(0, (h - target_h) // 2)
-  right = left + target_w
-  bottom = top + target_h
-  return img.crop((left, top, right, bottom))
+  left = max(0, (w - target_w) // 2)
+
+  return img[top:top+target_h, left:left+target_w]
 
 
-def gaussian_blur(img: PilImage, kernel_size=3, sigma_min=0.1, sigma_max=1.5) -> PilImage:
+def gaussian_blur(img: np.ndarray, kernel_size=3, sigma_min=0.1, sigma_max=1.5) -> np.ndarray:
   sigma = np.random.uniform(sigma_min, sigma_max)
-  return PilImage.fromarray(
-      cv2.GaussianBlur(np.array(img), (kernel_size, kernel_size), sigma)
-  )
+  return cv2.GaussianBlur(img, (kernel_size, kernel_size), sigma)
 
 
-def to_grayscale(img: PilImage) -> PilImage:
-  return PilImage.fromarray(
-      cv2.cvtColor(np.array(img), cv2.COLOR_RGB2GRAY)
-  )
+def to_grayscale(img: np.ndarray) -> np.ndarray:
+  return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-def to_tensor(img: PilImage) -> np.ndarray:
-  arr = np.array(img).astype(np.float32) / 255.0
+def to_tensor(img: np.ndarray) -> np.ndarray:
+  arr = img.astype(np.float32) / 255.0
 
   if arr.ndim == 2:  # grayscale
     arr = np.expand_dims(arr, axis=0)  # (1, H, W)
@@ -64,20 +53,19 @@ def to_tensor(img: PilImage) -> np.ndarray:
 
 
 def normalize(tensor: np.ndarray, mean, std) -> np.ndarray:
-  mean = np.array(mean).reshape(-1, 1, 1)
-  std = np.array(std).reshape(-1, 1, 1)
+  mean = np.array(mean, dtype=np.float32).reshape(-1, 1, 1)
+  std = np.array(std, dtype=np.float32).reshape(-1, 1, 1)
   return (tensor - mean) / std
 
 
 def transform(img: np.ndarray, mean, std) -> np.ndarray:
-  img = to_pil_image(img)
   img = pad_to_size(img, 40, 80, 0)
   img = center_crop(img, 40, 80)
   img = gaussian_blur(img, 3, 0.1, 1.5)
   img = to_grayscale(img)
   tensor = to_tensor(img)
-  tensor = normalize(tensor, mean, std).astype(np.float32)
-  return tensor
+  tensor = normalize(tensor, mean, std)
+  return tensor.astype(np.float32)
 
 
 def predict_letters(items):
@@ -171,5 +159,11 @@ if __name__ == '__main__':
       items.append(json.loads(line))
 
   predict_letters(items)
-  for item in items:
-    print(item)
+  missmatch = 0
+  for letter_box in items:
+    if letter_box.get('_predicted') is not None and letter_box['_predicted'] != letter_box['value']:
+      missmatch += 1
+      print(letter_box)
+
+  print(f'Total missmatches: {missmatch}')
+
