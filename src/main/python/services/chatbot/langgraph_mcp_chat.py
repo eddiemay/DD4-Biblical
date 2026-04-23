@@ -30,7 +30,7 @@ llm_with_tools = llm.bind_tools([
 ])
 
 
-def query(question, session_id=777, max_turns=7):
+def query(question):
   return llm_with_tools.invoke(question)
 
 

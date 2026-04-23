@@ -7,10 +7,6 @@ from langgraph_chat import Agent
 app = Flask(__name__)
 
 
-def get_datastore_client():
-  return datastore.Client()
-
-
 @app.route("/")
 def cors_enabled_function():
     # For more information about CORS and CORS preflight requests, see:
@@ -32,6 +28,10 @@ def cors_enabled_function():
     headers = {"Access-Control-Allow-Origin": "*"}
 
     return chat(request), 200, headers
+
+
+def get_datastore_client():
+  return datastore.Client()
 
 
 def chat(request):

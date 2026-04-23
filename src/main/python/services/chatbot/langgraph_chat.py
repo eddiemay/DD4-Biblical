@@ -125,7 +125,6 @@ def query(agent:Agent, question:str) -> list[str]:
   i = 0
   results = []
   next_prompt = question
-  result = None
   while i < MAX_TURNS:
     i += 1
 
@@ -155,6 +154,6 @@ def query(agent:Agent, question:str) -> list[str]:
     if "Answer:" in result:
       break
   print()
-  agent.messages.append({"role": 'assistant', "content": result})
+  agent.messages.append({"role": 'assistant', "content": results[-1]})
   agent.trim_messages()
   return results
