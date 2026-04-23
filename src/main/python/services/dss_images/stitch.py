@@ -51,8 +51,9 @@ def construct_column(collection, column=1, res=None):
 
 
 DSS_ORG_PATTERN = r"x(\d+)-y(\d+)-z(\d+)"
-def construct_dss_org(scroll, file_pattern, output_name):
+def construct_dss_org(scroll, file_pattern, output_name=None):
     files = []
+    output_name = output_name or file_pattern
     min_x, max_x, min_y, max_y = 99, 0, 99, 0
     tile_dir = f'images/{scroll}/tiles/'
     for entry in sorted(os.listdir(tile_dir)):
@@ -86,9 +87,15 @@ def construct_dss_org(scroll, file_pattern, output_name):
 
 
 if __name__ == '__main__':
-    # construct_dss_org('4Q320', '0hBWsyGjCZT', 'Infrared-Frag1')
-    # construct_dss_org('4Q320', 'wmhm0ryg', 'Infrared-Frag2')
-    # construct_dss_org('4Q320', 'BtzcLAfA', 'Infrared-Frag3')
+    # construct_dss_org('4QCalendrical', 'Ba6FnXeQZV2r6tmEjHzKd6TxXlz', '4Q318-Frag1')
+    # construct_dss_org('4QCalendrical', 'setRWBs0M2I1467lUOvPy', '4Q320')
+    construct_dss_org('4QCalendrical', '0hBWsyGjCZT', '4Q320-Frag1')
+    # construct_dss_org('4QCalendrical', '6lJ3FktiWJEcFvWtxQWd7DgoIhT', '4Q321-Frag10')
+    # construct_dss_org('4QCalendrical', 'QNpNbUEx1iw3L6p0yFOE9d18wFjJ10mt', '4Q326')
+    # construct_dss_org('4QCalendrical', '6Wx78IIdr', '4Q326-Plates-693_710')
+    # construct_dss_org('4QCalendrical', 'lDcGH98RiDYcN0FB2br0L', '4Q326-Plates-693_710_694')
+
+
 
     # for c in range(1, 5):
         # construct_column(Collection.TORAH, c)
@@ -99,9 +106,9 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 2, res=5)
     # construct_column(Collection.TORAH, 1, res=5)
 
-    for res in range(8, 11):
-        construct_column(Collection.ISAIAH, 16, res)
-    cv2.waitKey(0)
+    # for res in range(8, 11):
+        # construct_column(Collection.ISAIAH, 16, res)
+    # cv2.waitKey(0)
 
     # for c in range(1, 16):
       #  construct_column(Collection.WAR, c)

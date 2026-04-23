@@ -3,7 +3,7 @@ import json
 import pytesseract
 from pytesseract import Output
 from urllib import request
-from verify import verify, to_isa_verify_request, process_image
+from verify import verify, to_isa_verify_request, to_verify_request, process_image
 from utility import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
@@ -37,12 +37,21 @@ def send_json_req(url, data):
 def label(scroll, fragment, display=True, upload=None):
     filename = f'{scroll}-column-{fragment}'
 
-    request = to_isa_verify_request(fragment, display=display)
-    result = verify(request)
+    if scroll == 'isaiah':
+        ver_req = to_isa_verify_request(fragment, display=display)
+        result = verify(ver_req)
 
-    img = request['image']
-    best_img, _ = process_image(img, result['best']['parameters'])
-    model = result['best']['parameters']['model']
+        img = ver_req['image']
+        best_img, _ = process_image(img, result['best']['parameters'])
+        model = result['best']['parameters']['model']
+    else:
+        ver_req = to_verify_request(filename, f'../images/{scroll}/columns/{fragment}.jpg', '', display=display)
+        result = verify(ver_req)
+
+        img = ver_req['image']
+        best_img, _ = process_image(img, result['best']['parameters'])
+        model = result['best']['parameters']['model']
+
     model = f"dabar.cloud/{model}" if model.startswith("Heb") else model
 
     d = pytesseract.image_to_data(best_img, lang=model, output_type=Output.DICT)
@@ -115,4 +124,18 @@ def label(scroll, fragment, display=True, upload=None):
 
 
 if __name__ == '__main__':
-    label('isaiah', 16, upload=None)
+    preprocessors = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 0}
+    # label('isaiah', 16, upload=None)
+    # label('4QCalendrical', '4Q318-Frag1', upload=None)
+    # label('4QCalendrical', '4Q320', upload=None)
+    label('4QCalendrical', '4Q320-Frag1', upload=None)
+    # label('4QCalendrical', '4Q320-Frag2', upload=Upload.LETTERS)
+    # label('4QCalendrical', '4Q320-Frag3', upload=None)
+    # label('4QCalendrical', '4Q321-Frag5')
+    # label('4QCalendrical', '4Q321-Frag10')
+    # label('4QCalendrical', '4Q326', upload=Upload.LETTERS, preprocessors=preprocessors)
+    label('4QCalendrical', '4Q326-Frag1', upload=None)
+    # label('4QCalendrical', '4Q326-Plates-693_710', upload=Upload.LETTERS, preprocessors=preprocessors)
+    # label('4QCalendrical', '4Q326-Plates-693_710_694', upload=Upload.LETTERS, preprocessors=preprocessors)
+
+    migrate()

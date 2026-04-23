@@ -84,7 +84,23 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     return lessonService;
   })
   .service('letterBoxService', function(apiConnector) {
-    return new com.digitald4.common.JSONService('letterBox', apiConnector)
+    var service = new com.digitald4.common.JSONService('letterBox', apiConnector);
+    service.byFilename = function(filename, predict, success, error) {
+      request = {
+        request_url: 'https://dss-images-dot-dd4-biblical.appspot.com/letterboxes',
+        params: {filename: filename, predict: predict}
+      }
+      apiConnector.sendRequest(request, success, error);
+    }
+    service.create = function(letterBox, success, error) {
+      request = {
+        request_url: 'https://dss-images-dot-dd4-biblical.appspot.com/create_letterbox',
+        method: 'POST',
+        data: letterBox
+      }
+      apiConnector.sendRequest(request, success, error);
+    }
+    return service;
   })
   .service('lexiconService', function(apiConnector) {
     var lexiconService = new com.digitald4.common.JSONService('lexicon', apiConnector);
@@ -97,7 +113,7 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
   .service('notificationService', function(apiConnector) {
     return new com.digitald4.common.JSONService('notification', apiConnector);
   })
-  .service('scriptureService', function($http, apiConnector, globalData) {
+  .service('scriptureService', function(apiConnector, globalData) {
     var scriptureService = new com.digitald4.common.JSONService('scripture', apiConnector);
     var dssByVerse;
     scriptureService.scriptures = function(reference, success, error) {

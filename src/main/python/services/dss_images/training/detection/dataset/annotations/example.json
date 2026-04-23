@@ -1,0 +1,19 @@
+{
+  "images": [
+    {"id": 1, "file_name": "img1.png", "height": 80, "width": 40}
+  ],
+  "annotations": [
+    {
+      "id": 1,
+      "image_id": 1,
+      "category_id": 0,
+      "bbox": [x, y, width, height],
+      "area": 800,
+      "iscrowd": 0
+    }
+  ],
+  "categories": [
+    {"id": 0, "name": "aleph"},
+    {"id": 1, "name": "bet"}
+  ]
+}

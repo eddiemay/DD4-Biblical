@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
 from PIL import Image as PilImage
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ALL, parse_file_name
 
 VISUALIZE_PAGE_SIZE = 24
 pd.set_option("display.max_columns", None)
@@ -17,7 +17,8 @@ def visualize_abnormals(title, abnormal):
   for i, box in enumerate(abnormal.itertuples()):
     img = box.image
     axes[i].imshow(PilImage.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))) # CHW -> HWC
-    axes[i].set_title(f'{box.filename} {box.x1} {box.y1} {box.width} {box.height}')
+    _, _, frag = parse_file_name(box.filename)
+    axes[i].set_title(f'{frag} {box.x1} {box.y1} {box.width} {box.height}')
 
   for i in range(VISUALIZE_PAGE_SIZE):
     axes[i].axis('off')
@@ -49,7 +50,8 @@ def find_abnormals(letter, df, prop):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(SINGLE_LETTERS_ONLY, override_letter_cache=False)
+  dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY,
+                              cache_file='letter_boxes_all.jsonl')
   print(f'Dataset {len(dataset)} letters')
   letters = []
   for img, label, metadata in dataset:

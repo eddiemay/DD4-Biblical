@@ -4,6 +4,7 @@ distributed
 diff-match-patch
 Levenshtein
 matplotlib
+onnxruntime
 opencv-python
 pytesseract
 requests

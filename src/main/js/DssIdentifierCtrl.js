@@ -6,13 +6,21 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
   this.showLetterBoxes = true;
   this.showLetters = true;
   this.rowNum = 1;
+  const makeColumns = (n) => Array.from({length: n}, (_, i) => String(i + 1));
   this.scrolls = {
-    ISAIAH: {name: 'Isaiah', filename: 'isaiah', columns: 54, res: 9, textFile: '1Q_Isaiah_a.txt'},
-    COMMUNITY_RULE: {name: 'Community Rule', filename: 'community', columns: 11, res: 7},
-    WAR_SCROLL: {name: 'War Scroll', filename: 'war', columns: 15, res: 8},
-    TEMPLE: {name: 'Temple Scroll', filename: 'temple', columns: 67, res: 9},
-    HABAKKUK: {name: 'Commentary on Habakkuk', filename: 'habakkuk', columns: 14, res: 7},
-    TORAH: {name: 'Torah Scroll', filename: 'torah', columns: 4, res: 4},
+    ISAIAH: {name: 'Isaiah', filename: 'isaiah', columns: makeColumns(54), res: 9, textFile: '1Q_Isaiah_a.txt'},
+    COMMUNITY_RULE: {name: 'Community Rule', filename: 'community', columns: makeColumns(11), res: 7},
+    WAR_SCROLL: {name: 'War Scroll', filename: 'war', columns: makeColumns(15), res: 8},
+    TEMPLE: {name: 'Temple Scroll', filename: 'temple', columns: makeColumns(67), res: 9},
+    HABAKKUK: {name: 'Commentary on Habakkuk', filename: 'habakkuk', columns: makeColumns(14), res: 7},
+    TORAH: {name: 'Torah Scroll', filename: 'torah', columns: makeColumns(4), res: 4},
+    S4Q320: {name: '4QCalendrical', filename: '4QCalendrical', textFile: '4QCalendrical.txt', columns: ['4Q318-Frag1', '4Q318-Frag2', '4Q318-Frag3', '4Q318-Frag4', '4Q318-Frag5',
+        '4Q319-Frag1', '4Q319-Frag2', '4Q319-Frag2-II', '4Q319-Frag3', '4Q319-Frag7',
+        '4Q320', '4Q320-Frag1', '4Q320-Frag2', '4Q320-Frag3',
+        '4Q321-Frag1', '4Q321-Frag2', '4Q321-Frag3', '4Q321-Frag4', '4Q321-Frag5', '4Q321-Frag6', '4Q321-Frag7', '4Q321-Frag8', '4Q321-Frag9', '4Q321-P372-Frag1', '4Q321-P372-Frag2', '4Q321-P372-Frag3',
+        '4Q321a-Frag1', '4Q321a-Frag2', '4Q321a-Frag3', '4Q321a-Frag4', '4Q321a-Frag5', '4Q321a-Frag6', '4Q321a-Frag7',
+        '4Q326', '4Q326-Frag1', '4Q326-Plates-693_710', '4Q326-Plates-693_710_694',
+        '4Q328']}
   };
   this.letters = {
     alef: {value: 'א', width: 26, height: 26}, bet: {value: 'ב', width: 26, height: 26},
@@ -64,7 +72,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
         var letBox = this.letterBoxes[b];
         if (this.showLetterBoxes && letBox.x1 < lx && letBox.x2 > lx && letBox.y1 < ly && letBox.y2 > ly ||
             this.showLetters && x >= letBox.x1 + 7 && x < letBox.x1 + 14 && y > letBox.y2 + 7 && y <= letBox.y2 + 14) {
-          this.selectedBox = letBox;
+            this.selectedBox = letBox;
           this.drawScroll();
           return;
         }
@@ -202,8 +210,9 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
     for (var b = 0; b < this.letterBoxes.length; b++)  {
       var letterBox = this.letterBoxes[b];
       var byLCoords = letterBox._byLetterCoords;
-      if (byLCoords.x1 < x && byLCoords.x2 > x && byLCoords.y1 < y && byLCoords.y2 > y) {
+      if (byLCoords && byLCoords.x1 < x && byLCoords.x2 > x && byLCoords.y1 < y && byLCoords.y2 > y) {
         this.selectedBox = letterBox;
+        console.log(this.selectedBox.x1 + ',' + this.selectedBox.y1);
         this.drawScroll();
         return;
       }
@@ -257,15 +266,18 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.scrollChanged = function() {
 com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
   this.canvasReady = false;
   this.ctx = this.canvas.getContext('2d');
-  this.canvasTitle = 'Dead Sea Scrolls Viewer - ' + this.scroll.name + ' Column ' + this.column;
+  this.canvasTitle = 'Dead Sea Scrolls Viewer - ' + this.scroll.name + '-' + this.column;
 
-  this.filename = this.scroll.filename + '-column-' + this.column;
+  if (this.scroll.res) {
+    this.filename = this.scroll.filename + '-column-' + this.column;
+  } else {
+    this.filename = this.scroll.filename + '-' + this.column;
+  }
 
   this.letterBoxes = [];
   this.statMap = {};
   this.rows = [];
-  var request = {filter: `filename=${this.filename}`, pageSize: 0, orderBy: 'y2,x2 DESC'};
-  this.letterBoxService.list(request, response => {
+  this.letterBoxService.byFilename(this.filename, true, response => {
     console.log("Letter boxes: " + response.items.length);
     this.letterBoxes = [];
     this.rows = [];
@@ -295,7 +307,11 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
     this.$scope.$apply();
     this.drawScroll();
   }
-  this.img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/${this.scroll.filename}/columns/column_${this.scroll.res}_${this.column}.jpg`;
+  if (this.scroll.res) {
+    this.img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/${this.scroll.filename}/columns/column_${this.scroll.res}_${this.column}.jpg`;
+  } else {
+    this.img.src = `https://dss-images-dot-dd4-biblical.appspot.com/images/${this.scroll.filename}/columns/${this.column}.jpg`;
+  }
 
   if (this.scroll.textFile) {
     this.$http({
@@ -307,9 +323,9 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
       var re=/\r\n|\n\r|\r/g;
       var lines = response.data.replace(re,'\n').split('\n');
       var l = 0;
-      while (!lines[l].startsWith('Col. ' + romanNumeral)) {l++;}
+      while (!(lines[l].startsWith('Col. ' + romanNumeral) || lines[l].startsWith('Frg. ' + romanNumeral))) {l++;}
       this.textFile = lines[l];
-      while (!lines[++l].startsWith('Col. ')) {
+      while (!lines[++l].startsWith('Col. ') && !lines[l].startsWith('Frg. ')) {
         this.textFile += '\n' + lines[l];
       }
     }, errorResponse => {
@@ -403,7 +419,12 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawScroll = function() {
   this.rows.forEach(row => {
     this.ctx.font = '25px Arial';
     this.ctx.fillStyle = this.selectedBox == row ? 'blue' : 'black';
-    this.ctx.fillText(row.value, row.x2 + 10, row.y2 - 20);
+    if (row.x2 < this.canvasWidth / 4) {
+      // If this column ends less than halfway then it is most likely has 2 columns so paint the number to the left.
+      this.ctx.fillText(row.value, row.x1 - 10, row.y2 - 20);
+    } else {
+      this.ctx.fillText(row.value, row.x2 + 10, row.y2 - 20);
+    }
   });
 
   this.computeDiff();
@@ -417,6 +438,8 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawLetterBox = function(lett
     color = 'yellow';
   } else if (letterBox._state == 'error') {
     color = 'red';
+  } else if (this.showMissmatch && letterBox._predicted && letterBox.value != letterBox._predicted) {
+    color = 'orange';
   }
 
   var ctx = this.ctx;
@@ -437,7 +460,11 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawLetterBox = function(lett
   if (this.showLetters || color) {
       ctx.font = '16px Arial';
       ctx.fillStyle = color || 'green';
-      ctx.fillText(letterBox.value, letterBox.x1 + 7, letterBox.y2 + 14);
+      if (color == 'orange') {
+        ctx.fillText('L:' + letterBox.value + ' P:' + letterBox._predicted, letterBox.x1 + 7, letterBox.y2 + 14);
+      } else {
+        ctx.fillText(letterBox.value, letterBox.x1 + 7, letterBox.y2 + 14);
+      }
   }
 }
 
@@ -461,7 +488,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(lett
 
   for (var r = 0; r < this.rows.length; r++) {
     var row = this.rows[r];
-    if (row.y1 < letterBox.y2 && row.y2 >= letterBox.y2) {
+    if (row.y1 < letterBox.y2 && row.y2 >= letterBox.y2 && row.x1 < letterBox.x1 && row.x2 > letterBox.x1) {
       if (row._letterBoxes.indexOf(letterBox) == -1) {
         var index = 0;
         while (index < row._letterBoxes.length && row._letterBoxes[index].x2 > letterBox.x2) {
@@ -531,14 +558,22 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.getRowText = function(row) {
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.computeDiff = function() {
-  var textFileArray = this.textFile.split('\n');
   var rowTextMap = {};
   this.resultText = '';
-  this.rows.forEach(row => {
-    var rowText = this.getRowText(row);
-    rowTextMap[row.value] = rowText;
-    this.resultText += rowText + '\n';
-  });
+  this.rows
+    .slice() // avoid mutating original array
+    .sort((a, b) => Number(a.value) - Number(b.value))
+    .forEach(row => {
+      var rowText = this.getRowText(row);
+      rowTextMap[row.value] = rowText;
+      this.resultText += rowText + '\n';
+    });
+
+  if (!this.textFile) {
+    return;
+  }
+
+  var textFileArray = this.textFile.split('\n');
   this.textDiffs = [];
 
   for (var x = 1; x < textFileArray.length; x++) {
@@ -580,6 +615,9 @@ function unfinalize(text) {
 }
 
 function romanize(num) {
+  if (num.startsWith('4Q')) {
+    return num;
+  }
   var lookup = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1};
   var roman = '', i;
   for (i in lookup) {

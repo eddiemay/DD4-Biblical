@@ -1,1 +1,6 @@
 Flask==3.0.0
+google-cloud-datastore
+numpy
+onnxruntime
+opencv-python-headless
+pillow

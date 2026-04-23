@@ -6,7 +6,7 @@ import random
 import shutil
 import subprocess
 import time
-from letterbox_utils import DSSLettersDataset, columns
+from letterbox_utils import DSSLettersDataset, TRAINING_SET, get_img_file_path
 from pathlib import Path
 from verify import process_image
 
@@ -14,7 +14,7 @@ BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
 ITERATIONS = 8192
 override_letter_cache = False
-MODEL_NAME = f'{BASE_MODEL}_Label_{len(columns)}'
+MODEL_NAME = f'{BASE_MODEL}_Label_{len(TRAINING_SET)}'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
 row_map = {}
@@ -26,7 +26,7 @@ def get_row(filename, row):
         print('creating row map')
         letter_boxes = []
         row_boxes = []
-        dataset = DSSLettersDataset(override_letter_cache=override_letter_cache)
+        dataset = DSSLettersDataset(override_cache=override_letter_cache)
         for img, label, letter_box in dataset:
             if letter_box['type'] == 'Row':
                 letter_box['_letterBoxes'] = []
@@ -98,7 +98,7 @@ def get_text(row_box):
 
 
 def process(sample):
-    scroll, fragment = sample['scroll'], sample['fragment']
+    fragment = sample['fragment']
     res = sample.get('res') or random.randrange(8, 11)
     sample['res'] = res
 
@@ -110,14 +110,12 @@ def process(sample):
         ratio = 1
 
     srow, erow = sample['srow'], sample['erow']
-    filename = f'{scroll}-column-{fragment}'
-    sample['filename'] = filename
-    start_row_box = get_row(filename, srow)
-    end_row_box = get_row(filename, erow)
+    start_row_box = get_row(fragment, srow)
+    end_row_box = get_row(fragment, erow)
     if start_row_box is None or end_row_box is None:
         return None
 
-    img_filename = f'../images/{scroll}/columns/column_{res}_{fragment}.jpg'
+    img_filename = get_img_file_path(fragment, res)
     img = img_map.get(img_filename)
     if img is None:
         img = cv2.imread(img_filename)
@@ -137,7 +135,7 @@ def process(sample):
     sample['boxes'] = []
     outlined = row_img.copy()
     for row in range(srow, erow + 1):
-        row_box = get_row(filename, row)
+        row_box = get_row(fragment, row)
         sample['text'] += get_text(row_box) + '\n'
         sample['boxes'].extend(get_box_text(row_box, bottom, ratio))
 
@@ -153,7 +151,7 @@ def process(sample):
     # Square in red the letters from the rows above and below that to be cleared
     # Create a black mask with the same size as the image
     mask = np.zeros(row_img.shape[:2], dtype=np.uint8)
-    above = get_row(filename, srow - 1)
+    above = get_row(fragment, srow - 1)
     if above:
         for letter_box in above['_letterBoxes']:
             y2 = math.ceil(letter_box['y2'] * ratio)
@@ -166,7 +164,7 @@ def process(sample):
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 cv2.rectangle(mask, (x1, y1), (x2, y2), 255, -1)
 
-    below = get_row(filename, erow + 1)
+    below = get_row(fragment, erow + 1)
     if below:
         for letter_box in below['_letterBoxes']:
             y1 = math.floor(letter_box['y1'] * ratio)
@@ -199,7 +197,7 @@ def add_salt_and_pepper(img, amount=0.01):
 
 def output_files(sample):
     file_base_name = FILE_BASE_NAME.format(
-        sample['filename'],sample['res'],sample['srow'],sample['erow'])
+        sample['fragment'], sample['res'], sample['srow'], sample['erow'])
 
     with open(f'{output_directory}/{file_base_name}.gt.txt', 'w') as output_file:
         output_file.writelines([sample['text']])
@@ -220,7 +218,7 @@ def process_and_output(sample):
 def display(sample):
     print(sample['text'])
     print(sample['boxes'])
-    output_base = FILE_BASE_NAME.format(sample['filename'],sample['res'],sample['srow'],sample['erow'])
+    output_base = FILE_BASE_NAME.format(sample['fragment'], sample['res'], sample['srow'], sample['erow'])
 
     cv2.imshow(f'{output_base} cleared', sample["image"])
     cv2.imshow(f'{output_base} outlined', sample["outlined"])
@@ -257,13 +255,13 @@ if __name__ == '__main__':
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
     image_start = time.time()
-    for frag in columns:
+    for frag in TRAINING_SET:
         for r in range(1, 33):
-            process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r})
+            process_and_output({'fragment': frag, 'srow': r, 'erow': r})
             if r % 3 == 1:
-                process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r+2})
+                process_and_output({'fragment': frag, 'srow': r, 'erow': r+2})
             if r % 7 == 1:
-                process_and_output({'scroll': 'isaiah', 'fragment': frag, 'srow': r, 'erow': r+6})
+                process_and_output({'fragment': frag, 'srow': r, 'erow': r+6})
 
     training_start = time.time()
     print(f'Files creation time: {training_start - image_start} seconds')

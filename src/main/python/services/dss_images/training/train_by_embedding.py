@@ -13,6 +13,7 @@ from utility import unfinalize
 BASE_MODEL = 'Hebrew_Font'
 MODEL_NAME = f'{BASE_MODEL}_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
+ITERATIONS = 8192
 output_directory = f'{BASE_OUTPUT}embedding-ground-truth'
 base_image = cv2.imread('../images/isaiah/columns/column_9_54.jpg')
 background = base_image[1570:2200, 0:1127]
@@ -30,7 +31,7 @@ override_letter_cache = False
 def get_random_letter_box(letter):
     if not letter_map:
         print('creating letter map')
-        dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, override_letter_cache=override_letter_cache)
+        dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, override_cache=override_letter_cache)
         for img, label, letter_box in dataset:
             collection = letter_map.get(letter_box['value'])
             if not collection:
@@ -210,7 +211,7 @@ if __name__ == '__main__':
     os.chdir('tesstrain')
     start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
     command = ['make', 'training', 'MODEL_NAME=embedding', f'START_MODEL={start_model}',
-               'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=8192']
+               'TESSDATA=../tessdata_best', f'MAX_ITERATIONS={ITERATIONS}']
     print(' '.join(command))
     subprocess.run(command)
     command = ['cp', 'data/embedding.traineddata', f'/opt/homebrew/share/tessdata/{MODEL_NAME}.traineddata']

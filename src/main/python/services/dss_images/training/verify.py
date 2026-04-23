@@ -93,8 +93,12 @@ def evaluate(eval):
     img, name = process_image(eval['image'], params)
 
     ocr = unfinalize(image_to_string(img, model=params['model']).strip())
-    ld = Levenshtein.distance(txt, ocr)
-    percent = round((len(txt) - ld) * 100 / len(txt), 2)
+    if txt is not None and len(txt) > 0:
+        ld = Levenshtein.distance(txt, ocr)
+        percent = round((len(txt) - ld) * 100 / len(txt), 2)
+    else:
+        ld = 0
+        percent = len(ocr)
     eval['name'], eval['image'], eval['ocr'], eval['ld'], eval['percent'] =(
         name, None, ocr, ld, percent)
 
@@ -344,7 +348,8 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=True, model='Hebrew_Font_Embedding_Label_19', multithread=Multithread.COLUMN_LOCAL)
+    output_column_stats(use_best=True, model='Hebrew_Font_Embedding_Label_19',
+                        multithread=Multithread.COLUMN_LOCAL)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
               'Heb_Embedding', 'Hebrew_Embedding', 'Hebrew_Font_Embedding',

@@ -1,24 +1,20 @@
-import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import time
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from PIL import Image as PilImage
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage, get_image
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage, \
+  PadToSize, mean, std, test_transform
 from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
   visualize_augmentations, DD4Subset, conv_block
-from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
 from verify import process_image
-from letterbox_stats import VISUALIZE_PAGE_SIZE
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", None)
 torch.manual_seed(42)
 checkpoint_path = 'letter_model.pth'
-mean, std = (0.5,), (0.5,)
 
 # bf7-median3-THRESH_BINARY_135
 class Preprocess:
@@ -27,31 +23,6 @@ class Preprocess:
 
   def __call__(self, img):
     return process_image(img, self.params)[0]
-
-
-class PadToSize:
-  def __init__(self, target_w, target_h, fill=0):
-    self.target_w = target_w
-    self.target_h = target_h
-    self.fill = fill
-
-  def __call__(self, img):
-    w, h = img.size
-    pad_w = self.target_w - w
-    pad_h = self.target_h - h
-    padding = (pad_w // 2, pad_h // 2, pad_w - pad_w // 2, pad_h - pad_h // 2)
-    return transforms.functional.pad(img, padding, fill=self.fill)
-
-
-test_transform = transforms.Compose([
-  ToPilImage(),
-  PadToSize(40, 80, 0),
-  transforms.CenterCrop([40, 80]),
-  transforms.GaussianBlur(3, sigma=(0.1, 1.5)),
-  transforms.Grayscale(),
-  transforms.ToTensor(),
-  transforms.Normalize(mean, std)
-])
 
 train_transform = transforms.Compose([
   ToPilImage(),
@@ -67,31 +38,6 @@ train_transform = transforms.Compose([
   transforms.ToTensor(),
   transforms.Normalize(mean, std),
 ])
-
-
-def visualize_incorrect(title, df):
-  # See what the augmentation actually does to your images
-  fig, axes = plt.subplots(int(VISUALIZE_PAGE_SIZE / 4), 4, figsize=(12, 6))
-  axes = axes.flatten()
-  toPilImage = ToPilImage()
-
-  for i, row in enumerate(df.itertuples()):
-    img = toPilImage(get_image({'filename': row.filename,
-                     'x1': row.x1, 'y1': row.y1, 'x2': row.x2, 'y2': row.y2}))
-    if isinstance(img, PilImage.Image):
-      axes[i].imshow(img)
-    elif img.shape[0] == 1: # If gray scale.
-      axes[i].imshow(img.squeeze(), cmap='gray')
-    else:
-      axes[i].imshow(img.permute(1, 2, 0))
-    axes[i].set_title(f"L:{row.target} P:{row.prediction} {row.filename} ({row.x1},{row.y1}) {row.confidence:.2f}")
-
-  for i in range(VISUALIZE_PAGE_SIZE):
-    axes[i].axis('off')
-
-  plt.suptitle(title)
-  plt.tight_layout()
-  plt.show()
 
 
 if __name__ == '__main__':
@@ -153,62 +99,7 @@ if __name__ == '__main__':
   test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=False)
   loss, accuracy = model.evalulate(test_loader)
   print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%')
-  # model.export("letter_model.onnx", "image", "letter")
   full_loader = DataLoader(
       DD4Subset(dataset, test_transform), batch_size=1000, shuffle=False)
   loss, accuracy = model.evalulate(full_loader)
   print(f'Full Loss: {loss:.2f}, Full Accuracy: {accuracy:.2f}%')
-
-  model.eval()
-  label_lookup = list(dataset.classes)
-  rows = []
-  with torch.no_grad():
-    for inputs, targets, metadata in full_loader:
-      inputs, targets = inputs.to(model.device), targets.to(model.device)
-      outputs = model(inputs)
-      preds = outputs.argmax(dim=1)
-
-      for i in range(len(inputs)):
-        rows.append({
-          "target": label_lookup[targets[i].item()],
-          "prediction": label_lookup[preds[i].item()],
-          "correct": preds[i].item() == targets[i].item(),
-          "confidence": outputs[i].softmax(dim=0).max().item(),
-          "filename": metadata["filename"][i],
-          "x1": metadata["x1"][i].item(),
-          "y1": metadata["y1"][i].item(),
-          "x2": metadata["x2"][i].item(),
-          "y2": metadata["y2"][i].item(),
-        })
-
-  df = pd.DataFrame(rows)
-
-  cm = confusion_matrix(df["target"], df["prediction"])
-  cm_df = pd.DataFrame(cm)
-  print(cm_df)
-  # cm_norm = cm.astype("float") / cm.sum(axis=1)[:, None]
-  # cm_norm_df = pd.DataFrame(cm_norm, index=dataset.classes, columns=dataset.classes)
-  # print(cm_norm_df)
-
-  incorrect = df[df['correct'] == False]
-  print(f'Found: {len(incorrect)} incorrect out of {len(df)}')
-
-  # by letter
-  groups = incorrect.groupby("target")
-  for target, group in groups:
-    print(f'{target} incorrect: {len(group)}')
-
-  # by filename
-  groups = incorrect.groupby("filename")
-  for fn, group in groups:
-    print(f'{fn} incorrect: {len(group)}')
-
-  incorrect.sort_values('filename')
-  # Filter out wav/yod confusion before displaying, too many of those.
-  incorrect = incorrect[~(
-      ((incorrect['target'] == 'ו') & (incorrect['prediction'] == 'י')) |
-      ((incorrect['target'] == 'י') & (incorrect['prediction'] == 'ו'))
-  )]
-  for start in range(0, len(incorrect), VISUALIZE_PAGE_SIZE):
-    page = incorrect.iloc[start:start + VISUALIZE_PAGE_SIZE]
-    visualize_incorrect(f"InCorrect labels {start + 1}–{start + len(page)} of {len(incorrect)}", page)

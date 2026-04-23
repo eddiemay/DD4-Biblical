@@ -1,70 +1,93 @@
-# Copyright 2018 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# [START gae_python38_app]
-# [START gae_python3_app]
-from flask import Flask, request
+from flask import Flask, request, jsonify
+from google.cloud import datastore
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
 
 
-@app.route("/")
-def cors_enabled_function():
+def cors_enabled_function(method):
     # For more information about CORS and CORS preflight requests, see:
     # https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 
     # Set CORS headers for the preflight request
+    # Allows GET requests from any origin with the Content-Type
+    # header and caches preflight response for an 3600s
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": f"{method}, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "3600",
+    }
+
+    return "", 204, headers
+
+
+def get_datastore_client():
+    return datastore.Client()
+
+
+@app.route("/create_letterbox", methods=["POST", "OPTIONS"])
+def create_letterbox():
     if request.method == "OPTIONS":
-        # Allows GET requests from any origin with the Content-Type
-        # header and caches preflight response for an 3600s
-        headers = {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-        }
+        return cors_enabled_function('POST')
 
-        return "", 204, headers
+    datastore_client = get_datastore_client()
 
-    # Set CORS headers for the main request
-    headers = {"Access-Control-Allow-Origin": "*"}
+    letter_box = request.get_json()
 
-    return fetch(request, headers)
+    id = letter_box.get('id')
+    letter_box = {
+        k: v for k, v in letter_box.items()
+        if not k.startswith('_') and k != 'id'
+    }
+    entity = datastore.Entity(
+        key=datastore_client.key("LetterBox", id) if id is not None else datastore_client.key("LetterBox"))
+    entity.update(letter_box)
+    datastore_client.put(entity)
+    letter_box['id'] = entity.key.id
+
+    from predict_letters import predict_letters
+    predict_letters([letter_box])
+
+    headers = {"Access-Control-Allow-Origin": "*", 'Content-Type': 'application/json'}
+    return jsonify(letter_box), 200, headers
 
 
-def fetch(request, headers):
-    file = request.args.get('file')
-    if file is None:
-        return "DeadSea Scroll Images Service"
+@app.route("/letterboxes")
+def letterboxes():
+    if request.method == "OPTIONS":
+        return cors_enabled_function('GET')
 
-    try:
-        # Opening the binary file in binary mode as rb(read binary)
-        f = open("images/isaiah/{}".format(file), mode="rb")
+    datastore_client = get_datastore_client()
 
-        # Reading file data with read() method
-        data = f.read()
+    filename = request.args.get('filename')
+    predict = request.args.get('predict')
+    if not filename:
+        return jsonify({"error": "filename is required"}), 400
 
-        # Printing our byte sequenced data
-        print(data)
+    query = datastore_client.query(kind="LetterBox")
+    query.add_filter("filename", "=", filename)
+    results = list(query.fetch())
+    items = []
+    for r in results:
+        item = dict(r)
+        item['id'] = r.key.id
+        items.append(item)
+    # Sort: y2 ASC, x2 DESC
+    items = sorted(items, key=lambda r: (r.get('y2', 0), -r.get('x2', 0)))
+    if predict:
+      from predict_letters import predict_letters
+      predict_letters(items)
 
-        # Closing the opened file
-        f.close()
-
-        headers["Content-Type"] = 'image/jpeg'
-        return data, 200, headers
-    except OSError:
-        print("Could not open/read file:", file)
-        return "File not found", 404, headers
+    headers = {"Access-Control-Allow-Origin": "*", 'Content-Type': 'application/json'}
+    result = {
+        'type': 'LetterBox',
+        'filter': f'filename={filename}',
+        'orderBy': 'y2,x2 DESC',
+        'pageSize': 0,
+        'pageToken': 1,
+        'totalSize': len(results),
+        'items': items
+    }
+    return jsonify(result), 200, headers
