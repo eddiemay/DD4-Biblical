@@ -13,6 +13,7 @@
 .git
 .gitignore
 .env
+deploy.sh
 
 # Python pycache:
 __pycache__/

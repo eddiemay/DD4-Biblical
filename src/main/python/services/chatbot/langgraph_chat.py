@@ -47,12 +47,12 @@ if model.startswith("gpt"):
     print("Need to create an .env file and put OPENAI_API_KEY=[OPENAI_API_KEY]")
     print("For GCP create env_variables.yaml and follow instructions at " 
           "https://stackoverflow.com/questions/22669528")
-  llm = ChatOpenAI(model=model, api_key=api_key)
+  lang_llm = ChatOpenAI(model=model, api_key=api_key)
 else:
   from langchain_ollama import ChatOllama
-  llm = ChatOllama(model=model)
+  lang_llm = ChatOllama(model=model)
 
-llm.temperature = 0
+lang_llm.temperature = 0
 
 
 def fetch_scripture(reference):
@@ -73,39 +73,43 @@ known_actions = {
 action_re = re.compile(r'^Action:\s*(\w+):\s*(.*)$')
 
 
-def query(agent:Agent, question:str) -> list[str]:
-  i = 0
-  results = []
-  next_prompt = question
-  while i < MAX_TURNS:
-    i += 1
+class LangAgent(Agent):
+  def __init__(self, llm=None, system=prompt, ip_address=None, creation_time=None, last_modified_time=None, messages=None):
+    super().__init__(llm or lang_llm, system, ip_address, creation_time, last_modified_time, messages)
 
-    result = agent.execute({"role": 'user' if i == 1 else 'system', "content": next_prompt})
-    if i == 1:
-      agent.messages.append({"role": 'user', "content": question})
-    results.append(result)
-    print(result)
-    actions = []
-    for line in result.split('\n'):
-      line = line.strip()
-      match = action_re.match(line)
-      if match:
-        actions.append(match)
-    if actions:
-      # There is an action to run
-      action, action_input = actions[0].groups()
-      if action not in known_actions:
-        raise Exception(f"Unknown action: {action}: {action_input}")
-      print(f" -- running {action} {action_input}")
-      try:
-        observation = known_actions[action](action_input)
-      except Exception as e:
-        observation = f"Error: {str(e)}"
-      print("Observation:", observation)
-      next_prompt = f"Observation: {observation}"
-    if "Answer:" in result:
-      break
-  print()
-  agent.messages.append({"role": 'assistant', "content": results[-1]})
-  agent.trim_messages()
-  return results
+  def __call__(self, question:str) -> list[str]:
+    i = 0
+    results = []
+    next_prompt = question
+    while i < MAX_TURNS:
+      i += 1
+
+      result = self.execute({"role": 'user' if i == 1 else 'system', "content": next_prompt})
+      if i == 1:
+        self.messages.append({"role": 'user', "content": question})
+      results.append(result)
+      print(result)
+      actions = []
+      for line in result.split('\n'):
+        line = line.strip()
+        match = action_re.match(line)
+        if match:
+          actions.append(match)
+      if actions:
+        # There is an action to run
+        action, action_input = actions[0].groups()
+        if action not in known_actions:
+          raise Exception(f"Unknown action: {action}: {action_input}")
+        print(f" -- running {action} {action_input}")
+        try:
+          observation = known_actions[action](action_input)
+        except Exception as e:
+          observation = f"Error: {str(e)}"
+        print("Observation:", observation)
+        next_prompt = f"Observation: {observation}"
+      if "Answer:" in result:
+        break
+    print()
+    self.messages.append({"role": 'assistant', "content": results[-1]})
+    self.trim_messages()
+    return results

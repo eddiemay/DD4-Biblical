@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
-from mcp_chat import Agent, query, llm_with_tools
+from mcp_chat import MCPAgent
 
-agent = Agent(llm_with_tools)
+agent = MCPAgent()
 
 def _query(question):
-  return query(agent, question)['text']
+  return agent(question)['text']
 
 
 def test_gen_2_3():

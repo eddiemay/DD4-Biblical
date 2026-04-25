@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 
 class Agent:
-  def __init__(self, llm, system:str=None, ip_address=None, creation_time=None, last_modified_time=None, messages=None):
+  def __init__(self, llm=None, system:str=None, ip_address=None, creation_time=None, last_modified_time=None, messages=None):
     self.llm = llm
     self.system = system
     self.ip_address = ip_address
@@ -22,12 +22,11 @@ class Agent:
     }
 
   @classmethod
-  def from_dict(cls, llm, data):
+  def from_dict(cls, data):
     messages = data.get("messages")
     if type(messages) == list:
       messages = json.dumps(messages)
     return cls(
-        llm,
         system = data.get("system"),
         ip_address = data.get("ipAddress"),
         creation_time = data.get("creationTime"),
