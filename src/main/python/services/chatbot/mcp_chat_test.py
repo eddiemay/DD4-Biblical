@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langgraph_mcp_chat import Agent, query, llm_with_tools
+from mcp_chat import Agent, query, llm_with_tools
 
 agent = Agent(llm_with_tools)
 
