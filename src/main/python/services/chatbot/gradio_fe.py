@@ -1,13 +1,13 @@
 import gradio
 from dotenv import load_dotenv
 load_dotenv()
-from langgraph_chat import Agent
+from langgraph_chat import Agent, query, llm, prompt
 
-agent = Agent()
+agent = Agent(llm, prompt)
 
 
 def chat_func(question, history):
-  return agent(question)[-1]
+  return query(agent, question)[-1]
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import datetime, timezone
+from agent import Agent
 from langchain_openai import ChatOpenAI
 from urllib import parse, request
 
@@ -13,33 +13,33 @@ FETCH_URL =\
   'https://dabar.cloud/_api/scriptures/v1/fetch?searchText={}&lang=en&version=ISR'
 
 prompt = """
-You run in a loop of Thought, Action, PAUSE, Observation.
-At the end of the loop you output an Answer
-Use Thought to describe your thoughts about the question you have been asked.
-Use Action to run one of the actions available to you - then return PAUSE.
-Observation will be the result of running those actions.
+  You run in a loop of Thought, Action, PAUSE, Observation.
+  At the end of the loop you output an Answer
+  Use Thought to describe your thoughts about the question you have been asked.
+  Use Action to run one of the actions available to you - then return PAUSE.
+  Observation will be the result of running those actions.
+  
+  Your available actions are:
+  
+  fetch_scripture:
+  e.g. fetch_scripture: Genesis 2:3
+  returns json array of scriptures requested.
+  
+  Example session:
 
-Your available actions are:
+  Question: What does Genesis 2:3 say?
+  Thought: I should fetch the scripture using fetch_scripture
+  Action: fetch_scripture: Genesis 2:3
+  PAUSE
 
-fetch_scripture:
-e.g. fetch_scripture: Genesis 2:3
-returns json array of scriptures requested.
+  You will be called again with this:
 
-Example session:
+  Observation: And Elohim blessed the seventh day and set it apart, because on it He rested from all His work which Elohim in creating had made.
 
-Question: What does Genesis 2:3 say?
-Thought: I should fetch the scripture using fetch_scripture
-Action: fetch_scripture: Genesis 2:3
-PAUSE
+  You then output:
 
-You will be called again with this:
-
-Observation: And Elohim blessed the seventh day and set it apart, because on it He rested from all His work which Elohim in creating had made.
-
-You then output:
-
-Answer: And Elohim blessed the seventh day and set it apart, because on it He rested from all His work which Elohim in creating had made.
-""".strip()
+  Answer: And Elohim blessed the seventh day and set it apart, because on it He rested from all His work which Elohim in creating had made.
+  """.strip()
 
 if model.startswith("gpt"):
   api_key = os.environ.get("OPENAI_API_KEY")
@@ -53,54 +53,6 @@ else:
   llm = ChatOllama(model=model)
 
 llm.temperature = 0
-
-
-class Agent:
-  def __init__(self, system=prompt, ip_address=None, creation_time=None, last_modified_time=None, messages=None):
-    self.system = system
-    self.ip_address = ip_address
-    self.creation_time = creation_time or datetime.now(timezone.utc)
-    self.last_modified_time = last_modified_time
-    self.messages = messages or []
-
-  def to_dict(self):
-    self.last_modified_time = datetime.now(timezone.utc)
-    return {
-      "system": self.system,
-      "ipAddress": self.ip_address,
-      "creationTime": self.creation_time,
-      "lastModifiedTime": self.last_modified_time,
-      "messages": json.dumps(self.messages)
-    }
-
-  @classmethod
-  def from_dict(cls, data):
-    messages = data.get("messages")
-    if type(messages) == list:
-      messages = json.dumps(messages)
-    return cls(
-        system = data.get("system"),
-        ip_address = data.get("ipAddress"),
-        creation_time = data.get("creationTime"),
-        last_modified_time = data.get("lastModifiedTime"),
-        messages = json.loads(messages) if messages else []
-    )
-
-  def __call__(self, message):
-    return query(self, message)
-
-  def trim_messages(self, max_messages=20):
-    # Then trim to size.
-    if len(self.messages) > max_messages:
-      self.messages = self.messages[-(max_messages):]
-
-  def execute(self, message):
-    messages = []
-    if self.system:
-      messages.append({"role": "system", "content": self.system})
-    messages.extend(self.messages)
-    messages.append(message)
-    return llm.invoke(messages).content
 
 
 def fetch_scripture(reference):

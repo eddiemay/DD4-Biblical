@@ -1,14 +1,14 @@
 import os
+from agent import Agent
 
 gpt_model = "gpt-4.1"
 deepseek_model = "deepseek-r1:7b"
 model = gpt_model
 
 if model.startswith("gpt"):
-  if __name__ == "__main__":
-    from langchain_openai import ChatOpenAI
-    from dotenv import load_dotenv
-    load_dotenv()
+  from langchain_openai import ChatOpenAI
+  from dotenv import load_dotenv
+  load_dotenv()
   api_key = os.environ.get("OPENAI_API_KEY")
   if api_key is None:
     print("Need to create an .env file and put OPENAI_API_KEY=[OPENAI_API_KEY]")
@@ -30,13 +30,18 @@ llm_with_tools = llm.bind_tools([
 ])
 
 
-def query(question):
-  return llm_with_tools.invoke(question)
+def query(agent:Agent, question):
+  answer = agent.execute(question)[-1]
+  agent.messages.append({"role": 'user', "content": question})
+  agent.messages.append({"role": 'assistant', "content": answer['text']})
+  agent.trim_messages()
+  return answer
 
 
 if __name__ == "__main__":
-  print(query("Fetch the scripture Gen 2:3"))
-  print(query("How many references are there to Strong's H6963 in the bible?"))
-  print(query("What is the root of Strong's H0430?"))
-  # print(query("What is the similarity score of 'Hello there' and 'How are you?'"))
-  # print(query("What is the similarity score of 'I like dogs' and 'I love dogs'"))
+  agent = Agent(llm_with_tools)
+  print(query(agent, "Fetch the scripture Gen 2:3"))
+  print(query(agent, "How many references are there to Strong's H6963 in the bible?"))
+  print(query(agent, "What is the root of Strong's H0430?"))
+  # print(query(agent, "What is the similarity score of 'Hello there' and 'How are you?'"))
+  # print(query(agent, "What is the similarity score of 'I like dogs' and 'I love dogs'"))

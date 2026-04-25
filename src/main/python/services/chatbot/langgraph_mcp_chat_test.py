@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langgraph_chat import Agent, query, llm, prompt
+from langgraph_mcp_chat import Agent, query, llm_with_tools
 
-agent = Agent(llm, prompt)
+agent = Agent(llm_with_tools)
 
 def _query(question):
-  return query(agent, question)[-1]
+  return query(agent, question)['text']
 
 
 def test_gen_2_3():
