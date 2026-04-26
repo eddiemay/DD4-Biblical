@@ -1,8 +1,9 @@
-com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, letterBoxService) {
+com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, letterBoxService, scriptureService) {
   this.$http = $http;
   this.$scope = $scope;
   this.$window = $window;
   this.letterBoxService = letterBoxService;
+  this.scriptureService = scriptureService;
   this.showLetterBoxes = true;
   this.showLetters = true;
   this.rowNum = 1;
@@ -41,6 +42,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     resultText: {name: 'Text Result', isEnabled: () => true},
     textDiff: {name: 'Text Diff', isEnabled: () => this.textFile != undefined},
     imagesByLetter: {name: 'Images By Letter', isEnabled: () => true},
+    interlinear: {name: 'Interlinear', isEnabled: () => true}
   }
 
   this.textFile = "Please select a scroll and fragment."
@@ -137,6 +139,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
         this.letterBoxService.batchCreate(this.letterBoxes, result => {
           this.selectedBox = undefined;
           this.drawScroll();
+          this.updateTranslation();
         });
       }
       return;
@@ -162,6 +165,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
         }
         this.selectedBox = undefined;
         this.drawScroll();
+        this.updateTranslation();
       });
     } else if (event.key == 'r' || event.key == 'R') {
       this.letterDialogShown = true;
@@ -171,6 +175,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
       this.letterBoxService.create(this.selectedBox, result => {
         this.selectedBox = undefined;
         this.drawScroll();
+        this.updateTranslation();
       });
     } else if (event.key == 'ArrowUp') {
       this.selectedBox.y2 -= 1;
@@ -238,6 +243,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
     saveBox._state = undefined;
     saveBox.id = result.id;
     this.drawScroll();
+    this.updateTranslation();
   }, error => {
     saveBox._state = 'error';
     notifyError(error);
@@ -298,6 +304,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
     if (this.canvasReady) {
       this.drawScroll();
     }
+    this.updateTranslation();
   });
 
   this.img = new Image();
@@ -381,12 +388,17 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.createRow = function() {
       filename: this.filename, type: 'Row', value: this.rowNum, _letterBoxes: [],
       x1: this.x, y1: this.y, x2: this.canvasWidth / 2 - 10, y2: this.y + 70};
 
+    if (this.lastRow) { // Assume the x2 will stop at the place as the last row.
+      rowBox.x2 = this.lastRow.x2;
+    }
+
     var index = 0;
     while (index < this.rows.length && this.rows[index].y1 < rowBox.y1) {
       index++;
     }
     this.rows.splice(index, 0, rowBox);
     this.selectedBox = rowBox;
+    this.lastRow = rowBox;
   }
 
   this.rowNum++;
@@ -545,7 +557,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawImagesByLetter = function
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.getRowText = function(row) {
-  var text = row.value + ' ';
+  var text = '';
   var lastX1 = undefined;
   row._letterBoxes.forEach(letterBox => {
     if (lastX1 && (lastX1 - letterBox.x2) >= 5) {
@@ -564,7 +576,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.computeDiff = function() {
     .slice() // avoid mutating original array
     .sort((a, b) => Number(a.value) - Number(b.value))
     .forEach(row => {
-      var rowText = this.getRowText(row);
+      var rowText = row.value + ' ' + this.getRowText(row);
       rowTextMap[row.value] = rowText;
       this.resultText += rowText + '\n';
     });
@@ -590,6 +602,31 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.computeDiff = function() {
     });
     this.textDiffs.push(textDiff);
   }
+}
+
+com.digitald4.biblical.DssIdentifierCtrl.prototype.updateTranslation = function() {
+  this.translations = [];
+  if (this.selectedTab == this.tabs.interlinear) {
+    var rowTextList = [];
+    var rowNumbers = [];
+    this.rows
+      .slice() // avoid mutating original array
+      .sort((a, b) => Number(a.value) - Number(b.value))
+      .forEach(row => {
+        rowNumbers.push(row.value);
+        rowTextList.push(this.getRowText(row));
+      });
+    this.scriptureService.bulkTranslate(rowTextList, response => {
+      for (var x = 0; x < response.items.length; x++) {
+        var scripture = response.items[x];
+        scripture.book = this.scroll.name;
+        scripture.chapter = this.column;
+        scripture.verse = rowNumbers[x];
+        this.translations.push(scripture);
+      }
+    });
+  }
+
 }
 
 function unfinalize(text) {

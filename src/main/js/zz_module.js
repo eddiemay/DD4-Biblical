@@ -133,6 +133,10 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
       scriptureService.sendRequest({action: 'uploadScripture', method: 'POST', data: request},
           response => success(scriptureService.processPagination(response)), error);
     }
+    scriptureService.bulkTranslate = function(strings, success, error) {
+      scriptureService.sendRequest({action: 'bulkTranslate', method: 'POST', data: {items: strings}},
+          response => success(scriptureService.processPagination(response)), error);
+    }
     scriptureService.getScrollCoords = function(scripture, success, error) {
       const errorCallback = error || notifyError;
       const url = 'http://dss.collections.imj.org.il/api/get_translation?id=' + scripture.chapter + '%3A' + scripture.verse;

@@ -31,16 +31,16 @@
               <a data-ng-click="$ctrl.setSelectedTab(tab)" title="{{tab.name}}">{{tab.name}}</a>
             </li>
           </ul>
-          <div class="tabs-content" dir="rtl">
-            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textFile">
+          <div class="tabs-content">
+            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textFile" dir="rtl">
               <textarea data-ng-model="$ctrl.textFile" cols="52" rows="7" style="font-size: 24pt" disabled>
               </textarea>
             </div>
-            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.resultText">
+            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.resultText" dir="rtl">
               <textarea data-ng-model="$ctrl.resultText" cols="52" rows="7" style="font-size: 24pt" disabled>
               </textarea>
             </div>
-            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textDiff" style="max-height: 256px;max-width:100%;overflow: scroll;">
+            <div data-ng-if="$ctrl.selectedTab == $ctrl.tabs.textDiff" dir="rtl" style="max-height: 256px;max-width:100%;overflow: scroll;">
               <div data-ng-repeat="textDiff in $ctrl.textDiffs">
                 <p style="font-size: 24pt;">
                   {{textDiff.expected}}<br>
@@ -51,6 +51,44 @@
             </div>
             <div data-ng-show="$ctrl.selectedTab == $ctrl.tabs.imagesByLetter" style="max-height: 256px;max-width:100%;overflow: scroll;">
               <canvas id="letters" width="{{$ctrl.canvasWidth / 2}}" height="2000px"></canvas>
+            </div>
+            <div data-ng-show="$ctrl.selectedTab == $ctrl.tabs.interlinear" style="max-height:256px;width:100%;overflow:scroll;">
+              <div data-ng-repeat="script in $ctrl.translations">
+                <div align="right" class="maintable2">
+                  <table border="0" cellspacing="0" cellpadding="0" align="center" style="width:100%">
+                    <tr>
+                      <td>
+                        <div id="leftbox">
+                          <div class="vheading">
+                            <a href="" data-ng-click="$ctrl.showScripture(undefined, script.book, script.chapter)">
+                              ({{script.version}}) {{script.book}} {{script.chapter}}</a>:<a href="" data-ng-click="$ctrl.showScripture(script.version, script.book, script.chapter, script.verse)">{{script.verse}}</a>
+                          </div>
+                          <table class="tablefloatheb" data-ng-repeat="interlinear in script.interlinears">
+                            <tr><td class="mt-strongs" data-ng-class="interlinear.highlight">
+                              <span data-ng-repeat="subToken in interlinear.subTokens">
+                                <a href="" data-ng-click="$ctrl.showStrongsDef(subToken.strongsId)">
+                                  {{subToken.strongsId || '&nbsp;'}}
+                                </a>
+                              </span>
+                            </td></tr>
+                            <tr><td class="translit">
+                              <a href="" data-ng-click="$ctrl.showStrongsRefDialog(interlinear, true)">
+                                <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.transliteration}} </span>
+                              </a>
+                            </td></tr>
+                            <tr><td class="hebrew">
+                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.word}} </span>
+                            </td></tr>
+                            <tr><td class="machine-translation">
+                              <span data-ng-repeat="subToken in interlinear.subTokens">{{subToken.translation}}</span>
+                            </td></tr>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
