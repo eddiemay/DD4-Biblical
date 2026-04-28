@@ -12,6 +12,7 @@ def _fetch_scripture(reference: str) -> list:
   with request.urlopen(fetch_url) as url:
     return json.load(url)['items']
 
+
 @mcp.resource("scriptures://{reference}/fetch")
 def fetch_scripture_resource(reference: str) -> list:
   """Fetches Bible scriptures

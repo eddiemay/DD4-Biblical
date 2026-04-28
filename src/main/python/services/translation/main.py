@@ -22,8 +22,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 
-@app.route("/")
-def cors_enabled_function():
+def cors_enabled_function(request):
   # For more information about CORS and CORS preflight requests, see:
   # https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 
@@ -41,10 +40,12 @@ def cors_enabled_function():
     return "", 204, headers
 
   # Set CORS headers for the main request
-  headers = {"Access-Control-Allow-Origin": "*"}
+  return None, None, {"Access-Control-Allow-Origin": "*"}
 
-  return fetch(request, headers)
+@app.route("/")
+def fetch():
+  message, code, headers = cors_enabled_function(request)
+  if code is not None:
+    return message, code, headers
 
-
-def fetch(request, headers):
   return "Bible Translation Service", 200, headers

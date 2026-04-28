@@ -7,8 +7,7 @@ from langgraph_chat import LangAgent
 app = Flask(__name__)
 
 
-@app.route("/")
-def cors_enabled_function():
+def cors_enabled_function(request):
     # For more information about CORS and CORS preflight requests, see:
     # https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
     # Set CORS headers for the preflight request
@@ -25,16 +24,19 @@ def cors_enabled_function():
         return "", 204, headers
 
     # Set CORS headers for the main request
-    headers = {"Access-Control-Allow-Origin": "*"}
-
-    return chat(request), 200, headers
+    return None, None, {"Access-Control-Allow-Origin": "*"}
 
 
 def get_datastore_client():
   return datastore.Client()
 
 
-def chat(request):
+@app.route("/")
+def chat():
+    message, code, headers = cors_enabled_function(request)
+    if code is not None:
+      return message, code, headers
+
     datastore_client = get_datastore_client()
 
     question = request.args.get('question')
@@ -55,7 +57,7 @@ def chat(request):
     # 🗃️ Save to Datastore
     save_agent(datastore_client, session_id, agent)
 
-    return answer
+    return answer, 200, headers
 
 
 def get_agent(datastore_client:datastore.Client, session_id:str, ip_address):
@@ -74,4 +76,3 @@ def save_agent(datastore_client:datastore.Client, session_id:str, agent:LangAgen
       exclude_from_indexes=("messages",))
   entity.update(agent.to_dict())
   datastore_client.put(entity)
-
