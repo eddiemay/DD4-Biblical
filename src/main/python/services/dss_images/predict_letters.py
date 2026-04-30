@@ -68,26 +68,40 @@ def transform(img: np.ndarray, mean, std) -> np.ndarray:
   return tensor.astype(np.float32)
 
 
-def predict_letters(items):
-  predictable = []
-  images = []
-  for item in items:
-    if item['type'] == 'Letter' and len(item['value']) == 1:
-      predictable.append(item)
-      images.append(transform(get_image(item), mean, std))
-
-  if len(predictable) == 0:
-    return
-
+def predict_letters(items, batch_size=256):
   ort_session = ort.InferenceSession("letter_model.onnx")
   input_name = ort_session.get_inputs()[0].name
-  inputs = np.array(images)
-  outputs = ort_session.run(None, {input_name: inputs})[0]
-  preds = np.argmax(outputs, axis=1)
-
   label_lookup = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
-  for i in range(len(predictable)):
-    predictable[i]['_predicted'] = label_lookup[preds[i]]
+
+  batch_imgs = []
+  batch_items = []
+
+  for item in items:
+    if item['type'] != 'Letter' or len(item['value']) != 1:
+      continue
+
+    batch_items.append(item)
+    batch_imgs.append(transform(get_image(item), mean, std))
+
+    if len(batch_imgs) == batch_size:
+      inputs = np.array(batch_imgs)
+      outputs = ort_session.run(None, {input_name: inputs})[0]
+      preds = np.argmax(outputs, axis=1)
+
+      for j in range(len(batch_items)):
+        batch_items[j]['_predicted'] = label_lookup[preds[j]]
+
+      batch_imgs.clear()
+      batch_items.clear()
+
+  # handle remainder
+  if batch_imgs:
+    inputs = np.array(batch_imgs)
+    outputs = ort_session.run(None, {input_name: inputs})[0]
+    preds = np.argmax(outputs, axis=1)
+
+    for j in range(len(batch_items)):
+      batch_items[j]['_predicted'] = label_lookup[preds[j]]
 
 
 def parse_file_name(file_name):

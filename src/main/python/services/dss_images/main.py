@@ -107,7 +107,7 @@ def letterboxes():
 
 
 def resolve_login(datastore_client, id_token):
-    if id_token is None:
+    if id_token is None or len(id_token) == 0:
         return None
 
     key = datastore_client.key("Session", id_token)
