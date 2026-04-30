@@ -67,12 +67,13 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
     var x = event.x - rect.left,
         y = event.y - rect.top;
 
-    if (this.showLetterBoxes || this.showLetters) {
+    if (this.showLetterBoxes || this.showLetters || this.showMissmatch) {
       for (var b = 0; b < this.letterBoxes.length; b++)  {
         var lx = x > this.canvasWidth / 2 ? x - this.canvasWidth / 2 : x;
         var ly = x > this.canvasWidth / 2 ? y + 20 : y;
         var letBox = this.letterBoxes[b];
         if (this.showLetterBoxes && letBox.x1 < lx && letBox.x2 > lx && letBox.y1 < ly && letBox.y2 > ly ||
+            this.showMissmatch && letBox.value != letBox._predicted && letBox.x1 < lx && letBox.x2 > lx && letBox.y1 < ly && letBox.y2 > ly ||
             this.showLetters && x >= letBox.x1 + 7 && x < letBox.x1 + 14 && y > letBox.y2 + 7 && y <= letBox.y2 + 14) {
             this.selectedBox = letBox;
           this.drawScroll();

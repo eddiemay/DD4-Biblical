@@ -15,8 +15,8 @@ public class Scripture extends ModelObject<String> implements Searchable {
   private String version;
   private String language = Language.EN;
   private String book;
-  private int chapter;
-  private int verse;
+  private Integer chapter;
+  private Integer verse;
   private StringBuilder text;
   private String location;
 
@@ -55,20 +55,20 @@ public class Scripture extends ModelObject<String> implements Searchable {
     return this;
   }
 
-  public int getChapter() {
+  public Integer getChapter() {
     return chapter;
   }
 
-  public Scripture setChapter(int chapter) {
+  public Scripture setChapter(Integer chapter) {
     this.chapter = chapter;
     return this;
   }
 
-  public int getVerse() {
+  public Integer getVerse() {
     return verse;
   }
 
-  public Scripture setVerse(int verse) {
+  public Scripture setVerse(Integer verse) {
     this.verse = verse;
     return this;
   }

@@ -89,7 +89,9 @@ def construct_dss_org(scroll, file_pattern, output_name=None):
 if __name__ == '__main__':
     # construct_dss_org('4QCalendrical', 'Ba6FnXeQZV2r6tmEjHzKd6TxXlz', '4Q318-Frag1')
     # construct_dss_org('4QCalendrical', 'setRWBs0M2I1467lUOvPy', '4Q320')
-    construct_dss_org('4QCalendrical', '0hBWsyGjCZT', '4Q320-Frag1')
+    # construct_dss_org('4QCalendrical', '0hBWsyGjCZT', '4Q320-Frag1')
+    # construct_dss_org('4QCalendrical', 'BtzcLAfA2zzGdueiOUabgemHm4YiQzX9HlNT', '4Q320-Frag2')
+    construct_dss_org('4QCalendrical', 'wmhm0rygjVbeJX6p8xLz', '4Q320-Frag3')
     # construct_dss_org('4QCalendrical', '6lJ3FktiWJEcFvWtxQWd7DgoIhT', '4Q321-Frag10')
     # construct_dss_org('4QCalendrical', 'QNpNbUEx1iw3L6p0yFOE9d18wFjJ10mt', '4Q326')
     # construct_dss_org('4QCalendrical', '6Wx78IIdr', '4Q326-Plates-693_710')

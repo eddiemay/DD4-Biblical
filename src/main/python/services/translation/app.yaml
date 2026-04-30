@@ -13,6 +13,7 @@
 # limitations under the License.
 
 runtime: python311
+instance_class: F1
 service: translation  # Will be served at https://translation-dot-dd4-biblical.appspot.com/
 handlers:
   - url: /files

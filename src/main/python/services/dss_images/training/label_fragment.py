@@ -35,7 +35,7 @@ def send_json_req(url, data):
 
 
 def label(scroll, fragment, display=True, upload=None):
-    filename = f'{scroll}-column-{fragment}'
+    filename = f'{scroll}-{fragment}'
 
     if scroll == 'isaiah':
         ver_req = to_isa_verify_request(fragment, display=display)
@@ -128,14 +128,13 @@ if __name__ == '__main__':
     # label('isaiah', 16, upload=None)
     # label('4QCalendrical', '4Q318-Frag1', upload=None)
     # label('4QCalendrical', '4Q320', upload=None)
-    label('4QCalendrical', '4Q320-Frag1', upload=None)
+    label('4QCalendrical', '4Q320-Frag2', upload=Upload.LETTERS)
+    # label('4QCalendrical', '4Q320-Frag3', upload=None)
     # label('4QCalendrical', '4Q320-Frag2', upload=Upload.LETTERS)
     # label('4QCalendrical', '4Q320-Frag3', upload=None)
     # label('4QCalendrical', '4Q321-Frag5')
     # label('4QCalendrical', '4Q321-Frag10')
     # label('4QCalendrical', '4Q326', upload=Upload.LETTERS, preprocessors=preprocessors)
-    label('4QCalendrical', '4Q326-Frag1', upload=None)
+    # label('4QCalendrical', '4Q326-Frag1', upload=None)
     # label('4QCalendrical', '4Q326-Plates-693_710', upload=Upload.LETTERS, preprocessors=preprocessors)
     # label('4QCalendrical', '4Q326-Plates-693_710_694', upload=Upload.LETTERS, preprocessors=preprocessors)
-
-    migrate()

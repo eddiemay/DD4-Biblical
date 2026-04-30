@@ -189,7 +189,7 @@ public class HebrewConverter {
   }
 
   public static String toAncientRtl(String text) {
-    if (text.charAt(0) < 'א' || text.charAt(0) > 'ת') {
+    if (text.isEmpty() || text.charAt(0) < 'א' || text.charAt(0) > 'ת') {
       return null;
     }
 

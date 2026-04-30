@@ -1,7 +1,10 @@
 package com.digitald4.biblical.server;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Scripture;
+import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.ScriptureStore;
 import com.digitald4.biblical.store.ScriptureStore.GetOrSearchResponse;
 import com.digitald4.biblical.util.MachineTranslator;
@@ -140,6 +143,18 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
     }
   }
 
+  @ApiMethod(httpMethod = ApiMethod.HttpMethod.POST, path = "bulkTranslate")
+  public ImmutableList<InterlinearScripture> bulkTranslate(StringList strings) throws ServiceException {
+    try {
+      return strings.getItems().stream()
+          .map(machineTranslator::translate)
+          .map(InterlinearScripture::new)
+          .collect(toImmutableList());
+    } catch (DD4StorageException e) {
+      throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
   @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET, path = "invalidateMTCache")
   public Empty invalidateMTCache() throws ServiceException {
     try {
@@ -147,6 +162,19 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
       return Empty.getInstance();
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
+    }
+  }
+
+  public static class StringList {
+    private ImmutableList<String> items = ImmutableList.of();
+
+    public ImmutableList<String> getItems() {
+      return items;
+    }
+
+    public StringList setItems(Iterable<String> items) {
+      this.items = ImmutableList.copyOf(items);
+      return this;
     }
   }
 }
