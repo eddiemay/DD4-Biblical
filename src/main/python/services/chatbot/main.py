@@ -49,6 +49,10 @@ def chat():
 
     print(f"session_id: {session_id} question: {question} ip: {ip_address}")
 
+    if question is None or len(question) == 0 or session_id is None or len(session_id) == 0:
+      print('Bad Request, no question and/or session_id')
+      return "Bad Request", 400, headers
+
     agent = get_agent(datastore_client, session_id, ip_address)
 
     # 🧠 Get model answer
