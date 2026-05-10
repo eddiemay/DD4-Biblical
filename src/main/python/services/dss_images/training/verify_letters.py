@@ -38,23 +38,11 @@ def visualize_missmatch(title, df):
   plt.show()
 
 
-def migrate_4Q320():
-  dataset = DSSLettersDataset(
-      fragments=['4QCalendrical-4Q320-Frag1'], cache_file='4Q320-Frag1.jsonl')
-  for img, label, metadata in dataset:
-    metadata['x1'], metadata['x2'], metadata['y1'], metadata['y2'] = (
-      metadata['x1']*2, metadata['x2']*2, metadata['y1']*2, metadata['y2']*2)
-
-  send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': dataset.metadata})
-
-
 if __name__ == '__main__':
-  dataset = DSSLettersDataset(
-      fragments=['4QCalendrical-4Q320-Frag1'], filter=SINGLE_LETTERS_ONLY,
-      cache_file='4Q320-Frag1.jsonl', override_cache=True)
+  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY,
+      fragments=['4QCalendrical-4Q320-Frag1'], overrides=['4QCalendrical-4Q320-Frag1'])
   print(f'Dataset {len(dataset)} items')
-  data_loader = DataLoader(
-      DD4Subset(dataset, test_transform), batch_size=1000, shuffle=False)
+  data_loader = DataLoader(DD4Subset(dataset, test_transform), batch_size=1000)
 
   ort_session = ort.InferenceSession("letter_model.onnx")
   input_name = ort_session.get_inputs()[0].name

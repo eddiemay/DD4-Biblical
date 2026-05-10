@@ -25,13 +25,12 @@ fragment_map = {}
 line_spacing = 60
 min_space = 5
 max_space = 10
-override_letter_cache = False
 
 
 def get_random_letter_box(letter):
     if not letter_map:
         print('creating letter map')
-        dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, override_cache=override_letter_cache)
+        dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
         for img, label, letter_box in dataset:
             collection = letter_map.get(letter_box['value'])
             if not collection:

@@ -13,7 +13,6 @@ from verify import process_image
 BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
 ITERATIONS = 8192
-override_letter_cache = False
 MODEL_NAME = f'{BASE_MODEL}_Label_{len(TRAINING_SET)}'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
@@ -26,7 +25,7 @@ def get_row(filename, row):
         print('creating row map')
         letter_boxes = []
         row_boxes = []
-        dataset = DSSLettersDataset(override_cache=override_letter_cache)
+        dataset = DSSLettersDataset()
         for img, label, letter_box in dataset:
             if letter_box['type'] == 'Row':
                 letter_box['_letterBoxes'] = []

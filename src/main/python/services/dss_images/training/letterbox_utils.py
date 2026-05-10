@@ -13,7 +13,8 @@ letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1'
 TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}', [2, 4, 7, 9, 13, 14, 16, 17, 18, 20, 26, 27, 36, 40, 44, 45, 47, 48, 53]))
-ALL = TRAINING_SET.copy().append('4QCalendrical-4Q420-Frag1')
+ALL = TRAINING_SET.copy()
+ALL.append('4QCalendrical-4Q320-Frag1')
 SINGLE_LETTERS_ONLY =\
   lambda letter_box: letter_box['type'] == 'Letter' and len(letter_box['value']) == 1
 mean, std = (0.5,), (0.5,)
@@ -67,25 +68,22 @@ class LetterBox(TypedDict):
 class DSSLettersDataset(Dataset):
   def __init__(self, fragments:list[str]=None,
       filter:callable(LetterBox)=None, transform:callable(any)=None,
-      cache_file:str=letter_box_file, override_cache:bool=False, res:int=9):
+      overrides:list[str]=None, res:int=9):
     self.transform = transform or (lambda x:x)
     self.res = res
     self.metadata:list[LetterBox] = []
     self.labels:list[int] = []
     classes = set()
-    cache_letter_boxes(fragments or TRAINING_SET, cache_file, override_cache)
-    with open(cache_file, "r", encoding="utf-8") as f:
-      for line in f:
-        letter_box: LetterBox = json.loads(line)
-        if filter is None or filter(letter_box):
-          self.metadata.append(letter_box)
-          value = letter_box['value']
-          classes.add(value)
-          self.labels.append(ord(value) - ord('א') if len(value) == 1 and 'א' <= value <= 'ת' else 27)
-      self.classes = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
-      print(f'Classes: {self.classes} {len(self.classes)}')
-      print(f'Labels: {torch.unique(torch.tensor(self.labels))} {type(self.labels[0])}')
-      self.images:list = [None] * len(self.metadata)
+    for letter_box in read_database(fragments or TRAINING_SET, overrides or [], filter):
+        self.metadata.append(letter_box)
+        value = letter_box['value']
+        classes.add(value)
+        self.labels.append(ord(value) - ord('א') if len(value) == 1 and 'א' <= value <= 'ת' else 27)
+
+    self.classes = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
+    print(f'Classes: {self.classes} {len(self.classes)}')
+    print(f'Labels: {torch.unique(torch.tensor(self.labels))} {type(self.labels[0])}')
+    self.images:list = [None] * len(self.metadata)
 
   def __len__(self) -> int:
     return len(self.metadata)
@@ -159,29 +157,52 @@ def get_image(letter_box:dict, res:int=9) -> np.ndarray:
   return file_img[y1:y2, x1:x2]
 
 
-def cache_letter_boxes(fragments:list[str], cache_file, override_cache:bool=False):
-  if os.path.exists(cache_file) and not override_cache:
-    return
+def read_database(fragments:list[str], overrides:list[str], filter:callable(LetterBox)) -> list[LetterBox]:
+  override_map = {f: True for f in overrides}
+  db = {}
+  if os.path.exists(letter_box_file):
+    with open(letter_box_file, "r", encoding="utf-8") as f:
+      for line in f:
+        letter_box:LetterBox = json.loads(line)
+        filename = letter_box['filename']
+        if override_map.get(filename) is None:
+          if db.get(filename) is None:
+            db[filename] = []
+          db[filename].append(letter_box)
 
-  # Open the file for write.
-  print('Writing file: ', cache_file)
-  with open(cache_file, "w", encoding="utf-8") as f:
-    for fragment in fragments:
+  filtered = []
+  change_detected = False
+  for fragment in fragments:
+    if db.get(fragment) is None:
+      change_detected = True
       letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
       print('Sending request: ', letterbox_url)
       with request.urlopen(letterbox_url) as url:
         response = json.load(url)
         print('Response: ', response)
-        letterboxes = response['items']
-        # Dump each scripture verse into the file.
+        db[fragment] = response['items']
+
+    for letter_box in db[fragment]:
+      if filter is None or filter(letter_box):
+        filtered.append(letter_box)
+
+  if change_detected:
+    # Open the file for write.
+    print('Writing file: ', letter_box_file)
+    with open(letter_box_file, "w", encoding="utf-8") as f:
+      for key in sorted(db.keys()):
+        letterboxes = db[key]
+        # Dump each letterbox into the file.
         for letterbox in letterboxes:
           json.dump(letterbox, f)
           f.write("\n")
 
+  return filtered
+
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, override_cache=False)
+  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} letters')
   for i in range(3):
     image, label, metadata = dataset[i]

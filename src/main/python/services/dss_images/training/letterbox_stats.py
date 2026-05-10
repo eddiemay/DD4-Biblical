@@ -50,8 +50,7 @@ def find_abnormals(letter, df, prop):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY,
-                              cache_file='letter_boxes_all.jsonl')
+  dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} letters')
   letters = []
   for img, label, metadata in dataset:
