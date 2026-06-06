@@ -94,9 +94,17 @@ com.digitald4.biblical.module = angular.module('biblical', ['DD4Common', 'ngRout
     }
     service.create = function(letterBox, success, error) {
       request = {
-        request_url: 'https://dss-images-dot-dd4-biblical.appspot.com/create_letterbox',
+        request_url: 'https://dss-images-dot-dd4-biblical.appspot.com/letterboxes',
         method: 'POST',
         data: letterBox
+      }
+      apiConnector.sendRequest(request, success, error);
+    }
+    service.Delete = function(id, success, error) {
+      request = {
+        request_url: 'https://dss-images-dot-dd4-biblical.appspot.com/letterboxes',
+        method: 'DELETE',
+        params: {id: id}
       }
       apiConnector.sendRequest(request, success, error);
     }

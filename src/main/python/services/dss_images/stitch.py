@@ -83,7 +83,7 @@ def construct_dss_org(scroll, file_pattern, output_name=None):
 
     cv2.imshow(f'{output_name}', canvas)
     cv2.waitKey(0)
-    cv2.imwrite(f'images/{scroll}/{output_name}.jpg', canvas)
+    cv2.imwrite(f'images/{scroll}/columns/{output_name}.jpg', canvas)
 
 
 if __name__ == '__main__':
@@ -91,7 +91,8 @@ if __name__ == '__main__':
     # construct_dss_org('4QCalendrical', 'setRWBs0M2I1467lUOvPy', '4Q320')
     # construct_dss_org('4QCalendrical', '0hBWsyGjCZT', '4Q320-Frag1')
     # construct_dss_org('4QCalendrical', 'BtzcLAfA2zzGdueiOUabgemHm4YiQzX9HlNT', '4Q320-Frag2')
-    construct_dss_org('4QCalendrical', 'wmhm0rygjVbeJX6p8xLz', '4Q320-Frag3')
+    # construct_dss_org('4QCalendrical', 'wmhm0rygjVbeJX6p8xLz', '4Q320-Frag3')
+    # construct_dss_org('Jubilees', 'hy4TbYoeWlp0a9iE6IY5bN_', 'Plate293-Frag9')
     # construct_dss_org('4QCalendrical', '6lJ3FktiWJEcFvWtxQWd7DgoIhT', '4Q321-Frag10')
     # construct_dss_org('4QCalendrical', 'QNpNbUEx1iw3L6p0yFOE9d18wFjJ10mt', '4Q326')
     # construct_dss_org('4QCalendrical', '6Wx78IIdr', '4Q326-Plates-693_710')
@@ -109,26 +110,18 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 1, res=5)
 
     # for res in range(8, 11):
-        # construct_column(Collection.ISAIAH, 16, res)
+        # construct_column(Collection.ISAIAH, 29, res)
     # cv2.waitKey(0)
 
     # for c in range(1, 16):
-      #  construct_column(Collection.WAR, c)
-    # construct_column(Collection.WAR, 14)
-    # construct_column(Collection.WAR, 1)
+      # construct_column(Collection.WAR, c)
 
     # for c in range(1, 12):
         # construct_column(Collection.COMMUNITY_RULE, c)
-    # construct_column(Collection.COMMUNITY_RULE, 10)
-    # construct_column(Collection.COMMUNITY_RULE, 11)
 
-    # for c in range(2, 68):
-        # construct_column(Collection.TEMPLE_SCROLL, c, res=9)
-    # construct_column(Collection.TEMPLE_SCROLL, 66, res=9)
-    # construct_column(Collection.TEMPLE_SCROLL, 2, res=9)
-    # construct_column(Collection.TEMPLE_SCROLL, 1)
+    for c in range(2, 68):
+        construct_column(Collection.TEMPLE_SCROLL, c, res=9)
+    # construct_column(Collection.TEMPLE_SCROLL, 4, res=9)
 
     # for c in range(1, 15):
         # construct_column(Collection.HABAKKUK, c)
-    # construct_column(Collection.HABAKKUK, 13)
-    # construct_column(Collection.HABAKKUK, 1)

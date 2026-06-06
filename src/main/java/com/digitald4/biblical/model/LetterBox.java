@@ -1,16 +1,18 @@
 package com.digitald4.biblical.model;
 
 import com.digitald4.common.model.ModelObjectModUser;
+import com.google.common.collect.ImmutableList;
 
 public class LetterBox extends ModelObjectModUser<Long> {
   private String filename;
-  public enum Type {Letter, Word, Row};
+  public enum Type {Letter, Word, Row}
   private Type type = Type.Letter;
   private int x1;
   private int y1;
   private int x2;
   private int y2;
   private String value;
+  private ImmutableList<Coord> coords;
 
   @Override
   public Long getId() {
@@ -94,5 +96,47 @@ public class LetterBox extends ModelObjectModUser<Long> {
   public LetterBox setValue(String value) {
     this.value = value;
     return this;
+  }
+
+  public ImmutableList<Coord> getCoords() {
+    return coords;
+  }
+
+  public LetterBox setCoords(Iterable<Coord> coords) {
+    this.coords = ImmutableList.copyOf(coords);
+    return this;
+  }
+
+  public static class Coord {
+    private int x;
+    private int y;
+
+    public int getX() {
+      return x;
+    }
+
+    public Coord setX(String x) {
+      this.x = Integer.parseInt(x);
+      return this;
+    }
+
+    public Coord setX(int x) {
+      this.x = x;
+      return this;
+    }
+
+    public int getY() {
+      return y;
+    }
+
+    public Coord setY(int y) {
+      this.y = y;
+      return this;
+    }
+
+    public Coord setY(String y) {
+      this.y = Integer.parseInt(y);
+      return this;
+    }
   }
 }

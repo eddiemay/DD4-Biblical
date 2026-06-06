@@ -4,8 +4,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
   this.$window = $window;
   this.letterBoxService = letterBoxService;
   this.scriptureService = scriptureService;
-  this.showLetterBoxes = true;
-  this.showLetters = true;
+  this.showLetterBoxes = this.showLetters = this.showMissmatch = this.showRowBoxes = true;
   this.rowNum = 1;
   const makeColumns = (n) => Array.from({length: n}, (_, i) => String(i + 1));
   this.scrolls = {
@@ -55,7 +54,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     alert('Canvas not supported, will not be able to view scroll');
     return;
   }
-
+  this.letterBoxes = [];
   this.addEventListeners();
 }
 
@@ -64,11 +63,18 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
   var $window = this.$window;
   canvas.addEventListener('click', event => {
     // event.preventDefault();
-    this.saveSelected();
-
     var rect = canvas.getBoundingClientRect();
-    var x = event.x - rect.left,
-        y = event.y - rect.top;
+    var x = Math.round(event.x - rect.left),
+        y = Math.round(event.y - rect.top);
+    if (this.newRow) {
+      this.x = x;
+      this.y = y;
+      if (this.addRowCoord()) {
+        return;
+      }
+    }
+
+    this.saveSelected();
 
     if (this.showLetterBoxes || this.showLetters || this.showMissmatch) {
       for (var b = 0; b < this.letterBoxes.length; b++)  {
@@ -87,10 +93,14 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
     if (this.showRowBoxes) {
       for (var b = 0; b < this.rows.length; b++)  {
         var rowBox = this.rows[b];
-        if (rowBox.x1 < x && rowBox.x2 > x && rowBox.y1 < y && rowBox.y2 > y) {
-          this.selectedBox = rowBox;
-          this.drawScroll();
-          return;
+        for (var c = 0; c < rowBox.coords.length; c++) {
+          var coord = rowBox.coords[c];
+          if (Math.abs(x - coord.x) < 5 && Math.abs(y - coord.y) < 5) {
+            this.selectedBox = rowBox;
+            this.selectedCoord = coord;
+            this.drawScroll();
+            return;
+          }
         }
       }
     }
@@ -143,7 +153,6 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
         this.letterBoxService.batchCreate(this.letterBoxes, result => {
           this.selectedBox = undefined;
           this.drawScroll();
-          this.updateTranslation();
         });
       }
       return;
@@ -169,18 +178,25 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
         }
         this.selectedBox = undefined;
         this.drawScroll();
-        this.updateTranslation();
+        // this.updateTranslation();
       });
     } else if (event.key == 'r' || event.key == 'R') {
       this.letterDialogShown = true;
       this.dialogStyle = {top: $window.visualViewport.pageTop - 20};
       this.$scope.$apply();
     } else if (event.key == 's' || event.key == 'S') {
-      this.letterBoxService.create(this.selectedBox, result => {
-        this.selectedBox = undefined;
-        this.drawScroll();
-        this.updateTranslation();
-      });
+      this.saveSelected();
+    } else if (this.selectedCoord) {
+      if (event.key == 'ArrowUp') {
+        this.selectedCoord.y -= 1;
+      } else if (event.key == 'ArrowDown') {
+        this.selectedCoord.y += 1;
+      } else if (event.key == 'ArrowLeft') {
+        this.selectedCoord.x -= 1;
+      } else if (event.key == 'ArrowRight') {
+        this.selectedCoord.x += 1;
+      }
+      this.drawScroll();
     } else if (event.key == 'ArrowUp') {
       this.selectedBox.y2 -= 1;
       if (!event.shiftKey) {
@@ -230,30 +246,16 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
-  if (!this.selectedBox) {
+  this.saveBox(this.selectedBox);
+  this.selectedBox = this.selectedCoord = this.newRow = undefined;
+}
+
+com.digitald4.biblical.DssIdentifierCtrl.prototype.saveBox = function(saveBox) {
+  if (!saveBox) {
     return;
   }
 
-  // If there is a selected box currently, save it to the backend and deselect it.
-  var saveBox = this.selectedBox;
-  this.selectedBox = undefined;
   saveBox._state = 'saving';
-  saveBox._letterBoxes = undefined;
-  if (saveBox._row) {
-    saveBox._row._letterBoxes.splice(saveBox._row._letterBoxes.indexOf(saveBox), 1);
-    saveBox._row = undefined;
-  }
-  this.letterBoxService.create(saveBox, result => {
-    saveBox._state = undefined;
-    saveBox.id = result.id;
-    this.drawScroll();
-    this.updateTranslation();
-  }, error => {
-    saveBox._state = 'error';
-    notifyError(error);
-    this.drawScroll();
-  });
-
   if (saveBox.type == 'Letter') {
     this.addLetterStat(saveBox);
   } else {
@@ -263,10 +265,55 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveSelected = function() {
       this.addLetterStat(letterBox);
     });
   }
+
+  if (saveBox.coords) {
+    saveBox.x1 = saveBox.coords[0].x;
+    saveBox.x2 = saveBox.coords[saveBox.coords.length - 1].x;
+
+    saveBox.y2 = saveBox.coords[0].y;
+    saveBox.coords.forEach(coord => {
+      if (coord.y > saveBox.y2) {
+        saveBox.y2 = coord.y;
+      }
+    });
+
+    saveBox.y1 = saveBox.y2 - 10;
+    saveBox._letterBoxes.forEach(letterBox => {
+      if (letterBox.y1 - 1 < saveBox.y1) {
+        saveBox.y1 = letterBox.y1 - 1;
+      }
+    });
+  }
+
+  if (this.offline) {
+    return;
+  }
+
+  var _row = saveBox._row;
+  var _letterBoxes = saveBox._letterBoxes;
+  saveBox._row = saveBox._letterBoxes = undefined;
+  this.letterBoxService.create(saveBox, result => {
+    saveBox.id = result.id;
+    saveBox._state = undefined;
+    saveBox._predicted = result._predicted;
+    saveBox._row = _row;
+    saveBox._letterBoxes = _letterBoxes;
+    this.drawScroll();
+    if (_row && saveBox.y1 < _row.y1) {
+      this.saveBox(_row);
+    }
+  }, error => {
+    saveBox._state = 'error';
+    notifyError(error);
+    this.drawScroll();
+  });
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.setSelectedTab = function(tab) {
   this.selectedTab = tab;
+  if (tab == this.tabs.interlinear) {
+    this.updateTranslation();
+  }
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.scrollChanged = function() {
@@ -287,7 +334,12 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
   this.letterBoxes = [];
   this.statMap = {};
   this.rows = [];
-  this.letterBoxService.byFilename(this.filename, true, response => {
+  var filename = this.filename;
+  this.letterBoxService.byFilename(filename, true, response => {
+    if (this.filename != filename) {
+      return;
+    }
+
     console.log("Letter boxes: " + response.items.length);
     this.letterBoxes = [];
     this.rows = [];
@@ -308,6 +360,20 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
     if (this.canvasReady) {
       this.drawScroll();
     }
+
+    this.rows.forEach(row => {
+      var origY1 = row.y1;
+      row.y1 = row.y2 - 10;
+      row._letterBoxes.forEach(letterBox => {
+        if (letterBox.y1 - 1 < row.y1) {
+          row.y1 = letterBox.y1 - 1;
+        }
+      });
+      if (origY1 != row.y1) {
+        console.log("origY1: " + origY1 + " updated: " + row.y1);
+        this.saveBox(row);
+      }
+    });
     this.updateTranslation();
   });
 
@@ -384,30 +450,23 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.create = function(letter) {
   this.closeDialog();
 }
 
-com.digitald4.biblical.DssIdentifierCtrl.prototype.createRow = function() {
-  if (this.selectedBox) {
-    this.selectedBox.value = this.rowNum;
-  } else {
-    var rowBox = {
-      filename: this.filename, type: 'Row', value: this.rowNum, _letterBoxes: [],
-      x1: this.x, y1: this.y, x2: this.canvasWidth / 2 - 10, y2: this.y + 70};
-
-    if (this.lastRow) { // Assume the x2 will stop at the place as the last row.
-      rowBox.x2 = this.lastRow.x2;
-    }
-
-    var index = 0;
-    while (index < this.rows.length && this.rows[index].y1 < rowBox.y1) {
-      index++;
-    }
-    this.rows.splice(index, 0, rowBox);
-    this.selectedBox = rowBox;
-    this.lastRow = rowBox;
+com.digitald4.biblical.DssIdentifierCtrl.prototype.addRowCoord = function() {
+  if (!this.newRow) {
+    this.newRow = {filename: this.filename, type: 'Row', value: this.rowNum, coords: [], _letterBoxes: []};
+    this.rows.push(this.newRow);
+    this.selectedBox = this.newRow;
+    this.rowNum++;
+    this.closeDialog();
   }
 
-  this.rowNum++;
+  if (this.newRow.coords.length > 1 && this.x - this.newRow.coords[this.newRow.coords.length - 1].x < -50) {
+    return false;
+  }
+
+  this.selectedCoord = {x: this.x, y: this.y};
+  this.newRow.coords.push(this.selectedCoord);
   this.drawScroll();
-  this.closeDialog();
+  return true;
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.closeDialog = function() {
@@ -415,9 +474,10 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.closeDialog = function() {
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.drawScroll = function() {
-  this.ctx.drawImage(this.img, 0, 0);
-  this.ctx.fillStyle = 'white';
-  this.ctx.fillRect(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight);
+  var ctx = this.ctx;
+  ctx.drawImage(this.img, 0, 0);
+  ctx.fillStyle = 'white';
+  ctx.fillRect(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight);
 
   this.letterBoxes.forEach(letterBox => this.drawLetterBox(letterBox));
   this.canvasReady = true;
@@ -425,10 +485,25 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawScroll = function() {
 
   this.rows.forEach(row => {
     if (this.showRowBoxes || this.selectedBox == row) {
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = this.selectedBox == row ? 'blue' : 'black';
-      this.ctx.rect(row.x1, row.y1, row.x2 - row.x1, row.y2 - row.y1);
-      this.ctx.stroke();
+      ctx.beginPath();
+      ctx.strokeStyle = this.selectedBox == row ? 'blue' : 'black';
+      if (row.coords) {
+        var lastCoord = undefined;
+        row.coords.forEach(coord => {
+          ctx.arc(coord.x, coord.y, 5, 0, 2 * Math.PI);
+          if (this.selectedCoord == coord) {
+            ctx.arc(coord.x, coord.y, 7, 0, 2 * Math.PI);
+          }
+          if (lastCoord) {
+            ctx.moveTo(lastCoord.x, lastCoord.y);
+            ctx.lineTo(coord.x, coord.y);
+          }
+          lastCoord = coord;
+        });
+      } else {
+        this.ctx.rect(row.x1, row.y1, row.x2 - row.x1, row.y2 - row.y1);
+      }
+      ctx.stroke();
     }
   });
 
@@ -439,7 +514,11 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawScroll = function() {
       // If this column ends less than halfway then it is most likely has 2 columns so paint the number to the left.
       this.ctx.fillText(row.value, row.x1 - 10, row.y2 - 20);
     } else {
-      this.ctx.fillText(row.value, row.x2 + 10, row.y2 - 20);
+      if (row.coords) {
+        this.ctx.fillText(row.value, row.x2 + 10, row.coords[row.coords.length - 1].y - 20);
+      } else {
+        this.ctx.fillText(row.value, row.x2 + 10, row.y2 - 20);
+      }
     }
   });
 
@@ -455,7 +534,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawLetterBox = function(lett
   } else if (letterBox._state == 'error') {
     color = 'red';
   } else if (this.showMissmatch && letterBox._predicted && letterBox.value != letterBox._predicted) {
-    color = 'orange';
+    color = 'purple';
   }
 
   var ctx = this.ctx;
@@ -473,15 +552,36 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawLetterBox = function(lett
   }
 
   // If we are showing letters or the letter is of interest.
-  if (this.showLetters || color) {
+  if (this.showLetters || letterBox == this.selectedBox) {
       ctx.font = '16px Arial';
       ctx.fillStyle = color || 'green';
-      if (color == 'orange') {
-        ctx.fillText('L:' + letterBox.value + ' P:' + letterBox._predicted, letterBox.x1 + 7, letterBox.y2 + 14);
+      if (letterBox._predicted && letterBox.value != letterBox._predicted) {
+        ctx.fillText(letterBox._predicted + '-' + letterBox.value, letterBox.x1 - 0, letterBox.y2 + 14);
       } else {
         ctx.fillText(letterBox.value, letterBox.x1 + 7, letterBox.y2 + 14);
       }
   }
+}
+
+function includesBox(row, letterBox) {
+  if (row.y2 < letterBox.y2 || row.x1 > letterBox.x1 || row.x2 < letterBox.x2) {
+    return false;
+  }
+
+  var yAtX = row.y2;
+  if (row.coords) {
+    var ci = 0;
+    while (row.coords.length > ci + 1 && row.coords[ci + 1].x <= letterBox.x1) {
+      ci++;
+      if (ci == row.coords.length) {
+        console.log('got here, letterBox: ' + letterBox + ' row: ' + row);
+      }
+    }
+    var slope = (row.coords[ci + 1].y - row.coords[ci].y) / (row.coords[ci + 1].x - row.coords[ci].x)
+    yAtX = (letterBox.x1 - row.coords[ci].x) * slope + row.coords[ci].y;
+  }
+
+  return yAtX >= letterBox.y2;
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(letterBox) {
@@ -502,9 +602,10 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(lett
     letterBox._row._letterBoxes.splice(letterBox._row._letterBoxes.indexOf(letterBox), 1);
   }
 
-  for (var r = 0; r < this.rows.length; r++) {
-    var row = this.rows[r];
-    if (row.y1 < letterBox.y2 && row.y2 >= letterBox.y2 && row.x1 < letterBox.x1 && row.x2 > letterBox.x1) {
+  var rows = this.rows.slice().sort((a, b) => Number(a.y2) - Number(b.y2));
+  for (var r = 0; r < rows.length; r++) {
+    var row = rows[r];
+    if (includesBox(row, letterBox)) {
       if (row._letterBoxes.indexOf(letterBox) == -1) {
         var index = 0;
         while (index < row._letterBoxes.length && row._letterBoxes[index].x2 > letterBox.x2) {

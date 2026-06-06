@@ -13,7 +13,13 @@
 .git
 .gitignore
 training/
+images/4QCalendrical/tiles
+images/habakkuk/tiles
 images/isaiah/large_tiles/
+images/isaiah/tiles/8_
+images/Jubilees/tiles
+images/temple/tiles
+images/war/tiles
 # Python pycache:
 __pycache__/
 # Ignored by the build system

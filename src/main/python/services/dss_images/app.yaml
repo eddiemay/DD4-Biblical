@@ -13,7 +13,7 @@
 # limitations under the License.
 
 runtime: python311
-instance_class: F2
+instance_class: F4
 service: dss-images # Will be served at http://dss-images-dot-dd4-biblical.appspot.com/
 handlers:
   - url: /books

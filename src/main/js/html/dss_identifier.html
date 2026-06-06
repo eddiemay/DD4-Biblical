@@ -19,6 +19,8 @@
         <label>Show Missmatch Predictions</label>
         <input type="checkbox" data-ng-model="$ctrl.showRowBoxes" data-ng-change="$ctrl.drawScroll()">
         <label>Show Row Boxes</label>
+        <input type="checkbox" data-ng-model="$ctrl.offline">
+        <label>Offline</label>
         <span> ({{$ctrl.selectedBox.x1}}, {{$ctrl.selectedBox.y1}})</span>
         <div style="max-height: 512px;max-width:100%;overflow: scroll;">
           <canvas id="scroll_view" width="{{$ctrl.canvasWidth}}" height="{{$ctrl.canvasHeight}}"></canvas>
@@ -105,12 +107,14 @@
       </ul>
       <div class="block-content form">
         <span data-ng-repeat="letter in $ctrl.letters">
-          <button data-ng-class="{grey: letter.value==$ctrl.selectedBox.letter}"
+          <button data-ng-class="{grey: letter.value==$ctrl.selectedBox.value}"
                   data-ng-click="$ctrl.create(letter)">{{letter.value}}</button>
         </span><br>
         <div>
           <input type="number" min="1" max="50" data-ng-model="$ctrl.rowNum">
-          <button data-ng-click="$ctrl.createRow()">Row</button>
+          <button data-ng-click="$ctrl.addRowCoord()">Row</button>
+          <label>Value:</label>
+          <input type="text" data-ng-model="$ctrl.selectedBox.value" size="5">
         </div>
       </div>
       <button class="float-left" data-ng-click="$ctrl.closeDialog()">Close</button>
