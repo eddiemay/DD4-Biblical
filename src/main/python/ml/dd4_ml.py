@@ -37,7 +37,7 @@ class DD4PyTorchModel(nn.Module):
         self.val_loader, self.loss_function, optimizer, scheduler,
         self.checkpoint_path, self.min_val_accuracy)
 
-  def evalulate(self, val_loader=None):
+  def evaluate(self, val_loader=None):
     return evaluate(self if self.model is None else self.model,
                     val_loader or self.val_loader, self.loss_function)
 
