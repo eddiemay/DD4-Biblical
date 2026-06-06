@@ -12,9 +12,12 @@ from urllib import request
 letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1'
-TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}', [2, 4, 7, 9, 13, 14, 16, 17, 18, 20, 26, 27, 36, 40, 44, 45, 47, 48, 53]))
+TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}', [2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27, 29, 36, 37, 40, 44, 45, 47, 48, 53]))
+# Not represented 31-33, 37-39, 49-51
+# Next up 11, 37 then 32, 34, 50
 ALL = TRAINING_SET.copy()
-ALL.append('4QCalendrical-4Q320-Frag1')
+ALL.extend(['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3', 'temple-column-4'])
+# ALL.extend(list(map(lambda c: f'isaiah-column-{c}', [34, 50])))
 SINGLE_LETTERS_ONLY =\
   lambda letter_box: letter_box['type'] == 'Letter' and len(letter_box['value']) == 1
 mean, std = (0.5,), (0.5,)
@@ -73,11 +76,9 @@ class DSSLettersDataset(Dataset):
     self.res = res
     self.metadata:list[LetterBox] = []
     self.labels:list[int] = []
-    classes = set()
     for letter_box in read_database(fragments or TRAINING_SET, overrides or [], filter):
         self.metadata.append(letter_box)
         value = letter_box['value']
-        classes.add(value)
         self.labels.append(ord(value) - ord('א') if len(value) == 1 and 'א' <= value <= 'ת' else 27)
 
     self.classes = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
@@ -203,14 +204,21 @@ def read_database(fragments:list[str], overrides:list[str], filter:callable(Lett
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
   dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
-  print(f'Dataset {len(dataset)} letters')
+  print(f'Training Dataset {len(dataset)} letters')
   for i in range(3):
     image, label, metadata = dataset[i]
     cv2.imshow(f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})", image)
     cv2.waitKey(2000)
 
   imageDataset = DSSLettersDataset()
-  print(f'Dataset {len(imageDataset)} letters')
+  print(f'Training Dataset {len(imageDataset)} letters and rows')
+  for i in range(3):
+    image, label, metadata = imageDataset[i]
+    cv2.imshow(f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})", image)
+    cv2.waitKey(2000)
+
+  imageDataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
+  print(f'All Dataset {len(imageDataset)} letters')
   for i in range(3):
     image, label, metadata = imageDataset[i]
     cv2.imshow(f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})", image)

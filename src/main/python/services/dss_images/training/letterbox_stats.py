@@ -31,13 +31,14 @@ def visualize_abnormals(title, abnormal):
 def find_abnormals(letter, df, prop):
   mean = df[prop].mean()
   std = df[prop].std()
+  min, max = round(mean - 3 * std), round(mean + 3 * std)
 
   # print(df.describe())
-  abnormal = df[abs(df[prop] - mean) > 3 * std]
+  abnormal = df[(df[prop] < min) | (df[prop] > max)]
 
   if not abnormal.empty:
     title = (f'{len(abnormal)} abnormal {prop} for {letter}: mean: {mean:.1f}, '
-             f'std: {std:.1f}, normal range: {mean - 3 * std:.2f}-{mean + 3 * std:.2f}')
+             f'std: {std:.1f}, normal range: {min}-{max}')
     print(title)
     for box in abnormal.itertuples():
       print(f"\t{box.filename} width={box.width} height={box.height} x1={box.x1} y1={box.y1}")
@@ -50,7 +51,7 @@ def find_abnormals(letter, df, prop):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
+  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} letters')
   letters = []
   for img, label, metadata in dataset:

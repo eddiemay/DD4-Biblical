@@ -39,12 +39,11 @@ def visualize_missmatch(title, df):
 
 
 if __name__ == '__main__':
-  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY,
-      fragments=['4QCalendrical-4Q320-Frag1'], overrides=['4QCalendrical-4Q320-Frag1'])
+  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} items')
   data_loader = DataLoader(DD4Subset(dataset, test_transform), batch_size=1000)
 
-  ort_session = ort.InferenceSession("letter_model.onnx")
+  ort_session = ort.InferenceSession("../letter_model.onnx")
   input_name = ort_session.get_inputs()[0].name
 
   label_lookup = list(dataset.classes)

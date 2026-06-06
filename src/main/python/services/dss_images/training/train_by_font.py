@@ -128,4 +128,4 @@ if __name__ == '__main__':
                'TESSDATA=../tessdata_best', 'MAX_ITERATIONS=8192']
     print(command)
     subprocess.run(command)
-    subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata'])
+    subprocess.run(['cp', f'data/{MODEL_NAME}.traineddata', '/opt/homebrew/share/tessdata/dabar.cloud'])

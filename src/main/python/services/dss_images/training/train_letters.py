@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage, \
-  PadToSize, mean, std, test_transform
+  PadToSize, mean, std, test_transform, ALL
 from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
   visualize_augmentations, DD4Subset, conv_block
 from torch.utils.data import DataLoader
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
   # Split into train/val/test: 80/15/5
   train_size = int(0.80 * len(dataset))
-  val_size = int(0.15 * len(dataset))
+  val_size = int(0.10 * len(dataset))
   test_size = len(dataset) - train_size - val_size
 
   train_dataset, val_dataset, test_dataset = random_split(
@@ -85,6 +85,13 @@ if __name__ == '__main__':
       checkpoint_path=checkpoint_path, min_val_accuracy=97.71
   )
 
+  num_params = sum(p.numel() for p in model.parameters())
+  print(f"Parameters: {num_params:,}")
+  param_size = sum(p.numel() * p.element_size() for p in model.parameters())
+  buffer_size = sum(b.numel() * b.element_size() for b in model.buffers())
+  size_mb = (param_size + buffer_size) / 1024**2
+  print(f"Model size: {size_mb:.2f} MB")
+
   if train or not os.path.exists(checkpoint_path):
     train_start_time = time.time()
     num_epochs = 80
@@ -92,14 +99,19 @@ if __name__ == '__main__':
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
     best_val_accuracy, _, _ = model.train_model(num_epochs, optimizer, scheduler)
     if best_val_accuracy > 0: # If we replaced the save model we should export.
-      model.export("letter_model.onnx", "image", "letter")
+      model.export("../letter_model.onnx", "image", "letter")
     print(f'Training time {(time.time() - train_start_time)} seconds')
 
   model.reload(checkpoint_path)
-  test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=False)
-  loss, accuracy = model.evalulate(test_loader)
+  test_loader = DataLoader(test_dataset, batch_size=1000)
+  loss, accuracy = model.evaluate(test_loader)
   print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%')
-  full_loader = DataLoader(
-      DD4Subset(dataset, test_transform), batch_size=1000, shuffle=False)
-  loss, accuracy = model.evalulate(full_loader)
+
+  full_loader = DataLoader(DD4Subset(dataset, test_transform), batch_size=1000)
+  loss, accuracy = model.evaluate(full_loader)
   print(f'Full Loss: {loss:.2f}, Full Accuracy: {accuracy:.2f}%')
+
+  all_dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
+  all_loader = DataLoader(DD4Subset(all_dataset, test_transform), batch_size=1000)
+  loss, accuracy = model.evaluate(all_loader)
+  print(f'All Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(all_dataset)}')

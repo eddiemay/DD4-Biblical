@@ -326,29 +326,29 @@ def output_column_stats(model=None, use_best=False, multithread=Multithread.COLU
         print(f"Pool time: {pool_time - start_time} seconds")
         print(f"Column comparison time: {time.time() - start_time} seconds\n")
 
-    if not use_best:
-        bests = {}
-        with open('verify_best_by_fragment.jsonl', "w", encoding="utf-8") as f:
-            for b in sorted(bests_by_fragment):
-                json.dump({'fragment': b, 'bests': bests_by_fragment[b]}, f)
-                f.write("\n")
+    bests = {}
+    with open('verify_best_by_fragment.jsonl', "w", encoding="utf-8") as f:
+        for b in sorted(bests_by_fragment):
+            json.dump({'fragment': b, 'bests': bests_by_fragment[b]}, f)
+            f.write("\n")
 
-                for best in bests_by_fragment[b]:
-                    name = best['preprocessor_name']
-                    if bests.get(name) is None:
-                        bests[name] = {'preprocessor_name': name, 'count': 1,
-                                       'parameters': best['parameters']}
-                    else:
-                        bests[name]['count'] = bests[name]['count'] + 1
+            for best in bests_by_fragment[b]:
+                name = best['preprocessor_name']
+                if bests.get(name) is None:
+                    bests[name] = {'preprocessor_name': name, 'count': 1,
+                                   'parameters': best['parameters']}
+                else:
+                    bests[name]['count'] = bests[name]['count'] + 1
 
-        with open('verify_best_preprocessors.jsonl', "w", encoding="utf-8") as f:
-            for b in sorted(bests):
-                json.dump(bests[b], f)
-                f.write("\n")
+    with open('verify_best_preprocessors.jsonl', "w", encoding="utf-8") as f:
+        for b in sorted(bests):
+            json.dump(bests[b], f)
+            f.write("\n")
 
 
 if __name__ == '__main__':
-    output_column_stats(use_best=True, model='Hebrew_Font_Embedding_Label_19',
+    extras = False
+    output_column_stats(use_best=True, model='Hebrew_Font_Embedding_Label_24_more_rows_20K',
                         multithread=Multithread.COLUMN_LOCAL)
 
     models = ['heb', 'script/Hebrew', 'Heb_Font', 'Hebrew_Font',
@@ -358,19 +358,20 @@ if __name__ == '__main__':
               'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17',
               'Hebrew_Font_Embedding_Label_19_16K', BEST_MODEL]
 
-    for fragment in [48, 16, 7, 1, 54]:
-        print(f'\nIsaiah-{fragment}')
-        for model in ['Hebrew_Font_Embedding_Label_19_mb', 'Hebrew_Font_Embedding_Label_19_sp', 'Hebrew_Font_Embedding_Label_19_gblur', 'Hebrew_Font_Embedding_Label_19_otsu', 'Hebrew_Font_Embedding_Label_19_16K', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
-            verify(to_isa_verify_request(fragment, model, use_best=True, display=False))
-# Jody 937-630-2748
-    image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
-                   'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
-                   'dss_isa_9_6_7-11_embedded.jpg']
-    with open('dss_isa_6_7-11.txt', 'r') as f:
-        txt = unfinalize(f.read().strip())
-    for img_file in image_files:
-        for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
-            verify(to_verify_request(img_file, img_file, txt, model, use_best=True, display=model==BEST_MODEL))
+    if extras:
+        for fragment in [50, 48, 16, 7, 1, 54]:
+            print(f'\nIsaiah-{fragment}')
+            for model in ['Hebrew_Font_Embedding_Label_22', 'Hebrew_Font_Embedding_Label_22_22K_nosp', 'Hebrew_Font_Embedding_Label_22_22K', 'Hebrew_Font_Embedding_Label_19_sp', 'Hebrew_Font_Embedding_Label_19_gblur', 'Hebrew_Font_Embedding_Label_19_otsu', 'Hebrew_Font_Embedding_Label_19_16K', 'Hebrew_Font_Embedding_Label_14', 'Hebrew_Font_Embedding_Label_17', BEST_MODEL]:
+                verify(to_isa_verify_request(fragment, model, use_best=True, display=False))
+    # Jody 937-630-2748
+        image_files = ['dss_isa_9_6_7-11.png', 'dss_isa_9_6_7-11_scaled.png',
+                       'dss_isa_9_6_7-11_threshold.png', 'dss-isa_6_7-11.tif',
+                       'dss_isa_9_6_7-11_embedded.jpg']
+        with open('dss_isa_6_7-11.txt', 'r') as f:
+            txt = unfinalize(f.read().strip())
+        for img_file in image_files:
+            for model in ['Hebrew_Font_Label_14', 'Hebrew_Font_Embedding_Label_14', BEST_MODEL]:
+                verify(to_verify_request(img_file, img_file, txt, model, use_best=True, display=model==BEST_MODEL))
 
 
 ''' 

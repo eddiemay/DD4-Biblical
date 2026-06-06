@@ -38,6 +38,7 @@ def label(scroll, fragment, display=True, upload=None):
     filename = f'{scroll}-{fragment}'
 
     if scroll == 'isaiah':
+        filename = f'{scroll}-column-{fragment}'
         ver_req = to_isa_verify_request(fragment, display=display)
         result = verify(ver_req)
 
@@ -125,10 +126,11 @@ def label(scroll, fragment, display=True, upload=None):
 
 if __name__ == '__main__':
     preprocessors = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 0}
-    # label('isaiah', 16, upload=None)
+    label('isaiah', 50, upload=None)
     # label('4QCalendrical', '4Q318-Frag1', upload=None)
     # label('4QCalendrical', '4Q320', upload=None)
-    label('4QCalendrical', '4Q320-Frag2', upload=Upload.LETTERS)
+    # label('4QCalendrical', '4Q320-Frag2', upload=Upload.LETTERS)
+    # label('Jubilees', 'Plate293-Frag9', upload=Upload.LETTERS)
     # label('4QCalendrical', '4Q320-Frag3', upload=None)
     # label('4QCalendrical', '4Q320-Frag2', upload=Upload.LETTERS)
     # label('4QCalendrical', '4Q320-Frag3', upload=None)

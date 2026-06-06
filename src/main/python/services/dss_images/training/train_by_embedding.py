@@ -98,14 +98,13 @@ def process(sample):
                         f'../images/{scroll}/columns/column_{res}_{column}.jpg')
                     fragment_map[letter_box['filename']] = fragment
 
-                width = letter_box['x2'] - letter_box['x1']
-                height = letter_box['y2'] - letter_box['y1']
+                src = fragment[letter_box['y1']:letter_box['y2'], letter_box['x1']:letter_box['x2']]
+                height, width = src.shape[:2]
                 x1 = x2 - width
                 y1 = y2 - height
-                output_img[y1:y2, x1:x2] = fragment[letter_box['y1']:letter_box['y2'], letter_box['x1']:letter_box['x2']]
+                output_img[y1:y2, x1:x2] = src
                 boxes.append({'value': l, 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
                 x2 = x1
-
     if len(boxes) > 0:
         for box in reversed(boxes):
             sample['boxes'].append(box)
@@ -204,8 +203,10 @@ if __name__ == '__main__':
             'id': l / 4,
             'text': f'{lines[l]}  {lines[l+1]}\n{lines[l+2]}  {lines[l+3]}'})
 
-    with Pool() as pool:
-        pool.map(process_and_output, samples)
+    for sample in samples:
+        process_and_output(sample)
+    # with Pool() as pool:
+      #  pool.map(process_and_output, samples)
 
     os.chdir('tesstrain')
     start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
@@ -213,7 +214,7 @@ if __name__ == '__main__':
                'TESSDATA=../tessdata_best', f'MAX_ITERATIONS={ITERATIONS}']
     print(' '.join(command))
     subprocess.run(command)
-    command = ['cp', 'data/embedding.traineddata', f'/opt/homebrew/share/tessdata/{MODEL_NAME}.traineddata']
+    command = ['cp', 'data/embedding.traineddata', f'/opt/homebrew/share/tessdata/dabar.cloud/{MODEL_NAME}.traineddata']
     print(' '.join(command))
     subprocess.run(command)
     command = ['cp', 'data/embedding.traineddata', f'../tessdata_best/{MODEL_NAME}.traineddata']

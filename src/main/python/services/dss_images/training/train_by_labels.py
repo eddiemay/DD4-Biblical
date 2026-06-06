@@ -12,12 +12,29 @@ from verify import process_image
 
 BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
-ITERATIONS = 8192
-MODEL_NAME = f'{BASE_MODEL}_Label_{len(TRAINING_SET)}'
+ITERATIONS = 20
+MODEL_NAME = f'{BASE_MODEL}_Label_{len(TRAINING_SET)}_more_rows_{ITERATIONS}K'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
 row_map = {}
 img_map = {}
+
+
+def is_in_row(row_box, letter_box):
+    if (row_box['filename'] != letter_box['filename']
+        or row_box['y2'] < letter_box['y2']
+        or row_box['x1'] > letter_box['x1']
+        or row_box['x2'] < letter_box['x2']):
+        return False
+
+    coords = row_box['coords']
+    ci = 0
+    while coords[ci + 1]['x'] <= letter_box['x1']:
+        ci += 1
+    slope = (coords[ci + 1]['y'] - coords[ci]['y']) / (coords[ci + 1]['x'] - coords[ci]['x'])
+    yAtX = (letter_box['x1'] - coords[ci]['x']) * slope + coords[ci]['y']
+
+    return yAtX >= letter_box['y2']
 
 
 def get_row(filename, row):
@@ -26,11 +43,12 @@ def get_row(filename, row):
         letter_boxes = []
         row_boxes = []
         dataset = DSSLettersDataset()
-        for img, label, letter_box in dataset:
+        for _, _, letter_box in dataset:
             if letter_box['type'] == 'Row':
                 letter_box['_letterBoxes'] = []
                 row_boxes.append(letter_box)
-                row_map[f'{letter_box["filename"]}-{letter_box["value"]}'] = letter_box
+                letter_box['id'] = f'{letter_box["filename"]}-{letter_box["value"]}'
+                row_map[letter_box['id']] = letter_box
             elif letter_box['type'] == 'Letter':
                 letter_boxes.append(letter_box)
         print(f'{len(row_boxes)} total rows')
@@ -39,16 +57,16 @@ def get_row(filename, row):
 
         added_letters = 0
         for letter_box in letter_boxes:
-            fname = letter_box['filename']
-            y2 = letter_box['y2']
             for row_box in row_boxes:
-                if fname == row_box['filename'] and y2 <= row_box['y2']:
+                if is_in_row(row_box, letter_box):
                     row_box['_letterBoxes'].append(letter_box)
                     added_letters += 1
                     break
 
         print(f'{added_letters} letters added')
+        row_boxes = sorted(row_boxes, key=lambda r:r['id'])
         for row_box in row_boxes:
+            print(row_box['id'] + ":", len(row_box['_letterBoxes']))
             row_box['_letterBoxes'] = sorted(
                 row_box['_letterBoxes'], key=lambda b:b['x2'], reverse=True)
 
@@ -64,6 +82,7 @@ def get_box_text(row_box, bottom, ratio):
     boxes = []
     if len(row_box['_letterBoxes']) == 0:
         print(f'No letter boxes for {row_box}')
+        return boxes
 
     prev_x2 = None
     for letter_box in reversed(row_box['_letterBoxes']):
@@ -98,7 +117,7 @@ def get_text(row_box):
 
 def process(sample):
     fragment = sample['fragment']
-    res = sample.get('res') or random.randrange(8, 11)
+    res = sample.get('res') or 9 # random.randrange(8, 11)
     sample['res'] = res
 
     if res == 10:
@@ -118,10 +137,7 @@ def process(sample):
     img = img_map.get(img_filename)
     if img is None:
         img = cv2.imread(img_filename)
-        img, _ = process_image(img, {
-            'blur': 'median',
-            'blur_size': 3,
-        })
+        # img, _ = process_image(img, {'blur': 'median', 'blur_size': 3,})
         img_map[img_filename] = img
 
     top = math.floor(start_row_box['y1'] * ratio)
@@ -186,10 +202,10 @@ def process(sample):
 
 def add_salt_and_pepper(img, amount=0.01):
     noisy = img.copy()
-    rand = np.random.rand(*img.shape[:2])
+    ''' rand = np.random.rand(*img.shape[:2])
 
     noisy[rand < amount / 2] = 0
-    noisy[rand > 1 - amount / 2] = 255
+    noisy[rand > 1 - amount / 2] = 255 '''
 
     return noisy
 
@@ -229,9 +245,10 @@ if __name__ == '__main__':
     start_time = time.time()
     # for r in range(1, 8):
         # output_row('isaiah', 44, r)
-    # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 25, 'res': 10}))
-    # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 25, 'erow': 27, 'res': 9}))
-    # display(process({'scroll': 'isaiah', 'fragment': 44, 'srow': 1, 'erow': 7, 'res': 8}))
+    display(process({'fragment': 'isaiah-column-44', 'srow': 25, 'erow': 25, 'res': 10}))
+    display(process({'fragment': 'isaiah-column-44', 'srow': 25, 'erow': 27, 'res': 9}))
+    display(process({'fragment': 'isaiah-column-44', 'srow': 1, 'erow': 7, 'res': 8}))
+    display(process({'fragment': 'isaiah-column-44', 'srow': 1, 'erow': 28, 'res': 8}))
 
     # Git clone the training programs if they don't exist.
     if not os.path.exists(BASE_OUTPUT):
@@ -261,6 +278,10 @@ if __name__ == '__main__':
                 process_and_output({'fragment': frag, 'srow': r, 'erow': r+2})
             if r % 7 == 1:
                 process_and_output({'fragment': frag, 'srow': r, 'erow': r+6})
+            if r % 10 == 1:
+                process_and_output({'fragment': frag, 'srow': r, 'erow': r+9})
+            if r == 1:
+                process_and_output({'fragment': frag, 'srow': r, 'erow': r+27})
 
     training_start = time.time()
     print(f'Files creation time: {training_start - image_start} seconds')
@@ -268,10 +289,10 @@ if __name__ == '__main__':
     os.chdir('tesstrain')
     start_model = 'script/Hebrew' if BASE_MODEL == 'Hebrew' else BASE_MODEL
     command = ['make', 'training', 'MODEL_NAME=label', f'START_MODEL={start_model}',
-               'TESSDATA=../tessdata_best', f'MAX_ITERATIONS={ITERATIONS}']
+               'TESSDATA=../tessdata_best', f'MAX_ITERATIONS={ITERATIONS * 1024}']
     print(' '.join(command))
     subprocess.run(command)
-    command = ['cp', 'data/label.traineddata', f'/opt/homebrew/share/tessdata/{MODEL_NAME}.traineddata']
+    command = ['cp', 'data/label.traineddata', f'/opt/homebrew/share/tessdata/dabar.cloud/{MODEL_NAME}.traineddata']
     print(' '.join(command))
     subprocess.run(command)
 
