@@ -34,11 +34,10 @@ def create_letterbox(request, datastore_client, session):
     id, letter_box = read_entity(request)
     letter_box['x1'], letter_box['x2'], letter_box['y1'], letter_box['y2'] = \
         int(letter_box['x1']), int(letter_box['x2']), int(letter_box['y1']), int(letter_box['y2'])
-    letter_box['coords'] = (
-        json.dumps(letter_box['coords'])
-        if letter_box.get('coords') is not None
-        else None
-    )
+    if letter_box.get('coords') is not None:
+        letter_box['coords'] = json.dumps(letter_box['coords'])
+    else:
+        letter_box.pop('coords', None)
 
     entity = datastore.Entity(
         key=datastore_client.key("LetterBox", id) if id is not None
