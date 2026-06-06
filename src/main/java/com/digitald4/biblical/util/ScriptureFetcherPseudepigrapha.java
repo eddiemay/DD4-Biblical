@@ -39,25 +39,21 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
-    if (book.name().equals(BibleBook.JUBILEES)) {
-      return fetchJubilees(version, book, chapter);
-    } else if (book.name().equals(BibleBook.JASHER)) {
-      return fetchJasher(version, book);
-    } else if (book.name().equals(BibleBook.ENOCH)) {
-      return version.equals("OXFORD") ? fetchEnoch(version, book) : fetchEnochOther(version, book);
-    } else if (book.name().equals(BibleBook.ENOCH_2)) {
-      return fetch2Enoch(version, book);
-    } else if (book.name().equals(BibleBook.BOOK_OF_ADAM_AND_EVE)) {
-      return fetchBookOfAdamAndEve(version, book);
-    }
-    throw new DD4StorageException(String.format("Unsupported book: (%s) %s %d", version, book, chapter));
+    return switch (book.name()) {
+      case BibleBook.JUBILEES -> fetchJubilees(version, book, chapter);
+      case BibleBook.JASHER -> fetchJasher(version, book);
+      case BibleBook.ENOCH -> version.equals("OXFORD") ? fetchEnoch(version, book) : fetchEnochOther(version, book);
+      case BibleBook.ENOCH_2 -> fetch2Enoch(version, book);
+      case BibleBook.BOOK_OF_ADAM_AND_EVE -> fetchBookOfAdamAndEve(version, book);
+      default -> throw new DD4StorageException(String.format("Unsupported book: (%s) %s %d", version, book, chapter));
+    };
   }
 
   private ImmutableList<Scripture> fetchJubilees(String version, BibleBook book, int chapter) {
     String htmlResult = apiConnector.sendGet(String.format(URL, book.name().toLowerCase(), chapter));
     Document doc = Jsoup.parse(htmlResult.trim());
     Elements wrappers = doc.getElementsByTag("ol");
-    if (wrappers.size() == 0) {
+    if (wrappers.isEmpty()) {
       throw new DD4StorageException(
           String.format("Unable to find scripture content for: (%s) %s %d", version, book, chapter));
     }
@@ -140,7 +136,7 @@ public class ScriptureFetcherPseudepigrapha implements ScriptureFetcher {
                       .setChapter(chapter)
                       .setVerse(verse)
                       .setText(new StringBuilder()));
-              scripture.getText().append(scripture.getText().length() == 0 ? "" : " ").append(matcher.group(2).trim());
+              scripture.getText().append(scripture.getText().isEmpty() ? "" : " ").append(matcher.group(2).trim());
             } while (matcher.find());
           }
 
