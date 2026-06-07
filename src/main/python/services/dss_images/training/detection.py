@@ -4,6 +4,7 @@ import Levenshtein
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import sys
 import time
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
@@ -23,14 +24,14 @@ ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
                 "threshold_type": 0}
-config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+# config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 
 # R101 > R50 for accuracy
 # FPN helps small objects
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-# config "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -41,14 +42,16 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 
 cfg.OUTPUT_DIR = "detection/output"
 
-cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8, 16, 32, 64]]
-cfg.INPUT.MIN_SIZE_TRAIN = (800, 1024) # or (1024, 1280)
-cfg.INPUT.MAX_SIZE_TRAIN = 1333 # or 1600
+cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[4, 8, 16, 32]]
+cfg.INPUT.MIN_SIZE_TRAIN = (1280,) # or (1024,)
+cfg.INPUT.MAX_SIZE_TRAIN = 3000 # or 2500
+cfg.INPUT.MIN_SIZE_TEST = 1280
+cfg.INPUT.MAX_SIZE_TEST = 3000
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3 # or 0.2
 cfg.MODEL.DEVICE = 'cpu'
 
 
-def setup_data():
+def setup_data(preprocessor):
   dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
   train_conf = {"images": [], "annotations": [], "categories": []}
   val_conf = {"images": [], "annotations": [], "categories": []}
@@ -76,7 +79,7 @@ def setup_data():
     conf, path = (train_conf, f'{IMAGES_BASE}/train') \
       if id not in VAL_IDS else (val_conf, f'{IMAGES_BASE}/val')
     file_path = get_img_file_path(filename, 9)
-    img = cv2.imread(file_path)
+    img = process_image(cv2.imread(file_path), preprocessor)[0]
     h, w = img.shape[:2]
     conf["images"].append(
         {"id": id, "file_name": filename + '.jpg', "height": h, "width": w})
@@ -89,8 +92,8 @@ def setup_data():
     json.dump(val_conf, f, indent=True)
 
 
-def train(iters=500):
-  setup_data()
+def train(iters, preprocessor):
+  setup_data(preprocessor)
   register_coco_instances(
       "dss_train",
       {},
@@ -132,9 +135,8 @@ def evaluate(test_id, display=True, model="model_final.pth",
 
   start_time = time.time()
   predictor = DefaultPredictor(cfg)
-  image = cv2.imread(f'../images/isaiah/columns/column_9_{test_id}.jpg')
-  if preprocessor is not None:
-    image = process_image(image, preprocessor)[0]
+  img_file = f'../images/isaiah/columns/column_9_{test_id}.jpg'
+  image = process_image(cv2.imread(img_file), preprocessor)[0]
   outputs = predictor(image)
   print(outputs)
   print(f'Prediction took {time.time() - start_time} seconds')
@@ -206,11 +208,11 @@ def evaluate(test_id, display=True, model="model_final.pth",
   return percent
 
 
-def verity(model="model_final.pth"):
+def verify(model="model_final.pth", preprocessor=None):
   percents = []
   for c in [2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27, 29, 36, 37,
             40, 44, 45, 47, 48, 53]:
-    percents.append(evaluate(c, False, model))
+    percents.append(evaluate(c, False, model, preprocessor=preprocessor))
   print(percents)
   percents = np.array(percents)
   mean, std = percents.mean(), percents.std()
@@ -221,7 +223,12 @@ def verity(model="model_final.pth"):
 
 
 if __name__ == '__main__':
-  train(5000)
-  # verity('model_final_50_5000.pth')
-  verity('model_final.pth')
-  evaluate(48, True)
+  pp = {}
+  for a in range(len(sys.argv)):
+    if sys.argv[a] == '--preprocess':
+      pp = preprocessor
+
+  # train(5000, preprocessor=pp)
+  # verify('model_final_50_5000.pth', preprocessor=pp)
+  verify('model_final.pth', preprocessor=pp)
+  evaluate(48, True, preprocessor=pp)
