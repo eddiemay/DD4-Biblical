@@ -224,11 +224,14 @@ def verify(model="model_final.pth", preprocessor=None):
 
 if __name__ == '__main__':
   pp = {}
+  iters = 5000
   for a in range(len(sys.argv)):
     if sys.argv[a] == '--preprocess':
       pp = preprocessor
+    elif sys.argv[a] == 'iters':
+      iters = int(sys.argv[a + 1])
 
-  # train(5000, preprocessor=pp)
+  train(iters, preprocessor=pp)
   # verify('model_final_50_5000.pth', preprocessor=pp)
   verify('model_final.pth', preprocessor=pp)
   evaluate(48, True, preprocessor=pp)
