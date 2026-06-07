@@ -228,7 +228,7 @@ if __name__ == '__main__':
   for a in range(len(sys.argv)):
     if sys.argv[a] == '--preprocess':
       pp = preprocessor
-    elif sys.argv[a] == 'iters':
+    elif sys.argv[a] == '--iters':
       iters = int(sys.argv[a + 1])
 
   train(iters, preprocessor=pp)
