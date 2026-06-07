@@ -3,6 +3,7 @@ import json
 import Levenshtein
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import time
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
@@ -79,6 +80,7 @@ def setup_data():
     h, w = img.shape[:2]
     conf["images"].append(
         {"id": id, "file_name": filename + '.jpg', "height": h, "width": w})
+    os.makedirs(path, exist_ok=True)
     cv2.imwrite(f'{path}/{filename}.jpg', img)
 
   with open(f"{ANNOTATIONS}/train.json", "w", encoding="utf-8") as f:

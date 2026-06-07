@@ -6,6 +6,7 @@ Levenshtein
 matplotlib
 onnxruntime
 opencv-python
+pandas
 pytesseract
 requests
 scipy

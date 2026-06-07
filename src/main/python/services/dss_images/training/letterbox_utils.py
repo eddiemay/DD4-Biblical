@@ -16,7 +16,8 @@ TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}', [2, 4, 7, 9, 11, 12, 13,
 # Not represented 31-33, 37-39, 49-51
 # Next up 11, 37 then 32, 34, 50
 ALL = TRAINING_SET.copy()
-ALL.extend(['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3', 'temple-column-4'])
+ALL.extend(['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2',
+            '4QCalendrical-4Q320-Frag3', 'temple-column-4'])
 # ALL.extend(list(map(lambda c: f'isaiah-column-{c}', [34, 50])))
 SINGLE_LETTERS_ONLY =\
   lambda letter_box: letter_box['type'] == 'Letter' and len(letter_box['value']) == 1
