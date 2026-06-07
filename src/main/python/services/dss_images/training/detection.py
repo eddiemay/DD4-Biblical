@@ -24,14 +24,14 @@ ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
                 "threshold_type": 0}
-config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+# config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 
 # R101 > R50 for accuracy
 # FPN helps small objects
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-# config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -224,7 +224,7 @@ def verify(model="model_final.pth", preprocessor=None):
 
 if __name__ == '__main__':
   pp = {}
-  iters = 500
+  iters = 5000
   for a in range(len(sys.argv)):
     if sys.argv[a] == '--preprocess':
       pp = preprocessor
