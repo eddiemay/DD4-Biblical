@@ -20,6 +20,8 @@ VAL_IDS = ['7', '17', '27', '37', '47']
 DATASET_BASE = 'detection/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
+preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
+                "threshold_type": 0}
 config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 
 # R101 > R50 for accuracy
@@ -86,6 +88,7 @@ def setup_data():
 
 
 def train(iters=500):
+  setup_data()
   register_coco_instances(
       "dss_train",
       {},
@@ -203,8 +206,6 @@ def evaluate(test_id, display=True, model="model_final.pth",
 
 def verity(model="model_final.pth"):
   percents = []
-  preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
-                  "threshold_type": 0}
   for c in [2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27, 29, 36, 37,
             40, 44, 45, 47, 48, 53]:
     percents.append(evaluate(c, False, model))
@@ -218,7 +219,7 @@ def verity(model="model_final.pth"):
 
 
 if __name__ == '__main__':
-  setup_data()
   train(5000)
   # verity('model_final_50_5000.pth')
   verity('model_final.pth')
+  evaluate(48, True)
