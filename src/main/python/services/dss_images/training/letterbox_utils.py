@@ -21,6 +21,7 @@ ALL.extend(['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendr
 SINGLE_LETTERS_ONLY =\
   lambda letter_box: letter_box['type'] == 'Letter' and len(letter_box['value']) == 1
 mean, std = (0.5,), (0.5,)
+LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
 
 
 class ToPilImage:
@@ -81,8 +82,7 @@ class DSSLettersDataset(Dataset):
         value = letter_box['value']
         self.labels.append(ord(value) - ord('א') if len(value) == 1 and 'א' <= value <= 'ת' else 27)
 
-    self.classes = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
-    print(f'Classes: {self.classes} {len(self.classes)}')
+    self.classes = LABEL_LOOKUP
     print(f'Labels: {torch.unique(torch.tensor(self.labels))} {type(self.labels[0])}')
     self.images:list = [None] * len(self.metadata)
 

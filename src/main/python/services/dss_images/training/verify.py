@@ -226,22 +226,25 @@ def to_verify_request(name, img_file, txt, model=None, multithread=Multithread.P
             'display': display, 'multithread': multithread, 'preprocessors': preprocessors}
 
 
-def to_isa_verify_request(column, model=None, multithread=Multithread.PREPROCESSOR_LOCAL, use_best=True, display=False):
+def get_isa_text(column:int) -> str:
     txt_file = '../books/1Q_Isaiah_a.txt'
+    txt = ''
     roman_numeral = romanize(column)
     with open(txt_file, 'r') as f:
         lines = f.readlines()
-        txt = ''
         l = 0
         while not lines[l].startswith(f'Col. {roman_numeral},'):
             l += 1
         while l + 1 < len(lines) and not lines[l+1].startswith('Col. '):
             l += 1
             txt += lines[l].strip() + '\n'
+    return unfinalize(txt)
 
+
+def to_isa_verify_request(column, model=None, multithread=Multithread.PREPROCESSOR_LOCAL, use_best=True, display=False):
     return to_verify_request(
         f'isaiah-{column}', f'../images/isaiah/columns/column_9_{column}.jpg',
-        unfinalize(txt), model, multithread, use_best, display)
+        get_isa_text(column), model, multithread, use_best, display)
 
 
 def output(output_file, row_title, values):

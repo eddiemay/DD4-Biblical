@@ -5,7 +5,8 @@ import pandas as pd
 from PIL import Image as PilImage
 from label_fragment import send_json_req, LETTERBOX_BATCH_CREATE_URL
 from letterbox_stats import VISUALIZE_PAGE_SIZE
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage, get_image, parse_file_name, test_transform
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage,\
+  get_image, parse_file_name, test_transform, LABEL_LOOKUP
 from scipy.special import softmax
 from sklearn.metrics import confusion_matrix
 from src.main.python.ml.dd4_ml import DD4Subset
@@ -46,7 +47,6 @@ if __name__ == '__main__':
   ort_session = ort.InferenceSession("../letter_model.onnx")
   input_name = ort_session.get_inputs()[0].name
 
-  label_lookup = list(dataset.classes)
   rows = []
   for inputs, targets, metadata in data_loader:
     inputs, targets = inputs.numpy(), targets.numpy()
@@ -55,8 +55,8 @@ if __name__ == '__main__':
 
     for i in range(len(inputs)):
       rows.append({
-        "target": label_lookup[targets[i]],
-        "prediction": label_lookup[preds[i]],
+        "target": LABEL_LOOKUP[targets[i]],
+        "prediction": LABEL_LOOKUP[preds[i]],
         "missmatch": preds[i] != targets[i],
         "confidence": np.max(softmax(outputs[i])),
         "filename": metadata["filename"][i],
