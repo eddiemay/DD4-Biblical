@@ -63,16 +63,15 @@ def append_data(conf, sample):
       {"id": filename, "file_name": filename + '.jpg', "height": h, "width": w})
   cv2.imwrite(f'{IMAGES_BASE}/{conf["type"]}/{filename}.jpg', sample['image'])
 
-  letter_id = 0
   for letter_box in sample["boxes"]:
     if len(letter_box['value']) > 1:
       continue
     x, y = letter_box['x1'], letter_box['y1']
     width, height = letter_box['x2'] - x, letter_box['y2'] - y
+    letter_id = f'{filename}-{x}-{y}'
     conf["annotations"].append(
         {"id": letter_id, "image_id": filename, "category_id": ord('א') - ord(letter_box["value"]),
          "bbox": [x, y, width, height], "area": width * height, "iscrowd": 0})
-    letter_id += 1
 
 
 def setup_samples(preprocessor=None):
