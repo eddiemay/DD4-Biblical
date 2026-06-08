@@ -64,7 +64,7 @@ def append_data(conf, sample):
   cv2.imwrite(f'{IMAGES_BASE}/{conf["type"]}/{filename}.jpg', sample['image'])
 
   for letter_box in sample["boxes"]:
-    if len(letter_box['value']) > 1:
+    if len(letter_box['value']) > 1 or letter_box['value'] < 'א' or letter_box['value'] > 'ת':
       continue
     x, y = letter_box['x1'], letter_box['y1']
     width, height = letter_box['x2'] - x, letter_box['y2'] - y
