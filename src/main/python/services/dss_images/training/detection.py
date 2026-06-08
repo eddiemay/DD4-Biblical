@@ -70,7 +70,7 @@ def append_data(conf, sample):
     width, height = letter_box['x2'] - x, letter_box['y2'] - y
     letter_id = f'{filename}-{x}-{y}'
     conf["annotations"].append(
-        {"id": letter_id, "image_id": filename, "category_id": ord('א') - ord(letter_box["value"]),
+        {"id": letter_id, "image_id": filename, "category_id": ord(letter_box["value"]) - ord('א'),
          "bbox": [x, y, width, height], "area": width * height, "iscrowd": 0})
 
 
