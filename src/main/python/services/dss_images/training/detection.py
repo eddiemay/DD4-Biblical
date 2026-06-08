@@ -24,14 +24,14 @@ ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
                 "threshold_type": 0}
-# config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 
 # R101 > R50 for accuracy
 # FPN helps small objects
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+# config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -43,10 +43,10 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 cfg.OUTPUT_DIR = "detection/output"
 
 cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[4, 8, 16, 32]]
-cfg.INPUT.MIN_SIZE_TRAIN = (960,) # or (1024,) or  (1280,)
-cfg.INPUT.MAX_SIZE_TRAIN = 1330 # or 2500 or 3000
-cfg.INPUT.MIN_SIZE_TEST = 960
-cfg.INPUT.MAX_SIZE_TEST = 1330
+cfg.INPUT.MIN_SIZE_TRAIN = (1024,) # or (1024,) or  (1280,)
+cfg.INPUT.MAX_SIZE_TRAIN = 1333 # or 2500 or 3000
+cfg.INPUT.MIN_SIZE_TEST = 1024
+cfg.INPUT.MAX_SIZE_TEST = 1333
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3 # or 0.2
 cfg.MODEL.DEVICE = 'cpu'
 
@@ -78,7 +78,7 @@ def setup_data(preprocessor):
   for filename, id in files.items():
     conf, path = (train_conf, f'{IMAGES_BASE}/train') \
       if id not in VAL_IDS else (val_conf, f'{IMAGES_BASE}/val')
-    file_path = get_img_file_path(filename, 8)
+    file_path = get_img_file_path(filename, 9)
     img = process_image(cv2.imread(file_path), preprocessor)[0]
     h, w = img.shape[:2]
     conf["images"].append(
@@ -135,7 +135,7 @@ def evaluate(test_id, display=True, model="model_final.pth",
 
   start_time = time.time()
   predictor = DefaultPredictor(cfg)
-  img_file = f'../images/isaiah/columns/column_8_{test_id}.jpg'
+  img_file = f'../images/isaiah/columns/column_9_{test_id}.jpg'
   image = process_image(cv2.imread(img_file), preprocessor)[0]
   outputs = predictor(image)
   print(outputs)
@@ -159,10 +159,10 @@ def evaluate(test_id, display=True, model="model_final.pth",
     letter_boxes.append({
       "filename": test_file,
       "type": "Letter",
-      "x1": x1 / 2,
-      "y1": y1 / 2,
-      "x2": x2 / 2,
-      "y2": y2 / 2,
+      "x1": x1,
+      "y1": y1,
+      "x2": x2,
+      "y2": y2,
       "value": LABEL_LOOKUP[cls]
     })
 
