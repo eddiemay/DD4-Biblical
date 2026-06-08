@@ -73,7 +73,6 @@ def get_row(filename, row):
     row_box = row_map.get(f'{filename}-{row}')
     if row_box is None and 1 < row < 31:
         print(f'Found none for {filename} Row: {row}')
-        return None
 
     return row_box
 
@@ -137,7 +136,7 @@ def process(sample):
     img = img_map.get(img_filename)
     if img is None:
         img = cv2.imread(img_filename)
-        # img, _ = process_image(img, {'blur': 'median', 'blur_size': 3,})
+        img, _ = process_image(img, sample.get('preprocessor'))
         img_map[img_filename] = img
 
     top = math.floor(start_row_box['y1'] * ratio)

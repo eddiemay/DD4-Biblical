@@ -4,6 +4,7 @@ import Levenshtein
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import shutil
 import sys
 import time
 from detectron2 import model_zoo
@@ -12,9 +13,9 @@ from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.utils.visualizer import Visualizer
 from letterbox_utils import DSSLettersDataset, get_img_file_path, \
-  parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP
+  parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET
 from scipy import stats
-from train_by_labels import is_in_row
+from train_by_labels import is_in_row, process
 from verify import get_isa_text, process_image
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
@@ -24,14 +25,14 @@ ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
                 "threshold_type": 0}
-config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+# config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 
 # R101 > R50 for accuracy
 # FPN helps small objects
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-# config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -51,16 +52,82 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3 # or 0.2
 cfg.MODEL.DEVICE = 'cpu'
 
 
+def append_data(conf, sample):
+  sample = process(sample)
+  if sample is None:
+    return
+
+  filename = f'{sample["fragment"]}-{sample["srow"]}-{sample["erow"]}'
+  h, w = sample['image'].shape[:2]
+  conf["images"].append(
+      {"id": filename, "file_name": filename + '.jpg', "height": h, "width": w})
+  cv2.imwrite(f'{IMAGES_BASE}/{conf["type"]}/{filename}.jpg', sample['image'])
+
+  letter_id = 0
+  for letter_box in sample["boxes"]:
+    if len(letter_box['value']) > 1:
+      continue
+    x, y = letter_box['x1'], letter_box['y1']
+    width, height = letter_box['x2'] - x, letter_box['y2'] - y
+    conf["annotations"].append(
+        {"id": letter_id, "image_id": filename, "category_id": ord('א') - ord(letter_box["value"]),
+         "bbox": [x, y, width, height], "area": width * height, "iscrowd": 0})
+    letter_id += 1
+
+
+def setup_samples(preprocessor=None):
+  if os.path.exists(IMAGES_BASE):
+    shutil.rmtree(IMAGES_BASE)
+  os.makedirs(f'{DATASET_BASE}/annotations', exist_ok=True)
+  os.makedirs(f'{IMAGES_BASE}/train', exist_ok=True)
+  os.makedirs(f'{IMAGES_BASE}/val', exist_ok=True)
+
+  train_conf = {"type": 'train', "images": [], "annotations": [], "categories": []}
+  val_conf = {"type": 'val', "images": [], "annotations": [], "categories": []}
+  for c in range(len(LABEL_LOOKUP)):
+    train_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
+    val_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
+
+  image_start = time.time()
+  for frag in TRAINING_SET:
+    conf = train_conf if parse_file_name(frag)[2] not in VAL_IDS else val_conf
+    for r in range(1, 33):
+      append_data(conf, {'fragment': frag, 'srow': r, 'erow': r, 'preprocessor': preprocessor})
+      if r % 3 == 1:
+        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+2, 'preprocessor': preprocessor})
+      if r % 7 == 1:
+        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+6, 'preprocessor': preprocessor})
+      if r % 10 == 1:
+        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
+      if r % 14 == 1:
+        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
+
+  print(f'Files creation time: {time.time() - image_start} seconds')
+
+  train_conf.pop('type')
+  val_conf.pop('type')
+  with open(f"{ANNOTATIONS}/train.json", "w", encoding="utf-8") as f:
+    json.dump(train_conf, f, indent=True)
+  with open(f"{ANNOTATIONS}/val.json", "w", encoding="utf-8") as f:
+    json.dump(val_conf, f, indent=True)
+
+
 def setup_data(preprocessor):
-  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
+  if os.path.exists(IMAGES_BASE):
+    shutil.rmtree(IMAGES_BASE)
+  os.makedirs(f'{DATASET_BASE}/annotations', exist_ok=True)
+  os.makedirs(f'{IMAGES_BASE}/train', exist_ok=True)
+  os.makedirs(f'{IMAGES_BASE}/val', exist_ok=True)
+
   train_conf = {"images": [], "annotations": [], "categories": []}
   val_conf = {"images": [], "annotations": [], "categories": []}
-  for c in range(len(dataset.classes)):
-    train_conf["categories"].append({"id": c, "name": dataset.classes[c]})
-    val_conf["categories"].append({"id": c, "name": dataset.classes[c]})
+  for c in range(len(LABEL_LOOKUP)):
+    train_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
+    val_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
 
   files = {}
   letter_id = 0
+  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
   for _, label, letter_box in dataset:
     filename = letter_box['filename']
     image_id = parse_file_name(filename)[2]
@@ -93,7 +160,7 @@ def setup_data(preprocessor):
 
 
 def train(iters, preprocessor):
-  setup_data(preprocessor)
+  setup_samples(preprocessor)
   register_coco_instances(
       "dss_train",
       {},
@@ -231,7 +298,8 @@ if __name__ == '__main__':
     elif sys.argv[a] == '--iters':
       iters = int(sys.argv[a + 1])
 
-  train(iters, preprocessor=pp)
+  setup_data(pp)
+  # train(iters, preprocessor=pp)
   # verify('model_final_50_5000.pth', preprocessor=pp)
-  verify('model_final.pth', preprocessor=pp)
-  evaluate(48, True, preprocessor=pp)
+  # verify('model_final.pth', preprocessor=pp)
+  # evaluate(48, True, preprocessor=pp)

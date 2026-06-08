@@ -67,6 +67,7 @@ def diff_line_mode(text1, text2):
 
 def process_image(img, params):
     name = ''
+    params = params or {}
     if params.get('gray') is not None and params['gray']:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         name += 'gray'
