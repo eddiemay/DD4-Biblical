@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import json
 import Levenshtein
@@ -26,7 +27,7 @@ ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
                 "threshold_type": 0}
-# config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 '''[43.5, 46.69, 46.99, 55.53, 49.27, 52.37, 52.35, 54.93, 54.22, 52.82, 54.66, 53.41, 56.79, 56.81, 55.66, 59.74, 61.05, 51.43, 58.42, 59.94, 58.52, 58.58, 60.79, 50.9]
 min: 43.5 max: 61.05 mean: 54.39 median: 54.80 mode: 55.0 std: 4.57 Z-Low: 45.43 Z-High: 63.35'''
 
@@ -35,7 +36,7 @@ min: 43.5 max: 61.05 mean: 54.39 median: 54.80 mode: 55.0 std: 4.57 Z-Low: 45.43
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+# config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
 '''[49.9, 52.61, 53.5, 64.06, 59.35, 58.35, 62.1, 61.46, 63.04, 61.97, 61.15, 61.68, 64.27, 62.65, 61.36, 64.68, 68.42, 61.36, 68.71, 63.41, 62.82, 66.67, 69.74, 59.39]
 min: 49.9 max: 69.74 mean: 61.78 median: 62.03 mode: 60.0 std: 4.67 Z-Low: 52.62 Z-High: 70.93'''
 
@@ -168,8 +169,9 @@ def setup_data(preprocessor):
     json.dump(val_conf, f, indent=True)
 
 
-def train(iters, preprocessor):
-  setup_samples(preprocessor)
+def train(iters, preprocessor, samples=False):
+  setup_samples(preprocessor) if samples else setup_data(preprocessor)
+
   register_coco_instances(
       "dss_train",
       {},
@@ -187,7 +189,7 @@ def train(iters, preprocessor):
   cfg.DATASETS.TRAIN = ("dss_train",)
   cfg.DATASETS.TEST = ("dss_val",)
 
-  cfg.SOLVER.IMS_PER_BATCH = 2
+  cfg.SOLVER.IMS_PER_BATCH = 1
   cfg.SOLVER.BASE_LR = 0.00025
   # cfg.SOLVER.STEPS = (12000, 16000)
   # cfg.SOLVER.GAMMA = 0.1
@@ -299,15 +301,18 @@ def verify(model="model_final.pth", preprocessor=None):
 
 
 if __name__ == '__main__':
-  pp = {}
-  iters = 5000
-  for a in range(len(sys.argv)):
-    if sys.argv[a] == '--preprocess':
-      pp = preprocessor
-    elif sys.argv[a] == '--iters':
-      iters = int(sys.argv[a + 1])
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--preprocess', action='store_true')
+  parser.add_argument('--iters', type=int, default=5000)
+  parser.add_argument('--samples', action='store_true')
+  parser.add_argument('--fullcols', action='store_true')
 
-  train(iters, preprocessor=pp)
+  args = parser.parse_args()
+  pp = preprocessor if args.preprocess else {}
+  iters = args.iters
+  samples = not args.fullcols
+
+  train(iters, preprocessor=pp, samples=samples)
   # verify('model_final_50_5000.pth', preprocessor=pp)
   verify('model_final.pth', preprocessor=pp)
   evaluate(48, True, preprocessor=pp)
