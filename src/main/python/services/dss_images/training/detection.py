@@ -305,12 +305,11 @@ if __name__ == '__main__':
   parser.add_argument('--preprocess', action='store_true')
   parser.add_argument('--iters', type=int, default=5000)
   parser.add_argument('--samples', action='store_true')
-  parser.add_argument('--fullcols', action='store_true')
 
   args = parser.parse_args()
   pp = preprocessor if args.preprocess else {}
   iters = args.iters
-  samples = not args.fullcols
+  samples = args.samples
 
   train(iters, preprocessor=pp, samples=samples)
   # verify('model_final_50_5000.pth', preprocessor=pp)
