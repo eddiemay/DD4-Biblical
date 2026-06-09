@@ -42,7 +42,7 @@ def get_row(filename, row):
         print('creating row map')
         letter_boxes = []
         row_boxes = []
-        dataset = DSSLettersDataset(overrides=["isaiah-column-7"])
+        dataset = DSSLettersDataset()
         for _, _, letter_box in dataset:
             if letter_box['type'] == 'Row':
                 letter_box['_letterBoxes'] = []
