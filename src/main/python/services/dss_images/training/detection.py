@@ -101,15 +101,15 @@ def setup_samples(preprocessor=None):
     conf = train_conf if parse_file_name(frag)[2] not in VAL_IDS else val_conf
     row_30 = get_row(frag, 30)
     for r in range(1, 33):
-      append_data(conf, {'fragment': frag, 'srow': r, 'erow': r, 'preprocessor': preprocessor})
-      if r % 3 == 1:
-        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+2, 'preprocessor': preprocessor})
+      # append_data(conf, {'fragment': frag, 'srow': r, 'erow': r, 'preprocessor': preprocessor})
+      # if r % 3 == 1:
+        # append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+2, 'preprocessor': preprocessor})
       if r % 7 == 1:
         append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+6, 'preprocessor': preprocessor})
-      if r % 10 == 1 and row_30 is not None:
-        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
-      if r % 14 == 1 and row_30 is None:
-        append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
+      # if r % 10 == 1 and row_30 is not None:
+        # append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
+      # if r % 14 == 1 and row_30 is None:
+        # append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
 
   print(f'Files creation time: {time.time() - image_start} seconds')
 
