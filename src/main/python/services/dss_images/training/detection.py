@@ -49,9 +49,9 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 cfg.OUTPUT_DIR = "detection/output"
 
 cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[4, 8, 16, 32]]
-cfg.INPUT.MIN_SIZE_TRAIN = (1024,) # or (1024,) or  (1280,)
+cfg.INPUT.MIN_SIZE_TRAIN = (256,512) # or (1024,) or  (1280,)
 cfg.INPUT.MAX_SIZE_TRAIN = 1333 # or 2500 or 3000
-cfg.INPUT.MIN_SIZE_TEST = 1024
+cfg.INPUT.MIN_SIZE_TEST = 512
 cfg.INPUT.MAX_SIZE_TEST = 1333
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3 # or 0.2
 cfg.MODEL.DEVICE = 'cpu'
@@ -75,8 +75,8 @@ def append_data(conf, sample):
     width, height = letter_box['x2'] - x, letter_box['y2'] - y
     letter_id = f'{filename}-{x}-{y}'
     if letter_id in ANNO_IDS:
-      print(f'Duplicate id: {letter_id} detected. Real ID: {letter_box["id"]}')
-      raise f"Duplicate id: {letter_id} detected"
+      raise ValueError(
+          f'Duplicate id: {letter_id} detected. LetterBox: {letter_box}')
     ANNO_IDS[letter_id] = 1
     conf["annotations"].append(
         {"id": letter_id, "image_id": filename, "category_id": ord(letter_box["value"]) - ord('א'),
