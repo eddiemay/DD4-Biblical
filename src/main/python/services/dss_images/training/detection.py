@@ -20,6 +20,7 @@ from verify import get_isa_text, process_image
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
 VAL_IDS = ['7', '17', '27', '37', '47']
+ANNO_IDS = {}
 DATASET_BASE = 'detection/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
@@ -73,6 +74,10 @@ def append_data(conf, sample):
     x, y = letter_box['x1'], letter_box['y1']
     width, height = letter_box['x2'] - x, letter_box['y2'] - y
     letter_id = f'{filename}-{x}-{y}'
+    if letter_id in ANNO_IDS:
+      print(f"Duplicate id: {letter_id} detected")
+      raise f"Duplicate id: {letter_id} detected"
+    ANNO_IDS[letter_id] = 1
     conf["annotations"].append(
         {"id": letter_id, "image_id": filename, "category_id": ord(letter_box["value"]) - ord('א'),
          "bbox": [x, y, width, height], "area": width * height, "iscrowd": 0})
