@@ -75,7 +75,7 @@ def append_data(conf, sample):
     width, height = letter_box['x2'] - x, letter_box['y2'] - y
     letter_id = f'{filename}-{x}-{y}'
     if letter_id in ANNO_IDS:
-      print(f"Duplicate id: {letter_id} detected")
+      print(f'Duplicate id: {letter_id} detected. Real ID: {letter_box["id"]}')
       raise f"Duplicate id: {letter_id} detected"
     ANNO_IDS[letter_id] = 1
     conf["annotations"].append(
