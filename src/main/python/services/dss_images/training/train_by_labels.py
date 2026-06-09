@@ -271,16 +271,17 @@ if __name__ == '__main__':
 
     image_start = time.time()
     for frag in TRAINING_SET:
+        row_30 = get_row(frag, 30)
         for r in range(1, 33):
             process_and_output({'fragment': frag, 'srow': r, 'erow': r})
             if r % 3 == 1:
                 process_and_output({'fragment': frag, 'srow': r, 'erow': r+2})
             if r % 7 == 1:
                 process_and_output({'fragment': frag, 'srow': r, 'erow': r+6})
-            if r % 10 == 1:
+            if r % 10 == 1 and row_30 is not None:
                 process_and_output({'fragment': frag, 'srow': r, 'erow': r+9})
-            if r == 1:
-                process_and_output({'fragment': frag, 'srow': r, 'erow': r+27})
+            if r % 14 == 1 and row_30 is None:
+                process_and_output({'fragment': frag, 'srow': r, 'erow': r+13})
 
     training_start = time.time()
     print(f'Files creation time: {training_start - image_start} seconds')

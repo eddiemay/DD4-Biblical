@@ -15,7 +15,7 @@ from detectron2.utils.visualizer import Visualizer
 from letterbox_utils import DSSLettersDataset, get_img_file_path, \
   parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET
 from scipy import stats
-from train_by_labels import is_in_row, process
+from train_by_labels import is_in_row, process, get_row
 from verify import get_isa_text, process_image
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
@@ -26,13 +26,17 @@ IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
                 "threshold_type": 0}
 # config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+'''[43.5, 46.69, 46.99, 55.53, 49.27, 52.37, 52.35, 54.93, 54.22, 52.82, 54.66, 53.41, 56.79, 56.81, 55.66, 59.74, 61.05, 51.43, 58.42, 59.94, 58.52, 58.58, 60.79, 50.9]
+min: 43.5 max: 61.05 mean: 54.39 median: 54.80 mode: 55.0 std: 4.57 Z-Low: 45.43 Z-High: 63.35'''
 
 # R101 > R50 for accuracy
 # FPN helps small objects
-config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
+# config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-# config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+'''[49.9, 52.61, 53.5, 64.06, 59.35, 58.35, 62.1, 61.46, 63.04, 61.97, 61.15, 61.68, 64.27, 62.65, 61.36, 64.68, 68.42, 61.36, 68.71, 63.41, 62.82, 66.67, 69.74, 59.39]
+min: 49.9 max: 69.74 mean: 61.78 median: 62.03 mode: 60.0 std: 4.67 Z-Low: 52.62 Z-High: 70.93'''
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -90,15 +94,16 @@ def setup_samples(preprocessor=None):
   image_start = time.time()
   for frag in TRAINING_SET:
     conf = train_conf if parse_file_name(frag)[2] not in VAL_IDS else val_conf
+    row_30 = get_row(frag, 30)
     for r in range(1, 33):
       append_data(conf, {'fragment': frag, 'srow': r, 'erow': r, 'preprocessor': preprocessor})
       if r % 3 == 1:
         append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+2, 'preprocessor': preprocessor})
       if r % 7 == 1:
         append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+6, 'preprocessor': preprocessor})
-      if r % 10 == 1:
+      if r % 10 == 1 and row_30 is not None:
         append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
-      if r % 14 == 1:
+      if r % 14 == 1 and row_30 is None:
         append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
 
   print(f'Files creation time: {time.time() - image_start} seconds')
@@ -177,7 +182,7 @@ def train(iters, preprocessor):
   cfg.DATASETS.TRAIN = ("dss_train",)
   cfg.DATASETS.TEST = ("dss_val",)
 
-  cfg.SOLVER.IMS_PER_BATCH = 2
+  cfg.SOLVER.IMS_PER_BATCH = 1
   cfg.SOLVER.BASE_LR = 0.00025
   # cfg.SOLVER.STEPS = (12000, 16000)
   # cfg.SOLVER.GAMMA = 0.1
