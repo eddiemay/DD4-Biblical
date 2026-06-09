@@ -90,15 +90,15 @@ def get_box_text(row_box, bottom, ratio):
         y1 = bottom - math.ceil(letter_box['y2'] * ratio)
         y2 = bottom - math.floor(letter_box['y1'] * ratio)
         if prev_x2 and letter_box['x1'] - prev_x2 >= 5:
-            boxes.append(
-                {'id': letter_box['id'], 'value': ' ', 'x1': math.ceil(prev_x2 * ratio),
-                 'y1': y1, 'x2': x1, 'y2': y2})
+            boxes.append({'value': ' ', 'x1': math.ceil(prev_x2 * ratio),
+                          'y1': y1, 'x2': x1, 'y2': y2})
         value = letter_box['value']
-        boxes.append({'value': value, 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
+        boxes.append({'id': letter_box['id'], 'value': value,
+                      'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
         prev_x2 = letter_box['x2']
 
-    boxes.append({'value': '\t', 'x1': x2,
-                  'y1': y1, 'x2': math.ceil(x2 + 2 * ratio), 'y2': y2})
+    boxes.append({'value': '\t', 'x1': x2, 'y1': y1,
+                  'x2': math.ceil(x2 + 2 * ratio), 'y2': y2})
     return boxes
 
 
