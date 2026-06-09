@@ -187,7 +187,7 @@ def train(iters, preprocessor):
   cfg.DATASETS.TRAIN = ("dss_train",)
   cfg.DATASETS.TEST = ("dss_val",)
 
-  cfg.SOLVER.IMS_PER_BATCH = 1
+  cfg.SOLVER.IMS_PER_BATCH = 2
   cfg.SOLVER.BASE_LR = 0.00025
   # cfg.SOLVER.STEPS = (12000, 16000)
   # cfg.SOLVER.GAMMA = 0.1
