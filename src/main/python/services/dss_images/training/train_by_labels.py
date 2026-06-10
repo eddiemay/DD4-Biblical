@@ -207,8 +207,11 @@ def process(sample):
     # Create a 4-channel image with alpha channel
     cleared = cv2.cvtColor(row_img, cv2.COLOR_BGR2BGRA)
     # Set the alpha channel to 0 where the mask is white
-    background_color = np.median(img.reshape(-1, 3), axis=0)
-    cleared[mask == 255] = background_color
+    cleared[mask == 255] = cv2.inpaint(
+        img,
+        mask,
+        inpaintRadius=3,
+        flags=cv2.INPAINT_TELEA)
     sample['outlined'] = outlined
     sample['image'] = cleared
 
