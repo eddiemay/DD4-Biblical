@@ -175,10 +175,11 @@ def process(sample):
                 x2 = math.ceil(letter_box['x2'] * ratio)
                 y1 = math.floor(letter_box['y1'] * ratio)
                 h = y2 - y1
-                y1, y2 = y1 - top, y2 - top
+                y1, y2 = max(y1 - top, 0), y2 - top
                 vh = y2 - y1 # Calculate the visual height
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 if vh / h > visual_threshold:
+                    print('VH top: ' + (vh/h))
                     sample['boxes'].append({
                         'id': letter_box['id'], 'value': letter_box['value'],
                         'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
@@ -194,10 +195,11 @@ def process(sample):
                 x2 = math.ceil(letter_box['x2'] * ratio)
                 y2 = math.ceil(letter_box['y2'] * ratio)
                 h = y2 - y1
-                y1, y2 = y1 - top,  y2 - top
+                y1, y2 = y1 - top,  min(y2 - top, bottom - top)
                 vh = y2 - y1
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 if vh / h > visual_threshold:
+                    print('VH bottom: ' + (vh/h))
                     sample['boxes'].append({
                         'id': letter_box['id'], 'value': letter_box['value'],
                         'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
