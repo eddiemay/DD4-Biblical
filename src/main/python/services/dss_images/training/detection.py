@@ -306,16 +306,16 @@ if __name__ == '__main__':
   pp = preprocessor if args.preprocess else {}
   iters = args.iters
   samples = args.samples
-  if samples:
-    cfg.INPUT.MIN_SIZE_TRAIN = (512,) # or (1024,) or  (1280,)
-    cfg.INPUT.MAX_SIZE_TRAIN = 1280 # or 2500 or 3000
-    cfg.INPUT.MIN_SIZE_TEST = 512
-    cfg.INPUT.MAX_SIZE_TEST = 1280
-  else:
+  if not samples:
     cfg.INPUT.MIN_SIZE_TRAIN = (800,) # or (1024,) or  (1280,)
     cfg.INPUT.MAX_SIZE_TRAIN = 1600 # or 2500 or 3000
     cfg.INPUT.MIN_SIZE_TEST = 800
     cfg.INPUT.MAX_SIZE_TEST = 1600
+  else:
+    cfg.INPUT.MIN_SIZE_TRAIN = (512,)
+    cfg.INPUT.MAX_SIZE_TRAIN = 1280
+    cfg.INPUT.MIN_SIZE_TEST = 512
+    cfg.INPUT.MAX_SIZE_TEST = 1280
 
   train(iters, preprocessor=pp, samples=samples)
   # verify('model_final_50_5000.pth', preprocessor=pp)
