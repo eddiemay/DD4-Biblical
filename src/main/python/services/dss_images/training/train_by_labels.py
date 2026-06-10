@@ -162,6 +162,7 @@ def process(sample):
 
     # Square the letter boxes
 
+    visual_threshold = .333
     # Square in red the letters from the rows above and below that to be cleared
     # Create a black mask with the same size as the image
     mask = np.zeros(row_img.shape[:2], dtype=np.uint8)
@@ -172,11 +173,17 @@ def process(sample):
             if y2 > top:
                 x1 = math.floor(letter_box['x1'] * ratio)
                 x2 = math.ceil(letter_box['x2'] * ratio)
-                y1 = math.floor(letter_box['y1'] * ratio) - top
-                y2 = y2 - top
-
+                y1 = math.floor(letter_box['y1'] * ratio)
+                h = y2 - y1
+                y1, y2 = y1 - top, y2 - top
+                vh = y2 - y1 # Calculate the visual height
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                cv2.rectangle(mask, (x1, y1), (x2, y2), 255, -1)
+                if vh / h > visual_threshold:
+                    sample['boxes'].append({
+                        'id': letter_box['id'], 'value': letter_box['value'],
+                        'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
+                else:
+                    cv2.rectangle(mask, (x1, y1), (x2, y2), 255, -1)
 
     below = get_row(fragment, erow + 1)
     if below:
@@ -185,9 +192,17 @@ def process(sample):
             if y1 < bottom:
                 x1 = math.floor(letter_box['x1'] * ratio)
                 x2 = math.ceil(letter_box['x2'] * ratio)
-                y1, y2 = y1 - top,  math.ceil(letter_box['y2'] * ratio) - top
+                y2 = math.ceil(letter_box['y2'] * ratio)
+                h = y2 - y1
+                y1, y2 = y1 - top,  y2 - top
+                vh = y2 - y1
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                cv2.rectangle(mask, (x1, y1), (x2, y2), 255, -1)
+                if vh / h > visual_threshold:
+                    sample['boxes'].append({
+                        'id': letter_box['id'], 'value': letter_box['value'],
+                        'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
+                else:
+                    cv2.rectangle(mask, (x1, y1), (x2, y2), 255, -1)
 
     # Create a 4-channel image with alpha channel
     cleared = cv2.cvtColor(row_img, cv2.COLOR_BGR2BGRA)
