@@ -162,7 +162,7 @@ def process(sample):
 
     # Square the letter boxes
 
-    visual_threshold = .333
+    visual_threshold = 1.333
     # Square in red the letters from the rows above and below that to be cleared
     # Create a black mask with the same size as the image
     mask = np.zeros(row_img.shape[:2], dtype=np.uint8)
@@ -179,7 +179,6 @@ def process(sample):
                 vh = y2 - y1 # Calculate the visual height
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 if vh / h > visual_threshold:
-                    print('VH top: ', vh / h)
                     sample['boxes'].append({
                         'id': letter_box['id'], 'value': letter_box['value'],
                         'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
@@ -199,7 +198,6 @@ def process(sample):
                 vh = y2 - y1
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 if vh / h > visual_threshold:
-                    print('VH bottom: ', vh / h)
                     sample['boxes'].append({
                         'id': letter_box['id'], 'value': letter_box['value'],
                         'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
@@ -209,7 +207,8 @@ def process(sample):
     # Create a 4-channel image with alpha channel
     cleared = cv2.cvtColor(row_img, cv2.COLOR_BGR2BGRA)
     # Set the alpha channel to 0 where the mask is white
-    cleared[mask == 255] = [0, 0, 0, 0]
+    background_color = np.median(img.reshape(-1, 3), axis=0)
+    cleared[mask == 255] = background_color
     sample['outlined'] = outlined
     sample['image'] = cleared
 
