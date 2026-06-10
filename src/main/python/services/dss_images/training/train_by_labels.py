@@ -179,7 +179,7 @@ def process(sample):
                 vh = y2 - y1 # Calculate the visual height
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 if vh / h > visual_threshold:
-                    print('VH top: ' + (vh/h))
+                    print('VH top: ', vh / h)
                     sample['boxes'].append({
                         'id': letter_box['id'], 'value': letter_box['value'],
                         'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
@@ -199,7 +199,7 @@ def process(sample):
                 vh = y2 - y1
                 cv2.rectangle(outlined, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 if vh / h > visual_threshold:
-                    print('VH bottom: ' + (vh/h))
+                    print('VH bottom: ', vh / h)
                     sample['boxes'].append({
                         'id': letter_box['id'], 'value': letter_box['value'],
                         'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2})
