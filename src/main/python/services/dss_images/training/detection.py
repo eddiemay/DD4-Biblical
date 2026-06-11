@@ -25,26 +25,48 @@ ANNO_IDS = {}
 DATASET_BASE = 'detection/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
-preprocessor = {"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135,
-                "threshold_type": 0}
-config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
-'''[43.5, 46.69, 46.99, 55.53, 49.27, 52.37, 52.35, 54.93, 54.22, 52.82, 54.66, 53.41, 56.79, 56.81, 55.66, 59.74, 61.05, 51.43, 58.42, 59.94, 58.52, 58.58, 60.79, 50.9]
-min: 43.5 max: 61.05 mean: 54.39 median: 54.80 mode: 55.0 std: 4.57 Z-Low: 45.43 Z-High: 63.35'''
+preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3}
+# config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+'''
+[43.5, 46.69, 46.99, 55.53, 49.27, 52.37, 52.35, 54.93, 54.22, 52.82, 54.66, 53.41, 56.79, 56.81, 55.66, 59.74, 61.05, 51.43, 58.42, 59.94, 58.52, 58.58, 60.79, 50.9]
+min: 43.5 max: 61.05 mean: 54.39 median: 54.80 mode: 55.0 std: 4.57 Z-Low: 45.43 Z-High: 63.35
+
+800x1600, [4,8,16,32], 5000, 7:56:20
+iter: 4999  total_loss: 0.7535  loss_cls: 0.2568  loss_box_reg: 0.2721  loss_rpn_cls: 0.05465  loss_rpn_loc: 0.1655
+[46.87, 54.29, 52.2, 60.75, 44.38, 55.86, 59.23, 58.13, 62.25, 59.9, 60.04, 60.85, 62.14, 63.69, 64.1, 64.37, 66.57, 45.53, 59.06, 67.57, 66.83, 65.77, 69.16, 55.96]
+min: 44.38 max: 69.16 mean: 59.40 median: 60.39 mode: 60.0 std: 6.69 Z-Low: 46.29 Z-High: 72.51
+
+800x1600, [8,16,32,64], 5000, 20:48:29 (M2 Pro)
+iter: 4999  total_loss: 0.7975  loss_cls: 0.2792  loss_box_reg: 0.2903  loss_rpn_cls: 0.05824  loss_rpn_loc: 0.1654
+[47.83, 53.03, 50.08, 60.94, 49.27, 58.29, 59.66, 60.81, 62.65, 59.9, 58.66, 58.79, 63.48, 62.24, 59.22, 63.95, 64.96, 46.3, 56.63, 66.25, 64.04, 65.27, 69.53, 54.34]
+min: 46.3 max: 69.53 mean: 59.00 median: 59.78 mode: 60.0 std: 6.00 Z-Low: 47.24 Z-High: 70.77
+'''
 
 # R101 > R50 for accuracy
 # FPN helps small objects
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 
 # 👉 Much higher accuracy, but slower
-# config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
-'''[49.9, 52.61, 53.5, 64.06, 59.35, 58.35, 62.1, 61.46, 63.04, 61.97, 61.15, 61.68, 64.27, 62.65, 61.36, 64.68, 68.42, 61.36, 68.71, 63.41, 62.82, 66.67, 69.74, 59.39]
-min: 49.9 max: 69.74 mean: 61.78 median: 62.03 mode: 60.0 std: 4.67 Z-Low: 52.62 Z-High: 70.93'''
+config = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
+'''
+[49.9, 52.61, 53.5, 64.06, 59.35, 58.35, 62.1, 61.46, 63.04, 61.97, 61.15, 61.68, 64.27, 62.65, 61.36, 64.68, 68.42, 61.36, 68.71, 63.41, 62.82, 66.67, 69.74, 59.39]
+min: 49.9 max: 69.74 mean: 61.78 median: 62.03 mode: 60.0 std: 4.67 Z-Low: 52.62 Z-High: 70.93
+
+800x1600, [4,8,16,32], 5000, 12:52:47
+iter: 4999  total_loss: 0.6978  loss_cls: 0.2279  loss_box_reg: 0.285  loss_rpn_cls: 0.04744  loss_rpn_loc: 0.1606
+[55.06, 60.07, 57.32, 68.13, 52.76, 66.17, 66.42, 65.84, 69.04, 65.54, 66.46, 66.09, 70.54, 68.43, 66.32, 71.38, 72.27, 53.06, 66.34, 73.39, 70.99, 71.74, 74.71, 64.75]
+min: 52.76 max: 74.71 mean: 65.95 median: 66.38 mode: 65.0 std: 6.03 Z-Low: 54.14 Z-High: 77.77
+.55 instead of .60 threshold
+[56.02, 60.7, 55.53, 69.53, 57.8, 66.17, 67.76, 66.69, 69.5, 65.15, 65.98, 64.92, 70.18, 67.61, 63.43, 71.8, 72.04, 56.87, 68.61, 71.66, 67.91, 72.97, 75.34, 65.56]
+min: 55.53 max: 75.34 mean: 66.24 median: 67.15 mode: 70.0 std: 5.37 Z-Low: 55.71 Z-High: 76.76
+'''
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
 
-cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128 # or 256
+cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128 # or 256 or 512 or 1024
+# cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 
 cfg.OUTPUT_DIR = "detection/output"
@@ -202,7 +224,7 @@ def train(iters, preprocessor, samples=False):
 def evaluate(test_id, display=True, model="model_final.pth",
     preprocessor=None):
   cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/{model}'
-  cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.60
+  cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.55
   cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 12000
   cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 6000
   cfg.TEST.DETECTIONS_PER_IMAGE = 2000
@@ -211,16 +233,15 @@ def evaluate(test_id, display=True, model="model_final.pth",
   predictor = DefaultPredictor(cfg)
   img_file = f'../images/isaiah/columns/column_9_{test_id}.jpg'
   image = process_image(cv2.imread(img_file), preprocessor)[0]
+  if len(image.shape) == 2:
+    image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
   outputs = predictor(image)
-  print(outputs)
+  # print(outputs)
   print(f'Prediction took {time.time() - start_time} seconds')
 
   instances = outputs["instances"].to("cpu")
   if len(instances.pred_boxes) == 0:
     return 0
-
-  print(instances.scores.min())
-  print(instances.scores.max())
 
   boxes = instances.pred_boxes.tensor.numpy()
   classes = instances.pred_classes.numpy()

@@ -84,7 +84,6 @@ class DSSLettersDataset(Dataset):
         self.labels.append(ord(value) - ord('א') if len(value) == 1 and 'א' <= value <= 'ת' else 27)
 
     self.classes = LABEL_LOOKUP
-    print(f'Labels: {torch.unique(torch.tensor(self.labels))} {type(self.labels[0])}')
     self.images:list = [None] * len(self.metadata)
 
   def __len__(self) -> int:
