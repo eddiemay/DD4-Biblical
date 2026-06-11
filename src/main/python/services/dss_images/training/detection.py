@@ -40,6 +40,12 @@ min: 44.38 max: 69.16 mean: 59.40 median: 60.39 mode: 60.0 std: 6.69 Z-Low: 46.2
 iter: 4999  total_loss: 0.7975  loss_cls: 0.2792  loss_box_reg: 0.2903  loss_rpn_cls: 0.05824  loss_rpn_loc: 0.1654
 [47.83, 53.03, 50.08, 60.94, 49.27, 58.29, 59.66, 60.81, 62.65, 59.9, 58.66, 58.79, 63.48, 62.24, 59.22, 63.95, 64.96, 46.3, 56.63, 66.25, 64.04, 65.27, 69.53, 54.34]
 min: 46.3 max: 69.53 mean: 59.00 median: 59.78 mode: 60.0 std: 6.00 Z-Low: 47.24 Z-High: 70.77
+
+800x1600, [8,16,32,64], 5000, 20:29:13 (M2 Pro)
+iter: 4999  total_loss: 0.8785  loss_cls: 0.3392  loss_box_reg: 0.3206  loss_rpn_cls: 0.06343  loss_rpn_loc: 0.169
+[37.3, 41.67, 47.72, 52.04, 33.82, 48.87, 47.53, 46.44, 52.57, 54.9, 52.1, 50.38, 54.53, 55.43, 59.96, 61.08, 60.21, 36.6, 48.86, 64.52, 60.96, 53.85, 60.31, 45.29]
+min: 33.82 max: 64.52 mean: 51.12 median: 52.07 mode: 50.0 std: 8.06 Z-Low: 35.33 Z-High: 66.92
+[06/11 11:31:59 d2.checkpoint.detection_checkpoint]: [DetectionCheckpointer] Loading from detect
 '''
 
 # R101 > R50 for accuracy
@@ -59,13 +65,17 @@ min: 52.76 max: 74.71 mean: 65.95 median: 66.38 mode: 65.0 std: 6.03 Z-Low: 54.1
 .55 instead of .60 threshold
 [56.02, 60.7, 55.53, 69.53, 57.8, 66.17, 67.76, 66.69, 69.5, 65.15, 65.98, 64.92, 70.18, 67.61, 63.43, 71.8, 72.04, 56.87, 68.61, 71.66, 67.91, 72.97, 75.34, 65.56]
 min: 55.53 max: 75.34 mean: 66.24 median: 67.15 mode: 70.0 std: 5.37 Z-Low: 55.71 Z-High: 76.76
+
+800x1600, [4,8,16,32], 5000, 12:52:47, Preprocessed Gray GBlur 3, .55 threshold
+[48.86, 54.98, 55.28, 59.67, 44.38, 59.95, 60.33, 61.92, 64.62, 61.91, 63.35, 61.34, 65.06, 65.27, 63.58, 68.88, 65.35, 44.54, 61.19, 70.89, 68.34, 65.83, 68.12, 58.2]
+min: 44.38 max: 70.89 mean: 60.91 median: 61.91 mode: 60.0 std: 6.90 Z-Low: 47.38 Z-High: 74.44
 '''
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
 
-cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128 # or 256 or 512 or 1024
+cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512 # or 256 or 512 or 1024
 # cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 
