@@ -8,6 +8,7 @@ import time
 from dask.distributed import Client
 from diff_match_patch import diff_match_patch
 from dss_ocr import image_to_string
+from letterbox_utils import get_isa_text, process_image
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
 from pytesseract import Output
@@ -19,15 +20,6 @@ from utility import draw_letter_boxes_and_text
 BEST_MODEL = 'Hebrew_Font_Embedding_Label_19'
 DASK_SCHEDULER = 'localhost:8786'
 output_all = False
-threshold_names = {
-	cv2.THRESH_BINARY: 'THRESH_BINARY',
-	cv2.THRESH_BINARY_INV: 'THRESH_BINARY_INV',
-	cv2.THRESH_TRUNC: 'THRESH_TRUNC',
-	cv2.THRESH_TOZERO: 'THRESH_TOZERO',
-	cv2.THRESH_TOZERO_INV: 'THRESH_TOZERO_INV',
-	cv2.THRESH_MASK: 'THRESH_MASK',
-	cv2.THRESH_OTSU: 'THRESH_OTSU',
-	cv2.THRESH_TRIANGLE: 'THRESH_TRIANGLE'}
 
 
 class bcolors:
@@ -64,30 +56,6 @@ def diff_line_mode(text1, text2):
 	dmp = diff_match_patch()
 	diffs = dmp.diff_main(text1, text2)
 	return diffs
-
-
-def process_image(img, params):
-	name = ''
-	params = params or {}
-	if params.get('gray') is not None and params['gray']:
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-		name += 'gray'
-	if params.get('bf') is not None:
-		img = cv2.bilateralFilter(img, params['bf'], 75, 75)
-		name += f'-bf{params['bf']}'
-	if params.get('blur') == 'median':
-		img = cv2.medianBlur(img, params['blur_size'])
-		name += f'-median{params['blur_size']}'
-	elif params.get('blur') == 'gaussian':
-		img = cv2.GaussianBlur(img, [params['blur_size'], params['blur_size']],
-													 sigmaX=30, sigmaY=300)
-		name += f'-gaussian{params['blur_size']}'
-	if params.get('threshold_type') is not None:
-		threshold_type = params['threshold_type']
-		img = cv2.threshold(img, params['threshold'], 255, threshold_type)[1]
-		name += f'-{threshold_names[threshold_type]}_{params['threshold']}'
-
-	return img, name
 
 
 def evaluate(eval):
@@ -233,21 +201,6 @@ def to_verify_request(name, img_file, txt, model=None,
 	return {'name': name, 'image': img, 'text': txt, 'model': model,
 					'display': display, 'multithread': multithread,
 					'preprocessors': preprocessors}
-
-
-def get_isa_text(column: int) -> str:
-	txt_file = '../books/1Q_Isaiah_a.txt'
-	txt = ''
-	roman_numeral = romanize(column)
-	with open(txt_file, 'r') as f:
-		lines = f.readlines()
-		l = 0
-		while not lines[l].startswith(f'Col. {roman_numeral},'):
-			l += 1
-		while l + 1 < len(lines) and not lines[l + 1].startswith('Col. '):
-			l += 1
-			txt += lines[l].strip() + '\n'
-	return unfinalize(txt)
 
 
 def to_isa_verify_request(column, model=None,

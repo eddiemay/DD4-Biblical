@@ -13,10 +13,9 @@ from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.utils.visualizer import Visualizer
 from letterbox_utils import DSSLettersDataset, get_img_file_path, \
-	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET
+	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, \
+	get_isa_text, get_row, is_in_row, process_image
 from scipy import stats
-from train_by_labels import is_in_row, process, get_row
-from verify import get_isa_text, process_image
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
 VAL_IDS = ['7', '17', '27', '37', '47']
@@ -73,8 +72,6 @@ min: 44.38 max: 70.89 mean: 60.91 median: 61.91 mode: 60.0 std: 6.90 Z-Low: 47.3
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
-
-cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 1024  # or 256 or 512 or 1024
 # cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 
@@ -335,10 +332,11 @@ if __name__ == '__main__':
 	parser.add_argument('--preprocess', action='store_true')
 	parser.add_argument('--iters', type=int, default=5000)
 	parser.add_argument('--samples', action='store_true')
+	parser.add_argument('--batch_size_per_image', type=int, default=1024)
 
 	args = parser.parse_args()
 	pp = preprocessor if args.preprocess else {}
-	iters = args.iters
+	cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = args.batch_size_per_image
 	samples = args.samples
 	if not samples:
 		cfg.INPUT.MIN_SIZE_TRAIN = (800,)  # or (1024,) or  (1280,)
@@ -351,7 +349,7 @@ if __name__ == '__main__':
 		cfg.INPUT.MIN_SIZE_TEST = 512
 		cfg.INPUT.MAX_SIZE_TEST = 1280
 
-	train(iters, preprocessor=pp, samples=samples)
+	train(args.iters, preprocessor=pp, samples=samples)
 	# verify('model_final_50_5000.pth', preprocessor=pp)
 	verify('model_final.pth', preprocessor=pp)
 	evaluate(48, True, preprocessor=pp)

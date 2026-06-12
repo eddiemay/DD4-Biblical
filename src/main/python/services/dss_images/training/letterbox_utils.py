@@ -8,6 +8,7 @@ from PIL import Image as PilImage
 from typing import TypedDict
 from torch.utils.data import Dataset
 from urllib import request
+from utility import romanize, unfinalize
 
 letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
@@ -26,6 +27,15 @@ SINGLE_LETTERS_ONLY = \
 			letter_box['value']) == 1
 mean, std = (0.5,), (0.5,)
 LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
+THRESHOLD_NAMES = {
+	cv2.THRESH_BINARY: 'THRESH_BINARY',
+	cv2.THRESH_BINARY_INV: 'THRESH_BINARY_INV',
+	cv2.THRESH_TRUNC: 'THRESH_TRUNC',
+	cv2.THRESH_TOZERO: 'THRESH_TOZERO',
+	cv2.THRESH_TOZERO_INV: 'THRESH_TOZERO_INV',
+	cv2.THRESH_MASK: 'THRESH_MASK',
+	cv2.THRESH_OTSU: 'THRESH_OTSU',
+	cv2.THRESH_TRIANGLE: 'THRESH_TRIANGLE'}
 
 
 class ToPilImage:
@@ -207,6 +217,105 @@ def read_database(fragments: list[str], overrides: list[str],
 					f.write("\n")
 
 	return filtered
+
+
+def get_isa_text(column: int) -> str:
+	txt_file = '../books/1Q_Isaiah_a.txt'
+	txt = ''
+	roman_numeral = romanize(column)
+	with open(txt_file, 'r') as f:
+		lines = f.readlines()
+		l = 0
+		while not lines[l].startswith(f'Col. {roman_numeral},'):
+			l += 1
+		while l + 1 < len(lines) and not lines[l + 1].startswith('Col. '):
+			l += 1
+			txt += lines[l].strip() + '\n'
+	return unfinalize(txt)
+
+
+def process_image(img, params):
+	name = ''
+	params = params or {}
+	if params.get('gray') is not None and params['gray']:
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		name += 'gray'
+	if params.get('bf') is not None:
+		img = cv2.bilateralFilter(img, params['bf'], 75, 75)
+		name += f'-bf{params['bf']}'
+	if params.get('blur') == 'median':
+		img = cv2.medianBlur(img, params['blur_size'])
+		name += f'-median{params['blur_size']}'
+	elif params.get('blur') == 'gaussian':
+		img = cv2.GaussianBlur(img, [params['blur_size'], params['blur_size']],
+													 sigmaX=30, sigmaY=300)
+		name += f'-gaussian{params['blur_size']}'
+	if params.get('threshold_type') is not None:
+		threshold_type = params['threshold_type']
+		img = cv2.threshold(img, params['threshold'], 255, threshold_type)[1]
+		name += f'-{THRESHOLD_NAMES[threshold_type]}_{params['threshold']}'
+
+	return img, name
+
+
+def is_in_row(row_box, letter_box):
+	if (row_box['filename'] != letter_box['filename']
+			or row_box['y2'] < letter_box['y2']
+			or row_box['x1'] > letter_box['x1']
+			or row_box['x2'] < letter_box['x2']):
+		return False
+
+	coords = row_box['coords']
+	ci = 0
+	while coords[ci + 1]['x'] <= letter_box['x1']:
+		ci += 1
+	slope = (coords[ci + 1]['y'] - coords[ci]['y']) / (
+			coords[ci + 1]['x'] - coords[ci]['x'])
+	yAtX = (letter_box['x1'] - coords[ci]['x']) * slope + coords[ci]['y']
+
+	return yAtX >= letter_box['y2']
+
+row_map = {}
+
+
+def get_row(filename, row):
+	if not row_map:
+		print('creating row map')
+		letter_boxes = []
+		row_boxes = []
+		dataset = DSSLettersDataset()
+		for _, _, letter_box in dataset:
+			if letter_box['type'] == 'Row':
+				letter_box['_letterBoxes'] = []
+				row_boxes.append(letter_box)
+				letter_box['id'] = f'{letter_box["filename"]}-{letter_box["value"]}'
+				row_map[letter_box['id']] = letter_box
+			elif letter_box['type'] == 'Letter':
+				letter_boxes.append(letter_box)
+		print(f'{len(row_boxes)} total rows')
+		print(f'{len(letter_boxes)} total letters')
+		row_boxes = sorted(row_boxes, key=lambda b: b['y2'])
+
+		added_letters = 0
+		for letter_box in letter_boxes:
+			for row_box in row_boxes:
+				if is_in_row(row_box, letter_box):
+					row_box['_letterBoxes'].append(letter_box)
+					added_letters += 1
+					break
+
+		print(f'{added_letters} letters added')
+		row_boxes = sorted(row_boxes, key=lambda r: r['id'])
+		for row_box in row_boxes:
+			print(row_box['id'] + ":", len(row_box['_letterBoxes']))
+			row_box['_letterBoxes'] = sorted(
+					row_box['_letterBoxes'], key=lambda b: b['x2'], reverse=True)
+
+	row_box = row_map.get(f'{filename}-{row}')
+	if row_box is None and 1 < row < 31:
+		print(f'Found none for {filename} Row: {row}')
+
+	return row_box
 
 
 if __name__ == '__main__':

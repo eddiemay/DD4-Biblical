@@ -6,9 +6,9 @@ import random
 import shutil
 import subprocess
 import time
-from letterbox_utils import DSSLettersDataset, TRAINING_SET, get_img_file_path
+from letterbox_utils import DSSLettersDataset, TRAINING_SET, get_img_file_path, \
+	process_image, get_row
 from pathlib import Path
-from verify import process_image
 
 BASE_MODEL = 'Hebrew_Font_Embedding'
 BASE_OUTPUT = 'tesstrain/data/'
@@ -16,66 +16,7 @@ ITERATIONS = 20
 MODEL_NAME = f'{BASE_MODEL}_Label_{len(TRAINING_SET)}_more_rows_{ITERATIONS}K'
 output_directory = f'{BASE_OUTPUT}label-ground-truth'
 FILE_BASE_NAME = "{}_res_{}_rows_{}_to_{}"
-row_map = {}
 img_map = {}
-
-
-def is_in_row(row_box, letter_box):
-	if (row_box['filename'] != letter_box['filename']
-			or row_box['y2'] < letter_box['y2']
-			or row_box['x1'] > letter_box['x1']
-			or row_box['x2'] < letter_box['x2']):
-		return False
-
-	coords = row_box['coords']
-	ci = 0
-	while coords[ci + 1]['x'] <= letter_box['x1']:
-		ci += 1
-	slope = (coords[ci + 1]['y'] - coords[ci]['y']) / (
-			coords[ci + 1]['x'] - coords[ci]['x'])
-	yAtX = (letter_box['x1'] - coords[ci]['x']) * slope + coords[ci]['y']
-
-	return yAtX >= letter_box['y2']
-
-
-def get_row(filename, row):
-	if not row_map:
-		print('creating row map')
-		letter_boxes = []
-		row_boxes = []
-		dataset = DSSLettersDataset()
-		for _, _, letter_box in dataset:
-			if letter_box['type'] == 'Row':
-				letter_box['_letterBoxes'] = []
-				row_boxes.append(letter_box)
-				letter_box['id'] = f'{letter_box["filename"]}-{letter_box["value"]}'
-				row_map[letter_box['id']] = letter_box
-			elif letter_box['type'] == 'Letter':
-				letter_boxes.append(letter_box)
-		print(f'{len(row_boxes)} total rows')
-		print(f'{len(letter_boxes)} total letters')
-		row_boxes = sorted(row_boxes, key=lambda b: b['y2'])
-
-		added_letters = 0
-		for letter_box in letter_boxes:
-			for row_box in row_boxes:
-				if is_in_row(row_box, letter_box):
-					row_box['_letterBoxes'].append(letter_box)
-					added_letters += 1
-					break
-
-		print(f'{added_letters} letters added')
-		row_boxes = sorted(row_boxes, key=lambda r: r['id'])
-		for row_box in row_boxes:
-			print(row_box['id'] + ":", len(row_box['_letterBoxes']))
-			row_box['_letterBoxes'] = sorted(
-					row_box['_letterBoxes'], key=lambda b: b['x2'], reverse=True)
-
-	row_box = row_map.get(f'{filename}-{row}')
-	if row_box is None and 1 < row < 31:
-		print(f'Found none for {filename} Row: {row}')
-
-	return row_box
 
 
 def get_box_text(row_box, bottom, ratio):
