@@ -13,8 +13,7 @@ from matplotlib import pyplot as plt
 from multiprocessing import Pool
 from pytesseract import Output
 from scipy import stats
-from utility import image_to_boxes_data, post_process_boxes, romanize, \
-	unfinalize
+from utility import image_to_boxes_data, post_process_boxes, unfinalize
 from utility import draw_letter_boxes_and_text
 
 BEST_MODEL = 'Hebrew_Font_Embedding_Label_19'

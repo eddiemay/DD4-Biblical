@@ -6,8 +6,7 @@ import random
 import shutil
 import subprocess
 import time
-from letterbox_utils import DSSLettersDataset, TRAINING_SET, get_img_file_path, \
-	process_image, get_row
+from letterbox_utils import TRAINING_SET, get_img_file_path, process_image, get_row
 from pathlib import Path
 
 BASE_MODEL = 'Hebrew_Font_Embedding'
