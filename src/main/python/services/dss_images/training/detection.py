@@ -16,6 +16,7 @@ from letterbox_utils import DSSLettersDataset, get_img_file_path, \
 	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, \
 	get_isa_text, get_row, is_in_row, process_image
 from scipy import stats
+from train_by_labels import process
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
 VAL_IDS = ['7', '17', '27', '37', '47']
@@ -67,6 +68,11 @@ min: 55.53 max: 75.34 mean: 66.24 median: 67.15 mode: 70.0 std: 5.37 Z-Low: 55.7
 800x1600, [4,8,16,32], 5000, 12:52:47, Preprocessed Gray GBlur 3, .55 threshold
 [48.86, 54.98, 55.28, 59.67, 44.38, 59.95, 60.33, 61.92, 64.62, 61.91, 63.35, 61.34, 65.06, 65.27, 63.58, 68.88, 65.35, 44.54, 61.19, 70.89, 68.34, 65.83, 68.12, 58.2]
 min: 44.38 max: 70.89 mean: 60.91 median: 61.91 mode: 60.0 std: 6.90 Z-Low: 47.38 Z-High: 74.44
+
+800x1600, [4,8,16,32], 5000, 12:52:14, .55 threshold, 512 batch_size_per_image
+iter: 4999  total_loss: 1.027  loss_cls: 0.2344  loss_box_reg: 0.5713  loss_rpn_cls: 0.04986  loss_rpn_loc: 0.1622
+[58.43, 65.09, 54.15, 70.1, 65.6, 70.02, 71.12, 68.13, 69.96, 66.77, 67.08, 67.75, 73.04, 69.67, 64.1, 74.0, 72.6, 61.32, 72.48, 70.96, 70.7, 71.85, 77.43, 65.25]
+min: 54.15 max: 77.43 mean: 68.23 median: 69.81 mode: 70.0 std: 5.06 Z-Low: 58.32 Z-High: 78.14
 '''
 
 cfg = get_cfg()
