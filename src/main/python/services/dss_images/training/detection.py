@@ -12,11 +12,15 @@ from detectron2.config import get_cfg
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.utils.visualizer import Visualizer
+from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
+	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, \
 	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, \
 	get_isa_text, get_row, is_in_row, process_image
+from predict_letters import predict_letters
 from scipy import stats
 from train_by_labels import process
+from urllib import request
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
 VAL_IDS = ['7', '17', '27', '37', '47']
@@ -73,7 +77,88 @@ min: 44.38 max: 70.89 mean: 60.91 median: 61.91 mode: 60.0 std: 6.90 Z-Low: 47.3
 iter: 4999  total_loss: 1.027  loss_cls: 0.2344  loss_box_reg: 0.5713  loss_rpn_cls: 0.04986  loss_rpn_loc: 0.1622
 [58.43, 65.09, 54.15, 70.1, 65.6, 70.02, 71.12, 68.13, 69.96, 66.77, 67.08, 67.75, 73.04, 69.67, 64.1, 74.0, 72.6, 61.32, 72.48, 70.96, 70.7, 71.85, 77.43, 65.25]
 min: 54.15 max: 77.43 mean: 68.23 median: 69.81 mode: 70.0 std: 5.06 Z-Low: 58.32 Z-High: 78.14
+
+800x1600, [4,8,16,32]. 10000, 60:05:55, .55 threshold, 1024 batch_size_per_image
+iter: 9999  total_loss: 0.9716  loss_cls: 0.06698  loss_box_reg: 0.7344  loss_rpn_cls: 0.03224  loss_rpn_loc: 0.1369
+[54.92, 57.49, 36.02, 65.46, 72.87, 68.72, 70.32, 68.97, 67.13, 61.58, 66.11, 68.5, 68.53, 68.36, 56.7, 72.11, 73.72, 63.49, 75.79, 66.39, 64.26, 68.73, 78.38, 64.44]
+min: 36.02 max: 78.38 mean: 65.79 median: 67.75 mode: 70.0 std: 8.33 Z-Low: 49.46 Z-High: 82.12
+.80 threshold
+[63.25, 68.43, 56.75, 74.49, 72.38, 72.51, 75.75, 75.05, 75.03, 70.47, 71.43, 76.57, 74.62, 73.59, 70.47, 76.0, 79.02, 66.44, 79.9, 77.41, 75.29, 76.25, 83.61, 72.68]
+min: 56.75 max: 83.61 mean: 73.22 median: 74.56 mode: 75.0 std: 5.45 Z-Low: 62.55 Z-High: 83.90
+.85 threshold
+[62.9, 69.06, 59.19, 75.19, 70.25, 72.81, 76.11, 75.83, 76.15, 70.6, 73.08, 77.53, 75.41, 75.58, 72.39, 76.55, 79.3, 65.31, 79.5, 78.72, 77.22, 75.75, 83.56, 72.11]
+min: 59.19 max: 83.56 mean: 73.75 median: 75.50 mode: 75.0 std: 5.39 Z-Low: 63.19 Z-High: 84.32
+.90 threshold
+[62.84, 68.99, 60.89, 75.51, 66.42, 71.98, 75.14, 75.83, 76.42, 71.64, 73.5, 77.26, 76.2, 76.07, 73.5, 77.22, 78.96, 62.72, 78.71, 80.11, 79.37, 74.58, 82.67, 70.56]
+min: 60.89 max: 82.67 mean: 73.63 median: 75.33 mode: 75.0 std: 5.61 Z-Low: 62.63 Z-High: 84.63
+
+1280x2043, [4,8,16,32]. 5000, 27:06:28, .55 threshold, 1024 batch_size_per_image
+ iter: 4999  total_loss: 1.087  loss_cls: 0.1415  loss_box_reg: 0.7596  loss_rpn_cls: 0.03509  loss_rpn_loc: 0.1287
+[69.99, 72.33, 58.62, 77.04, 78.54, 75.18, 76.11, 79.49, 78.26, 72.42, 75.43, 78.7, 77.48, 78.68, 73.13, 77.89, 82.03, 76.87, 83.42, 80.39, 78.01, 78.87, 86.65, 75.98]
+min: 58.62 max: 86.65 mean: 76.73 median: 77.69 mode: 80.0 std: 5.18 Z-Low: 66.58 Z-High: 86.88
+.60 threshold
+[71.37, 73.59, 59.92, 78.94, 78.78, 75.77, 76.78, 80.86, 79.58, 73.07, 77.02, 79.67, 78.39, 79.5, 74.76, 79.11, 83.04, 77.23, 84.06, 81.22, 79.08, 79.88, 86.96, 76.92]
+min: 59.92 max: 86.96 mean: 77.73 median: 78.86 mode: 80.0 std: 5.04 Z-Low: 67.86 Z-High: 87.60
+.70 threshold
+[71.78, 75.75, 63.25, 80.79, 78.05, 76.36, 78.92, 80.73, 80.9, 74.82, 78.74, 80.57, 79.73, 80.74, 76.68, 80.45, 83.93, 77.19, 84.26, 82.67, 80.3, 80.38, 87.33, 79.48]
+min: 63.25 max: 87.33 mean: 78.91 median: 80.02 mode: 80.0 std: 4.57 Z-Low: 69.95 Z-High: 87.87
+.75 threshold
+[71.99, 76.24, 63.9, 80.85, 77.86, 76.9, 79.59, 80.6, 81.23, 75.47, 79.02, 80.57, 79.55, 81.5, 77.42, 80.33, 83.87, 76.73, 84.21, 83.58, 81.02, 80.1, 87.33, 78.98]
+min: 63.9 max: 87.33 mean: 79.12 median: 79.84 mode: 80.0 std: 4.47 Z-Low: 70.36 Z-High: 87.87
+.80 threshold
+[70.89, 76.31, 64.96, 80.92, 77.33, 77.07, 79.34, 80.73, 81.03, 75.34, 79.57, 80.63, 79.49, 81.91, 77.79, 80.76, 84.04, 76.24, 84.11, 83.78, 81.59, 79.71, 87.23, 78.29]
+min: 64.96 max: 87.23 mean: 79.13 median: 79.64 mode: 80.0 std: 4.45 Z-Low: 70.41 Z-High: 87.84
+.85 threshold
+[69.72, 74.84, 65.53, 79.64, 75.73, 75.59, 78.43, 79.49, 80.43, 74.43, 79.16, 80.01, 79.25, 81.43, 78.24, 80.09, 83.31, 74.6, 83.71, 83.85, 82.02, 78.87, 86.34, 76.48]
+min: 65.53 max: 86.34 mean: 78.38 median: 79.20 mode: 80.0 std: 4.49 Z-Low: 69.58 Z-High: 87.18
+.90 threshold
+[66.76, 72.26, 64.55, 77.29, 73.59, 74.05, 76.17, 76.88, 79.25, 73.07, 77.16, 79.12, 78.45, 79.64, 77.2, 78.87, 81.53, 71.79, 81.58, 82.54, 81.09, 77.37, 84.5, 73.42]
+min: 64.55 max: 84.5 mean: 76.59 median: 77.25 mode: 75.0 std: 4.66 Z-Low: 67.45 Z-High: 85.73
+
+1280x2043, [4,8,16,32]. 5000 + 2000, 27:06 + 11:02, .75 threshold, 1024 batch_size_per_image
+iter: 6999  total_loss: 1.009  loss_cls: 0.1029  loss_box_reg: 0.7689  loss_rpn_cls: 0.02253  loss_rpn_loc: 0.1247
+[76.81, 78.89, 64.31, 83.65, 81.15, 79.15, 80.8, 83.54, 83.6, 75.99, 80.4, 81.67, 82.53, 82.67, 78.16, 84.04, 85.71, 78.23, 86.14, 84.55, 82.88, 81.66, 89.53, 80.97]
+min: 64.31 max: 89.53 mean: 81.13 median: 81.66 mode: 80.0 std: 4.65 Z-Low: 72.02 Z-High: 90.23
+.70 threshold
+[76.39, 77.49, 62.93, 82.95, 81.4, 78.44, 80.32, 82.23, 83.07, 75.34, 79.64, 81.32, 82.11, 81.57, 76.91, 82.89, 84.77, 78.46, 86.39, 83.51, 81.52, 81.49, 88.9, 79.73]
+min: 62.93 max: 88.9 mean: 80.41 median: 81.44 mode: 80.0 std: 4.76 Z-Low: 71.07 Z-High: 89.75
+.80 threshold
+[76.6, 79.79, 65.53, 83.91, 80.43, 79.44, 81.17, 83.8, 83.99, 76.77, 81.23, 82.29, 82.78, 83.15, 78.68, 84.77, 86.33, 77.87, 86.14, 84.82, 83.6, 81.66, 89.53, 81.22]
+min: 65.53 max: 89.53 mean: 81.48 median: 81.97 mode: 80.0 std: 4.51 Z-Low: 72.63 Z-High: 90.33
+.85 threshold
+[75.91, 79.58, 66.42, 83.65, 79.07, 79.5, 80.87, 83.93, 83.53, 76.64, 81.09, 82.36, 82.41, 83.15, 78.83, 84.9, 85.66, 76.87, 86.04, 85.52, 84.24, 81.38, 88.8, 80.1]
+min: 66.42 max: 88.8 mean: 81.27 median: 81.87 mode: 80.0 std: 4.43 Z-Low: 72.59 Z-High: 89.95
+
+1280x2043, [4,8,16,32]. 7000 + 777, 38:08, .80 threshold, 1024 batch_size_per_image
+iter: 7776  total_loss: 0.996  loss_cls: 0.09002  loss_box_reg: 0.7619  loss_rpn_cls: 0.0229  loss_rpn_loc: 0.126
+[78.32, 82.37, 67.32, 83.78, 82.36, 80.86, 82.94, 83.8, 83.33, 78.33, 82.19, 83.8, 84.66, 84.94, 77.72, 84.53, 86.83, 78.23, 86.53, 85.38, 86.03, 82.72, 90.37, 83.28]
+min: 67.32 max: 90.37 mean: 82.53 median: 83.31 mode: 85.0 std: 4.32 Z-Low: 74.06 Z-High: 91.00
+.85 threshold
+[77.7, 82.37, 67.8, 83.91, 81.4, 80.69, 82.57, 84.19, 83.66, 78.13, 82.4, 84.42, 85.03, 85.76, 78.9, 85.26, 86.94, 77.78, 86.44, 86.35, 85.96, 82.55, 90.94, 83.34]
+min: 67.8 max: 90.94 mean: 82.69 median: 83.50 mode: 85.0 std: 4.40 Z-Low: 74.05 Z-High: 91.32
+.90 threshold
+[75.02, 81.05, 68.13, 83.65, 79.75, 79.98, 81.66, 84.06, 83.14, 77.22, 81.92, 84.22, 84.42, 85.21, 78.83, 84.71, 86.33, 75.42, 86.14, 86.97, 86.03, 81.55, 89.42, 81.66]
+min: 68.13 max: 89.42 mean: 81.94 median: 82.53 mode: 85.0 std: 4.55 Z-Low: 73.02 Z-High: 90.85
+
+1280x2043, [4,8,16,32]. 7777 + 2333, 38:08, .90 threshold, 2048 batch_size_per_image
+iter: 9999  total_loss: 0.9209  loss_cls: 0.04377  loss_box_reg: 0.726  loss_rpn_cls: 0.02629  loss_rpn_loc: 0.1188
+.95 threshold
+[76.19, 81.53, 65.04, 84.1, 78.88, 78.91, 81.72, 83.02, 83.79, 75.47, 80.4, 83.74, 83.69, 83.7, 76.83, 84.17, 85.44, 73.56, 86.73, 85.03, 84.38, 80.6, 88.27, 81.72]
+min: 65.04 max: 88.27 mean: 81.12 median: 82.37 mode: 85.0 std: 4.91 Z-Low: 71.50 Z-High: 90.74
+.90 threshold
+[78.05, 81.46, 64.47, 84.41, 81.3, 79.92, 82.75, 83.54, 84.06, 76.18, 80.95, 83.8, 84.24, 83.84, 78.09, 84.84, 86.44, 76.46, 87.43, 84.2, 84.24, 82.72, 89.53, 82.84]
+min: 64.47 max: 89.53 mean: 81.91 median: 83.19 mode: 85.0 std: 4.82 Z-Low: 72.45 Z-High: 91.36
+.85 threshold
+[77.43, 80.56, 63.25, 84.1, 81.88, 79.56, 81.78, 82.69, 83.14, 76.25, 79.92, 83.18, 83.26, 83.08, 76.83, 83.98, 86.33, 77.96, 86.83, 83.44, 83.09, 81.66, 89.74, 83.66]
+min: 63.25 max: 89.74 mean: 81.40 median: 82.88 mode: 85.0 std: 4.89 Z-Low: 71.81 Z-High: 90.99
+.8 threshold
+[76.88, 79.44, 61.46, 82.63, 81.54, 78.85, 81.29, 81.58, 82.35, 75.02, 79.09, 82.43, 82.11, 81.71, 75.8, 82.76, 85.71, 78.23, 86.83, 81.64, 81.88, 81.44, 89.42, 82.41]
+min: 61.46 max: 89.42 mean: 80.52 median: 81.61 mode: 80.0 std: 5.07 Z-Low: 70.58 Z-High: 90.46
+.75 threshold
+[72.68, 75.4, 60.73, 79.26, 78.88, 76.48, 78.12, 78.51, 78.85, 73.98, 76.95, 80.22, 79.49, 79.44, 75.35, 80.39, 84.6, 78.87, 85.3, 78.31, 78.8, 81.72, 88.69, 78.35]
+min: 60.73 max: 88.69 mean: 78.31 median: 78.82 mode: 80.0 std: 5.01 Z-Low: 68.49 Z-High: 88.13
 '''
+threshold = .90
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -203,7 +288,7 @@ def setup_data(preprocessor):
 		json.dump(val_conf, f, indent=True)
 
 
-def train(iters, preprocessor, samples=False):
+def train(iters, preprocessor, samples=False, resume=False):
 	setup_samples(preprocessor) if samples else setup_data(preprocessor)
 
 	register_coco_instances(
@@ -224,7 +309,7 @@ def train(iters, preprocessor, samples=False):
 	cfg.DATASETS.TEST = ("dss_val",)
 
 	cfg.SOLVER.IMS_PER_BATCH = 1
-	cfg.SOLVER.BASE_LR = 0.00025
+	cfg.SOLVER.BASE_LR = 0.000125
 	# cfg.SOLVER.STEPS = (12000, 16000)
 	# cfg.SOLVER.GAMMA = 0.1
 
@@ -233,14 +318,13 @@ def train(iters, preprocessor, samples=False):
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
 	trainer = DefaultTrainer(cfg)
-	trainer.resume_or_load(resume=False)
+	trainer.resume_or_load(resume=resume)
 	trainer.train()
 
 
-def evaluate(test_id, display=True, model="model_final.pth",
-		preprocessor=None):
+def predict(test_id, display=True, model="model_final.pth", preprocessor=None):
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/{model}'
-	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.55
+	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
 	cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 12000
 	cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 6000
 	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
@@ -253,22 +337,21 @@ def evaluate(test_id, display=True, model="model_final.pth",
 		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 	outputs = predictor(image)
 	# print(outputs)
-	print(f'Prediction took {time.time() - start_time} seconds')
+	print(f'Prediction took {time.time() - start_time:.1f} seconds')
 
 	instances = outputs["instances"].to("cpu")
 	if len(instances.pred_boxes) == 0:
-		return 0
+		return None, None
 
 	boxes = instances.pred_boxes.tensor.numpy()
 	classes = instances.pred_classes.numpy()
 
-	test_file = f'isaiah-column-{test_id}'
+	fragment = f'isaiah-column-{test_id}'
 	letter_boxes = []
 	for box, cls in zip(boxes, classes):
 		x1, y1, x2, y2 = map(int, box)
-
 		letter_boxes.append({
-			"filename": test_file,
+			"filename": fragment,
 			"type": "Letter",
 			"x1": x1,
 			"y1": y1,
@@ -277,23 +360,43 @@ def evaluate(test_id, display=True, model="model_final.pth",
 			"value": LABEL_LOOKUP[cls]
 		})
 
+	if display:
+		v = Visualizer(image[:, :, ::-1], scale=1.0)
+		out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+		plt.imshow(out.get_image()[:, :, ::-1])
+		plt.show()
+
+	return outputs, letter_boxes
+
+
+def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None):
+	fragment = f'isaiah-column-{test_id}'
+	outputs, letter_boxes = predict(test_id, display, model, preprocessor)
+	predict_letters(letter_boxes)
+
 	dataset = DSSLettersDataset(
-			fragments=[test_file],
+			fragments=[fragment], overrides=[fragment],
 			filter=lambda letter_box: letter_box['type'] == 'Row')
 	row_boxes = []
 	for _, _, row_box in dataset:
 		row_box['_letterBoxes'] = []
 		row_box['_text'] = ''
+		row_box['_predict_text'] = ''
 		row_boxes.append(row_box)
 
 	added_letters = 0
+	matching_predictions = 0
 	for letter_box in sorted(letter_boxes, key=lambda x: x['x2'], reverse=True):
+		if letter_box['value'] == letter_box['_predicted']:
+			matching_predictions += 1
 		for row_box in row_boxes:
 			if is_in_row(row_box, letter_box):
 				if len(row_box['_letterBoxes']) > 0 and (
 						row_box['_letterBoxes'][-1]['x1'] - letter_box['x2'] >= 5):
 					row_box['_text'] += ' '
+					row_box['_predict_text'] += ' '
 				row_box['_text'] += letter_box['value']
+				row_box['_predict_text'] += letter_box['_predicted']
 				row_box['_letterBoxes'].append(letter_box)
 				added_letters += 1
 				break
@@ -301,31 +404,72 @@ def evaluate(test_id, display=True, model="model_final.pth",
 
 	target_text = get_isa_text(test_id)
 	pred_text = ''
+	repred_text = ''
 	for row_box in row_boxes:
 		pred_text += row_box['_text'] + '\n'
+		repred_text += row_box['_predict_text'] + '\n'
 
 	ld = Levenshtein.distance(target_text, pred_text)
 	percent = round((len(target_text) - ld) * 100 / len(target_text), 2)
-	print(f"{test_id} Diff: {ld}, {percent}%")
+	rp_ld = Levenshtein.distance(target_text, repred_text)
+	rp_percent = round((len(target_text) - rp_ld) * 100 / len(target_text), 2)
+	print(f"{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%",
+				f'Prediction Diff: {len(letter_boxes)-matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
 		print('\nTarget Text:\n', target_text)
 		print('Pred Text:\n', pred_text)
-		v = Visualizer(image[:, :, ::-1], scale=1.0)
-		out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-		plt.imshow(out.get_image()[:, :, ::-1])
-		plt.show()
 
-	return percent
+	return percent, rp_percent
+
+
+def label_fragment(test_id, model="model_final.pth", preprocessor=None):
+	fragment = f'isaiah-column-{test_id}'
+	_, letter_boxes = predict(test_id, model=model, preprocessor=preprocessor)
+
+	# Get the list of existing letter boxes, if there are any.
+	letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
+	print('Sending request: ', letterbox_url)
+	row_ids = []
+	letter_ids = []
+	with request.urlopen(letterbox_url) as url:
+		response = json.load(url)
+		print('Response: ', response)
+		letterboxes = response.get('items')
+		if letterboxes is not None:
+			for letterbox in letterboxes:
+				if letterbox['type'] == 'Row':
+					row_ids.append(letterbox['id'])
+				elif letterbox['type'] == 'Letter':
+					letter_ids.append(letterbox['id'])
+		else:
+			print(f'No existing letter boxes for {fragment}, continuing...')
+
+	# Delete old letter boxes and create the new ones.
+	send_json_req(LETTERBOX_BATCH_DELETE_URL, {'items': letter_ids})
+	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': letter_boxes})
+
 
 
 def verify(model="model_final.pth", preprocessor=None):
 	percents = []
+	rp_percents = []
 	for c in [2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27, 29, 36, 37,
-						40, 44, 45, 47, 48, 53]:
-		percents.append(evaluate(c, False, model, preprocessor=preprocessor))
+						40, 44, 45, 47, 48, 50, 53]:
+		result = evaluate(c, False, model, preprocessor=preprocessor)
+		percents.append(result[0])
+		rp_percents.append(result[1])
+
 	print(percents)
 	percents = np.array(percents)
+	mean, std = percents.mean(), percents.std()
+	print('min:', percents.min(), 'max:', percents.max(),
+				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
+				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
+	print(rp_percents)
+	percents = np.array(rp_percents)
 	mean, std = percents.mean(), percents.std()
 	print('min:', percents.min(), 'max:', percents.max(),
 				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
@@ -338,24 +482,30 @@ if __name__ == '__main__':
 	parser.add_argument('--preprocess', action='store_true')
 	parser.add_argument('--iters', type=int, default=5000)
 	parser.add_argument('--samples', action='store_true')
-	parser.add_argument('--batch_size_per_image', type=int, default=1024)
+	parser.add_argument('--max_size', type=int, default=2043)
+	parser.add_argument('--resume', action='store_true')
+	parser.add_argument('--train', action='store_true')
+	parser.add_argument('--batch_size_per_image', type=int, default=2048)
 
 	args = parser.parse_args()
 	pp = preprocessor if args.preprocess else {}
 	cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = args.batch_size_per_image
 	samples = args.samples
 	if not samples:
-		cfg.INPUT.MIN_SIZE_TRAIN = (800,)  # or (1024,) or  (1280,)
-		cfg.INPUT.MAX_SIZE_TRAIN = 1600  # or 2500 or 3000
-		cfg.INPUT.MIN_SIZE_TEST = 800
-		cfg.INPUT.MAX_SIZE_TEST = 1600
+		cfg.INPUT.MIN_SIZE_TRAIN = (1280,)  # (1024,) or (1280,)
+		cfg.INPUT.MAX_SIZE_TRAIN = args.max_size  # 2043 or 1600
+		cfg.INPUT.MIN_SIZE_TEST = 1280
+		cfg.INPUT.MAX_SIZE_TEST = args.max_size
 	else:
 		cfg.INPUT.MIN_SIZE_TRAIN = (512,)
 		cfg.INPUT.MAX_SIZE_TRAIN = 1280
 		cfg.INPUT.MIN_SIZE_TEST = 512
 		cfg.INPUT.MAX_SIZE_TEST = 1280
 
-	train(args.iters, preprocessor=pp, samples=samples)
+	if args.train or args.resume:
+		train(args.iters, preprocessor=pp, samples=samples, resume=args.resume)
+
 	# verify('model_final_50_5000.pth', preprocessor=pp)
-	verify('model_final.pth', preprocessor=pp)
-	evaluate(48, True, preprocessor=pp)
+	# verify('model_final.pth', preprocessor=pp)
+	evaluate(6, True, preprocessor=pp)
+	# label_fragment(6, preprocessor=pp)

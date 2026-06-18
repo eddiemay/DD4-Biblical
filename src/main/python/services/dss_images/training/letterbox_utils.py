@@ -16,11 +16,13 @@ LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pa
 TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
 												[2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27,
 												 29, 36, 37, 40, 44, 45, 47, 48, 53]))
-# Not represented 31-33, 37-39, 49-51
-# Next up 11, 37 then 32, 34, 50
+# Not represented 5-6, 21-22, 41-42, 51-52
+# Next up 6, 22. 42, 52
 ALL = TRAINING_SET.copy()
-ALL.extend(['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2',
-						'4QCalendrical-4Q320-Frag3', 'temple-column-4'])
+ALL.extend(
+		['isaiah-column-32', 'isaiah-column-34', 'isaiah-column-50',
+		 '4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3',
+		 'temple-column-4'])
 # ALL.extend(list(map(lambda c: f'isaiah-column-{c}', [34, 50])))
 SINGLE_LETTERS_ONLY = \
 	lambda letter_box: letter_box['type'] == 'Letter' and len(
