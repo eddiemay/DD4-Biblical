@@ -161,7 +161,9 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
     if (event.key == 'd' || event.key == 'D') {
       var deleteBox = this.selectedBox;
       this.letterBoxService.Delete(deleteBox.id, result => {
-        if (deleteBox.type == 'Letter') {
+       if (deleteBox.type == 'Row') {
+          this.rows.splice(this.rows.indexOf(deleteBox), 1);
+        } else {
           // Remove the letter from the list.
           this.letterBoxes.splice(this.letterBoxes.indexOf(deleteBox), 1);
 
@@ -173,8 +175,6 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function(
           if (deleteBox._row) {
             deleteBox._row._letterBoxes.splice(deleteBox._row._letterBoxes.indexOf(deleteBox), 1);
           }
-        } else if (deleteBox.type == 'Row') {
-          this.rows.splice(this.rows.indexOf(deleteBox), 1);
         }
         this.selectedBox = undefined;
         this.drawScroll();
@@ -256,31 +256,28 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveBox = function(saveBox) {
   }
 
   saveBox._state = 'saving';
-  if (saveBox.type == 'Letter') {
-    this.addLetterStat(saveBox);
-  } else {
+  if (saveBox.type == 'Row') {
     this.rows.forEach(row => row._letterBoxes = []);
     this.letterBoxes.forEach(letterBox => {
       letterBox._row = undefined;
       this.addLetterStat(letterBox);
     });
+  } else {
+    saveBox.type = saveBox.value.length == 1 ? 'Letter' : 'Word';
+    this.addLetterStat(saveBox);
   }
 
   if (saveBox.coords) {
     saveBox.x1 = saveBox.coords[0].x;
     saveBox.x2 = saveBox.coords[saveBox.coords.length - 1].x;
 
+    saveBox.y1 = saveBox.coords[0].y;
     saveBox.y2 = saveBox.coords[0].y;
     saveBox.coords.forEach(coord => {
-      if (coord.y > saveBox.y2) {
+      if (coord.y < saveBox.y1) {
+        saveBox.y1 = coord.y;
+      } else if (coord.y > saveBox.y2) {
         saveBox.y2 = coord.y;
-      }
-    });
-
-    saveBox.y1 = saveBox.y2 - 10;
-    saveBox._letterBoxes.forEach(letterBox => {
-      if (letterBox.y1 - 1 < saveBox.y1) {
-        saveBox.y1 = letterBox.y1 - 1;
       }
     });
   }
@@ -299,9 +296,6 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.saveBox = function(saveBox) {
     saveBox._row = _row;
     saveBox._letterBoxes = _letterBoxes;
     this.drawScroll();
-    if (_row && saveBox.y1 < _row.y1) {
-      this.saveBox(_row);
-    }
   }, error => {
     saveBox._state = 'error';
     notifyError(error);
@@ -349,11 +343,11 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
         letterBox.x1 += 12;
         letterBox.x2 += 12;
       } */
-      if (letterBox.type == 'Letter') {
-        this.letterBoxes.push(letterBox);
-      } else if (letterBox.type == 'Row') {
+      if (letterBox.type == 'Row') {
         letterBox._letterBoxes = [];
         this.rows.push(letterBox);
+      } else {
+        this.letterBoxes.push(letterBox);
       }
     });
     this.letterBoxes.forEach(letterBox => this.addLetterStat(letterBox));
@@ -363,17 +357,19 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.refresh = function() {
 
     this.rows.forEach(row => {
       var origY1 = row.y1;
-      row.y1 = row.y2 - 10;
-      row._letterBoxes.forEach(letterBox => {
-        if (letterBox.y1 - 1 < row.y1) {
-          row.y1 = letterBox.y1 - 1;
+      var miny = row.coords[0].y;
+      row.coords.forEach(coord => {
+        if (coord.y < miny) {
+          miny = coord.y;
         }
       });
-      if (origY1 != row.y1) {
-        console.log("origY1: " + origY1 + " updated: " + row.y1);
+
+      if (origY1 != miny) {
+        console.log("origY1: " + origY1 + " updated: " + miny);
         this.saveBox(row);
       }
     });
+
     this.updateTranslation();
   });
 
@@ -487,22 +483,18 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.drawScroll = function() {
     if (this.showRowBoxes || this.selectedBox == row) {
       ctx.beginPath();
       ctx.strokeStyle = this.selectedBox == row ? 'blue' : 'black';
-      if (row.coords) {
-        var lastCoord = undefined;
-        row.coords.forEach(coord => {
-          ctx.arc(coord.x, coord.y, 5, 0, 2 * Math.PI);
-          if (this.selectedCoord == coord) {
-            ctx.arc(coord.x, coord.y, 7, 0, 2 * Math.PI);
-          }
-          if (lastCoord) {
-            ctx.moveTo(lastCoord.x, lastCoord.y);
-            ctx.lineTo(coord.x, coord.y);
-          }
-          lastCoord = coord;
-        });
-      } else {
-        this.ctx.rect(row.x1, row.y1, row.x2 - row.x1, row.y2 - row.y1);
-      }
+      var lastCoord = undefined;
+      row.coords.forEach(coord => {
+        ctx.arc(coord.x, coord.y, 5, 0, 2 * Math.PI);
+        if (this.selectedCoord == coord) {
+          ctx.arc(coord.x, coord.y, 7, 0, 2 * Math.PI);
+        }
+        if (lastCoord) {
+          ctx.moveTo(lastCoord.x, lastCoord.y);
+          ctx.lineTo(coord.x, coord.y);
+        }
+        lastCoord = coord;
+      });
       ctx.stroke();
     }
   });
@@ -573,9 +565,10 @@ function includesBox(row, letterBox) {
     var ci = 0;
     while (row.coords.length > ci + 1 && row.coords[ci + 1].x <= letterBox.x1) {
       ci++;
-      if (ci == row.coords.length) {
-        console.log('got here, letterBox: ' + letterBox + ' row: ' + row);
-      }
+    }
+    if (ci == row.coords.length - 1) {
+      console.log('got here, letterBox: ' + letterBox + ' row: ' + row);
+      return false;
     }
     var slope = (row.coords[ci + 1].y - row.coords[ci].y) / (row.coords[ci + 1].x - row.coords[ci].x)
     yAtX = (letterBox.x1 - row.coords[ci].x) * slope + row.coords[ci].y;
@@ -585,24 +578,26 @@ function includesBox(row, letterBox) {
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(letterBox) {
-  if (letterBox.type != 'Letter') {
+  if (letterBox.type == 'Row') {
     return;
   }
 
-  var stats = this.statMap[letterBox.value];
-  if (!stats) {
-    stats = {letterBoxes: []};
-    this.statMap[letterBox.value] = stats;
-  }
-  if (stats.letterBoxes.indexOf(letterBox) == -1) {
-    stats.letterBoxes.push(letterBox);
+  if (letterBox.type != 'Letter') {
+    var stats = this.statMap[letterBox.value];
+    if (!stats) {
+      stats = {letterBoxes: []};
+      this.statMap[letterBox.value] = stats;
+    }
+    if (stats.letterBoxes.indexOf(letterBox) == -1) {
+      stats.letterBoxes.push(letterBox);
+    }
   }
 
   if (letterBox._row) {
     letterBox._row._letterBoxes.splice(letterBox._row._letterBoxes.indexOf(letterBox), 1);
   }
 
-  var rows = this.rows.slice().sort((a, b) => Number(a.y2) - Number(b.y2));
+  var rows = this.rows.slice().sort((a, b) => Number(a.y1) - Number(b.y1));
   for (var r = 0; r < rows.length; r++) {
     var row = rows[r];
     if (includesBox(row, letterBox)) {
@@ -665,11 +660,16 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.getRowText = function(row) {
   var text = '';
   var lastX1 = undefined;
   row._letterBoxes.forEach(letterBox => {
-    if (lastX1 && (lastX1 - letterBox.x2) >= 5) {
-      text += ' ';
+    if (letterBox.type == 'Word') {
+      text += ' ' + letterBox.value + ' ';
+      lastX1 = undefined;
+    } else {
+      if (lastX1 && (lastX1 - letterBox.x2) >= 5) {
+        text += ' ';
+      }
+      text += letterBox.value;
+      lastX1 = letterBox.x1;
     }
-    text += letterBox.value;
-    lastX1 = letterBox.x1;
   });
   return text;
 }

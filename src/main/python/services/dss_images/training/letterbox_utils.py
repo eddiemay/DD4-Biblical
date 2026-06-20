@@ -18,15 +18,12 @@ TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
 												 29, 36, 37, 40, 44, 45, 47, 48, 53]))
 # Not represented 5-6, 21-22, 41-42, 51-52
 # Next up 6, 22. 42, 52
-ALL = TRAINING_SET.copy()
+ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
+ALL = ISAIAH_SET.copy()
 ALL.extend(
-		['isaiah-column-32', 'isaiah-column-34', 'isaiah-column-50',
-		 '4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3',
-		 'temple-column-4'])
-# ALL.extend(list(map(lambda c: f'isaiah-column-{c}', [34, 50])))
-SINGLE_LETTERS_ONLY = \
-	lambda letter_box: letter_box['type'] == 'Letter' and len(
-			letter_box['value']) == 1
+		['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2',
+		 '4QCalendrical-4Q320-Frag3', 'temple-column-4'])
+SINGLE_LETTERS_ONLY = lambda lb:lb['type'] == 'Letter' and len(lb['value']) == 1
 mean, std = (0.5,), (0.5,)
 LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
 THRESHOLD_NAMES = {
@@ -201,7 +198,7 @@ def read_database(fragments: list[str], overrides: list[str],
 			with request.urlopen(letterbox_url) as url:
 				response = json.load(url)
 				print('Response: ', response)
-				db[fragment] = response['items']
+				db[fragment] = response.get('items', [])
 
 		for letter_box in db[fragment]:
 			if filter is None or filter(letter_box):
@@ -347,6 +344,18 @@ if __name__ == '__main__':
 		cv2.imshow(
 			f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})",
 			image)
+		cv2.waitKey(2000)
+
+	multiLetter = DSSLettersDataset(
+			fragments=ALL,
+			filter=lambda lb: lb['type'] == 'Letter' and len(lb['value']) > 1)
+	print(f'Multi Letter Sets: {len(multiLetter)}')
+	for i in range(len(multiLetter)):
+		image, label, metadata = multiLetter[i]
+		print(f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})")
+		cv2.imshow(
+				f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})",
+				image)
 		cv2.waitKey(2000)
 
 	image = get_image(

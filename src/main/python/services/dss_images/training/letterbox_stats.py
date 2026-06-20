@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
 from PIL import Image as PilImage
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ALL, parse_file_name
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ALL, parse_file_name, ISAIAH_SET
 
 VISUALIZE_PAGE_SIZE = 24
 pd.set_option("display.max_columns", None)
@@ -51,7 +51,7 @@ def find_abnormals(letter, df, prop):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
+  dataset = DSSLettersDataset(fragments=ISAIAH_SET, filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} letters')
   letters = []
   for img, label, metadata in dataset:

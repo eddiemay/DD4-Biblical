@@ -369,19 +369,21 @@ def predict(test_id, display=True, model="model_final.pth", preprocessor=None):
 	return outputs, letter_boxes
 
 
-def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None):
+def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None,
+		override=False):
 	fragment = f'isaiah-column-{test_id}'
 	outputs, letter_boxes = predict(test_id, display, model, preprocessor)
 	predict_letters(letter_boxes)
 
 	dataset = DSSLettersDataset(
-			fragments=[fragment], overrides=[fragment],
+			fragments=[fragment], overrides=[fragment] if override else [],
 			filter=lambda letter_box: letter_box['type'] == 'Row')
 	row_boxes = []
 	for _, _, row_box in dataset:
 		row_box['_letterBoxes'] = []
 		row_box['_text'] = ''
 		row_box['_predict_text'] = ''
+		row_box['_remove_mismatch_text'] = ''
 		row_boxes.append(row_box)
 
 	added_letters = 0
@@ -390,6 +392,7 @@ def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None):
 		if letter_box['value'] == letter_box['_predicted']:
 			matching_predictions += 1
 		for row_box in row_boxes:
+			last_non_removed = None
 			if is_in_row(row_box, letter_box):
 				if len(row_box['_letterBoxes']) > 0 and (
 						row_box['_letterBoxes'][-1]['x1'] - letter_box['x2'] >= 5):
@@ -397,6 +400,11 @@ def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None):
 					row_box['_predict_text'] += ' '
 				row_box['_text'] += letter_box['value']
 				row_box['_predict_text'] += letter_box['_predicted']
+				if letter_box['value'] == letter_box['_predicted']:
+					if last_non_removed != None and last_non_removed['x1'] - letter_box['x2'] >= 5:
+						row_box['_remove_mismatch_text'] = ' '
+					row_box['_remove_mismatch_text'] += letter_box['value']
+					last_non_removed = letter_box
 				row_box['_letterBoxes'].append(letter_box)
 				added_letters += 1
 				break
@@ -405,22 +413,26 @@ def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None):
 	target_text = get_isa_text(test_id)
 	pred_text = ''
 	repred_text = ''
+	remove_mismatch_text = ''
 	for row_box in row_boxes:
 		pred_text += row_box['_text'] + '\n'
 		repred_text += row_box['_predict_text'] + '\n'
+		remove_mismatch_text += row_box['_remove_mismatch_text'] + '\n'
 
 	ld = Levenshtein.distance(target_text, pred_text)
 	percent = round((len(target_text) - ld) * 100 / len(target_text), 2)
 	rp_ld = Levenshtein.distance(target_text, repred_text)
 	rp_percent = round((len(target_text) - rp_ld) * 100 / len(target_text), 2)
-	print(f"{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%",
+	rm_ld = Levenshtein.distance(target_text, remove_mismatch_text)
+	rm_percent = round((len(target_text) - rm_ld) * 100 / len(target_text), 2)
+	print(f"{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%, Remove Miss Diff: {rm_ld} {rm_percent}%",
 				f'Prediction Diff: {len(letter_boxes)-matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
 		print('\nTarget Text:\n', target_text)
 		print('Pred Text:\n', pred_text)
 
-	return percent, rp_percent
+	return percent, rp_percent, rm_percent
 
 
 def label_fragment(test_id, model="model_final.pth", preprocessor=None):
@@ -454,11 +466,12 @@ def label_fragment(test_id, model="model_final.pth", preprocessor=None):
 def verify(model="model_final.pth", preprocessor=None):
 	percents = []
 	rp_percents = []
-	for c in [2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27, 29, 36, 37,
-						40, 44, 45, 47, 48, 50, 53]:
-		result = evaluate(c, False, model, preprocessor=preprocessor)
+	rm_percents = []
+	for c in range(54):
+		result = evaluate(c + 1, False, model, preprocessor=preprocessor)
 		percents.append(result[0])
 		rp_percents.append(result[1])
+		rm_percents.append(result[2])
 
 	print(percents)
 	percents = np.array(percents)
@@ -470,6 +483,14 @@ def verify(model="model_final.pth", preprocessor=None):
 
 	print(rp_percents)
 	percents = np.array(rp_percents)
+	mean, std = percents.mean(), percents.std()
+	print('min:', percents.min(), 'max:', percents.max(),
+				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
+				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
+	print(rm_percents)
+	percents = np.array(rm_percents)
 	mean, std = percents.mean(), percents.std()
 	print('min:', percents.min(), 'max:', percents.max(),
 				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
@@ -506,6 +527,9 @@ if __name__ == '__main__':
 		train(args.iters, preprocessor=pp, samples=samples, resume=args.resume)
 
 	# verify('model_final_50_5000.pth', preprocessor=pp)
-	# verify('model_final.pth', preprocessor=pp)
-	evaluate(6, True, preprocessor=pp)
-	# label_fragment(6, preprocessor=pp)
+	verify('model_final.pth', preprocessor=pp)
+	# evaluate(37, False, preprocessor=pp)
+	# evaluate(41, True, preprocessor=pp, override=True)
+	# evaluate(43, True, preprocessor=pp, override=True)
+	# label_fragment(41, preprocessor=pp)
+	# label_fragment(43, preprocessor=pp)

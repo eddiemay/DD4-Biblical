@@ -109,9 +109,9 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 2, res=5)
     # construct_column(Collection.TORAH, 1, res=5)
 
-    # for res in range(8, 11):
-        # construct_column(Collection.ISAIAH, 29, res)
-    # cv2.waitKey(0)
+    for res in range(8, 11):
+        construct_column(Collection.ISAIAH, 22, res)
+    cv2.waitKey(0)
 
     # for c in range(1, 16):
       # construct_column(Collection.WAR, c)
@@ -119,8 +119,8 @@ if __name__ == '__main__':
     # for c in range(1, 12):
         # construct_column(Collection.COMMUNITY_RULE, c)
 
-    for c in range(2, 68):
-        construct_column(Collection.TEMPLE_SCROLL, c, res=9)
+    # for c in range(2, 68):
+        # construct_column(Collection.TEMPLE_SCROLL, c, res=9)
     # construct_column(Collection.TEMPLE_SCROLL, 4, res=9)
 
     # for c in range(1, 15):
