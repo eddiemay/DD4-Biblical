@@ -582,7 +582,7 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.addLetterStat = function(lett
     return;
   }
 
-  if (letterBox.type != 'Letter') {
+  if (letterBox.type == 'Letter') {
     var stats = this.statMap[letterBox.value];
     if (!stats) {
       stats = {letterBoxes: []};
