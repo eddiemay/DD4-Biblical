@@ -62,6 +62,8 @@ if __name__ == '__main__':
   df["width"] = df["x2"] - df["x1"]
   df["height"] = df["y2"] - df["y1"]
 
+  print("Min Y: ", df["y1"].min(), "Max Y: ", df["y2"].max())
+
   print(df['value'].value_counts())
 
   find_abnormals("all", df, 'width')

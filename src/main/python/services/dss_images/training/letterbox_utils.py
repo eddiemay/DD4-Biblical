@@ -16,8 +16,8 @@ LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pa
 TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
 												[2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27,
 												 29, 36, 37, 40, 44, 45, 47, 48, 53]))
-# Not represented 5-6, 21-22, 41-42, 51-52
-# Next up 6, 22. 42, 52
+# Not represented
+# 1, 54, 31, 51, 8, 5, 33, 25, 19, 28, 30, 15, 23, 35, 21, 46
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
 ALL = ISAIAH_SET.copy()
 ALL.extend(
@@ -197,7 +197,6 @@ def read_database(fragments: list[str], overrides: list[str],
 			print('Sending request: ', letterbox_url)
 			with request.urlopen(letterbox_url) as url:
 				response = json.load(url)
-				print('Response: ', response)
 				db[fragment] = response.get('items', [])
 
 		for letter_box in db[fragment]:
@@ -274,9 +273,8 @@ def is_in_row(row_box, letter_box):
 
 	return yAtX >= letter_box['y2']
 
+
 row_map = {}
-
-
 def get_row(filename, row):
 	if not row_map:
 		print('creating row map')
