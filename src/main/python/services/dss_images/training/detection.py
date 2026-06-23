@@ -227,10 +227,10 @@ def setup_samples(preprocessor=None):
 			if r % 7 == 1:
 				append_data(conf, {'fragment': frag, 'srow': r, 'erow': r + 6,
 													 'preprocessor': preprocessor})
-			# if r % 10 == 1 and row_30 is not None:
-			# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
-			# if r % 14 == 1 and row_30 is None:
-			# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
+		# if r % 10 == 1 and row_30 is not None:
+		# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
+		# if r % 14 == 1 and row_30 is None:
+		# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
 
 	print(f'Files creation time: {time.time() - image_start} seconds')
 
@@ -358,7 +358,7 @@ def predict(predictor, test_id, display=True, preprocessor=None):
 
 	predict_letters(letter_boxes)
 	nms = []
-	for box in sorted(letter_boxes, key=lambda b:b["_score"], reverse=True):
+	for box in sorted(letter_boxes, key=lambda b: b["_score"], reverse=True):
 		keep = True
 		for kept in nms:
 			if intersection_over_union(box, kept) > 0.225:
@@ -389,7 +389,8 @@ def predict(predictor, test_id, display=True, preprocessor=None):
 def evaluate(predictor, test_id, display=True, preprocessor=None,
 		override=False):
 	fragment = f'isaiah-column-{test_id}'
-	outputs, letter_boxes, nms = predict(predictor, test_id, display, preprocessor)
+	outputs, letter_boxes, nms = predict(predictor, test_id, display,
+																			 preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [],
@@ -408,7 +409,7 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 
 	added_letters = 0
 	matching_predictions = 0
-	for letter_box in sorted(letter_boxes, key=lambda x:x['x2'], reverse=True):
+	for letter_box in sorted(letter_boxes, key=lambda x: x['x2'], reverse=True):
 		if letter_box['value'] == letter_box['_predicted']:
 			matching_predictions += 1
 		for row_box in row_boxes:
@@ -420,7 +421,8 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 				row_box['_text'] += letter_box['value']
 				row_box['_predict_text'] += letter_box['_predicted']
 				if letter_box['value'] == letter_box['_predicted']:
-					if row_box.get('_last_non_removed') != None and row_box['_last_non_removed']['x1'] - letter_box['x2'] >= 5:
+					if row_box.get('_last_non_removed') != None and \
+							row_box['_last_non_removed']['x1'] - letter_box['x2'] >= 5:
 						row_box['_remove_mismatch_text'] += ' '
 					row_box['_remove_mismatch_text'] += letter_box['value']
 					row_box['_last_non_removed'] = letter_box
@@ -433,9 +435,10 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 					# min: 0.0 max: 91.26 mean: 79.26 median: 80.84 mode: 80.0 std: 12.51 Z-Low: 54.74 Z-High: 103.78
 					# .33 [0.0, 80.52, 66.95, 84.88, 76.32, 77.66, 68.13, 76.03, 87.15, 76.3, 80.62, 83.29, 84.58, 86.54, 79.17, 87.09, 78.2, 85.51, 78.27, 86.63, 81.62, 82.44, 80.31, 87.16, 79.26, 87.28, 81.64, 77.79, 86.91, 78.39, 69.32, 72.25, 75.7, 79.44, 80.29, 88.78, 78.87, 83.16, 85.49, 88.61, 79.64, 81.98, 81.73, 88.22, 87.39, 80.88, 84.28, 91.2, 80.03, 75.39, 73.62, 71.85, 85.46, 59.84]
 					# min: 0.0 max: 91.2 mean: 79.08 median: 80.57 mode: 80.0 std: 12.47 Z-Low: 54.64 Z-High: 103.51
-					if row_box.get('_prev_letter') != None and row_box['_prev_letter']['x1'] - letter_box['x2'] >= 5:
+					if row_box.get('_prev_letter') != None and row_box['_prev_letter'][
+						'x1'] - letter_box['x2'] >= 5:
 						row_box['_remove_union_text'] += ' '
-					row_box['_remove_union_text']  += letter_box['value']
+					row_box['_remove_union_text'] += letter_box['value']
 					row_box['_prev_letter'] = letter_box
 				row_lbs.append(letter_box)
 				added_letters += 1
@@ -443,7 +446,7 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 	print(f'{added_letters} letters added')
 
 	added_letters = 0
-	for letter_box in sorted(nms, key=lambda x:x['x2'], reverse=True):
+	for letter_box in sorted(nms, key=lambda x: x['x2'], reverse=True):
 		for row_box in row_boxes:
 			if is_in_row(row_box, letter_box):
 				row_lbs = row_box['_nmsBoxes']
@@ -483,12 +486,13 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 	nms_ld = Levenshtein.distance(target_text, nms_text)
 	nms_percent = round((len(target_text) - nms_ld) * 100 / len(target_text), 2)
 	nms_rp_ld = Levenshtein.distance(target_text, nms_rp_text)
-	nms_rp_percent = round((len(target_text) - nms_rp_ld) * 100 / len(target_text), 2)
+	nms_rp_percent = round(
+		(len(target_text) - nms_rp_ld) * 100 / len(target_text), 2)
 	print(
 			f'{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
 			f'Remove Miss Diff: {rm_ld} {rm_percent}%, Remove Union Text: {ru_ld} {ru_percent}%,',
 			f'NMS Diff: {nms_ld} {nms_percent}%, NMS RP Diff: {nms_rp_ld} {nms_rp_percent}%,',
-			f'Prediction Diff: {len(letter_boxes)-matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
+			f'Prediction Diff: {len(letter_boxes) - matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
 		print('\nTarget Text:\n', target_text)
@@ -501,7 +505,8 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 
 def label_fragment(predictor, test_id, preprocessor=None):
 	fragment = f'isaiah-column-{test_id}'
-	_, _, nms_letter_boxes = predict(predictor, test_id, preprocessor=preprocessor)
+	_, _, nms_letter_boxes = predict(predictor, test_id,
+																	 preprocessor=preprocessor)
 
 	for letter_box in nms_letter_boxes:
 		letter_box['value'] = letter_box['_predicted']
@@ -567,8 +572,9 @@ def verify(predictor, preprocessor=None, non_labeled_only=False):
 				"labeled": counts[scroll] > 500
 			})
 
-	for scroll in sorted(scrolls, key=lambda s:s["nms_rp_percent"]):
-		print(f'{scroll["scroll"]} {scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
+	for scroll in sorted(scrolls, key=lambda s: s["nms_rp_percent"]):
+		print(
+			f'{scroll["scroll"]} {scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
 
 	print(percents)
 	percents = np.array(percents)
