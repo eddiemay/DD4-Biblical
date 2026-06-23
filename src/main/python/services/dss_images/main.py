@@ -73,6 +73,11 @@ def get_letterboxes(request):
     for r in results:
         item = dict(r)
         item['id'] = r.key.id
+
+        for key in list(item.keys()):
+            if key.endswith(('Time', 'Date')):
+                item[key] = int(item[key].timestamp() * 1000)
+
         coords = item.get('coords')
         if isinstance(coords, str):
             item['coords'] = json.loads(coords)
