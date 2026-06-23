@@ -107,7 +107,10 @@
       </ul>
       <div class="block-content form">
         <span data-ng-repeat="letter in $ctrl.letters">
-          <button data-ng-class="{grey: letter.value==$ctrl.selectedBox.value}"
+          <button data-ng-class="{
+            grey: letter.value == $ctrl.selectedBox.value,
+            orange: letter.value != $ctrl.selectedBox.value && letter.value == $ctrl.selectedBox._predicted
+          }"
                   data-ng-click="$ctrl.create(letter)">{{letter.value}}</button>
         </span><br>
         <div>
