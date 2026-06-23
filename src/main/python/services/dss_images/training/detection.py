@@ -29,7 +29,7 @@ ANNO_IDS = {}
 DATASET_BASE = 'detection/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
-preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3}
+preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3, "crop": [122, 1920]}
 # config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 '''
 [43.5, 46.69, 46.99, 55.53, 49.27, 52.37, 52.35, 54.93, 54.22, 52.82, 54.66, 53.41, 56.79, 56.81, 55.66, 59.74, 61.05, 51.43, 58.42, 59.94, 58.52, 58.58, 60.79, 50.9]
@@ -257,6 +257,7 @@ def setup_data(preprocessor):
 
 	files = {}
 	letter_id = 0
+	y_offset = preprocessor["crop"][0] if preprocessor.get("crop") is not None else 0
 	dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
 	for _, label, letter_box in dataset:
 		filename = letter_box['filename']
@@ -269,7 +270,7 @@ def setup_data(preprocessor):
 		width, height = letter_box['x2'] - x, letter_box['y2'] - y
 		conf["annotations"].append(
 				{"id": letter_id, "image_id": image_id, "category_id": label,
-				 "bbox": [x, y, width, height], "area": width * height, "iscrowd": 0})
+				 "bbox": [x, y - y_offset, width, height], "area": width * height, "iscrowd": 0})
 		letter_id += 1
 
 	for filename, id in files.items():
@@ -337,6 +338,8 @@ def predict(predictor, test_id, display=True, preprocessor=None):
 	if len(instances.pred_boxes) == 0:
 		return None, None
 
+	y_offset = preprocessor["crop"][0] if preprocessor.get("crop") is not None else 0
+
 	boxes = instances.pred_boxes.tensor.numpy()
 	classes = instances.pred_classes.numpy()
 	scores = instances.scores.numpy()
@@ -349,9 +352,9 @@ def predict(predictor, test_id, display=True, preprocessor=None):
 			"filename": fragment,
 			"type": "Letter",
 			"x1": x1,
-			"y1": y1,
+			"y1": y1 + y_offset,
 			"x2": x2,
-			"y2": y2,
+			"y2": y2 + y_offset,
 			"value": LABEL_LOOKUP[cls],
 			"_score": float(score)
 		})
@@ -551,13 +554,13 @@ def verify(predictor, preprocessor=None, non_labeled_only=False):
 			counts[metadata['filename']] = 0
 		counts[metadata['filename']] += 1
 
-	for c in range(2, 54):
+	for c in range(1, 54):
 		scroll = f'isaiah-column-{c}'
 		if not non_labeled_only or counts[scroll] < 500:
-			if non_labeled_only:
-				dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
-				if len(dataset) > 500:
-					continue
+			# if non_labeled_only:
+				# dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
+				# if len(dataset) > 500:
+					# continue
 			result = evaluate(predictor, c, False, preprocessor=preprocessor)
 			percents.append(result[0])
 			rp_percents.append(result[1])
@@ -630,13 +633,13 @@ if __name__ == '__main__':
 	parser.add_argument('--preprocess', action='store_true')
 	parser.add_argument('--iters', type=int, default=5000)
 	parser.add_argument('--samples', action='store_true')
-	parser.add_argument('--max_size', type=int, default=2043)
+	parser.add_argument('--max_size', type=int, default=1920)
 	parser.add_argument('--resume', action='store_true')
 	parser.add_argument('--train', action='store_true')
 	parser.add_argument('--batch_size_per_image', type=int, default=2048)
 
 	args = parser.parse_args()
-	pp = preprocessor if args.preprocess else {}
+	pp = preprocessor if args.preprocess else preprocessor
 	cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = args.batch_size_per_image
 	samples = args.samples
 	if not samples:
@@ -660,8 +663,24 @@ if __name__ == '__main__':
 	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
 	predictor = DefaultPredictor(cfg)
 
-	# verify(predictor, preprocessor=pp, non_labeled_only=True)
+	verify(predictor, preprocessor=pp, non_labeled_only=True)
 	# evaluate(predictor, 39, False, preprocessor=pp)
 	# evaluate(predictor, 39, True, preprocessor=pp, override=True)
 	# evaluate(predictor, 43, True, preprocessor=pp, override=True)
 	# label_fragment(predictor, 31, preprocessor=pp)
+
+# No preprocessing
+# [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]
+# min: 76.52 max: 84.94 mean: 81.61 median: 82.17 mode: 80.0 std: 2.50 Z-Low: 76.70 Z-High: 86.51
+# Gray, G-Blur, Crop
+# [74.6, 76.62, 76.48, 75.74, 80.76, 77.14, 71.25, 79.83, 83.16, 78.98, 80.29, 83.32, 79.09]
+# min: 71.25 max: 83.32 mean: 78.25 median: 78.98 mode: 75.0 std: 3.28 Z-Low: 71.83 Z-High: 84.67
+# Gray, Crop
+# [75.07, 76.74, 78.17, 77.04, 81.62, 80.52, 74.61, 79.49, 82.72, 78.68, 81.52, 83.27, 79.09]
+# min: 74.61 max: 83.27 mean: 79.12 median: 79.09 mode: 80.0 std: 2.66 Z-Low: 73.90 Z-High: 84.34
+# Crop
+# [76.45, 76.8, 80.87, 77.47, 82.24, 81.23, 76.94, 80.07, 82.92, 79.47, 81.65, 83.75, 79.94]
+# min: 76.45 max: 83.75 mean: 79.98 median: 80.07 mode: 80.0 std: 2.35 Z-Low: 75.39 Z-High: 84.58
+# Gray, G-Blur
+# [76.32, 77.98, 79.52, 80.94, 83.26, 83.52, 81.01, 78.62, 80.37, 78.61, 82.82, 83.65, 76.08]
+# min: 76.08 max: 83.65 mean: 80.21 median: 80.37 mode: 80.0 std: 2.52 Z-Low: 75.26 Z-High: 85.16
