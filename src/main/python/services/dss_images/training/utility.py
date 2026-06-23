@@ -121,6 +121,29 @@ def draw_letter_boxes_and_text(img, boxes, box_colors=None):
         draw_letter_boxes(img, boxes, box_colors), boxes, box_colors)
 
 
+def calc_area(box):
+    return max(0, box["x2"] - box["x1"]) * max(0, box["y2"] - box["y1"])
+
+
+def intersection_over_union(box1, box2):
+    if box1 is None:
+        return 0.0
+
+    ix1 = max(box1["x1"], box2["x1"])
+    iy1 = max(box1["y1"], box2["y1"])
+    ix2 = min(box1["x2"], box2["x2"])
+    iy2 = min(box1["y2"], box2["y2"])
+
+    intersection = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+
+    area1 = calc_area(box1)
+    area2 = calc_area(box2)
+
+    union = area1 + area2 - intersection
+
+    return intersection / union if union > 0 else 0.0
+
+
 if __name__ == '__main__':
     img = cv2.imread('dss_isa_9_6_7-11.png')
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

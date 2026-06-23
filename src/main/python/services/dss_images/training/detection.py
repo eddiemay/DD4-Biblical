@@ -14,13 +14,14 @@ from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
-from letterbox_utils import DSSLettersDataset, get_img_file_path, \
+from letterbox_utils import DSSLettersDataset, get_img_file_path, ISAIAH_SET, \
 	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, \
 	get_isa_text, get_row, is_in_row, process_image
 from predict_letters import predict_letters
 from scipy import stats
 from train_by_labels import process
 from urllib import request
+from utility import intersection_over_union
 
 TRAIN_IDS = ['2', '11', '24', '36', '45']
 VAL_IDS = ['7', '17', '27', '37', '47']
@@ -158,7 +159,7 @@ min: 61.46 max: 89.42 mean: 80.52 median: 81.61 mode: 80.0 std: 5.07 Z-Low: 70.5
 [72.68, 75.4, 60.73, 79.26, 78.88, 76.48, 78.12, 78.51, 78.85, 73.98, 76.95, 80.22, 79.49, 79.44, 75.35, 80.39, 84.6, 78.87, 85.3, 78.31, 78.8, 81.72, 88.69, 78.35]
 min: 60.73 max: 88.69 mean: 78.31 median: 78.82 mode: 80.0 std: 5.01 Z-Low: 68.49 Z-High: 88.13
 '''
-threshold = .90
+threshold = .7
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
@@ -322,15 +323,8 @@ def train(iters, preprocessor, samples=False, resume=False):
 	trainer.train()
 
 
-def predict(test_id, display=True, model="model_final.pth", preprocessor=None):
-	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/{model}'
-	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
-	cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 12000
-	cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 6000
-	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
-
+def predict(predictor, test_id, display=True, preprocessor=None):
 	start_time = time.time()
-	predictor = DefaultPredictor(cfg)
 	img_file = f'../images/isaiah/columns/column_9_{test_id}.jpg'
 	image = process_image(cv2.imread(img_file), preprocessor)[0]
 	if len(image.shape) == 2:
@@ -345,10 +339,11 @@ def predict(test_id, display=True, model="model_final.pth", preprocessor=None):
 
 	boxes = instances.pred_boxes.tensor.numpy()
 	classes = instances.pred_classes.numpy()
+	scores = instances.scores.numpy()
 
 	fragment = f'isaiah-column-{test_id}'
 	letter_boxes = []
-	for box, cls in zip(boxes, classes):
+	for box, cls, score in zip(boxes, classes, scores):
 		x1, y1, x2, y2 = map(int, box)
 		letter_boxes.append({
 			"filename": fragment,
@@ -357,8 +352,30 @@ def predict(test_id, display=True, model="model_final.pth", preprocessor=None):
 			"y1": y1,
 			"x2": x2,
 			"y2": y2,
-			"value": LABEL_LOOKUP[cls]
+			"value": LABEL_LOOKUP[cls],
+			"_score": float(score)
 		})
+
+	predict_letters(letter_boxes)
+	nms = []
+	for box in sorted(letter_boxes, key=lambda b:b["_score"], reverse=True):
+		keep = True
+		for kept in nms:
+			if intersection_over_union(box, kept) > 0.225:
+				# .2 [0.0, 81.76, 69.0, 86.69, 77.31, 78.47, 69.27, 76.62, 87.85, 77.08, 81.44, 84.0, 85.19, 87.52, 79.7, 87.68, 78.59, 85.71, 80.14, 87.59, 83.41, 84.11, 81.18, 87.83, 80.17, 88.38, 82.01, 78.37, 87.7, 78.83, 69.71, 72.25, 76.25, 80.2, 81.26, 89.62, 79.05, 83.65, 85.75, 88.71, 80.48, 82.45, 83.05, 89.6, 89.04, 82.26, 84.89, 91.57, 80.73, 75.22, 73.67, 72.6, 85.9, 59.84]
+				# min: 0.0 max: 91.57 mean: 79.84 median: 81.60 mode: 80.0 std: 12.59 Z-Low: 55.16 Z-High: 104.52
+				# .225 [0.0, 81.62, 68.62, 86.55, 77.24, 78.25, 69.11, 76.68, 87.85, 77.08, 81.4, 84.06, 85.13, 87.46, 79.64, 87.62, 78.59, 85.71, 80.14, 87.46, 83.18, 84.04, 81.07, 87.77, 80.17, 88.38, 82.01, 78.33, 87.7, 78.87, 69.6, 72.25, 76.25, 80.02, 81.33, 89.68, 79.14, 83.7, 85.7, 88.66, 80.37, 82.61, 83.05, 89.6, 88.9, 82.26, 84.84, 91.78, 80.68, 75.27, 73.72, 72.43, 86.15, 59.64]
+				# min: 0.0 max: 91.78 mean: 79.80 median: 81.51 mode: 80.0 std: 12.61 Z-Low: 55.09 Z-High: 104.52
+				# .25 [0.0, 81.69, 68.47, 86.55, 76.98, 78.18, 68.94, 76.74, 87.79, 77.18, 81.3, 83.95, 85.19, 87.46, 79.58, 87.62, 78.52, 85.44, 80.0, 87.32, 82.71, 83.97, 81.07, 87.89, 80.17, 88.31, 82.09, 78.28, 87.58, 78.83, 69.49, 72.25, 76.31, 79.97, 81.26, 89.68, 79.23, 83.75, 85.65, 88.66, 80.37, 82.56, 82.67, 89.54, 88.97, 82.26, 84.84, 91.68, 80.73, 75.33, 73.92, 72.18, 86.09, 59.84]
+				# min: 0.0 max: 91.68 mean: 79.76 median: 81.50 mode: 80.0 std: 12.60 Z-Low: 55.07 Z-High: 104.45
+				# .3 [0.0, 81.42, 67.56, 86.2, 76.78, 77.96, 68.54, 76.62, 87.79, 76.92, 81.1, 83.65, 85.19, 87.26, 79.52, 87.35, 78.33, 85.44, 79.42, 86.97, 82.4, 83.34, 80.96, 87.58, 79.65, 88.1, 82.01, 77.99, 87.58, 78.73, 69.43, 72.37, 76.31, 79.97, 81.07, 89.79, 79.14, 83.59, 85.54, 88.66, 80.15, 82.4, 82.17, 89.05, 88.61, 82.06, 84.73, 91.68, 80.68, 75.45, 73.92, 72.1, 85.9, 59.43]
+				# min: 0.0 max: 91.68 mean: 79.57 median: 81.26 mode: 80.0 std: 12.59 Z-Low: 54.89 Z-High: 104.24
+				# .4 [0.0, 79.7, 66.64, 83.48, 75.0, 76.12, 66.34, 75.15, 86.13, 75.57, 80.23, 82.11, 84.16, 85.7, 78.29, 85.24, 77.35, 82.95, 76.68, 85.67, 80.76, 80.78, 79.38, 86.43, 77.91, 85.69, 80.75, 76.87, 86.24, 77.67, 68.66, 72.19, 74.85, 78.63, 79.64, 88.11, 78.37, 81.98, 84.72, 88.32, 78.74, 81.04, 81.1, 87.04, 86.75, 80.03, 83.95, 90.58, 79.85, 75.04, 72.92, 70.43, 84.09, 58.02]
+				# min: 0.0 max: 90.58 mean: 78.15 median: 79.94 mode: 80.0 std: 12.37 Z-Low: 53.90 Z-High: 102.40
+				keep = False
+				break
+		if keep:
+			nms.append(box)
 
 	if display:
 		v = Visualizer(image[:, :, ::-1], scale=1.0)
@@ -366,14 +383,13 @@ def predict(test_id, display=True, model="model_final.pth", preprocessor=None):
 		plt.imshow(out.get_image()[:, :, ::-1])
 		plt.show()
 
-	return outputs, letter_boxes
+	return outputs, letter_boxes, nms
 
 
-def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None,
+def evaluate(predictor, test_id, display=True, preprocessor=None,
 		override=False):
 	fragment = f'isaiah-column-{test_id}'
-	outputs, letter_boxes = predict(test_id, display, model, preprocessor)
-	predict_letters(letter_boxes)
+	outputs, letter_boxes, nms = predict(predictor, test_id, display, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [],
@@ -381,43 +397,80 @@ def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None,
 	row_boxes = []
 	for _, _, row_box in dataset:
 		row_box['_letterBoxes'] = []
+		row_box['_nmsBoxes'] = []
 		row_box['_text'] = ''
 		row_box['_predict_text'] = ''
 		row_box['_remove_mismatch_text'] = ''
+		row_box['_remove_union_text'] = ''
+		row_box['_nms_text'] = ''
+		row_box['_nms_rp_text'] = ''
 		row_boxes.append(row_box)
 
 	added_letters = 0
 	matching_predictions = 0
-	for letter_box in sorted(letter_boxes, key=lambda x: x['x2'], reverse=True):
+	for letter_box in sorted(letter_boxes, key=lambda x:x['x2'], reverse=True):
 		if letter_box['value'] == letter_box['_predicted']:
 			matching_predictions += 1
 		for row_box in row_boxes:
-			last_non_removed = None
 			if is_in_row(row_box, letter_box):
-				if len(row_box['_letterBoxes']) > 0 and (
-						row_box['_letterBoxes'][-1]['x1'] - letter_box['x2'] >= 5):
+				row_lbs = row_box['_letterBoxes']
+				if len(row_lbs) > 0 and (row_lbs[-1]['x1'] - letter_box['x2'] >= 5):
 					row_box['_text'] += ' '
 					row_box['_predict_text'] += ' '
 				row_box['_text'] += letter_box['value']
 				row_box['_predict_text'] += letter_box['_predicted']
 				if letter_box['value'] == letter_box['_predicted']:
-					if last_non_removed != None and last_non_removed['x1'] - letter_box['x2'] >= 5:
-						row_box['_remove_mismatch_text'] = ' '
+					if row_box.get('_last_non_removed') != None and row_box['_last_non_removed']['x1'] - letter_box['x2'] >= 5:
+						row_box['_remove_mismatch_text'] += ' '
 					row_box['_remove_mismatch_text'] += letter_box['value']
-					last_non_removed = letter_box
-				row_box['_letterBoxes'].append(letter_box)
+					row_box['_last_non_removed'] = letter_box
+
+				iou = intersection_over_union(row_box.get('_prev_letter'), letter_box)
+				if iou < .25:
+					# .125 [0.0, 80.18, 67.56, 84.25, 76.85, 77.81, 68.54, 75.56, 86.51, 76.72, 80.62, 83.29, 84.28, 86.35, 78.7, 86.82, 78.84, 84.89, 79.35, 87.11, 81.78, 82.65, 80.41, 86.91, 79.97, 87.55, 81.5, 77.02, 86.24, 77.91, 69.16, 71.27, 74.36, 79.56, 80.48, 88.06, 78.28, 82.41, 85.49, 88.07, 79.58, 81.62, 81.17, 88.57, 87.61, 81.27, 83.89, 90.42, 79.28, 74.41, 72.52, 71.6, 84.9, 59.23]
+					# min: 0.0 max: 90.42 mean: 78.88 median: 80.55 mode: 80.0 std: 12.44 Z-Low: 54.49 Z-High: 103.26
+					# .25 [0.0, 80.8, 67.71, 85.16, 76.58, 77.74, 68.54, 76.21, 87.4, 76.66, 80.72, 83.71, 84.83, 86.74, 79.11, 87.35, 78.72, 85.37, 78.27, 86.91, 82.09, 83.14, 80.47, 87.58, 79.52, 87.76, 81.64, 77.75, 87.15, 78.54, 69.38, 72.02, 75.52, 79.67, 80.87, 88.78, 79.0, 83.38, 85.65, 88.51, 79.92, 82.09, 81.98, 88.98, 87.75, 81.54, 84.17, 91.26, 79.89, 75.16, 73.72, 71.6, 85.4, 59.74]
+					# min: 0.0 max: 91.26 mean: 79.26 median: 80.84 mode: 80.0 std: 12.51 Z-Low: 54.74 Z-High: 103.78
+					# .33 [0.0, 80.52, 66.95, 84.88, 76.32, 77.66, 68.13, 76.03, 87.15, 76.3, 80.62, 83.29, 84.58, 86.54, 79.17, 87.09, 78.2, 85.51, 78.27, 86.63, 81.62, 82.44, 80.31, 87.16, 79.26, 87.28, 81.64, 77.79, 86.91, 78.39, 69.32, 72.25, 75.7, 79.44, 80.29, 88.78, 78.87, 83.16, 85.49, 88.61, 79.64, 81.98, 81.73, 88.22, 87.39, 80.88, 84.28, 91.2, 80.03, 75.39, 73.62, 71.85, 85.46, 59.84]
+					# min: 0.0 max: 91.2 mean: 79.08 median: 80.57 mode: 80.0 std: 12.47 Z-Low: 54.64 Z-High: 103.51
+					if row_box.get('_prev_letter') != None and row_box['_prev_letter']['x1'] - letter_box['x2'] >= 5:
+						row_box['_remove_union_text'] += ' '
+					row_box['_remove_union_text']  += letter_box['value']
+					row_box['_prev_letter'] = letter_box
+				row_lbs.append(letter_box)
 				added_letters += 1
 				break
 	print(f'{added_letters} letters added')
+
+	added_letters = 0
+	for letter_box in sorted(nms, key=lambda x:x['x2'], reverse=True):
+		for row_box in row_boxes:
+			if is_in_row(row_box, letter_box):
+				row_lbs = row_box['_nmsBoxes']
+				if len(row_lbs) > 0 and (row_lbs[-1]['x1'] - letter_box['x2'] >= 5):
+					row_box['_nms_text'] += ' '
+					row_box['_nms_rp_text'] += ' '
+				row_box['_nms_text'] += letter_box['value']
+				row_box['_nms_rp_text'] += letter_box["_predicted"]
+				row_lbs.append(letter_box)
+				added_letters += 1
+				break
+	print(f'NMS {added_letters} letters added')
 
 	target_text = get_isa_text(test_id)
 	pred_text = ''
 	repred_text = ''
 	remove_mismatch_text = ''
+	remove_union_text = ''
+	nms_text = ''
+	nms_rp_text = ''
 	for row_box in row_boxes:
 		pred_text += row_box['_text'] + '\n'
 		repred_text += row_box['_predict_text'] + '\n'
 		remove_mismatch_text += row_box['_remove_mismatch_text'] + '\n'
+		remove_union_text += row_box['_remove_union_text'] + '\n'
+		nms_text += row_box['_nms_text'] + '\n'
+		nms_rp_text += row_box['_nms_rp_text'] + '\n'
 
 	ld = Levenshtein.distance(target_text, pred_text)
 	percent = round((len(target_text) - ld) * 100 / len(target_text), 2)
@@ -425,19 +478,33 @@ def evaluate(test_id, display=True, model="model_final.pth", preprocessor=None,
 	rp_percent = round((len(target_text) - rp_ld) * 100 / len(target_text), 2)
 	rm_ld = Levenshtein.distance(target_text, remove_mismatch_text)
 	rm_percent = round((len(target_text) - rm_ld) * 100 / len(target_text), 2)
-	print(f"{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%, Remove Miss Diff: {rm_ld} {rm_percent}%",
-				f'Prediction Diff: {len(letter_boxes)-matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
+	ru_ld = Levenshtein.distance(target_text, remove_union_text)
+	ru_percent = round((len(target_text) - ru_ld) * 100 / len(target_text), 2)
+	nms_ld = Levenshtein.distance(target_text, nms_text)
+	nms_percent = round((len(target_text) - nms_ld) * 100 / len(target_text), 2)
+	nms_rp_ld = Levenshtein.distance(target_text, nms_rp_text)
+	nms_rp_percent = round((len(target_text) - nms_rp_ld) * 100 / len(target_text), 2)
+	print(
+			f'{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
+			f'Remove Miss Diff: {rm_ld} {rm_percent}%, Remove Union Text: {ru_ld} {ru_percent}%,',
+			f'NMS Diff: {nms_ld} {nms_percent}%, NMS RP Diff: {nms_rp_ld} {nms_rp_percent}%,',
+			f'Prediction Diff: {len(letter_boxes)-matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
 		print('\nTarget Text:\n', target_text)
 		print('Pred Text:\n', pred_text)
+		print('Remove Missmatch Text:\n', remove_mismatch_text)
+		print('Remove Union Text:\n', remove_union_text)
 
-	return percent, rp_percent, rm_percent
+	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent
 
 
-def label_fragment(test_id, model="model_final.pth", preprocessor=None):
+def label_fragment(predictor, test_id, preprocessor=None):
 	fragment = f'isaiah-column-{test_id}'
-	_, letter_boxes = predict(test_id, model=model, preprocessor=preprocessor)
+	_, _, nms_letter_boxes = predict(predictor, test_id, preprocessor=preprocessor)
+
+	for letter_box in nms_letter_boxes:
+		letter_box['value'] = letter_box['_predicted']
 
 	# Get the list of existing letter boxes, if there are any.
 	letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
@@ -459,19 +526,49 @@ def label_fragment(test_id, model="model_final.pth", preprocessor=None):
 
 	# Delete old letter boxes and create the new ones.
 	send_json_req(LETTERBOX_BATCH_DELETE_URL, {'items': letter_ids})
-	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': letter_boxes})
+	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': nms_letter_boxes})
 
 
-
-def verify(model="model_final.pth", preprocessor=None):
+def verify(predictor, preprocessor=None, non_labeled_only=False):
+	scrolls = []
 	percents = []
 	rp_percents = []
 	rm_percents = []
-	for c in range(54):
-		result = evaluate(c + 1, False, model, preprocessor=preprocessor)
-		percents.append(result[0])
-		rp_percents.append(result[1])
-		rm_percents.append(result[2])
+	ru_percents = []
+	nms_percents = []
+	nms_rp_percents = []
+
+	counts = {}
+	dataset = DSSLettersDataset(fragments=ISAIAH_SET)
+	for _, _, metadata in dataset:
+		count = counts.get(metadata['filename'])
+		if count == None:
+			counts[metadata['filename']] = 0
+		counts[metadata['filename']] += 1
+
+	for c in range(2, 54):
+		scroll = f'isaiah-column-{c}'
+		if not non_labeled_only or counts[scroll] < 500:
+			if non_labeled_only:
+				dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
+				if len(dataset) > 500:
+					continue
+			result = evaluate(predictor, c, False, preprocessor=preprocessor)
+			percents.append(result[0])
+			rp_percents.append(result[1])
+			rm_percents.append(result[2])
+			ru_percents.append(result[3])
+			nms_percents.append(result[4])
+			nms_rp_percents.append(result[5])
+
+			scrolls.append({
+				"scroll": scroll,
+				"nms_rp_percent": result[5],
+				"labeled": counts[scroll] > 500
+			})
+
+	for scroll in sorted(scrolls, key=lambda s:s["nms_rp_percent"]):
+		print(f'{scroll["scroll"]} {scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
 
 	print(percents)
 	percents = np.array(percents)
@@ -491,6 +588,30 @@ def verify(model="model_final.pth", preprocessor=None):
 
 	print(rm_percents)
 	percents = np.array(rm_percents)
+	mean, std = percents.mean(), percents.std()
+	print('min:', percents.min(), 'max:', percents.max(),
+				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
+				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
+	print(ru_percents)
+	percents = np.array(ru_percents)
+	mean, std = percents.mean(), percents.std()
+	print('min:', percents.min(), 'max:', percents.max(),
+				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
+				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
+	print(nms_percents)
+	percents = np.array(nms_percents)
+	mean, std = percents.mean(), percents.std()
+	print('min:', percents.min(), 'max:', percents.max(),
+				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
+				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
+	print(nms_rp_percents)
+	percents = np.array(nms_rp_percents)
 	mean, std = percents.mean(), percents.std()
 	print('min:', percents.min(), 'max:', percents.max(),
 				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
@@ -526,10 +647,15 @@ if __name__ == '__main__':
 	if args.train or args.resume:
 		train(args.iters, preprocessor=pp, samples=samples, resume=args.resume)
 
-	# verify('model_final_50_5000.pth', preprocessor=pp)
-	verify('model_final.pth', preprocessor=pp)
-	# evaluate(37, False, preprocessor=pp)
-	# evaluate(41, True, preprocessor=pp, override=True)
-	# evaluate(43, True, preprocessor=pp, override=True)
-	# label_fragment(41, preprocessor=pp)
-	# label_fragment(43, preprocessor=pp)
+	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
+	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
+	cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 12000
+	cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 6000
+	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
+	predictor = DefaultPredictor(cfg)
+
+	# verify(predictor, preprocessor=pp, non_labeled_only=True)
+	# evaluate(predictor, 39, False, preprocessor=pp)
+	# evaluate(predictor, 39, True, preprocessor=pp, override=True)
+	# evaluate(predictor, 43, True, preprocessor=pp, override=True)
+	# label_fragment(predictor, 31, preprocessor=pp)
