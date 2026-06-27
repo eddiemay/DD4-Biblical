@@ -158,6 +158,36 @@ min: 61.46 max: 89.42 mean: 80.52 median: 81.61 mode: 80.0 std: 5.07 Z-Low: 70.5
 .75 threshold
 [72.68, 75.4, 60.73, 79.26, 78.88, 76.48, 78.12, 78.51, 78.85, 73.98, 76.95, 80.22, 79.49, 79.44, 75.35, 80.39, 84.6, 78.87, 85.3, 78.31, 78.8, 81.72, 88.69, 78.35]
 min: 60.73 max: 88.69 mean: 78.31 median: 78.82 mode: 80.0 std: 5.01 Z-Low: 68.49 Z-High: 88.13
+Preprocessed to 1280x1920
+NMS
+[0.0, 71.09, 69.23, 76.86, 74.67, 73.55, 66.5, 76.56, 79.33, 76.4, 78.49, 75.24, 78.12, 79.82, 76.48, 80.63, 75.6, 76.26, 75.88, 79.32, 80.92, 80.5, 77.2, 80.89, 71.38, 77.24, 78.09, 79.78, 80.82, 82.96, 73.78, 75.65, 78.92, 82.0, 80.29, 85.55, 82.95, 83.43, 84.5, 86.78, 75.31, 83.39, 81.54, 81.57, 82.02, 80.16, 84.39, 88.59, 85.15, 79.42, 79.14, 77.19, 79.16, 59.43]
+min: 0.0 max: 88.59 mean: 77.04 median: 79.15 mode: 80.0 std: 11.69 Z-Low: 54.12 Z-High: 99.95
+no space
+[0.0, 76.31, 74.45, 80.99, 78.63, 82.67, 74.71, 82.93, 84.86, 80.62, 82.79, 83.96, 86.1, 86.51, 83.69, 88.56, 84.88, 86.42, 84.89, 88.3, 87.96, 88.26, 87.16, 88.46, 85.66, 88.3, 87.49, 83.07, 89.25, 86.29, 77.76, 80.65, 85.01, 87.83, 87.62, 90.95, 86.56, 87.71, 90.57, 91.27, 84.69, 87.75, 86.69, 88.54, 89.73, 87.36, 88.36, 93.06, 87.4, 82.96, 82.18, 82.03, 82.13, 60.81]
+min: 0.0 max: 93.06 mean: 83.22 median: 86.19 mode: 85.0 std: 12.54 Z-Low: 58.64 Z-High: 107.80
+No preprocessing
+NMS
+[0.0, 73.43, 73.19, 80.28, 76.72, 82.22, 72.52, 80.7, 82.38, 79.26, 82.12, 81.22, 83.42, 84.65, 82.27, 84.39, 83.0, 83.78, 83.83, 85.04, 84.35, 84.25, 83.8, 84.91, 82.3, 86.04, 85.42, 80.65, 85.02, 81.38, 75.43, 74.15, 79.16, 82.47, 84.12, 87.28, 81.13, 84.88, 87.49, 86.83, 84.25, 85.48, 85.37, 87.66, 84.81, 85.22, 85.62, 90.79, 83.05, 77.52, 77.98, 75.94, 79.6, 62.06]
+min: 0.0 max: 90.79 mean: 80.39 median: 83.03 mode: 85.0 std: 12.03 Z-Low: 56.81 Z-High: 103.96
+No space
+[0.0, 77.87, 75.69, 83.55, 80.05, 87.31, 78.93, 84.51, 87.45, 82.42, 85.22, 86.17, 88.22, 88.74, 85.69, 89.32, 86.13, 87.83, 89.65, 91.12, 89.25, 89.95, 88.94, 89.39, 89.22, 91.7, 90.33, 82.4, 90.18, 84.34, 78.52, 77.67, 83.31, 86.96, 88.92, 91.02, 84.28, 89.13, 91.35, 89.78, 89.94, 87.75, 88.61, 91.41, 90.72, 89.69, 89.27, 93.58, 85.32, 80.1, 80.3, 80.55, 81.81, 64.16]
+min: 0.0 max: 93.58 mean: 84.37 median: 87.60 mode: 90.0 std: 12.70 Z-Low: 59.46 Z-High: 109.27
+
+Preprocessed: cropped to 1280x1920, Gray scale, gblur 3, 7500 iters
+NMS
+[0.0, 76.88, 72.81, 81.11, 78.03, 82.07, 72.6, 81.7, 84.8, 80.72, 82.7, 82.11, 83.36, 84.91, 82.15, 86.3, 81.7, 82.4, 81.73, 85.32, 85.28, 85.29, 83.36, 85.82, 80.56, 85.21, 84.46, 80.75, 85.99, 81.47, 74.71, 75.36, 80.26, 85.61, 84.52, 89.62, 80.23, 85.21, 87.18, 88.61, 84.87, 84.02, 85.62, 87.39, 88.11, 85.02, 84.84, 91.47, 80.03, 79.02, 77.58, 75.1, 82.16, 64.48]
+min: 0.0 max: 91.47 mean: 80.79 median: 82.55 mode: 85.0 std: 12.04 Z-Low: 57.18 Z-High: 104.39
+No Space
+[0.0, 80.84, 75.41, 85.94, 81.14, 87.88, 79.24, 85.1, 89.07, 83.15, 85.79, 88.62, 87.98, 89.9, 85.84, 90.33, 87.72, 89.15, 88.62, 91.29, 91.64, 90.21, 89.77, 91.11, 88.89, 92.31, 91.47, 82.58, 91.88, 85.68, 78.45, 80.22, 85.7, 90.22, 90.05, 93.88, 83.77, 89.13, 92.0, 92.14, 89.87, 87.09, 89.08, 91.58, 94.14, 90.02, 88.64, 94.94, 81.81, 81.57, 80.55, 79.49, 85.54, 69.04]
+min: 0.0 max: 94.94 mean: 85.32 median: 88.62 mode: 90.0 std: 12.77 Z-Low: 60.29 Z-High: 110.35
+
+Preprocessed: copped to 1280x1920, Gray scale, gblur 3, 10000 iters
+NMS
+[67.04, 78.18, 73.95, 83.76, 79.09, 80.6, 72.44, 84.06, 86.51, 81.5, 85.27, 85.78, 85.74, 85.83, 83.79, 86.56, 81.96, 84.75, 82.38, 87.39, 85.2, 86.4, 84.34, 87.64, 81.52, 86.31, 85.49, 81.76, 87.52, 82.96, 74.77, 77.32, 80.5, 85.09, 85.1, 89.73, 81.9, 85.53, 88.11, 89.36, 85.38, 85.43, 86.88, 88.22, 88.4, 85.22, 86.57, 93.35, 82.04, 78.62, 79.44, 74.85, 82.84, 62.76]
+min: 62.76 max: 93.35 mean: 83.02 median: 84.92 mode: 85.0 std: 5.45 Z-Low: 72.33 Z-High: 93.71
+No space
+[69.11, 83.89, 77.89, 87.98, 81.64, 86.46, 78.61, 87.95, 90.53, 85.07, 87.78, 91.14, 90.49, 90.56, 87.84, 91.08, 86.3, 90.56, 88.53, 92.96, 91.14, 91.1, 89.63, 92.82, 89.3, 92.31, 91.66, 83.68, 92.27, 86.29, 78.8, 81.38, 85.09, 89.93, 89.72, 94.22, 86.22, 89.13, 91.93, 92.69, 90.29, 88.21, 90.28, 91.75, 94.14, 89.44, 89.76, 95.78, 84.49, 81.86, 81.8, 79.18, 86.58, 65.27]
+min: 65.27 max: 95.78 mean: 87.31 median: 89.22 mode: 90.0 std: 5.80 Z-Low: 75.93 Z-High: 98.68
 '''
 threshold = .7
 
@@ -489,12 +519,15 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 	nms_ld = Levenshtein.distance(target_text, nms_text)
 	nms_percent = round((len(target_text) - nms_ld) * 100 / len(target_text), 2)
 	nms_rp_ld = Levenshtein.distance(target_text, nms_rp_text)
-	nms_rp_percent = round(
-		(len(target_text) - nms_rp_ld) * 100 / len(target_text), 2)
+	nms_rp_percent = round((len(target_text) - nms_rp_ld) * 100 / len(target_text), 2)
+	no_space_text = ''.join(target_text.split())
+	ld_no_space = Levenshtein.distance(no_space_text, ''.join(nms_rp_text.split()))
+	no_space_percent = round((len(no_space_text) - ld_no_space) * 100 / len(no_space_text), 2)
 	print(
 			f'{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
 			f'Remove Miss Diff: {rm_ld} {rm_percent}%, Remove Union Text: {ru_ld} {ru_percent}%,',
 			f'NMS Diff: {nms_ld} {nms_percent}%, NMS RP Diff: {nms_rp_ld} {nms_rp_percent}%,',
+			f'No Space Diff: {ld_no_space} {no_space_percent}%',
 			f'Prediction Diff: {len(letter_boxes) - matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
@@ -503,7 +536,7 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 		print('Remove Missmatch Text:\n', remove_mismatch_text)
 		print('Remove Union Text:\n', remove_union_text)
 
-	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent
+	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent, no_space_percent
 
 
 def label_fragment(predictor, test_id, preprocessor=None):
@@ -537,7 +570,7 @@ def label_fragment(predictor, test_id, preprocessor=None):
 	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': nms_letter_boxes})
 
 
-def verify(predictor, preprocessor=None, non_labeled_only=False):
+def verify(predictor, preprocessor=None, non_labeled_only=False, refresh=False):
 	scrolls = []
 	percents = []
 	rp_percents = []
@@ -545,6 +578,7 @@ def verify(predictor, preprocessor=None, non_labeled_only=False):
 	ru_percents = []
 	nms_percents = []
 	nms_rp_percents = []
+	no_space_percents = []
 
 	counts = {}
 	dataset = DSSLettersDataset(fragments=ISAIAH_SET)
@@ -554,13 +588,14 @@ def verify(predictor, preprocessor=None, non_labeled_only=False):
 			counts[metadata['filename']] = 0
 		counts[metadata['filename']] += 1
 
-	for c in range(1, 54):
+	for c in range(54):
+		c = c + 1
 		scroll = f'isaiah-column-{c}'
 		if not non_labeled_only or counts[scroll] < 500:
-			# if non_labeled_only:
-				# dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
-				# if len(dataset) > 500:
-					# continue
+			if non_labeled_only and refresh:
+				dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
+				if len(dataset) > 500:
+					continue
 			result = evaluate(predictor, c, False, preprocessor=preprocessor)
 			percents.append(result[0])
 			rp_percents.append(result[1])
@@ -568,16 +603,18 @@ def verify(predictor, preprocessor=None, non_labeled_only=False):
 			ru_percents.append(result[3])
 			nms_percents.append(result[4])
 			nms_rp_percents.append(result[5])
+			no_space_percents.append((result[6]))
 
 			scrolls.append({
 				"scroll": scroll,
 				"nms_rp_percent": result[5],
+				"no_space_percent": result[6],
 				"labeled": counts[scroll] > 500
 			})
 
-	for scroll in sorted(scrolls, key=lambda s: s["nms_rp_percent"]):
+	for scroll in sorted(scrolls, key=lambda s: s["no_space_percent"]):
 		print(
-			f'{scroll["scroll"]} {scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
+			f'{scroll["scroll"]} {scroll["no_space_percent"]}% labeled: {scroll["labeled"]}')
 
 	print(percents)
 	percents = np.array(percents)
@@ -627,6 +664,14 @@ def verify(predictor, preprocessor=None, non_labeled_only=False):
 				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
 				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
 
+	print(no_space_percents)
+	percents = np.array(no_space_percents)
+	mean, std = percents.mean(), percents.std()
+	print('min:', percents.min(), 'max:', percents.max(),
+				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
+				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -657,6 +702,7 @@ if __name__ == '__main__':
 		train(args.iters, preprocessor=pp, samples=samples, resume=args.resume)
 
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
+	# cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final_32x84_1280_2043_10000.pth'
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
 	cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 12000
 	cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 6000
@@ -664,7 +710,8 @@ if __name__ == '__main__':
 	predictor = DefaultPredictor(cfg)
 
 	verify(predictor, preprocessor=pp, non_labeled_only=True)
-	# evaluate(predictor, 39, False, preprocessor=pp)
+	# evaluate(predictor, 1, True, preprocessor=pp, override=True)
+		#			 preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
 	# evaluate(predictor, 39, True, preprocessor=pp, override=True)
 	# evaluate(predictor, 43, True, preprocessor=pp, override=True)
 	# label_fragment(predictor, 31, preprocessor=pp)
