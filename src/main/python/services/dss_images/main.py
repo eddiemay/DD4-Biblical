@@ -76,7 +76,8 @@ def get_letterboxes(request):
 
         for key in list(item.keys()):
             if key.endswith(('Time', 'Date')):
-                item[key] = int(item[key].timestamp() * 1000)
+                if isinstance(item[key], datetime):
+                    item[key] = int(item[key].timestamp() * 1000)
 
         coords = item.get('coords')
         if isinstance(coords, str):
@@ -169,6 +170,9 @@ def parse_time(entity, prop):
 
     if isinstance(time, str):
         time = parsedate_to_datetime(time)
+    elif isinstance(time, int):
+        # Epoch milliseconds
+        time = datetime.fromtimestamp(time / 1000, tz=timezone.utc)
     elif isinstance(time, datetime) and time.tzinfo is None:
         # Ensure timezone awareness
         time = time.replace(tzinfo=timezone.utc)

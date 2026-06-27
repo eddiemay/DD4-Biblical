@@ -122,13 +122,14 @@ def parse_file_name(file_name):
   return scroll, is_column, fragment_or_colnum
 
 
-def get_img_file_path(file_name, res):
+def get_img_file_path(file_name):
   scroll, is_column, fragment = parse_file_name(file_name)
+  res = {'habakkuk': 7, 'community': 7, 'war': 8}.get(scroll, 9)
   return f"./images/{scroll}/columns/column_{res}_{fragment}.jpg" if is_column else f"./images/{scroll}/columns/{fragment}.jpg"
 
 
 file_img_cache:dict[str, np.ndarray] = {}
-def get_image(letter_box:dict, res:int=9) -> np.ndarray:
+def get_image(letter_box:dict) -> np.ndarray:
   """
   Retrieve a cropped letter image from a larger column image, using caching
   to avoid repeatedly loading the same file from disk.
@@ -156,12 +157,11 @@ def get_image(letter_box:dict, res:int=9) -> np.ndarray:
 
   file_img = file_img_cache.get(letter_box['filename'])
   if file_img is None:
-    file_path = get_img_file_path(letter_box['filename'], res)
+    file_path = get_img_file_path(letter_box['filename'])
     file_img = cv2.imread(file_path)
     file_img_cache[letter_box['filename']] = file_img
-  scale = {10: 2, 9: 1, 8: 0.5}.get(res, 1)
-  y1, y2 = int(letter_box['y1'] * scale), int(letter_box['y2'] * scale)
-  x1, x2 = int(letter_box['x1'] * scale), int(letter_box['x2'] * scale)
+  x1, y1, x2, y2 = (letter_box['x1'], letter_box['y1'],
+                    letter_box['x2'], letter_box['y2'])
   return file_img[y1:y2, x1:x2]
 
 
