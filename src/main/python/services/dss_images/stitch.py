@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 1, res=5)
 
     for res in range(8, 11):
-        construct_column(Collection.ISAIAH, 22, res)
+        construct_column(Collection.ISAIAH, 29, res)
     cv2.waitKey(0)
 
     # for c in range(1, 16):
