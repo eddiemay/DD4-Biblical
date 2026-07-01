@@ -40,8 +40,6 @@ def find_abnormals(letter, df, prop):
     title = (f'{len(abnormal)} abnormal {prop} for {letter}: mean: {mean:.1f}, '
              f'std: {std:.1f}, normal range: {min}-{max}')
     print(title)
-    for box in abnormal.itertuples():
-      print(f"\t{box.filename} width={box.width} height={box.height} x1={box.x1} y1={box.y1}")
     for start in range(0, len(abnormal), VISUALIZE_PAGE_SIZE):
       page = abnormal.iloc[start:start + VISUALIZE_PAGE_SIZE]
       visualize_abnormals(f"{title} ({start + 1}–{start + len(page)})", page)
@@ -64,7 +62,13 @@ if __name__ == '__main__':
 
   print("Min Y: ", df["y1"].min(), "Max Y: ", df["y2"].max())
 
-  print(df['value'].value_counts())
+  counts = df['value'].value_counts()
+  print(counts)
+  mean = counts.mean()
+  std = counts.std()
+  print(f"Mean: {mean:.2f}, Median: {counts.median()},",
+        f"Mode: {counts.round(-2).mode().tolist()}, Std: {std:.2f},",
+        f"90% interval: {mean - 1.645 * std:.2f} to {mean + 1.645 * std:.2f}")
 
   find_abnormals("all", df, 'width')
   # find_abnormals("all", df, 'height')
