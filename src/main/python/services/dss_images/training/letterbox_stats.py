@@ -28,12 +28,14 @@ def visualize_abnormals(title, abnormal):
   plt.show()
 
 
-def find_abnormals(letter, df, prop):
+def find_abnormals(letter, df, prop, filename):
   mean = df[prop].mean()
   std = df[prop].std()
   min, max = round(mean - 3 * std), round(mean + 3 * std)
 
   # print(df.describe())
+  if filename is not None:
+    df = df[df['filename'] == filename]
   abnormal = df[(df[prop] < min) | (df[prop] > max)]
 
   if not abnormal.empty:
@@ -49,7 +51,7 @@ def find_abnormals(letter, df, prop):
 
 if __name__ == '__main__':
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(fragments=ISAIAH_SET, filter=SINGLE_LETTERS_ONLY)
+  dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} letters')
   letters = []
   for img, label, metadata in dataset:
@@ -70,7 +72,8 @@ if __name__ == '__main__':
         f"Mode: {counts.round(-2).mode().tolist()}, Std: {std:.2f},",
         f"90% interval: {mean - 1.645 * std:.2f} to {mean + 1.645 * std:.2f}")
 
-  find_abnormals("all", df, 'width')
+  filename = 'war-column-1'
+  find_abnormals("all", df, 'width', filename)
   # find_abnormals("all", df, 'height')
 
   lessthan_7 = df[df['width'] < 7]
@@ -83,5 +86,5 @@ if __name__ == '__main__':
 
   groups = df.groupby("value")
   for letter, group in groups:
-    find_abnormals(letter, group, 'width')
-    find_abnormals(letter, group, 'height')
+    find_abnormals(letter, group, 'width', filename)
+    find_abnormals(letter, group, 'height', filename)

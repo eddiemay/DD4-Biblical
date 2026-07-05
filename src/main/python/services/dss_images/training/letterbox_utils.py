@@ -2,7 +2,6 @@ import cv2
 import json
 import os
 import numpy as np
-import torch
 import torchvision.transforms as transforms
 from PIL import Image as PilImage
 from typing import TypedDict
@@ -12,17 +11,19 @@ from utility import romanize, unfinalize
 
 letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1'
+LETTERBOX_BY_FRAGMENT_URL =(
+		API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1')
 TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
 												[2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27,
-												 29, 36, 37, 40, 44, 45, 47, 48, 53]))
-# Not represented
-# 1, 54, 31, 51, 8, 5, 33, 25, 19, 28, 30, 15, 23, 35, 21, 46
+												 28, 29, 31, 36, 37, 40, 44, 45, 47, 48, 50, 53]))
+NON_TRAIN_ISA = list(map(lambda c: f'isaiah-column-{c}',
+												 [1, 3, 5, 6, 8, 10, 15, 19, 21, 22, 23, 25, 30, 32,
+													33, 34, 35, 38, 39, 41, 42, 43, 46, 40, 51, 52, 54]))
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
 ALL = ISAIAH_SET.copy()
 ALL.extend(
 		['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2',
-		 '4QCalendrical-4Q320-Frag3', 'temple-column-4'])
+		 '4QCalendrical-4Q320-Frag3', 'temple-column-4', 'war-column-1'])
 SINGLE_LETTERS_ONLY = lambda lb:lb['type'] == 'Letter' and len(lb['value']) == 1
 mean, std = (0.5,), (0.5,)
 LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
@@ -35,6 +36,19 @@ THRESHOLD_NAMES = {
 	cv2.THRESH_MASK: 'THRESH_MASK',
 	cv2.THRESH_OTSU: 'THRESH_OTSU',
 	cv2.THRESH_TRIANGLE: 'THRESH_TRIANGLE'}
+
+
+class Resize:
+	def __init__(self, target_w, target_h):
+		self.target_w = target_w
+		self.target_h = target_h
+
+	def __call__(self, img):
+		h, w = img.shape[:2]
+		scale = min(self.target_w / w, self.target_h / h)
+		return cv2.resize(
+				img, (round(w * scale), round(h * scale)),
+				interpolation=cv2.INTER_CUBIC if scale > 1 else cv2.INTER_AREA)
 
 
 class ToPilImage:
@@ -57,9 +71,9 @@ class PadToSize:
 
 
 test_transform = transforms.Compose([
+	Resize(32, 64),
 	ToPilImage(),
-	PadToSize(40, 80, 0),
-	transforms.CenterCrop([40, 80]),
+	PadToSize(32, 64, 0),
 	transforms.GaussianBlur(3, sigma=(0.1, 1.5)),
 	transforms.Grayscale(),
 	transforms.ToTensor(),
@@ -129,9 +143,11 @@ def parse_file_name(file_name):
 	return scroll, is_column, fragment_or_colnum
 
 
-def get_img_file_path(file_name, res):
-	scroll, is_column, fragment = parse_file_name(file_name)
-	return f"../images/{scroll}/columns/column_{res}_{fragment}.jpg" if is_column else f"../images/{scroll}/columns/{fragment}.jpg"
+def get_img_file_path(filename, res):
+	scroll, is_column, fragment = parse_file_name(filename)
+	res = 8 if filename.startswith('war-column') else res
+	return f"../images/{scroll}/columns/column_{res}_{fragment}.jpg" if is_column \
+		else f"../images/{scroll}/columns/{fragment}.jpg"
 
 
 file_img_cache: dict[str, np.ndarray] = {}
@@ -322,28 +338,25 @@ if __name__ == '__main__':
 	dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
 	print(f'Training Dataset {len(dataset)} letters')
 	for i in range(3):
-		image, label, metadata = dataset[i]
-		cv2.imshow(
-			f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})",
-			image)
+		image, label, md = dataset[i]
+		cv2.imshow(f"{md['value']} {md['filename']} ({md['x1']},{md['y1']})",
+							 image)
 		cv2.waitKey(2000)
 
 	imageDataset = DSSLettersDataset()
 	print(f'Training Dataset {len(imageDataset)} letters and rows')
 	for i in range(3):
-		image, label, metadata = imageDataset[i]
-		cv2.imshow(
-			f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})",
-			image)
+		image, label, md = imageDataset[i]
+		cv2.imshow(f"{md['value']} {md['filename']} ({md['x1']},{md['y1']})",
+							 image)
 		cv2.waitKey(2000)
 
 	imageDataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
 	print(f'All Dataset {len(imageDataset)} letters')
 	for i in range(3):
 		image, label, metadata = imageDataset[i]
-		cv2.imshow(
-			f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})",
-			image)
+		cv2.imshow(f"{md['value']} {md['filename']} ({md['x1']},{md['y1']})",
+							 image)
 		cv2.waitKey(2000)
 
 	multiLetter = DSSLettersDataset(
@@ -351,11 +364,10 @@ if __name__ == '__main__':
 			filter=lambda lb: lb['type'] == 'Letter' and len(lb['value']) > 1)
 	print(f'Multi Letter Sets: {len(multiLetter)}')
 	for i in range(len(multiLetter)):
-		image, label, metadata = multiLetter[i]
-		print(f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})")
-		cv2.imshow(
-				f"{metadata['value']} {metadata['filename']} ({metadata['x1']},{metadata['y1']})",
-				image)
+		image, label, md = multiLetter[i]
+		print(f"{md['value']} {md['filename']} ({md['x1']},{md['y1']})")
+		cv2.imshow(f"{md['value']} {md['filename']} ({md['x1']},{md['y1']})",
+							 image)
 		cv2.waitKey(2000)
 
 	image = get_image(

@@ -354,9 +354,9 @@ def train(iters, preprocessor, samples=False, resume=False):
 	trainer.train()
 
 
-def predict(predictor, test_id, display=True, preprocessor=None):
+def predict(predictor, column, display=True, preprocessor=None):
 	start_time = time.time()
-	img_file = f'../images/isaiah/columns/column_9_{test_id}.jpg'
+	img_file = f'../images/isaiah/columns/column_9_{column}.jpg'
 	image = process_image(cv2.imread(img_file), preprocessor)[0]
 	if len(image.shape) == 2:
 		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
@@ -374,7 +374,7 @@ def predict(predictor, test_id, display=True, preprocessor=None):
 	classes = instances.pred_classes.numpy()
 	scores = instances.scores.numpy()
 
-	fragment = f'isaiah-column-{test_id}'
+	fragment = f'isaiah-column-{column}'
 	letter_boxes = []
 	for box, cls, score in zip(boxes, classes, scores):
 		x1, y1, x2, y2 = map(int, box)
@@ -419,11 +419,10 @@ def predict(predictor, test_id, display=True, preprocessor=None):
 	return outputs, letter_boxes, nms
 
 
-def evaluate(predictor, test_id, display=True, preprocessor=None,
+def evaluate(predictor, column, display=True, preprocessor=None,
 		override=False):
-	fragment = f'isaiah-column-{test_id}'
-	outputs, letter_boxes, nms = predict(predictor, test_id, display,
-																			 preprocessor)
+	fragment = f'isaiah-column-{column}'
+	outputs, letter_boxes, nms = predict(predictor, column, display, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [],
@@ -493,7 +492,7 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 				break
 	print(f'NMS {added_letters} letters added')
 
-	target_text = get_isa_text(test_id)
+	target_text = get_isa_text(column)
 	pred_text = ''
 	repred_text = ''
 	remove_mismatch_text = ''
@@ -524,7 +523,7 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 	ld_no_space = Levenshtein.distance(no_space_text, ''.join(nms_rp_text.split()))
 	no_space_percent = round((len(no_space_text) - ld_no_space) * 100 / len(no_space_text), 2)
 	print(
-			f'{test_id} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
+			f'{fragment} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
 			f'Remove Miss Diff: {rm_ld} {rm_percent}%, Remove Union Text: {ru_ld} {ru_percent}%,',
 			f'NMS Diff: {nms_ld} {nms_percent}%, NMS RP Diff: {nms_rp_ld} {nms_rp_percent}%,',
 			f'No Space Diff: {ld_no_space} {no_space_percent}%',
@@ -539,10 +538,9 @@ def evaluate(predictor, test_id, display=True, preprocessor=None,
 	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent, no_space_percent
 
 
-def label_fragment(predictor, test_id, preprocessor=None):
-	fragment = f'isaiah-column-{test_id}'
-	_, _, nms_letter_boxes = predict(predictor, test_id,
-																	 preprocessor=preprocessor)
+def label_fragment(predictor, column, preprocessor=None):
+	fragment = f'isaiah-column-{column}'
+	_, _, nms_letter_boxes = predict(predictor, column, preprocessor=preprocessor)
 
 	for letter_box in nms_letter_boxes:
 		letter_box['value'] = letter_box['_predicted']
@@ -709,12 +707,14 @@ if __name__ == '__main__':
 	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
 	predictor = DefaultPredictor(cfg)
 
-	verify(predictor, preprocessor=pp, non_labeled_only=True)
-	# evaluate(predictor, 1, True, preprocessor=pp, override=True)
-		#			 preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
-	# evaluate(predictor, 39, True, preprocessor=pp, override=True)
+	# evaluate(predictor, 1, False, preprocessor=pp, override=True)
+	evaluate(predictor, 28, False, preprocessor=pp, override=True)
+	# evaluate(predictor, 54, False, preprocessor=pp, override=True)
+	# verify(predictor, preprocessor=pp, non_labeled_only=False)
+			# preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
+	# evaluate(predictor, 23, True, preprocessor=pp, override=True)
 	# evaluate(predictor, 43, True, preprocessor=pp, override=True)
-	# label_fragment(predictor, 31, preprocessor=pp)
+	# label_fragment(predictor, 30, preprocessor=pp)
 
 # No preprocessing
 # [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]

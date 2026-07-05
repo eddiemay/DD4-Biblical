@@ -4,8 +4,8 @@ import time
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage, \
-	PadToSize, mean, std, test_transform, ALL, process_image
+from letterbox_utils import (DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, \
+	PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image, ISAIAH_SET, NON_TRAIN_ISA)
 from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
 	visualize_augmentations, DD4Subset, conv_block
 from torch.utils.data import DataLoader
@@ -26,12 +26,10 @@ class Preprocess:
 
 
 train_transform = transforms.Compose([
+	Resize(32, 64),
 	ToPilImage(),
-	PadToSize(44, 84, 0),
-	transforms.CenterCrop([40, 80]),
-	transforms.RandomRotation(degrees=10),
-	transforms.RandomAffine(degrees=0, translate=(0.05, 0.05), scale=(0.9, 1.1)),
-	# transforms.RandomHorizontalFlip(),
+	PadToSize(32, 64, 0),
+	transforms.RandomAffine(degrees=20, translate=(0.05, 0.05), scale=(0.7, 1.3)),
 	transforms.RandomPerspective(distortion_scale=0.2, p=0.3),
 	transforms.ColorJitter(brightness=0.3, contrast=0.3),
 	transforms.GaussianBlur(3, sigma=(0.1, 1.5)),
@@ -82,7 +80,7 @@ if __name__ == '__main__':
 	model = DD4PyTorchModel(
 			train_loader=train_loader, val_loader=val_loader,
 			loss_function=loss_function, layers=nn.Sequential(*layers),
-			checkpoint_path=checkpoint_path, min_val_accuracy=97.71
+			checkpoint_path=checkpoint_path, min_val_accuracy=97.75
 	)
 
 	num_params = sum(p.numel() for p in model.parameters())
@@ -94,7 +92,7 @@ if __name__ == '__main__':
 
 	if train or not os.path.exists(checkpoint_path):
 		train_start_time = time.time()
-		num_epochs = 80
+		num_epochs = 120
 		optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
 		scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,
 																													 T_max=num_epochs)
@@ -105,17 +103,26 @@ if __name__ == '__main__':
 		print(f'Training time {(time.time() - train_start_time)} seconds')
 
 	model.reload(checkpoint_path)
+
 	test_loader = DataLoader(test_dataset, batch_size=1000)
 	loss, accuracy = model.evaluate(test_loader)
-	print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%')
+	print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%, Items: {len(test_dataset)}')
 
 	full_loader = DataLoader(DD4Subset(dataset, test_transform), batch_size=1000)
 	loss, accuracy = model.evaluate(full_loader)
-	print(f'Full Loss: {loss:.2f}, Full Accuracy: {accuracy:.2f}%')
+	print(f'Full Train Loss: {loss:.2f}, Full Accuracy: {accuracy:.2f}%, Items: {len(dataset)}')
+
+	nt_dataset = DSSLettersDataset(fragments=NON_TRAIN_ISA, filter=SINGLE_LETTERS_ONLY)
+	non_train_loader = DataLoader(DD4Subset(nt_dataset, test_transform), batch_size=1000)
+	loss, accuracy = model.evaluate(non_train_loader)
+	print(f'Non Train Isa Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(nt_dataset)}')
+
+	isa_dataset = DSSLettersDataset(fragments=ISAIAH_SET, filter=SINGLE_LETTERS_ONLY)
+	isa_loader = DataLoader(DD4Subset(isa_dataset, test_transform), batch_size=1000)
+	loss, accuracy = model.evaluate(isa_loader)
+	print(f'Isa Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(isa_dataset)}')
 
 	all_dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
-	all_loader = DataLoader(DD4Subset(all_dataset, test_transform),
-													batch_size=1000)
+	all_loader = DataLoader(DD4Subset(all_dataset, test_transform), batch_size=1000)
 	loss, accuracy = model.evaluate(all_loader)
-	print(
-		f'All Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(all_dataset)}')
+	print(f'All Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(all_dataset)}')

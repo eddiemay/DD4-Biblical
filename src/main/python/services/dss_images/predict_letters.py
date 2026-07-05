@@ -5,7 +5,15 @@ import onnxruntime as ort
 mean, std = (0.5,), (0.5,)
 
 
-def pad_to_size(img: np.ndarray, target_h: int, target_w: int, fill=0) -> np.ndarray:
+def resize(img: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
+  h, w = img.shape[:2]
+  scale = min(target_w / w, target_h / h)
+  return cv2.resize(
+      img, (round(w * scale), round(h * scale)),
+      interpolation=cv2.INTER_CUBIC if scale > 1 else cv2.INTER_AREA)
+
+
+def pad_to_size(img: np.ndarray, target_w: int, target_h: int, fill=0) -> np.ndarray:
   h, w = img.shape[:2]
 
   pad_w = max(0, target_w - w)
@@ -23,7 +31,7 @@ def pad_to_size(img: np.ndarray, target_h: int, target_w: int, fill=0) -> np.nda
   )
 
 
-def center_crop(img: np.ndarray, target_h: int, target_w: int) -> np.ndarray:
+def center_crop(img: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
   h, w = img.shape[:2]
 
   top = max(0, (h - target_h) // 2)
@@ -59,8 +67,8 @@ def normalize(tensor: np.ndarray, mean, std) -> np.ndarray:
 
 
 def transform(img: np.ndarray, mean, std) -> np.ndarray:
-  img = pad_to_size(img, 40, 80, 0)
-  img = center_crop(img, 40, 80)
+  img = resize(img, 32, 64)
+  img = pad_to_size(img, 32, 64, 0)
   img = gaussian_blur(img, 3, 0.1, 1.5)
   img = to_grayscale(img)
   tensor = to_tensor(img)
@@ -168,9 +176,11 @@ def get_image(letter_box:dict) -> np.ndarray:
 if __name__ == '__main__':
   import json
   items = []
-  with open('training/4Q320-Frag1.jsonl', "r", encoding="utf-8") as f:
+  with open('training/letter_boxes.jsonl', "r", encoding="utf-8") as f:
     for line in f:
-      items.append(json.loads(line))
+      item = json.loads(line)
+      if item['filename'] == 'war-column-1':
+        items.append(item)
 
   predict_letters(items)
   missmatch = 0

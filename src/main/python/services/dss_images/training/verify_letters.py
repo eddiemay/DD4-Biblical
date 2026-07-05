@@ -3,10 +3,9 @@ import numpy as np
 import onnxruntime as ort
 import pandas as pd
 from PIL import Image as PilImage
-from label_fragment import send_json_req, LETTERBOX_BATCH_CREATE_URL
 from letterbox_stats import VISUALIZE_PAGE_SIZE
-from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ToPilImage,\
-  get_image, parse_file_name, test_transform, LABEL_LOOKUP
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, ISAIAH_SET,\
+  ToPilImage, get_image, parse_file_name, test_transform, LABEL_LOOKUP
 from scipy.special import softmax
 from sklearn.metrics import confusion_matrix
 from src.main.python.ml.dd4_ml import DD4Subset
@@ -40,7 +39,7 @@ def visualize_missmatch(title, df):
 
 
 if __name__ == '__main__':
-  dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
+  dataset = DSSLettersDataset(fragments=ISAIAH_SET, filter=SINGLE_LETTERS_ONLY)
   print(f'Dataset {len(dataset)} items')
   data_loader = DataLoader(DD4Subset(dataset, test_transform), batch_size=1000)
 
