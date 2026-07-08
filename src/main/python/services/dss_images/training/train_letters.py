@@ -4,10 +4,10 @@ import time
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from letterbox_utils import (DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, \
-	PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image, ISAIAH_SET, NON_TRAIN_ISA)
-from src.main.python.ml.dd4_ml import DD4PyTorchModel, random_split, \
-	visualize_augmentations, DD4Subset, conv_block
+from letterbox_utils import (
+	DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, TRAINING_SET, VAL_SET, TEST_SET, \
+	ISAIAH_SET, PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image)
+from src.main.python.ml.dd4_ml import DD4PyTorchModel, visualize_augmentations, DD4Subset, conv_block
 from torch.utils.data import DataLoader
 
 pd.set_option("display.max_columns", None)
@@ -39,18 +39,11 @@ train_transform = transforms.Compose([
 ])
 
 if __name__ == '__main__':
-	train = False
-	dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
-	print(f'Dataset {len(dataset)} items')
+	train = True
+	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, transform=train_transform)
+	val_dataset = DSSLettersDataset(VAL_SET, SINGLE_LETTERS_ONLY, test_transform)
+	test_dataset = DSSLettersDataset(TEST_SET, SINGLE_LETTERS_ONLY, test_transform)
 
-	# Split into train/val/test: 80/15/5
-	train_size = int(0.80 * len(dataset))
-	val_size = int(0.10 * len(dataset))
-	test_size = len(dataset) - train_size - val_size
-
-	train_dataset, val_dataset, test_dataset = random_split(
-			dataset, [train_size, val_size, test_size],
-			[train_transform, test_transform, test_transform])
 	print(f'Train: {len(train_dataset)} items')
 	print(f'Val: {len(val_dataset)} items')
 	print(f'Test: {len(test_dataset)} items')
@@ -72,7 +65,7 @@ if __name__ == '__main__':
 		nn.Linear(256, 256),
 		nn.ReLU(),
 		nn.Dropout(0.2),
-		nn.Linear(256, len(dataset.classes))
+		nn.Linear(256, len(train_dataset.classes))
 	]
 
 	loss_function = nn.CrossEntropyLoss(label_smoothing=0.1)
@@ -80,7 +73,7 @@ if __name__ == '__main__':
 	model = DD4PyTorchModel(
 			train_loader=train_loader, val_loader=val_loader,
 			loss_function=loss_function, layers=nn.Sequential(*layers),
-			checkpoint_path=checkpoint_path, min_val_accuracy=97.75
+			checkpoint_path=checkpoint_path, min_val_accuracy=97
 	)
 
 	num_params = sum(p.numel() for p in model.parameters())
@@ -104,25 +97,36 @@ if __name__ == '__main__':
 
 	model.reload(checkpoint_path)
 
+	eval_start = time.time()
+	train_dataset = DSSLettersDataset(TRAINING_SET, SINGLE_LETTERS_ONLY, test_transform)
+	train_loader = DataLoader(train_dataset, batch_size=1000)
+	loss, accuracy = model.evaluate(train_loader)
+	print(f'Train Loss: {loss:.2f}, Train Accuracy: {accuracy:.2f}%, Items: {len(train_dataset)}')
+	print(f"Eval took: {time.time() - eval_start} seconds")
+
+	start = time.time()
+	loss, accuracy = model.evaluate(val_loader)
+	print(f'Val Loss: {loss:.2f}, Val Accuracy: {accuracy:.2f}%, Items: {len(val_dataset)}')
+	print(f"Eval took: {time.time() - start} seconds")
+
+	start = time.time()
 	test_loader = DataLoader(test_dataset, batch_size=1000)
 	loss, accuracy = model.evaluate(test_loader)
 	print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%, Items: {len(test_dataset)}')
+	print(f"Eval took: {time.time() - start} seconds")
 
-	full_loader = DataLoader(DD4Subset(dataset, test_transform), batch_size=1000)
-	loss, accuracy = model.evaluate(full_loader)
-	print(f'Full Train Loss: {loss:.2f}, Full Accuracy: {accuracy:.2f}%, Items: {len(dataset)}')
-
-	nt_dataset = DSSLettersDataset(fragments=NON_TRAIN_ISA, filter=SINGLE_LETTERS_ONLY)
-	non_train_loader = DataLoader(DD4Subset(nt_dataset, test_transform), batch_size=1000)
-	loss, accuracy = model.evaluate(non_train_loader)
-	print(f'Non Train Isa Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(nt_dataset)}')
-
-	isa_dataset = DSSLettersDataset(fragments=ISAIAH_SET, filter=SINGLE_LETTERS_ONLY)
-	isa_loader = DataLoader(DD4Subset(isa_dataset, test_transform), batch_size=1000)
+	start = time.time()
+	isa_dataset = DSSLettersDataset(ISAIAH_SET, SINGLE_LETTERS_ONLY, test_transform)
+	isa_loader = DataLoader(isa_dataset, batch_size=1000)
 	loss, accuracy = model.evaluate(isa_loader)
 	print(f'Isa Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(isa_dataset)}')
+	print(f"Eval took: {time.time() - start} seconds")
 
-	all_dataset = DSSLettersDataset(fragments=ALL, filter=SINGLE_LETTERS_ONLY)
-	all_loader = DataLoader(DD4Subset(all_dataset, test_transform), batch_size=1000)
+	start = time.time()
+	all_dataset = DSSLettersDataset(ALL, SINGLE_LETTERS_ONLY, test_transform)
+	all_loader = DataLoader(all_dataset, batch_size=1000)
 	loss, accuracy = model.evaluate(all_loader)
 	print(f'All Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(all_dataset)}')
+	print(f"Eval took: {time.time() - start} seconds")
+
+	print(f"Total Eval took: {time.time() - eval_start} seconds")

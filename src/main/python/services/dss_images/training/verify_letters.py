@@ -20,8 +20,8 @@ def visualize_missmatch(title, df):
 
   for i, row in enumerate(df.itertuples()):
     _, _, frag = parse_file_name(row.filename)
-    img = toPilImage(get_image({'filename': row.filename,
-                                'x1': row.x1, 'y1': row.y1, 'x2': row.x2, 'y2': row.y2}))
+    img = toPilImage(get_image({'filename': row.filename, 'x1': row.x1,
+                                'y1': row.y1, 'x2': row.x2, 'y2': row.y2}))
     if isinstance(img, PilImage.Image):
       axes[i].imshow(img)
     elif img.shape[0] == 1: # If gray scale.

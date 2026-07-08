@@ -14,11 +14,12 @@ API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL =(
 		API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1')
 TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
-												[2, 4, 7, 9, 11, 12, 13, 14, 16, 17, 18, 20, 24, 26, 27,
-												 28, 29, 31, 36, 37, 40, 44, 45, 47, 48, 50, 53]))
-NON_TRAIN_ISA = list(map(lambda c: f'isaiah-column-{c}',
-												 [1, 3, 5, 6, 8, 10, 15, 19, 21, 22, 23, 25, 30, 32,
-													33, 34, 35, 38, 39, 41, 42, 43, 46, 40, 51, 52, 54]))
+												[2, 4, 9, 11, 12, 13, 14, 16, 18, 20, 24, 26,
+												 28, 29, 31, 36, 38, 40, 44, 45, 48, 50, 52, 53]))
+VAL_SET = list(map(lambda c: f'isaiah-column-{c}', [7, 17, 27, 37, 47]))
+TEST_SET = list(map(lambda c: f'isaiah-column-{c}',
+										[1, 3, 5, 6, 8, 10, 15, 19, 21, 22, 23, 25,
+										 30, 32, 33, 34, 35, 39, 41, 42, 43, 46, 49, 51, 54]))
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
 ALL = ISAIAH_SET.copy()
 ALL.extend(
@@ -274,6 +275,15 @@ def process_image(img, params):
 	return img, name
 
 
+def get_y_at_x(row_box, x):
+	coords = row_box['coords']
+	ci = 0
+	while coords[ci + 1]['x'] <= x:
+		ci += 1
+	slope = (coords[ci + 1]['y'] - coords[ci]['y']) / (coords[ci + 1]['x'] - coords[ci]['x'])
+	return (x - coords[ci]['x']) * slope + coords[ci]['y']
+
+
 def is_in_row(row_box, letter_box):
 	if (row_box['filename'] != letter_box['filename']
 			or row_box['y2'] < letter_box['y2']
@@ -281,15 +291,7 @@ def is_in_row(row_box, letter_box):
 			or row_box['x2'] < letter_box['x2']):
 		return False
 
-	coords = row_box['coords']
-	ci = 0
-	while coords[ci + 1]['x'] <= letter_box['x1']:
-		ci += 1
-	slope = (coords[ci + 1]['y'] - coords[ci]['y']) / (
-			coords[ci + 1]['x'] - coords[ci]['x'])
-	yAtX = (letter_box['x1'] - coords[ci]['x']) * slope + coords[ci]['y']
-
-	return yAtX >= letter_box['y2']
+	return get_y_at_x(row_box, letter_box['x1']) >= letter_box['y2']
 
 
 row_map = {}

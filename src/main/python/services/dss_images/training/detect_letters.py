@@ -15,7 +15,7 @@ from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, ISAIAH_SET, \
-	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, \
+	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, VAL_SET, \
 	get_isa_text, get_row, is_in_row, process_image
 from predict_letters import predict_letters
 from scipy import stats
@@ -23,10 +23,8 @@ from train_by_labels import process
 from urllib import request
 from utility import intersection_over_union
 
-TRAIN_IDS = ['2', '11', '24', '36', '45']
-VAL_IDS = ['7', '17', '27', '37', '47']
 ANNO_IDS = {}
-DATASET_BASE = 'detection/dataset'
+DATASET_BASE = 'detect_letters/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3, "crop": [122, 1920]}
@@ -197,7 +195,7 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
 # cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
 
-cfg.OUTPUT_DIR = "detection/output"
+cfg.OUTPUT_DIR = "detect_letters/output"
 
 cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[4, 8, 16, 32]]
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3  # or 0.2
@@ -248,19 +246,16 @@ def setup_samples(preprocessor=None):
 
 	image_start = time.time()
 	for frag in TRAINING_SET:
-		conf = train_conf if parse_file_name(frag)[2] not in VAL_IDS else val_conf
-		row_30 = get_row(frag, 30)
 		for r in range(1, 33):
-			# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r, 'preprocessor': preprocessor})
-			# if r % 3 == 1:
-			# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+2, 'preprocessor': preprocessor})
 			if r % 7 == 1:
-				append_data(conf, {'fragment': frag, 'srow': r, 'erow': r + 6,
+				append_data(train_conf, {'fragment': frag, 'srow': r, 'erow': r + 6,
 													 'preprocessor': preprocessor})
-		# if r % 10 == 1 and row_30 is not None:
-		# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+9, 'preprocessor': preprocessor})
-		# if r % 14 == 1 and row_30 is None:
-		# append_data(conf, {'fragment': frag, 'srow': r, 'erow': r+13, 'preprocessor': preprocessor})
+
+	for frag in VAL_SET:
+		for r in range(1, 33):
+			if r % 7 == 1:
+				append_data(val_conf, {'fragment': frag, 'srow': r, 'erow': r + 6,
+																 'preprocessor': preprocessor})
 
 	print(f'Files creation time: {time.time() - image_start} seconds')
 
@@ -288,13 +283,16 @@ def setup_data(preprocessor):
 	files = {}
 	letter_id = 0
 	y_offset = preprocessor["crop"][0] if preprocessor.get("crop") is not None else 0
-	dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY)
+	fragments = []
+	fragments.extend(TRAINING_SET)
+	fragments.extend(VAL_SET)
+	dataset = DSSLettersDataset(fragments, SINGLE_LETTERS_ONLY)
 	for _, label, letter_box in dataset:
 		filename = letter_box['filename']
 		image_id = parse_file_name(filename)[2]
 		if filename not in files:
 			files[filename] = image_id
-		conf = train_conf if image_id not in VAL_IDS else val_conf
+		conf = train_conf if filename not in VAL_SET else val_conf
 
 		x, y = letter_box['x1'], letter_box['y1']
 		width, height = letter_box['x2'] - x, letter_box['y2'] - y
@@ -305,7 +303,7 @@ def setup_data(preprocessor):
 
 	for filename, id in files.items():
 		conf, path = (train_conf, f'{IMAGES_BASE}/train') \
-			if id not in VAL_IDS else (val_conf, f'{IMAGES_BASE}/val')
+			if filename not in VAL_SET else (val_conf, f'{IMAGES_BASE}/val')
 		file_path = get_img_file_path(filename, 9)
 		img = process_image(cv2.imread(file_path), preprocessor)[0]
 		h, w = img.shape[:2]
@@ -708,7 +706,7 @@ if __name__ == '__main__':
 	predictor = DefaultPredictor(cfg)
 
 	# evaluate(predictor, 1, False, preprocessor=pp, override=True)
-	evaluate(predictor, 28, False, preprocessor=pp, override=True)
+	evaluate(predictor, 28, True, preprocessor=pp, override=False)
 	# evaluate(predictor, 54, False, preprocessor=pp, override=True)
 	# verify(predictor, preprocessor=pp, non_labeled_only=False)
 			# preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
