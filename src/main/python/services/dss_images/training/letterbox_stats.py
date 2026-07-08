@@ -36,7 +36,8 @@ def find_abnormals(letter, df, prop, filename):
   letter_means = df.groupby("value")[[prop]].mean()
   nw_mean = letter_means[prop].mean()
   nw_std = letter_means[prop].std()
-  nw_min, nw_max = round(nw_mean - 3 * nw_std), round(nw_mean + 3 * nw_std)
+  nw_7l, nw_7h = round(nw_mean - 3 * nw_std), round(nw_mean + 3 * nw_std)
+  nw_max = letter_means[prop].max()
 
   # print(df.describe())
   if filename is not None:
@@ -47,7 +48,7 @@ def find_abnormals(letter, df, prop, filename):
     title = (f'{len(abnormal)} abnormal {prop} for {letter}: mean: {mean:.1f}, '
              f'std: {std:.1f}, normal range: {min}-{max}')
     print(title)
-    print("Non weigthed", f'mean: {nw_mean:.1f}, std: {nw_std:.1f}, normal range: {nw_min}-{nw_max}')
+    print("Non wiegthed", f'mean: {nw_mean:.1f}, std: {nw_std:.1f}, normal range: {nw_7l}-{nw_7h}, max: {nw_max}')
     for start in range(0, len(abnormal), VISUALIZE_PAGE_SIZE):
       page = abnormal.iloc[start:start + VISUALIZE_PAGE_SIZE]
       visualize_abnormals(f"{title} ({start + 1}–{start + len(page)})", page)
