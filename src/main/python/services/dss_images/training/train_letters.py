@@ -26,9 +26,9 @@ class Preprocess:
 
 
 train_transform = transforms.Compose([
-	Resize(32, 64),
+	Resize(20, 40),
 	ToPilImage(),
-	PadToSize(32, 64, 0),
+	PadToSize(20, 40, 0),
 	transforms.RandomAffine(degrees=20, translate=(0.05, 0.05), scale=(0.7, 1.3)),
 	transforms.RandomPerspective(distortion_scale=0.2, p=0.3),
 	transforms.ColorJitter(brightness=0.3, contrast=0.3),
@@ -37,6 +37,12 @@ train_transform = transforms.Compose([
 	transforms.ToTensor(),
 	transforms.Normalize(mean, std),
 ])
+# model     Train   Val      Test   All
+# 32x64 256 99.32%, 97.63%, 97.05%, 98.03%
+# 32x64 128 could not get passed 96.46% Val
+# 26x50 256 98.80%, 97.57%, 97.03%, 97.74%
+# 20x28 256 99.37%, 97.52%, 96.99%, 97.98%
+# 20x40 256 99.36%, 97.37%, 96.79%, 97.99%
 
 if __name__ == '__main__':
 	train = True

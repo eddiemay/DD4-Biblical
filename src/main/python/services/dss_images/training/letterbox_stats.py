@@ -92,6 +92,9 @@ if __name__ == '__main__':
         f"Mode: {counts.round(-2).mode().tolist()}, Std: {std:.2f},",
         f"90% interval: {mean - 1.645 * std:.2f} to {mean + 1.645 * std:.2f}")
 
+  letter_means = df.groupby("value")[['width', 'height']].mean()
+  print(letter_means)
+
   filename = None # 'war-column-1'
   find_abnormals("all", df, 'width', filename)
   find_abnormals("all", df, 'height', filename)

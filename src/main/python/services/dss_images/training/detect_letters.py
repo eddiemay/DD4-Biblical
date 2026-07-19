@@ -417,8 +417,7 @@ def predict(predictor, column, display=True, preprocessor=None):
 	return outputs, letter_boxes, nms
 
 
-def evaluate(predictor, column, display=True, preprocessor=None,
-		override=False):
+def evaluate(predictor, column, display=True, preprocessor=None, override=False):
 	fragment = f'isaiah-column-{column}'
 	outputs, letter_boxes, nms = predict(predictor, column, display, preprocessor)
 

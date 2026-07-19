@@ -72,9 +72,9 @@ class PadToSize:
 
 
 test_transform = transforms.Compose([
-	Resize(32, 64),
+	Resize(20, 40),
 	ToPilImage(),
-	PadToSize(32, 64, 0),
+	PadToSize(20, 40, 0),
 	transforms.GaussianBlur(3, sigma=(0.1, 1.5)),
 	transforms.Grayscale(),
 	transforms.ToTensor(),
