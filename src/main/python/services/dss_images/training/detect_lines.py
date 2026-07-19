@@ -11,6 +11,7 @@ from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer
+from detectron2.evaluation import COCOEvaluator
 from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
@@ -168,6 +169,15 @@ def setup_data(preprocessor):
 		json.dump(val_conf, f, indent=True)
 
 
+class Trainer(DefaultTrainer):
+	@classmethod
+	def build_evaluator(cls, cfg, dataset_name, output_folder=None):
+		if output_folder is None:
+			output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
+
+		return COCOEvaluator(dataset_name, output_dir=output_folder)
+
+
 def train(iters, preprocessor, resume=False):
 	setup_data(preprocessor)
 
@@ -201,7 +211,7 @@ def train(iters, preprocessor, resume=False):
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
 	print('Training with conf:', cfg)
-	trainer = DefaultTrainer(cfg)
+	trainer = Trainer(cfg)
 	trainer.resume_or_load(resume=resume)
 	trainer.train()
 
