@@ -129,6 +129,7 @@ def setup_data(preprocessor):
 		else:
 			files[filename]["letters"].append(letter_box)
 
+	row_id = 0
 	for filename, file in files.items():
 		conf = train_conf if filename not in VAL_SET else val_conf
 		image_id = parse_file_name(filename)[2]
@@ -137,7 +138,7 @@ def setup_data(preprocessor):
 
 		pts = []
 		for row_box in row_boxes:
-			row_id = f'{filename}-{row_box["value"]}'
+			row_id += 1
 			segmentation, bbox = get_segmentation(row_box)
 			conf["annotations"].append(
 					{"id": row_id, "image_id": image_id, "category_id": 1,
