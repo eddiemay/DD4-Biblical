@@ -110,7 +110,7 @@ def setup_data(preprocessor):
 
 	train_conf = {"images": [], "categories": [], "annotations": []}
 	val_conf = {"images": [], "categories": [], "annotations": []}
-	category = {"id": 0, "name": "row", "supercategory": "text"}
+	category = {"id": 1, "name": "row", "supercategory": "text"}
 	train_conf["categories"].append(category)
 	val_conf["categories"].append(category)
 
@@ -140,7 +140,7 @@ def setup_data(preprocessor):
 			row_id = f'{filename}-{row_box["value"]}'
 			segmentation, bbox = get_segmentation(row_box)
 			conf["annotations"].append(
-					{"id": row_id, "image_id": image_id, "category_id": 0,
+					{"id": row_id, "image_id": image_id, "category_id": 1,
 					 "segmentation": [segmentation],
 					 "bbox": bbox, "area": bbox[2] * bbox[3], "iscrowd": 0})
 			pts.append(np.array(segmentation, dtype=np.int32).reshape((-1, 2)))
