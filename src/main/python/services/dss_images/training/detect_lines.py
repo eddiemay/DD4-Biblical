@@ -204,8 +204,8 @@ def train(iters, preprocessor, resume=False):
 
 	cfg.SOLVER.IMS_PER_BATCH = 1
 	cfg.SOLVER.BASE_LR = 0.000250
-	cfg.SOLVER.STEPS = (8000, 10000)
-	cfg.SOLVER.GAMMA = 0.1
+	cfg.SOLVER.STEPS = (6000, 7000)
+	cfg.SOLVER.GAMMA = 0.5
 
 	cfg.DATALOADER.NUM_WORKERS = 1
 
@@ -414,7 +414,7 @@ if __name__ == '__main__':
 	force_train = False
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--preprocess', action='store_true')
-	parser.add_argument('--iters', type=int, default=12000)
+	parser.add_argument('--iters', type=int, default=7500)
 	parser.add_argument('--samples', action='store_true')
 	parser.add_argument('--max_size', type=int, default=2270)
 	parser.add_argument('--resume', action='store_true')
@@ -429,7 +429,7 @@ if __name__ == '__main__':
 	cfg.INPUT.MIN_SIZE_TEST = 1280
 	cfg.INPUT.MAX_SIZE_TEST = args.max_size
 	cfg.INPUT.RANDOM_FLIP = "none"
-	cfg.TEST.EVAL_PERIOD = 500
+	cfg.TEST.EVAL_PERIOD = 250
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
 	cfg.MODEL.RPN.PRE_NMS_TOPK_TRAIN = 1000
 	cfg.MODEL.RPN.POST_NMS_TOPK_TRAIN = 500
