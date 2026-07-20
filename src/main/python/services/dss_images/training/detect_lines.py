@@ -129,10 +129,10 @@ def setup_data(preprocessor):
 		else:
 			files[filename]["letters"].append(letter_box)
 
-	row_id = 0
+	row_id = 100
 	for filename, file in files.items():
 		conf = train_conf if filename not in VAL_SET else val_conf
-		image_id = parse_file_name(filename)[2]
+		image_id = int(parse_file_name(filename)[2])
 		row_boxes = file["rows"]
 		set_rows(file["rows"], file["letters"])
 
