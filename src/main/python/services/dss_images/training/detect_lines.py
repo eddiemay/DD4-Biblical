@@ -426,6 +426,9 @@ if __name__ == '__main__':
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
 	predictor = DefaultPredictor(cfg)
 
+	print("Verifying with:")
+	print(cfg)
+
 	verify(predictor, TRAINING_SET, preprocessor=pp)
 	verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
