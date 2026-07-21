@@ -414,16 +414,16 @@ if __name__ == '__main__':
 	parser.add_argument('--samples', action='store_true')
 	parser.add_argument('--resume', action='store_true')
 	parser.add_argument('--train', action='store_true')
-	parser.add_argument('--threshold', type=float, default=.7)
+	parser.add_argument('--thresh_test', type=float, default=.5)
 
 	args = parser.parse_args()
 	pp = preprocessor if args.preprocess else preprocessor
-	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.threshold
 
 	if args.train or args.resume or force_train:
 		train(args.iters, preprocessor=pp, resume=args.resume)
 
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_best.pth'
+	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.thresh_test
 	predictor = DefaultPredictor(cfg)
 
 	print("Verifying with:")
