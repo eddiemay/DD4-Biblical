@@ -423,7 +423,7 @@ if __name__ == '__main__':
 	if args.train or args.resume or force_train:
 		train(args.iters, preprocessor=pp, resume=args.resume)
 
-	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
+	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_best.pth'
 	predictor = DefaultPredictor(cfg)
 
 	print("Verifying with:")
