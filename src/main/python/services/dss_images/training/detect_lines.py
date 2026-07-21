@@ -11,6 +11,7 @@ from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer
+from detectron2.engine.hooks import BestCheckpointer
 from detectron2.evaluation import COCOEvaluator
 from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
@@ -178,6 +179,21 @@ class Trainer(DefaultTrainer):
 
 		return COCOEvaluator(dataset_name, output_dir=output_folder)
 
+	def build_hooks(self):
+		hooks = super().build_hooks()
+
+		hooks.insert(
+				-1,
+				BestCheckpointer(
+						self.cfg.TEST.EVAL_PERIOD,
+						self.checkpointer,
+						"segm/AP50",      # metric to maximize
+						mode="max"
+				)
+		)
+
+		return hooks
+
 
 def train(iters, preprocessor, resume=False):
 	setup_data(preprocessor)
@@ -207,7 +223,7 @@ def train(iters, preprocessor, resume=False):
 	cfg.SOLVER.STEPS = (6000, 7000)
 	cfg.SOLVER.GAMMA = 0.5
 
-	cfg.DATALOADER.NUM_WORKERS = 1
+	cfg.DATALOADER.NUM_WORKERS = 2
 
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
@@ -441,7 +457,7 @@ if __name__ == '__main__':
 		train(args.iters, preprocessor=pp, resume=args.resume)
 
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
-	cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = 0.3
+	# cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = 0.3
 	predictor = DefaultPredictor(cfg)
 
 	verify(predictor, TRAINING_SET, preprocessor=pp)
