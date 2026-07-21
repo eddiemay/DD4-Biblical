@@ -28,19 +28,11 @@ IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3}
 
 config = "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
-threshold = .7
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
-# cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
-cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-
-cfg.OUTPUT_DIR = "detect_lines/output"
-
-cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.04, 0.08, 0.16, 0.20]]
-cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[32, 64, 128, 256]]
-cfg.MODEL.DEVICE = 'cpu'
+cfg.merge_from_file("detect_lines/config.yaml")
 
 
 def ensure_four(row_box):
@@ -204,26 +196,14 @@ def train(iters, preprocessor, resume=False):
 			f"{ANNOTATIONS}/train.json",
 			f"{IMAGES_BASE}/train"
 	)
-
 	register_coco_instances(
 			"dss_val",
 			{},
 			f"{ANNOTATIONS}/val.json",
 			f"{IMAGES_BASE}/val"
 	)
-
 	MetadataCatalog.get("dss_val").set(thing_classes=["row"])
 	MetadataCatalog.get("dss_train").set(thing_classes=["row"])
-
-	cfg.DATASETS.TRAIN = ("dss_train",)
-	cfg.DATASETS.TEST = ("dss_val",)
-
-	cfg.SOLVER.IMS_PER_BATCH = 1
-	cfg.SOLVER.BASE_LR = 0.000250
-	cfg.SOLVER.STEPS = (6000, 7000)
-	cfg.SOLVER.GAMMA = 0.5
-
-	cfg.DATALOADER.NUM_WORKERS = 2
 
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
@@ -432,32 +412,18 @@ if __name__ == '__main__':
 	parser.add_argument('--preprocess', action='store_true')
 	parser.add_argument('--iters', type=int, default=7500)
 	parser.add_argument('--samples', action='store_true')
-	parser.add_argument('--max_size', type=int, default=2270)
 	parser.add_argument('--resume', action='store_true')
 	parser.add_argument('--train', action='store_true')
-	parser.add_argument('--batch_size_per_image', type=int, default=256)
+	parser.add_argument('--threshold', type=float, default=.7)
 
 	args = parser.parse_args()
 	pp = preprocessor if args.preprocess else preprocessor
-	cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = args.batch_size_per_image
-	cfg.INPUT.MIN_SIZE_TRAIN = (1280,)  # (1024,) or (1280,)
-	cfg.INPUT.MAX_SIZE_TRAIN = args.max_size  # 2043 or 1600
-	cfg.INPUT.MIN_SIZE_TEST = 1280
-	cfg.INPUT.MAX_SIZE_TEST = args.max_size
-	cfg.INPUT.RANDOM_FLIP = "none"
-	cfg.TEST.EVAL_PERIOD = 250
-	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
-	cfg.MODEL.RPN.PRE_NMS_TOPK_TRAIN = 1000
-	cfg.MODEL.RPN.POST_NMS_TOPK_TRAIN = 500
-	cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 300
-	cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 100
-	cfg.TEST.DETECTIONS_PER_IMAGE = 60
+	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.threshold
 
 	if args.train or args.resume or force_train:
 		train(args.iters, preprocessor=pp, resume=args.resume)
 
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
-	# cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = 0.3
 	predictor = DefaultPredictor(cfg)
 
 	verify(predictor, TRAINING_SET, preprocessor=pp)
