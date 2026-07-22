@@ -179,7 +179,7 @@ class Trainer(DefaultTrainer):
 				BestCheckpointer(
 						self.cfg.TEST.EVAL_PERIOD,
 						self.checkpointer,
-						"bbox/AR@100",      # metric to maximize
+						"bbox/AR100",      # metric to maximize
 						mode="max"
 				)
 		)
