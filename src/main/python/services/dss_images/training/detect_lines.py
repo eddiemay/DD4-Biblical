@@ -222,9 +222,9 @@ def predict(predictor, fragment, display=True, preprocessor=None):
 		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 	outputs = predictor(image)
 	# print(outputs)
-	print(f'Prediction took {time.time() - start_time:.1f} seconds')
-
 	instances = outputs["instances"].to("cpu")
+	print(f'Prediction found {len(instances.pred_boxes)} boxes in {time.time() - start_time:.1f} seconds')
+
 	if len(instances.pred_boxes) == 0:
 		return None, None
 
