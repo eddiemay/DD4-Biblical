@@ -324,6 +324,7 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 
 
 def verify(predictor, fragments, preprocessor=None, refresh=False):
+	print()
 	scrolls = []
 	fps, fns, tps, precisions, recalls, f1_scores = [], [], [], [], [], []
 	for fragment in fragments:
@@ -349,7 +350,6 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 		print(f'{scroll["scroll"]} fp: {scroll["fp"]} fn: {scroll["fn"]} tp: {scroll["tp"]} '
 					f'precision:{scroll["precision"]} recall:{scroll["recall"]:.3f} f1_score: {scroll["f1_score"]:.3f}')
 
-	print()
 	print(precisions)
 	percents = np.array(precisions) * 100
 	mean, std = percents.mean(), percents.std()
