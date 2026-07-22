@@ -341,14 +341,17 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 
 		scrolls.append({
 			"scroll": fragment,
+			"fp": result[0],
+			"fn": result[1],
+			"tp": result[2],
 			"precision": result[3],
 			"recall": result[4],
 			"f1_score": result[5],
 		})
 
 	for scroll in sorted(scrolls, key=lambda s:s["f1_score"]):
-		print(f'{scroll["scroll"]} precision:{scroll["precision"]} '
-					f'recall:{scroll["recall"]:.3f} f1_score: {scroll["f1_score"]:.3f}')
+		print(f'{scroll["scroll"]} fp: {scroll["fp"]} fn: {scroll["fn"]} tp: {scroll["tp"]} '
+					f'precision:{scroll["precision"]} recall:{scroll["recall"]:.3f} f1_score: {scroll["f1_score"]:.3f}')
 
 	print()
 	print(precisions)
