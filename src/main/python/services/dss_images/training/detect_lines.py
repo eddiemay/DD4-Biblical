@@ -303,7 +303,8 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 				best_iou = iou
 				best_pred = pred_box
 
-		if best_iou >= 0.5:
+		# print("best_iou:", best_iou)
+		if best_iou >= 0.25:
 			tp += 1
 			row_box["_taken"], best_pred["_taken"] = True, True
 		else:
@@ -427,6 +428,7 @@ if __name__ == '__main__':
 	print("Verifying with:")
 	print(cfg)
 
+	# evaluate(predictor, 'isaiah-column-40', preprocessor=pp)
 	verify(predictor, TRAINING_SET, preprocessor=pp)
 	verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
