@@ -293,29 +293,24 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 
 	fn, fp, tp = 0, 0, 0
 	for row_box in row_boxes:
-		max_iou, max_pred_box = 0, None
+		best_iou, best_pred = 0, None
 		for pred_box in pred_boxes:
+			if pred_box.get("_taken"):
+				continue
+
 			iou = intersection_over_union(row_box, pred_box)
-			if iou > max_iou:
-				max_iou, max_pred_box = iou, pred_box
-		if max_iou > .5:
+			if iou > best_iou:
+				best_iou = iou
+				best_pred = pred_box
+
+		if best_iou >= 0.5:
 			tp += 1
-			row_box["_taken"], max_pred_box["_taken"] = True, True
+			row_box["_taken"], best_pred["_taken"] = True, True
 		else:
 			fn += 1
 
 	for pred_box in pred_boxes:
-		if pred_box.get("_taken") is True:
-			continue
-		max_iou, max_row_box = 0, None
-		for row_box in row_boxes:
-			iou = intersection_over_union(pred_box, row_box)
-			if iou > max_iou:
-				max_iou, max_row_box = iou, row_box
-		if max_iou > .5:
-			tp += 1
-			pred_box["_taken"], max_row_box["_taken"] = True, True
-		else:
+		if not pred_box.get("_taken"):
 			fp += 1
 
 	precision, recall = tp / (tp + fp), tp / (tp + fn)
