@@ -80,13 +80,11 @@ def get_segmentation(row_box):
 		segmentation.append({"x": last_box["x1"] - 4, "y": last_box["y1"] - 4})
 
 	x1, x2 = min(segmentation[0]["x"], segmentation[-1]["x"]), 0
-	y1, y2 = segmentation[-1]["y"], segmentation[0]["y"]
+	y1, y2 = row_box["_minYBox"]["y1"] - 4, segmentation[0]["y"]
 	segs = []
 	for segment in segmentation:
 		if segment["x"] > x2:
 			x2 = segment["x"]
-		if segment["y"] < y1:
-			y1 = segment["y"]
 		if segment["y"] > y2:
 			y2 = segment["y"]
 		segs.extend([segment["x"], segment["y"]])
@@ -179,7 +177,7 @@ class Trainer(DefaultTrainer):
 				BestCheckpointer(
 						self.cfg.TEST.EVAL_PERIOD,
 						self.checkpointer,
-						"bbox/AR100",      # metric to maximize
+						"bbox/AR50",      # metric to maximize
 						mode="max"
 				)
 		)
@@ -213,17 +211,12 @@ def train(iters, preprocessor, resume=False):
 	trainer.train()
 
 
-def predict(predictor, fragment, display=True, preprocessor=None):
-	column = fragment if isinstance(fragment, int) else parse_file_name(fragment)[2]
+def predict(predictor, fragment, image, preprocessor=None):
 	start_time = time.time()
-	img_file = f'../images/isaiah/columns/column_9_{column}.jpg'
-	image = process_image(cv2.imread(img_file), preprocessor)[0]
-	if len(image.shape) == 2:
-		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 	outputs = predictor(image)
 	# print(outputs)
 	instances = outputs["instances"].to("cpu")
-	print(f'Prediction found {len(instances.pred_boxes)} boxes in {time.time() - start_time:.1f} seconds')
+	print(f'Prediction on {fragment} found {len(instances.pred_boxes)} boxes in {time.time() - start_time:.1f} seconds')
 
 	if len(instances.pred_boxes) == 0:
 		return None, None
@@ -236,7 +229,6 @@ def predict(predictor, fragment, display=True, preprocessor=None):
 	classes = instances.pred_classes.numpy()
 	scores = instances.scores.numpy()
 
-	fragment = f'isaiah-column-{column}'
 	row_boxes = []
 	for box, cls, score in zip(boxes, classes, scores):
 		x1, y1, x2, y2 = map(int, box)
@@ -266,17 +258,16 @@ def predict(predictor, fragment, display=True, preprocessor=None):
 		if keep:
 			nms.append(box)
 
-	if display:
-		v = Visualizer(image[:, :, ::-1], scale=1.0)
-		out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-		plt.imshow(out.get_image()[:, :, ::-1])
-		plt.show()
-
 	return outputs, row_boxes, nms
 
 
 def evaluate(predictor, fragment, display=True, preprocessor=None, override=False):
-	outputs, pred_boxes, pred_nms = predict(predictor, fragment, display, preprocessor)
+	column = fragment if isinstance(fragment, int) else parse_file_name(fragment)[2]
+	img_file = f'../images/isaiah/columns/column_9_{column}.jpg'
+	image = process_image(cv2.imread(img_file), preprocessor)[0]
+	if len(image.shape) == 2:
+		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+	outputs, pred_boxes, pred_nms = predict(predictor, fragment, image, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [])
@@ -293,18 +284,20 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 
 	fn, fp, tp = 0, 0, 0
 	for row_box in row_boxes:
+		segmentation, bbox = get_segmentation(row_box)
+		bbox = {"x1": bbox[0], "y1": bbox[1], "x2": bbox[0] + bbox[2], "y2": bbox[1] + bbox[3]}
 		best_iou, best_pred = 0, None
 		for pred_box in pred_boxes:
 			if pred_box.get("_taken"):
 				continue
 
-			iou = intersection_over_union(row_box, pred_box)
+			iou = intersection_over_union(bbox, pred_box)
 			if iou > best_iou:
 				best_iou = iou
 				best_pred = pred_box
 
-		# print("best_iou:", best_iou)
-		if best_iou >= 0.25:
+		# print(f'{row_box["value"]} best_iou: {best_iou} ({row_box["x1"]},{row_box["y1"]},{row_box["x2"]},{row_box["y2"]}) pred ({best_pred["x1"]},{best_pred["y1"]},{best_pred["x2"]},{best_pred["y2"]})')
+		if best_iou >= 0.6:
 			tp += 1
 			row_box["_taken"], best_pred["_taken"] = True, True
 		else:
@@ -319,8 +312,22 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 
 	if display:
 		print(f'FP {fp}, FN {fn}, TP {tp}, Precision {precision}, Recall {recall}, F1 Score {f1_score}')
+		v = Visualizer(image[:, :, ::-1], scale=1.0)
+		out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+		plt.imshow(out.get_image()[:, :, ::-1])
+		plt.show()
 
 	return fp, fn, tp, precision, recall, f1_score
+
+
+def print_stats(title, values):
+	print(f'{title}: {values}')
+	npa = np.array(values) * 100
+	mean, std = npa.mean(), npa.std()
+	print(f'{title} min: {npa.min():.2f}, max:{npa.max():.2f}',
+				f'mean: {mean:.2f} median: {np.median(npa):.2f}',
+				'mode:', stats.mode(np.round(npa / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
 
 
 def verify(predictor, fragments, preprocessor=None, refresh=False):
@@ -350,29 +357,9 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 		print(f'{scroll["scroll"]} fp: {scroll["fp"]} fn: {scroll["fn"]} tp: {scroll["tp"]} '
 					f'precision:{scroll["precision"]} recall:{scroll["recall"]:.3f} f1_score: {scroll["f1_score"]:.3f}')
 
-	print(precisions)
-	percents = np.array(precisions) * 100
-	mean, std = percents.mean(), percents.std()
-	print('Precision min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(recalls)
-	percents = np.array(recalls) * 100
-	mean, std = percents.mean(), percents.std()
-	print('Recall min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(f1_scores)
-	percents = np.array(f1_scores) * 100
-	mean, std = percents.mean(), percents.std()
-	print('F1 Score min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+	print_stats('Precision', precisions)
+	print_stats('Recall', recalls)
+	print_stats('F1 Score', f1_scores)
 
 
 def label_fragment(predictor, column, preprocessor=None):
@@ -428,7 +415,7 @@ if __name__ == '__main__':
 	print("Verifying with:")
 	print(cfg)
 
-	# evaluate(predictor, 'isaiah-column-40', preprocessor=pp)
+	# evaluate(predictor, 'isaiah-column-17', preprocessor=pp)
 	verify(predictor, TRAINING_SET, preprocessor=pp)
 	verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
