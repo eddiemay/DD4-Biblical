@@ -70,6 +70,8 @@ def get_segmentation(row_box):
 		segmentation = []
 		segmentation.extend(row_box["coords"])
 
+		if len(row_box["_letterBoxes"]) == 0:
+			print("No letters for:", row_box)
 		first_box = row_box["_letterBoxes"][0]
 		segmentation.append({"x": first_box["x2"] + 4, "y": first_box["y1"] - 4})
 
@@ -177,7 +179,7 @@ class Trainer(DefaultTrainer):
 				BestCheckpointer(
 						self.cfg.TEST.EVAL_PERIOD,
 						self.checkpointer,
-						"bbox/AR50",      # metric to maximize
+						"segm/AP50",      # metric to maximize
 						mode="max"
 				)
 		)
@@ -307,8 +309,8 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 		if not pred_box.get("_taken"):
 			fp += 1
 
-	precision, recall = tp / (tp + fp), tp / (tp + fn)
-	f1_score = 2 * precision * recall / (precision + recall + 0.00001)
+	precision, recall = round(tp * 100 / (tp + fp), 2), round(tp * 100 / (tp + fn), 2)
+	f1_score = round(2 * precision * recall / (precision + recall + 0.00001), 2)
 
 	if display:
 		print(f'FP {fp}, FN {fn}, TP {tp}, Precision {precision}, Recall {recall}, F1 Score {f1_score}')
@@ -322,9 +324,9 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 
 def print_stats(title, values):
 	print(f'{title}: {values}')
-	npa = np.array(values) * 100
+	npa = np.array(values)
 	mean, std = npa.mean(), npa.std()
-	print(f'{title} min: {npa.min():.2f}, max:{npa.max():.2f}',
+	print(f'{title} min: {npa.min():.2f}, max: {npa.max():.2f}',
 				f'mean: {mean:.2f} median: {np.median(npa):.2f}',
 				'mode:', stats.mode(np.round(npa / 5) * 5).mode, f'std: {std:.2f}',
 				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
@@ -354,8 +356,8 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 		})
 
 	for scroll in sorted(scrolls, key=lambda s:s["f1_score"]):
-		print(f'{scroll["scroll"]} fp: {scroll["fp"]} fn: {scroll["fn"]} tp: {scroll["tp"]} '
-					f'precision:{scroll["precision"]} recall:{scroll["recall"]:.3f} f1_score: {scroll["f1_score"]:.3f}')
+		print(f'{scroll["scroll"]} FP: {scroll["fp"]} FN: {scroll["fn"]} TP: {scroll["tp"]} '
+					f'Precision: {scroll["precision"]} Recall: {scroll["recall"]:.3f} F1 Score: {scroll["f1_score"]:.3f}')
 
 	print_stats('Precision', precisions)
 	print_stats('Recall', recalls)
@@ -415,7 +417,7 @@ if __name__ == '__main__':
 	print("Verifying with:")
 	print(cfg)
 
-	# evaluate(predictor, 'isaiah-column-17', preprocessor=pp)
-	verify(predictor, TRAINING_SET, preprocessor=pp)
-	verify(predictor, VAL_SET, preprocessor=pp)
+	evaluate(predictor, 'isaiah-column-54', preprocessor=pp)
+	# verify(predictor, TRAINING_SET, preprocessor=pp)
+	# verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
