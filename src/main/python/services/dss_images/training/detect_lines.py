@@ -417,7 +417,7 @@ if __name__ == '__main__':
 	print("Verifying with:")
 	print(cfg)
 
-	evaluate(predictor, 'isaiah-column-54', preprocessor=pp)
-	# verify(predictor, TRAINING_SET, preprocessor=pp)
-	# verify(predictor, VAL_SET, preprocessor=pp)
+	# evaluate(predictor, 'isaiah-column-54', preprocessor=pp)
+	verify(predictor, TRAINING_SET, preprocessor=pp)
+	verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
