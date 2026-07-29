@@ -213,8 +213,12 @@ def train(iters, preprocessor, resume=False):
 	trainer.train()
 
 
-def predict(predictor, fragment, image, preprocessor=None):
+def predict(predictor, fragment, preprocessor=None):
 	start_time = time.time()
+	img_file = get_img_file_path(fragment, 9)
+	image = process_image(cv2.imread(img_file), preprocessor)[0]
+	if len(image.shape) == 2:
+		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 	outputs = predictor(image)
 	# print(outputs)
 	instances = outputs["instances"].to("cpu")
@@ -260,16 +264,11 @@ def predict(predictor, fragment, image, preprocessor=None):
 		if keep:
 			nms.append(box)
 
-	return outputs, row_boxes, nms
+	return image, outputs, row_boxes, nms
 
 
 def evaluate(predictor, fragment, display=True, preprocessor=None, override=False):
-	column = fragment if isinstance(fragment, int) else parse_file_name(fragment)[2]
-	img_file = f'../images/isaiah/columns/column_9_{column}.jpg'
-	image = process_image(cv2.imread(img_file), preprocessor)[0]
-	if len(image.shape) == 2:
-		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-	outputs, pred_boxes, pred_nms = predict(predictor, fragment, image, preprocessor)
+	image, outputs, pred_boxes, pred_nms = predict(predictor, fragment, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [])
@@ -364,12 +363,15 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 	print_stats('F1 Score', f1_scores)
 
 
-def label_fragment(predictor, column, preprocessor=None):
-	fragment = f'isaiah-column-{column}'
-	_, _, nms_letter_boxes = predict(predictor, column, preprocessor=preprocessor)
+def label_fragment(predictor, fragment, preprocessor=None):
+	image, outputs, pred_boxes, pred_nms = predict(predictor, fragment, preprocessor=preprocessor)
 
-	for letter_box in nms_letter_boxes:
-		letter_box['value'] = letter_box['_predicted']
+	v = Visualizer(image[:, :, ::-1], scale=1.0)
+	out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+	plt.imshow(out.get_image()[:, :, ::-1])
+	plt.show()
+
+	return
 
 	# Get the list of existing letter boxes, if there are any.
 	letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
@@ -390,8 +392,8 @@ def label_fragment(predictor, column, preprocessor=None):
 			print(f'No existing letter boxes for {fragment}, continuing...')
 
 	# Delete old letter boxes and create the new ones.
-	send_json_req(LETTERBOX_BATCH_DELETE_URL, {'items': letter_ids})
-	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': nms_letter_boxes})
+	send_json_req(LETTERBOX_BATCH_DELETE_URL, {'items': row_ids})
+	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': pred_boxes})
 
 
 if __name__ == '__main__':
@@ -421,3 +423,4 @@ if __name__ == '__main__':
 	verify(predictor, TRAINING_SET, preprocessor=pp)
 	verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
+	label_fragment(predictor, 'community-column-2', preprocessor=pp)

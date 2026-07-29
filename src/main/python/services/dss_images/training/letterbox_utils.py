@@ -146,7 +146,10 @@ def parse_file_name(file_name):
 
 def get_img_file_path(filename, res):
 	scroll, is_column, fragment = parse_file_name(filename)
-	res = 8 if filename.startswith('war-column') else res
+	if filename.startswith('war-column'):
+		res = 8
+	elif filename.startswith('community-column'):
+		res = 7
 	return f"../images/{scroll}/columns/column_{res}_{fragment}.jpg" if is_column \
 		else f"../images/{scroll}/columns/{fragment}.jpg"
 
