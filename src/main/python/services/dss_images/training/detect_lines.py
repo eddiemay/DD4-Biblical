@@ -423,4 +423,4 @@ if __name__ == '__main__':
 	verify(predictor, TRAINING_SET, preprocessor=pp)
 	verify(predictor, VAL_SET, preprocessor=pp)
 	verify(predictor, TEST_SET, preprocessor=pp)
-	label_fragment(predictor, 'community-column-2', preprocessor=pp)
+	label_fragment(predictor, 'war-column-2', preprocessor=pp)
