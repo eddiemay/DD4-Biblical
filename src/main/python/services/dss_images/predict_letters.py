@@ -6,188 +6,193 @@ mean, std = (0.5,), (0.5,)
 
 
 def resize(img: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
-  h, w = img.shape[:2]
-  scale = min(target_w / w, target_h / h)
-  return cv2.resize(
-      img, (round(w * scale), round(h * scale)),
-      interpolation=cv2.INTER_CUBIC if scale > 1 else cv2.INTER_AREA)
+	h, w = img.shape[:2]
+	scale = min(target_w / w, target_h / h)
+	return cv2.resize(
+			img, (round(w * scale), round(h * scale)),
+			interpolation=cv2.INTER_CUBIC if scale > 1 else cv2.INTER_AREA)
 
 
-def pad_to_size(img: np.ndarray, target_w: int, target_h: int, fill=0) -> np.ndarray:
-  h, w = img.shape[:2]
+def pad_to_size(img: np.ndarray, target_w: int, target_h: int,
+		fill=0) -> np.ndarray:
+	h, w = img.shape[:2]
 
-  pad_w = max(0, target_w - w)
-  pad_h = max(0, target_h - h)
+	pad_w = max(0, target_w - w)
+	pad_h = max(0, target_h - h)
 
-  left = pad_w // 2
-  right = pad_w - left
-  top = pad_h // 2
-  bottom = pad_h - top
+	left = pad_w // 2
+	right = pad_w - left
+	top = pad_h // 2
+	bottom = pad_h - top
 
-  return cv2.copyMakeBorder(
-      img, top, bottom, left, right,
-      borderType=cv2.BORDER_CONSTANT,
-      value=fill
-  )
+	return cv2.copyMakeBorder(
+			img, top, bottom, left, right,
+			borderType=cv2.BORDER_CONSTANT,
+			value=fill
+	)
 
 
 def center_crop(img: np.ndarray, target_w: int, target_h: int) -> np.ndarray:
-  h, w = img.shape[:2]
+	h, w = img.shape[:2]
 
-  top = max(0, (h - target_h) // 2)
-  left = max(0, (w - target_w) // 2)
+	top = max(0, (h - target_h) // 2)
+	left = max(0, (w - target_w) // 2)
 
-  return img[top:top+target_h, left:left+target_w]
+	return img[top:top + target_h, left:left + target_w]
 
 
-def gaussian_blur(img: np.ndarray, kernel_size=3, sigma_min=0.1, sigma_max=1.5) -> np.ndarray:
-  sigma = np.random.uniform(sigma_min, sigma_max)
-  return cv2.GaussianBlur(img, (kernel_size, kernel_size), sigma)
+def gaussian_blur(img: np.ndarray, kernel_size=3, sigma_min=0.1,
+		sigma_max=1.5) -> np.ndarray:
+	sigma = np.random.uniform(sigma_min, sigma_max)
+	return cv2.GaussianBlur(img, (kernel_size, kernel_size), sigma)
 
 
 def to_grayscale(img: np.ndarray) -> np.ndarray:
-  return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
 def to_tensor(img: np.ndarray) -> np.ndarray:
-  arr = img.astype(np.float32) / 255.0
+	arr = img.astype(np.float32) / 255.0
 
-  if arr.ndim == 2:  # grayscale
-    arr = np.expand_dims(arr, axis=0)  # (1, H, W)
-  else:
-    arr = np.transpose(arr, (2, 0, 1))  # (C, H, W)
+	if arr.ndim == 2:  # grayscale
+		arr = np.expand_dims(arr, axis=0)  # (1, H, W)
+	else:
+		arr = np.transpose(arr, (2, 0, 1))  # (C, H, W)
 
-  return arr
+	return arr
 
 
 def normalize(tensor: np.ndarray, mean, std) -> np.ndarray:
-  mean = np.array(mean, dtype=np.float32).reshape(-1, 1, 1)
-  std = np.array(std, dtype=np.float32).reshape(-1, 1, 1)
-  return (tensor - mean) / std
+	mean = np.array(mean, dtype=np.float32).reshape(-1, 1, 1)
+	std = np.array(std, dtype=np.float32).reshape(-1, 1, 1)
+	return (tensor - mean) / std
 
 
 def transform(img: np.ndarray, mean, std) -> np.ndarray:
-  img = resize(img, 32, 64)
-  img = pad_to_size(img, 32, 64, 0)
-  img = gaussian_blur(img, 3, 0.1, 1.5)
-  img = to_grayscale(img)
-  tensor = to_tensor(img)
-  tensor = normalize(tensor, mean, std)
-  return tensor.astype(np.float32)
+	img = resize(img, 20, 40)
+	img = pad_to_size(img, 20, 40, 0)
+	img = gaussian_blur(img, 3, 0.1, 1.5)
+	img = to_grayscale(img)
+	tensor = to_tensor(img)
+	tensor = normalize(tensor, mean, std)
+	return tensor.astype(np.float32)
 
 
 def predict_letters(items, batch_size=256):
-  ort_session = ort.InferenceSession("letter_model.onnx")
-  input_name = ort_session.get_inputs()[0].name
-  label_lookup = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
+	ort_session = ort.InferenceSession("letter_model.onnx")
+	input_name = ort_session.get_inputs()[0].name
+	label_lookup = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
 
-  batch_imgs = []
-  batch_items = []
+	batch_imgs = []
+	batch_items = []
 
-  for item in items:
-    if item['type'] != 'Letter' or len(item['value']) != 1:
-      continue
+	for item in items:
+		if item['type'] != 'Letter' or len(item['value']) != 1:
+			continue
 
-    batch_items.append(item)
-    batch_imgs.append(transform(get_image(item), mean, std))
+		batch_items.append(item)
+		batch_imgs.append(transform(get_image(item), mean, std))
 
-    if len(batch_imgs) == batch_size:
-      inputs = np.array(batch_imgs)
-      outputs = ort_session.run(None, {input_name: inputs})[0]
-      preds = np.argmax(outputs, axis=1)
+		if len(batch_imgs) == batch_size:
+			inputs = np.array(batch_imgs)
+			outputs = ort_session.run(None, {input_name: inputs})[0]
+			preds = np.argmax(outputs, axis=1)
 
-      for j in range(len(batch_items)):
-        batch_items[j]['_predicted'] = label_lookup[preds[j]]
+			for j in range(len(batch_items)):
+				batch_items[j]['_predicted'] = label_lookup[preds[j]]
 
-      batch_imgs.clear()
-      batch_items.clear()
+			batch_imgs.clear()
+			batch_items.clear()
 
-  # handle remainder
-  if batch_imgs:
-    inputs = np.array(batch_imgs)
-    outputs = ort_session.run(None, {input_name: inputs})[0]
-    preds = np.argmax(outputs, axis=1)
+	# handle remainder
+	if batch_imgs:
+		inputs = np.array(batch_imgs)
+		outputs = ort_session.run(None, {input_name: inputs})[0]
+		preds = np.argmax(outputs, axis=1)
 
-    for j in range(len(batch_items)):
-      batch_items[j]['_predicted'] = label_lookup[preds[j]]
+		for j in range(len(batch_items)):
+			batch_items[j]['_predicted'] = label_lookup[preds[j]]
 
 
 def parse_file_name(file_name):
-  # Split the filename into scroll and the rest at the first hyphen
-  parts = file_name.split('-', 1)
-  if len(parts) != 2:
-    return None  # Invalid format
+	# Split the filename into scroll and the rest at the first hyphen
+	parts = file_name.split('-', 1)
+	if len(parts) != 2:
+		return None  # Invalid format
 
-  scroll, rest = parts[0], parts[1]
+	scroll, rest = parts[0], parts[1]
 
-  is_column = rest.startswith('column-')
-  if is_column:
-    fragment_or_colnum = rest.split('-')[-1]
-  else:
-    # For fragments, take the entire rest as the fragment
-    fragment_or_colnum = rest
+	is_column = rest.startswith('column-')
+	if is_column:
+		fragment_or_colnum = rest.split('-')[-1]
+	else:
+		# For fragments, take the entire rest as the fragment
+		fragment_or_colnum = rest
 
-  return scroll, is_column, fragment_or_colnum
+	return scroll, is_column, fragment_or_colnum
 
 
 def get_img_file_path(file_name):
-  scroll, is_column, fragment = parse_file_name(file_name)
-  res = {'habakkuk': 7, 'community': 7, 'war': 8}.get(scroll, 9)
-  return f"./images/{scroll}/columns/column_{res}_{fragment}.jpg" if is_column else f"./images/{scroll}/columns/{fragment}.jpg"
+	scroll, is_column, fragment = parse_file_name(file_name)
+	res = {'habakkuk': 7, 'community': 7, 'war': 8}.get(scroll, 9)
+	return f"./images/{scroll}/columns/column_{res}_{fragment}.jpg" if is_column else f"./images/{scroll}/columns/{fragment}.jpg"
 
 
-file_img_cache:dict[str, np.ndarray] = {}
-def get_image(letter_box:dict) -> np.ndarray:
-  """
-  Retrieve a cropped letter image from a larger column image, using caching
-  to avoid repeatedly loading the same file from disk.
+file_img_cache: dict[str, np.ndarray] = {}
 
-  Parameters:
-      letter_box (dict): A dictionary containing bounding box metadata with keys:
-          - 'filename' (str): Identifier for the source column image
-          - 'x1', 'y1', 'x2', 'y2' (int/float): Bounding box coordinates
-      res (int, optional): Resolution level of the source image.
-          Supported values:
-              10 → scale factor 2
-               9 → scale factor 1
-               8 → scale factor 0.5
-          Defaults to 9.
 
-  Returns:
-      np.ndarray: Cropped image corresponding to the bounding box.
+def get_image(letter_box: dict) -> np.ndarray:
+	"""
+	Retrieve a cropped letter image from a larger column image, using caching
+	to avoid repeatedly loading the same file from disk.
 
-  Behavior:
-      - Loads the full column image from disk only once per filename
-      - Stores it in a global cache (`file_img_cache`)
-      - Applies scaling to bounding box coordinates based on resolution
-      - Returns the cropped region from the cached image
-  """
+	Parameters:
+			letter_box (dict): A dictionary containing bounding box metadata with keys:
+					- 'filename' (str): Identifier for the source column image
+					- 'x1', 'y1', 'x2', 'y2' (int/float): Bounding box coordinates
+			res (int, optional): Resolution level of the source image.
+					Supported values:
+							10 → scale factor 2
+							 9 → scale factor 1
+							 8 → scale factor 0.5
+					Defaults to 9.
 
-  file_img = file_img_cache.get(letter_box['filename'])
-  if file_img is None:
-    file_path = get_img_file_path(letter_box['filename'])
-    file_img = cv2.imread(file_path)
-    file_img_cache[letter_box['filename']] = file_img
-  x1, y1, x2, y2 = (letter_box['x1'], letter_box['y1'],
-                    letter_box['x2'], letter_box['y2'])
-  return file_img[y1:y2, x1:x2]
+	Returns:
+			np.ndarray: Cropped image corresponding to the bounding box.
+
+	Behavior:
+			- Loads the full column image from disk only once per filename
+			- Stores it in a global cache (`file_img_cache`)
+			- Applies scaling to bounding box coordinates based on resolution
+			- Returns the cropped region from the cached image
+	"""
+
+	file_img = file_img_cache.get(letter_box['filename'])
+	if file_img is None:
+		file_path = get_img_file_path(letter_box['filename'])
+		file_img = cv2.imread(file_path)
+		file_img_cache[letter_box['filename']] = file_img
+	x1, y1, x2, y2 = (letter_box['x1'], letter_box['y1'],
+										letter_box['x2'], letter_box['y2'])
+	return file_img[y1:y2, x1:x2]
 
 
 if __name__ == '__main__':
-  import json
-  items = []
-  with open('training/letter_boxes.jsonl', "r", encoding="utf-8") as f:
-    for line in f:
-      item = json.loads(line)
-      if item['filename'] == 'war-column-1':
-        items.append(item)
+	import json
 
-  predict_letters(items)
-  missmatch = 0
-  for letter_box in items:
-    if letter_box.get('_predicted') is not None and letter_box['_predicted'] != letter_box['value']:
-      missmatch += 1
-      print(letter_box)
+	items = []
+	with open('training/letter_boxes.jsonl', "r", encoding="utf-8") as f:
+		for line in f:
+			item = json.loads(line)
+			if item['filename'] == 'war-column-1':
+				items.append(item)
 
-  print(f'Total missmatches: {missmatch}')
+	predict_letters(items)
+	missmatch = 0
+	for letter_box in items:
+		if letter_box.get('_predicted') is not None and letter_box['_predicted'] != \
+				letter_box['value']:
+			missmatch += 1
+			print(letter_box)
 
+	print(f'Total missmatches: {missmatch}')
