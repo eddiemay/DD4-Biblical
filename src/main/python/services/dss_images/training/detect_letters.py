@@ -15,8 +15,8 @@ from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, ISAIAH_SET, \
-	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, VAL_SET, \
-	get_isa_text, get_row, is_in_row, process_image
+	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, VAL_SET, WAR_SET, \
+	get_frag_text, get_row, is_in_row, process_image
 from predict_letters import predict_letters
 from scipy import stats
 from train_by_labels import process
@@ -352,9 +352,9 @@ def train(iters, preprocessor, samples=False, resume=False):
 	trainer.train()
 
 
-def predict(predictor, column, display=True, preprocessor=None):
+def predict(predictor, fragment, preprocessor=None):
 	start_time = time.time()
-	img_file = f'../images/isaiah/columns/column_9_{column}.jpg'
+	img_file = get_img_file_path(fragment, 9)
 	image = process_image(cv2.imread(img_file), preprocessor)[0]
 	if len(image.shape) == 2:
 		image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
@@ -372,7 +372,6 @@ def predict(predictor, column, display=True, preprocessor=None):
 	classes = instances.pred_classes.numpy()
 	scores = instances.scores.numpy()
 
-	fragment = f'isaiah-column-{column}'
 	letter_boxes = []
 	for box, cls, score in zip(boxes, classes, scores):
 		x1, y1, x2, y2 = map(int, box)
@@ -393,33 +392,16 @@ def predict(predictor, column, display=True, preprocessor=None):
 		keep = True
 		for kept in nms:
 			if intersection_over_union(box, kept) > 0.225:
-				# .2 [0.0, 81.76, 69.0, 86.69, 77.31, 78.47, 69.27, 76.62, 87.85, 77.08, 81.44, 84.0, 85.19, 87.52, 79.7, 87.68, 78.59, 85.71, 80.14, 87.59, 83.41, 84.11, 81.18, 87.83, 80.17, 88.38, 82.01, 78.37, 87.7, 78.83, 69.71, 72.25, 76.25, 80.2, 81.26, 89.62, 79.05, 83.65, 85.75, 88.71, 80.48, 82.45, 83.05, 89.6, 89.04, 82.26, 84.89, 91.57, 80.73, 75.22, 73.67, 72.6, 85.9, 59.84]
-				# min: 0.0 max: 91.57 mean: 79.84 median: 81.60 mode: 80.0 std: 12.59 Z-Low: 55.16 Z-High: 104.52
-				# .225 [0.0, 81.62, 68.62, 86.55, 77.24, 78.25, 69.11, 76.68, 87.85, 77.08, 81.4, 84.06, 85.13, 87.46, 79.64, 87.62, 78.59, 85.71, 80.14, 87.46, 83.18, 84.04, 81.07, 87.77, 80.17, 88.38, 82.01, 78.33, 87.7, 78.87, 69.6, 72.25, 76.25, 80.02, 81.33, 89.68, 79.14, 83.7, 85.7, 88.66, 80.37, 82.61, 83.05, 89.6, 88.9, 82.26, 84.84, 91.78, 80.68, 75.27, 73.72, 72.43, 86.15, 59.64]
-				# min: 0.0 max: 91.78 mean: 79.80 median: 81.51 mode: 80.0 std: 12.61 Z-Low: 55.09 Z-High: 104.52
-				# .25 [0.0, 81.69, 68.47, 86.55, 76.98, 78.18, 68.94, 76.74, 87.79, 77.18, 81.3, 83.95, 85.19, 87.46, 79.58, 87.62, 78.52, 85.44, 80.0, 87.32, 82.71, 83.97, 81.07, 87.89, 80.17, 88.31, 82.09, 78.28, 87.58, 78.83, 69.49, 72.25, 76.31, 79.97, 81.26, 89.68, 79.23, 83.75, 85.65, 88.66, 80.37, 82.56, 82.67, 89.54, 88.97, 82.26, 84.84, 91.68, 80.73, 75.33, 73.92, 72.18, 86.09, 59.84]
-				# min: 0.0 max: 91.68 mean: 79.76 median: 81.50 mode: 80.0 std: 12.60 Z-Low: 55.07 Z-High: 104.45
-				# .3 [0.0, 81.42, 67.56, 86.2, 76.78, 77.96, 68.54, 76.62, 87.79, 76.92, 81.1, 83.65, 85.19, 87.26, 79.52, 87.35, 78.33, 85.44, 79.42, 86.97, 82.4, 83.34, 80.96, 87.58, 79.65, 88.1, 82.01, 77.99, 87.58, 78.73, 69.43, 72.37, 76.31, 79.97, 81.07, 89.79, 79.14, 83.59, 85.54, 88.66, 80.15, 82.4, 82.17, 89.05, 88.61, 82.06, 84.73, 91.68, 80.68, 75.45, 73.92, 72.1, 85.9, 59.43]
-				# min: 0.0 max: 91.68 mean: 79.57 median: 81.26 mode: 80.0 std: 12.59 Z-Low: 54.89 Z-High: 104.24
-				# .4 [0.0, 79.7, 66.64, 83.48, 75.0, 76.12, 66.34, 75.15, 86.13, 75.57, 80.23, 82.11, 84.16, 85.7, 78.29, 85.24, 77.35, 82.95, 76.68, 85.67, 80.76, 80.78, 79.38, 86.43, 77.91, 85.69, 80.75, 76.87, 86.24, 77.67, 68.66, 72.19, 74.85, 78.63, 79.64, 88.11, 78.37, 81.98, 84.72, 88.32, 78.74, 81.04, 81.1, 87.04, 86.75, 80.03, 83.95, 90.58, 79.85, 75.04, 72.92, 70.43, 84.09, 58.02]
-				# min: 0.0 max: 90.58 mean: 78.15 median: 79.94 mode: 80.0 std: 12.37 Z-Low: 53.90 Z-High: 102.40
 				keep = False
 				break
 		if keep:
 			nms.append(box)
 
-	if display:
-		v = Visualizer(image[:, :, ::-1], scale=1.0)
-		out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-		plt.imshow(out.get_image()[:, :, ::-1])
-		plt.show()
-
-	return outputs, letter_boxes, nms
+	return image, outputs, letter_boxes, nms
 
 
-def evaluate(predictor, column, display=True, preprocessor=None, override=False):
-	fragment = f'isaiah-column-{column}'
-	outputs, letter_boxes, nms = predict(predictor, column, display, preprocessor)
+def evaluate(predictor, fragment, display=True, preprocessor=None, override=False):
+	image, outputs, letter_boxes, nms = predict(predictor, fragment, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [],
@@ -489,7 +471,7 @@ def evaluate(predictor, column, display=True, preprocessor=None, override=False)
 				break
 	print(f'NMS {added_letters} letters added')
 
-	target_text = get_isa_text(column)
+	target_text = get_frag_text(fragment)
 	pred_text = ''
 	repred_text = ''
 	remove_mismatch_text = ''
@@ -531,13 +513,85 @@ def evaluate(predictor, column, display=True, preprocessor=None, override=False)
 		print('Pred Text:\n', pred_text)
 		print('Remove Missmatch Text:\n', remove_mismatch_text)
 		print('Remove Union Text:\n', remove_union_text)
+		v = Visualizer(image[:, :, ::-1], scale=1.0)
+		out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+		plt.imshow(out.get_image()[:, :, ::-1])
+		plt.show()
 
 	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent, no_space_percent
 
 
-def label_fragment(predictor, column, preprocessor=None):
-	fragment = f'isaiah-column-{column}'
-	_, _, nms_letter_boxes = predict(predictor, column, preprocessor=preprocessor)
+def print_stats(title, values):
+	print(f'{title}: {values}')
+	npa = np.array(values)
+	mean, std = npa.mean(), npa.std()
+	print(f'{title} min: {npa.min():.2f}, max: {npa.max():.2f}',
+				f'mean: {mean:.2f} median: {np.median(npa):.2f}',
+				'mode:', stats.mode(np.round(npa / 5) * 5).mode, f'std: {std:.2f}',
+				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+
+
+def verify(predictor, fragments, preprocessor=None, non_labeled_only=False, refresh=False):
+	scrolls = []
+	percents = []
+	rp_percents = []
+	rm_percents = []
+	ru_percents = []
+	nms_percents = []
+	nms_rp_percents = []
+	no_space_percents = []
+
+	counts = {}
+	dataset = DSSLettersDataset(fragments=fragments)
+	for _, _, metadata in dataset:
+		count = counts.get(metadata['filename'])
+		if count == None:
+			counts[metadata['filename']] = 0
+		counts[metadata['filename']] += 1
+
+	for scroll in fragments:
+		if not non_labeled_only or counts[scroll] < 500:
+			if non_labeled_only and refresh:
+				dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
+				if len(dataset) > 500:
+					continue
+			result = evaluate(predictor, scroll, False, preprocessor=preprocessor)
+			percents.append(result[0])
+			rp_percents.append(result[1])
+			rm_percents.append(result[2])
+			ru_percents.append(result[3])
+			nms_percents.append(result[4])
+			nms_rp_percents.append(result[5])
+			no_space_percents.append((result[6]))
+
+			scrolls.append({
+				"scroll": scroll,
+				"nms_rp_percent": result[5],
+				"no_space_percent": result[6],
+				"labeled": counts[scroll] > 500
+			})
+
+	for scroll in sorted(scrolls, key=lambda s: s["no_space_percent"]):
+		print(
+				f'{scroll["scroll"]} {scroll["no_space_percent"]}% labeled: {scroll["labeled"]}')
+
+	print_stats("Percents", percents)
+	print_stats("RP Percents", rp_percents)
+	print_stats("RM Percents", rm_percents)
+	print_stats("RU Percents", ru_percents)
+	print_stats("NMS Percents", nms_percents)
+	print_stats("NMS RP Percents", nms_rp_percents)
+	print_stats("No Space Percents", no_space_percents)
+
+
+def label_fragment(predictor, fragment, preprocessor=None):
+	image, outputs, _, nms_letter_boxes = predict(
+			predictor, fragment, preprocessor=preprocessor)
+
+	v = Visualizer(image[:, :, ::-1], scale=1.0)
+	out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+	plt.imshow(out.get_image()[:, :, ::-1])
+	plt.show()
 
 	for letter_box in nms_letter_boxes:
 		letter_box['value'] = letter_box['_predicted']
@@ -563,109 +617,6 @@ def label_fragment(predictor, column, preprocessor=None):
 	# Delete old letter boxes and create the new ones.
 	send_json_req(LETTERBOX_BATCH_DELETE_URL, {'items': letter_ids})
 	send_json_req(LETTERBOX_BATCH_CREATE_URL, {'items': nms_letter_boxes})
-
-
-def verify(predictor, preprocessor=None, non_labeled_only=False, refresh=False):
-	scrolls = []
-	percents = []
-	rp_percents = []
-	rm_percents = []
-	ru_percents = []
-	nms_percents = []
-	nms_rp_percents = []
-	no_space_percents = []
-
-	counts = {}
-	dataset = DSSLettersDataset(fragments=ISAIAH_SET)
-	for _, _, metadata in dataset:
-		count = counts.get(metadata['filename'])
-		if count == None:
-			counts[metadata['filename']] = 0
-		counts[metadata['filename']] += 1
-
-	for c in range(54):
-		c = c + 1
-		scroll = f'isaiah-column-{c}'
-		if not non_labeled_only or counts[scroll] < 500:
-			if non_labeled_only and refresh:
-				dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
-				if len(dataset) > 500:
-					continue
-			result = evaluate(predictor, c, False, preprocessor=preprocessor)
-			percents.append(result[0])
-			rp_percents.append(result[1])
-			rm_percents.append(result[2])
-			ru_percents.append(result[3])
-			nms_percents.append(result[4])
-			nms_rp_percents.append(result[5])
-			no_space_percents.append((result[6]))
-
-			scrolls.append({
-				"scroll": scroll,
-				"nms_rp_percent": result[5],
-				"no_space_percent": result[6],
-				"labeled": counts[scroll] > 500
-			})
-
-	for scroll in sorted(scrolls, key=lambda s: s["no_space_percent"]):
-		print(
-			f'{scroll["scroll"]} {scroll["no_space_percent"]}% labeled: {scroll["labeled"]}')
-
-	print(percents)
-	percents = np.array(percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(rp_percents)
-	percents = np.array(rp_percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(rm_percents)
-	percents = np.array(rm_percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(ru_percents)
-	percents = np.array(ru_percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(nms_percents)
-	percents = np.array(nms_percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(nms_rp_percents)
-	percents = np.array(nms_rp_percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-	print(no_space_percents)
-	percents = np.array(no_space_percents)
-	mean, std = percents.mean(), percents.std()
-	print('min:', percents.min(), 'max:', percents.max(),
-				f'mean: {mean:.2f} median: {np.median(percents):.2f}',
-				'mode:', stats.mode(np.round(percents / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
 
 
 if __name__ == '__main__':
@@ -704,14 +655,10 @@ if __name__ == '__main__':
 	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
 	predictor = DefaultPredictor(cfg)
 
-	# evaluate(predictor, 1, False, preprocessor=pp, override=True)
-	evaluate(predictor, 28, True, preprocessor=pp, override=False)
-	# evaluate(predictor, 54, False, preprocessor=pp, override=True)
-	# verify(predictor, preprocessor=pp, non_labeled_only=False)
+	# evaluate(predictor, "war-column-4", True, preprocessor=pp, override=False)
+	verify(predictor, WAR_SET, preprocessor=pp, non_labeled_only=False)
 			# preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
-	# evaluate(predictor, 23, True, preprocessor=pp, override=True)
-	# evaluate(predictor, 43, True, preprocessor=pp, override=True)
-	# label_fragment(predictor, 30, preprocessor=pp)
+	# label_fragment(predictor, "war-column-4", preprocessor=pp)
 
 # No preprocessing
 # [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]

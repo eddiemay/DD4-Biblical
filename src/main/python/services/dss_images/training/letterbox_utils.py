@@ -13,14 +13,22 @@ letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL =(
 		API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1')
+TEXT_MAP =  {'isaiah': '1Q_Isaiah_a.txt',
+						 'cal': '4QCalendrical.txt',
+						 'community': '1Q_Community.txt',
+						 'temple': '1Q_Temple.txt',
+						 'war': '1Q_War_Scroll.txt'}
 TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
 												[2, 4, 9, 11, 12, 13, 14, 16, 18, 20, 24, 26,
 												 28, 29, 31, 36, 38, 40, 44, 45, 48, 50, 52, 53]))
+# From war scroll 2,4,7,12,14
 VAL_SET = list(map(lambda c: f'isaiah-column-{c}', [7, 17, 27, 37, 47]))
+# From war scroll 5, 8, 13
 TEST_SET = list(map(lambda c: f'isaiah-column-{c}',
 										[1, 3, 5, 6, 8, 10, 15, 19, 21, 22, 23, 25,
 										 30, 32, 33, 34, 35, 39, 41, 42, 43, 46, 49, 51, 54]))
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
+WAR_SET = list(map(lambda c: f'war-column-{c + 1}', range(15)))
 ALL = ISAIAH_SET.copy()
 ALL.extend(
 		['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2',
@@ -136,7 +144,7 @@ def parse_file_name(file_name):
 
 	is_column = rest.startswith('column-')
 	if is_column:
-		fragment_or_colnum = rest.split('-')[-1]
+		fragment_or_colnum = int(rest.split('-')[-1])
 	else:
 		# For fragments, take the entire rest as the fragment
 		fragment_or_colnum = rest
@@ -237,14 +245,15 @@ def read_database(fragments: list[str], overrides: list[str],
 	return filtered
 
 
-def get_isa_text(column: int) -> str:
-	txt_file = '../books/1Q_Isaiah_a.txt'
+def get_frag_text(fragment: str) -> str:
+	scroll, is_column, frag = parse_file_name(fragment)
+	txt_file = f'../books/{TEXT_MAP.get(scroll)}'
 	txt = ''
-	roman_numeral = romanize(column)
+	roman_numeral = romanize(frag)
 	with open(txt_file, 'r') as f:
 		lines = f.readlines()
 		l = 0
-		while not lines[l].startswith(f'Col. {roman_numeral},'):
+		while not lines[l].startswith(f'Col. {roman_numeral}'):
 			l += 1
 		while l + 1 < len(lines) and not lines[l + 1].startswith('Col. '):
 			l += 1

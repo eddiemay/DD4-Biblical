@@ -8,7 +8,7 @@ import time
 from dask.distributed import Client
 from diff_match_patch import diff_match_patch
 from dss_ocr import image_to_string
-from letterbox_utils import get_isa_text, process_image
+from letterbox_utils import get_frag_text, process_image
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
 from pytesseract import Output
@@ -204,9 +204,10 @@ def to_verify_request(name, img_file, txt, model=None,
 
 def to_isa_verify_request(column, model=None,
 		multithread=Multithread.PREPROCESSOR_LOCAL, use_best=True, display=False):
+	frag = f'isaiah-{column}'
 	return to_verify_request(
-			f'isaiah-{column}', f'../images/isaiah/columns/column_9_{column}.jpg',
-			get_isa_text(column), model, multithread, use_best, display)
+			frag, f'../images/isaiah/columns/column_9_{column}.jpg',
+			get_frag_text(frag), model, multithread, use_best, display)
 
 
 def output(output_file, row_title, values):

@@ -6,6 +6,7 @@ import numpy as np
 import os
 import shutil
 import time
+from detect_letters import print_stats
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog
@@ -18,7 +19,6 @@ from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, VAL_SET, \
 	parse_file_name, TRAINING_SET, TEST_SET, get_y_at_x, is_in_row, process_image
-from scipy import stats
 from urllib import request
 from utility import intersection_over_union
 
@@ -245,30 +245,24 @@ def predict(predictor, fragment, preprocessor=None):
 			"y1": y1 + y_offset,
 			"x2": x2,
 			"y2": y2 + y_offset,
-			# "coords": coords,
+			"coords": [
+				{"x": x1, "y": y2},
+				{"x": (x1 + x2) / 2, "y": y2},
+				{"x": x2, "y": y2}
+			],
 			"_score": float(score)
 		})
 
 	row = 1
-	for box in sorted(row_boxes, key=lambda b: b["y1"]):
+	for box in sorted(row_boxes, key=lambda b:b["y1"]):
 		box["value"] = row
 		row += 1
 
-	nms = []
-	for box in sorted(row_boxes, key=lambda b: b["_score"], reverse=True):
-		keep = True
-		for kept in nms:
-			if intersection_over_union(box, kept) > 0.5:
-				keep = False
-				break
-		if keep:
-			nms.append(box)
-
-	return image, outputs, row_boxes, nms
+	return image, outputs, row_boxes
 
 
 def evaluate(predictor, fragment, display=True, preprocessor=None, override=False):
-	image, outputs, pred_boxes, pred_nms = predict(predictor, fragment, preprocessor)
+	image, outputs, pred_boxes = predict(predictor, fragment, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [])
@@ -321,16 +315,6 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 	return fp, fn, tp, precision, recall, f1_score
 
 
-def print_stats(title, values):
-	print(f'{title}: {values}')
-	npa = np.array(values)
-	mean, std = npa.mean(), npa.std()
-	print(f'{title} min: {npa.min():.2f}, max: {npa.max():.2f}',
-				f'mean: {mean:.2f} median: {np.median(npa):.2f}',
-				'mode:', stats.mode(np.round(npa / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
-
-
 def verify(predictor, fragments, preprocessor=None, refresh=False):
 	print()
 	scrolls = []
@@ -364,14 +348,14 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 
 
 def label_fragment(predictor, fragment, preprocessor=None):
-	image, outputs, pred_boxes, pred_nms = predict(predictor, fragment, preprocessor=preprocessor)
+	image, outputs, pred_boxes = predict(predictor, fragment, preprocessor=preprocessor)
+
+	print(outputs)
 
 	v = Visualizer(image[:, :, ::-1], scale=1.0)
 	out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
 	plt.imshow(out.get_image()[:, :, ::-1])
 	plt.show()
-
-	return
 
 	# Get the list of existing letter boxes, if there are any.
 	letterbox_url = LETTERBOX_BY_FRAGMENT_URL.format(fragment)
@@ -419,8 +403,8 @@ if __name__ == '__main__':
 	print("Verifying with:")
 	print(cfg)
 
-	# evaluate(predictor, 'isaiah-column-54', preprocessor=pp)
-	verify(predictor, TRAINING_SET, preprocessor=pp)
-	verify(predictor, VAL_SET, preprocessor=pp)
-	verify(predictor, TEST_SET, preprocessor=pp)
-	label_fragment(predictor, 'war-column-2', preprocessor=pp)
+	evaluate(predictor, 'war-column-2', preprocessor=pp)
+	# verify(predictor, TRAINING_SET, preprocessor=pp)
+	# verify(predictor, VAL_SET, preprocessor=pp)
+	# verify(predictor, TEST_SET, preprocessor=pp)
+	# label_fragment(predictor, 'war-column-2', preprocessor=pp)
