@@ -634,9 +634,9 @@ if __name__ == '__main__':
 	cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = args.batch_size_per_image
 	samples = args.samples
 	if not samples:
-		cfg.INPUT.MIN_SIZE_TRAIN = (1280,)  # (1024,) or (1280,)
+		cfg.INPUT.MIN_SIZE_TRAIN = (1880,)  # (1024,) or (1280,)
 		cfg.INPUT.MAX_SIZE_TRAIN = args.max_size  # 2043 or 1600
-		cfg.INPUT.MIN_SIZE_TEST = 1280
+		cfg.INPUT.MIN_SIZE_TEST = 1880
 		cfg.INPUT.MAX_SIZE_TEST = args.max_size
 	else:
 		cfg.INPUT.MIN_SIZE_TRAIN = (512,)
@@ -655,7 +655,7 @@ if __name__ == '__main__':
 	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
 	predictor = DefaultPredictor(cfg)
 
-	# evaluate(predictor, "war-column-4", True, preprocessor=pp, override=False)
+	evaluate(predictor, "war-column-4", True, preprocessor=pp, override=True)
 	verify(predictor, WAR_SET, preprocessor=pp, non_labeled_only=False)
 			# preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
 	# label_fragment(predictor, "war-column-4", preprocessor=pp)
@@ -675,3 +675,17 @@ if __name__ == '__main__':
 # Gray, G-Blur
 # [76.32, 77.98, 79.52, 80.94, 83.26, 83.52, 81.01, 78.62, 80.37, 78.61, 82.82, 83.65, 76.08]
 # min: 76.08 max: 83.65 mean: 80.21 median: 80.37 mode: 80.0 std: 2.52 Z-Low: 75.26 Z-High: 85.16
+
+'''War Scroll 1280x1920
+No Space Percents: [0.0, 49.41, 45.65, 51.78, 51.15, 57.84, 59.3, 63.41, 61.56, 53.99, 59.68, 57.49, 60.84, 57.59, 53.9]
+No Space Percents min: 0.00, max: 63.41 mean: 52.24 median: 57.49 mode: 60.0 std: 14.76 Z-Low: 23.32 Z-High: 81.16
+'''
+'''War Scroll 1920x1920
+No Space Percents: [0.0, 52.13, 53.27, 55.89, 55.77, 63.71, 67.84, 53.76, 53.45, 57.98, 54.97, 41.96, 49.28, 50.49, 34.4]
+No Space Percents min: 0.00, max: 67.84 mean: 49.66 median: 53.45 mode: 55.0 std: 15.30 Z-Low: 19.67 Z-High: 79.65
+'''
+'''War Scroll 1880x1920
+No Space Percents: [0.0, 51.95, 55.03, 55.89, 56.5, 63.8, 68.11, 53.26, 54.0, 57.43, 53.8, 41.96, 49.17, 50.39, 36.49]
+No Space Percents min: 0.00, max: 68.11 mean: 49.85 median: 53.80 mode: 55.0 std: 15.21 Z-Low: 20.05 Z-High: 79.66
+'''
+

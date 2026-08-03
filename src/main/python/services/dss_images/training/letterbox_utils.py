@@ -13,26 +13,34 @@ letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL =(
 		API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1')
-TEXT_MAP =  {'isaiah': '1Q_Isaiah_a.txt',
-						 'cal': '4QCalendrical.txt',
-						 'community': '1Q_Community.txt',
-						 'temple': '1Q_Temple.txt',
-						 'war': '1Q_War_Scroll.txt'}
-TRAINING_SET = list(map(lambda c: f'isaiah-column-{c}',
-												[2, 4, 9, 11, 12, 13, 14, 16, 18, 20, 24, 26,
-												 28, 29, 31, 36, 38, 40, 44, 45, 48, 50, 52, 53]))
-# From war scroll 2,4,7,12,14
-VAL_SET = list(map(lambda c: f'isaiah-column-{c}', [7, 17, 27, 37, 47]))
-# From war scroll 5, 8, 13
-TEST_SET = list(map(lambda c: f'isaiah-column-{c}',
-										[1, 3, 5, 6, 8, 10, 15, 19, 21, 22, 23, 25,
-										 30, 32, 33, 34, 35, 39, 41, 42, 43, 46, 49, 51, 54]))
+TEXT_MAP =  {'cal': '4QCalendrical.txt', 'community': '1Q_Community.txt',
+	'isaiah': '1Q_Isaiah_a.txt', 'temple': '1Q_Temple.txt', 'war': '1Q_War_Scroll.txt'}
+COMMUNITY_SET = list(map(lambda c: f'community-column-{c + 1}', range(11)))
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
+ISAIAH_TRAIN_SET = list(map(lambda c: f'isaiah-column-{c}',
+														[2, 4, 9, 11, 12, 13, 14, 16, 18, 20,24, 26,
+														 28, 29, 31, 36, 38, 40, 44, 45, 48, 50, 52, 53]))
+ISAIAH_VAL_SET = list(map(lambda c: f'isaiah-column-{c}', [7, 17, 27, 37, 47]))
+ISAIAH_TEST_SET = [
+	scroll for scroll in ISAIAH_SET
+	if scroll not in set(ISAIAH_TRAIN_SET) | set(ISAIAH_VAL_SET)
+]
+TEMPLE_SET = list(map(lambda c: f'temple-column-{c + 1}', range(67)))
 WAR_SET = list(map(lambda c: f'war-column-{c + 1}', range(15)))
-ALL = ISAIAH_SET.copy()
-ALL.extend(
-		['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2',
-		 '4QCalendrical-4Q320-Frag3', 'temple-column-4', 'war-column-1'])
+WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 7, 12, 14]))
+WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [5, 8, 13]))
+WAR_TEST_SET = [
+	scroll for scroll in WAR_SET
+	if scroll not in set(WAR_TRAIN_SET) | set(WAR_VAL_SET)
+]
+ALL = (
+		ISAIAH_SET + WAR_SET +
+		['temple-column-4',
+		 '4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3',
+		  ])
+TRAINING_SET = ISAIAH_TRAIN_SET # + WAR_TRAIN_SET
+VAL_SET = ISAIAH_VAL_SET # + WAR_VAL_SET
+TEST_SET = ISAIAH_TEST_SET # + WAR_TEST_SET
 SINGLE_LETTERS_ONLY = lambda lb:lb['type'] == 'Letter' and len(lb['value']) == 1
 mean, std = (0.5,), (0.5,)
 LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
