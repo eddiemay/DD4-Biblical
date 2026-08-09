@@ -17,7 +17,6 @@ from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 from letterbox_utils import DSSLettersDataset, get_img_file_path, ISAIAH_SET, \
 	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, VAL_SET, WAR_SET, \
 	get_frag_text, get_row, is_in_row, process_image
-from predict_letters import predict_letters
 from scipy import stats
 from train_by_labels import process
 from urllib import request
@@ -370,6 +369,7 @@ def predict(predictor, fragment, preprocessor=None):
 			"_score": float(score)
 		})
 
+	from predict_letters import predict_letters
 	predict_letters(letter_boxes)
 	nms = []
 	for box in sorted(letter_boxes, key=lambda b: b["_score"], reverse=True):
