@@ -27,8 +27,8 @@ ISAIAH_TEST_SET = [
 ]
 TEMPLE_SET = list(map(lambda c: f'temple-column-{c + 1}', range(67)))
 WAR_SET = list(map(lambda c: f'war-column-{c + 1}', range(15)))
-WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 7, 12, 14]))
-WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [5, 8, 13]))
+WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 7, 10])) # 14
+WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [6])) # 5, 11
 WAR_TEST_SET = [
 	scroll for scroll in WAR_SET
 	if scroll not in set(WAR_TRAIN_SET) | set(WAR_VAL_SET)
@@ -38,9 +38,9 @@ ALL = (
 		['temple-column-4',
 		 '4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3',
 		  ])
-TRAINING_SET = ISAIAH_TRAIN_SET # + WAR_TRAIN_SET
-VAL_SET = ISAIAH_VAL_SET # + WAR_VAL_SET
-TEST_SET = ISAIAH_TEST_SET # + WAR_TEST_SET
+TRAINING_SET = ISAIAH_TRAIN_SET + WAR_TRAIN_SET
+VAL_SET = ISAIAH_VAL_SET + WAR_VAL_SET
+TEST_SET = ISAIAH_TEST_SET + WAR_TEST_SET
 SINGLE_LETTERS_ONLY = lambda lb:lb['type'] == 'Letter' and len(lb['value']) == 1
 mean, std = (0.5,), (0.5,)
 LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']

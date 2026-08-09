@@ -18,7 +18,7 @@ from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, VAL_SET, \
-	parse_file_name, TRAINING_SET, TEST_SET, get_y_at_x, is_in_row, process_image
+	parse_file_name, TRAINING_SET, TEST_SET, WAR_TRAIN_SET, WAR_VAL_SET, get_y_at_x, is_in_row, process_image
 from urllib import request
 from utility import intersection_over_union
 
@@ -71,7 +71,8 @@ def get_segmentation(row_box):
 		segmentation.extend(row_box["coords"])
 
 		if len(row_box["_letterBoxes"]) == 0:
-			print("No letters for:", row_box)
+			print("No letters for:", row_box["filename"], row_box["value"])
+			return None, None
 		first_box = row_box["_letterBoxes"][0]
 		segmentation.append({"x": first_box["x2"] + 4, "y": first_box["y1"] - 4})
 
@@ -113,7 +114,7 @@ def setup_data(preprocessor):
 	fragments.extend(VAL_SET)
 	dataset = DSSLettersDataset(fragments)
 	for _, _, letter_box in dataset:
-		filename = letter_box['filename']
+		filename = letter_box["filename"]
 		if filename not in files:
 			files[filename] = {"rows": [], "letters": []}
 		if letter_box["type"] == 'Row':
@@ -133,6 +134,8 @@ def setup_data(preprocessor):
 		for row_box in row_boxes:
 			row_id += 1
 			segmentation, bbox = get_segmentation(row_box)
+			if segmentation is None:
+				continue
 			conf["annotations"].append(
 					{"id": row_id, "image_id": image_id, "category_id": 1,
 					 "segmentation": [segmentation],
@@ -280,6 +283,8 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 	fn, fp, tp = 0, 0, 0
 	for row_box in row_boxes:
 		segmentation, bbox = get_segmentation(row_box)
+		if segmentation is None:
+			continue
 		bbox = {"x1": bbox[0], "y1": bbox[1], "x2": bbox[0] + bbox[2], "y2": bbox[1] + bbox[3]}
 		best_iou, best_pred = 0, None
 		for pred_box in pred_boxes:
@@ -403,8 +408,8 @@ if __name__ == '__main__':
 	print("Verifying with:")
 	print(cfg)
 
-	evaluate(predictor, 'war-column-2', preprocessor=pp)
-	# verify(predictor, TRAINING_SET, preprocessor=pp)
-	# verify(predictor, VAL_SET, preprocessor=pp)
+	# evaluate(predictor, 'war-column-2', preprocessor=pp)
+	verify(predictor, TRAINING_SET, preprocessor=pp)
+	verify(predictor, VAL_SET, preprocessor=pp)
 	# verify(predictor, TEST_SET, preprocessor=pp)
 	# label_fragment(predictor, 'war-column-2', preprocessor=pp)

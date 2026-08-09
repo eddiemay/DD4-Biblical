@@ -192,14 +192,8 @@ threshold = .7
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
+cfg.merge_from_file("detect_letters/config.yaml")
 # cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
-cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(LABEL_LOOKUP) - 1  # <-- number of letters
-
-cfg.OUTPUT_DIR = "detect_letters/output"
-
-cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[4, 8, 16, 32]]
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3  # or 0.2
-cfg.MODEL.DEVICE = 'cpu'
 
 
 def append_data(conf, sample):
@@ -335,16 +329,6 @@ def train(iters, preprocessor, samples=False, resume=False):
 			f"{IMAGES_BASE}/val"
 	)
 
-	cfg.DATASETS.TRAIN = ("dss_train",)
-	cfg.DATASETS.TEST = ("dss_val",)
-
-	cfg.SOLVER.IMS_PER_BATCH = 1
-	cfg.SOLVER.BASE_LR = 0.000125
-	# cfg.SOLVER.STEPS = (12000, 16000)
-	# cfg.SOLVER.GAMMA = 0.1
-
-	cfg.DATALOADER.NUM_WORKERS = 2
-
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
 	trainer = DefaultTrainer(cfg)
@@ -391,7 +375,7 @@ def predict(predictor, fragment, preprocessor=None):
 	for box in sorted(letter_boxes, key=lambda b: b["_score"], reverse=True):
 		keep = True
 		for kept in nms:
-			if intersection_over_union(box, kept) > 0.225:
+			if intersection_over_union(box, kept) > 0.25:
 				keep = False
 				break
 		if keep:
@@ -627,38 +611,21 @@ if __name__ == '__main__':
 	parser.add_argument('--max_size', type=int, default=1920)
 	parser.add_argument('--resume', action='store_true')
 	parser.add_argument('--train', action='store_true')
-	parser.add_argument('--batch_size_per_image', type=int, default=2048)
 
 	args = parser.parse_args()
 	pp = preprocessor if args.preprocess else preprocessor
-	cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = args.batch_size_per_image
-	samples = args.samples
-	if not samples:
-		cfg.INPUT.MIN_SIZE_TRAIN = (1880,)  # (1024,) or (1280,)
-		cfg.INPUT.MAX_SIZE_TRAIN = args.max_size  # 2043 or 1600
-		cfg.INPUT.MIN_SIZE_TEST = 1880
-		cfg.INPUT.MAX_SIZE_TEST = args.max_size
-	else:
-		cfg.INPUT.MIN_SIZE_TRAIN = (512,)
-		cfg.INPUT.MAX_SIZE_TRAIN = 1280
-		cfg.INPUT.MIN_SIZE_TEST = 512
-		cfg.INPUT.MAX_SIZE_TEST = 1280
 
 	if args.train or args.resume:
-		train(args.iters, preprocessor=pp, samples=samples, resume=args.resume)
+		train(args.iters, preprocessor=pp, resume=args.resume)
 
-	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
-	# cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final_32x84_1280_2043_10000.pth'
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
-	cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 12000
-	cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 6000
-	cfg.TEST.DETECTIONS_PER_IMAGE = 2000
+	print(cfg)
 	predictor = DefaultPredictor(cfg)
 
-	evaluate(predictor, "war-column-4", True, preprocessor=pp, override=True)
+	# evaluate(predictor, "war-column-4", True, preprocessor=pp, override=False)
 	verify(predictor, WAR_SET, preprocessor=pp, non_labeled_only=False)
 			# preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
-	# label_fragment(predictor, "war-column-4", preprocessor=pp)
+	# label_fragment(predictor, "war-column-10", preprocessor=pp)
 
 # No preprocessing
 # [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]

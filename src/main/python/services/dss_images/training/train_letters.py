@@ -6,7 +6,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 from letterbox_utils import (
 	DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, TRAINING_SET, VAL_SET, TEST_SET, \
-	ISAIAH_SET, PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image)
+	ISAIAH_SET, WAR_SET, PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image)
 from src.main.python.ml.dd4_ml import DD4PyTorchModel, visualize_augmentations, DD4Subset, conv_block
 from torch.utils.data import DataLoader
 
@@ -125,7 +125,14 @@ if __name__ == '__main__':
 	isa_dataset = DSSLettersDataset(ISAIAH_SET, SINGLE_LETTERS_ONLY, test_transform)
 	isa_loader = DataLoader(isa_dataset, batch_size=1000)
 	loss, accuracy = model.evaluate(isa_loader)
-	print(f'Isa Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(isa_dataset)}')
+	print(f'Isa Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, Items: {len(isa_dataset)}')
+	print(f"Eval took: {time.time() - start} seconds")
+
+	start = time.time()
+	war_dataset = DSSLettersDataset(WAR_SET, SINGLE_LETTERS_ONLY, test_transform)
+	war_loader = DataLoader(war_dataset, batch_size=1000)
+	loss, accuracy = model.evaluate(war_loader)
+	print(f'War Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, Items: {len(war_dataset)}')
 	print(f"Eval took: {time.time() - start} seconds")
 
 	start = time.time()
