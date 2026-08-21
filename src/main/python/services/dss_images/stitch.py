@@ -98,8 +98,6 @@ if __name__ == '__main__':
     # construct_dss_org('4QCalendrical', '6Wx78IIdr', '4Q326-Plates-693_710')
     # construct_dss_org('4QCalendrical', 'lDcGH98RiDYcN0FB2br0L', '4Q326-Plates-693_710_694')
 
-
-
     # for c in range(1, 5):
         # construct_column(Collection.TORAH, c)
 
@@ -109,10 +107,12 @@ if __name__ == '__main__':
     # construct_column(Collection.TORAH, 2, res=5)
     # construct_column(Collection.TORAH, 1, res=5)
 
-    for res in range(8, 11):
-        construct_column(Collection.ISAIAH, 29, res)
-    cv2.waitKey(0)
+    # for res in range(8, 11):
+        # construct_column(Collection.ISAIAH, 29, res)
+    # cv2.waitKey(0)
 
+    construct_column(Collection.WAR, 1)
+    cv2.waitKey(0)
     # for c in range(1, 16):
       # construct_column(Collection.WAR, c)
 

@@ -87,8 +87,8 @@
 			"imageURL": "http://tiles.imj.org.il/columns/war/War2.jpg"
 		}, {
 			"id": "1",
-			"width": 822,
-			"x": 7255,
+			"width": 547,
+			"x": 7275,
 			"imageURL": "http://tiles.imj.org.il/columns/war/War1.jpg"
 		}
 	]
