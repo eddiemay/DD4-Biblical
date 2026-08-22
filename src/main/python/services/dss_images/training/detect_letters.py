@@ -11,22 +11,23 @@ from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer
+from detectron2.engine.hooks import BestCheckpointer
+from detectron2.evaluation import COCOEvaluator
 from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
-from letterbox_utils import DSSLettersDataset, get_img_file_path, ISAIAH_SET, \
-	parse_file_name, SINGLE_LETTERS_ONLY, LABEL_LOOKUP, TRAINING_SET, VAL_SET, WAR_SET, \
-	get_frag_text, get_row, is_in_row, process_image
+from letterbox_utils import DSSLettersDataset, get_img_file_path, LABEL_LOOKUP, \
+	SINGLE_LETTERS_ONLY, TRAINING_SET, VAL_SET, WAR_SET, get_frag_text, is_in_row, \
+	process_image, intersection_over_union
 from scipy import stats
 from train_by_labels import process
 from urllib import request
-from utility import intersection_over_union
 
 ANNO_IDS = {}
 DATASET_BASE = 'detect_letters/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
-preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3, "crop": [122, 1920]}
+preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3}
 # config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
 '''
 [43.5, 46.69, 46.99, 55.53, 49.27, 52.37, 52.35, 54.93, 54.22, 52.82, 54.66, 53.41, 56.79, 56.81, 55.66, 59.74, 61.05, 51.43, 58.42, 59.94, 58.52, 58.58, 60.79, 50.9]
@@ -260,6 +261,16 @@ def setup_samples(preprocessor=None):
 		json.dump(val_conf, f, indent=True)
 
 
+def resize(filename, img, start_x, end_x, target_x, max_x, start_y, end_y, target_y, max_y):
+	y_buffer = max(target_y - (end_y - start_y), 0)
+	x_buffer = max(target_x - (end_x - start_x), 0)
+	y_start, y_end = int(max(start_y - y_buffer / 2, 0)), int(min(end_y + y_buffer / 2, max_y))
+	x_start, x_end = int(max(start_x - x_buffer / 2, 0)), int(min(end_x + x_buffer / 2, max_x))
+	letter_h, letter_w = y_end - y_start, x_end - x_start
+	print(f'{filename} Image h,w: ({max_y}, {max_x}), Letter h,w: ({end_y - start_y}, {end_x - start_x}), Result: ({letter_h}, {letter_w})')
+	return img[y_start:y_end,x_start:x_end], x_start, y_start
+
+
 def setup_data(preprocessor):
 	if os.path.exists(IMAGES_BASE):
 		shutil.rmtree(IMAGES_BASE)
@@ -274,41 +285,98 @@ def setup_data(preprocessor):
 		val_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
 
 	files = {}
-	letter_id = 0
-	y_offset = preprocessor["crop"][0] if preprocessor.get("crop") is not None else 0
 	fragments = []
 	fragments.extend(TRAINING_SET)
 	fragments.extend(VAL_SET)
 	dataset = DSSLettersDataset(fragments, SINGLE_LETTERS_ONLY)
 	for _, label, letter_box in dataset:
 		filename = letter_box['filename']
-		image_id = parse_file_name(filename)[2]
 		if filename not in files:
-			files[filename] = image_id
-		conf = train_conf if filename not in VAL_SET else val_conf
-
+			files[filename] = {"id": filename, "min_x": None, "max_x": None,
+												 "min_y": None, "max_y": None, "letter_boxes": []}
+		file = files[filename]
+		letter_box["label"] = label
 		x, y = letter_box['x1'], letter_box['y1']
-		width, height = letter_box['x2'] - x, letter_box['y2'] - y
-		conf["annotations"].append(
-				{"id": letter_id, "image_id": image_id, "category_id": label,
-				 "bbox": [x, y - y_offset, width, height], "area": width * height, "iscrowd": 0})
-		letter_id += 1
+		if file["min_x"] is None or file["min_x"] > x:
+			file["min_x"] = x
+		if file["min_y"] is None or file["min_y"] > y:
+			file["min_y"] = y
+		if file["max_x"] is None or file["max_x"] < letter_box['x2']:
+			file["max_x"] = letter_box['x2']
+		if file["max_y"] is None or file["max_y"] < letter_box['y2']:
+			file["max_y"] = letter_box['y2']
+		file["letter_boxes"].append(letter_box)
 
-	for filename, id in files.items():
+	letter_id = 0
+	min_sides, max_sides = [], []
+	for filename, file in files.items():
 		conf, path = (train_conf, f'{IMAGES_BASE}/train') \
 			if filename not in VAL_SET else (val_conf, f'{IMAGES_BASE}/val')
 		file_path = get_img_file_path(filename, 9)
 		img = process_image(cv2.imread(file_path), preprocessor)[0]
 		h, w = img.shape[:2]
+		if file["max_y"] - file["min_y"] > file["max_x"] - file["min_x"]:
+			min_side, max_side = file["max_x"] - file["min_x"], file["max_y"] - file["min_y"]
+			img, x_start, y_start = resize(
+					filename, img,
+					file["min_x"], file["max_x"], file["max_x"] - file["min_x"] + 20, w,
+					file["min_y"], file["max_y"], cfg.INPUT.MAX_SIZE_TRAIN, h)
+		else:
+			max_side, min_side = file["max_x"] - file["min_x"], file["max_y"] - file["min_y"]
+			img, x_start, y_start = resize(
+					filename, img,
+					file["min_x"], file["max_x"], cfg.INPUT.MAX_SIZE_TRAIN, w,
+					file["min_y"], file["max_y"], file["max_y"] - file["min_y"] + 20, h)
+
+		min_sides.append(min_side)
+		max_sides.append(max_side)
+		h, w = img.shape[:2]
 		conf["images"].append(
-				{"id": id, "file_name": filename + '.jpg', "height": h, "width": w})
+				{"id": filename, "file_name": filename + '.jpg', "height": h, "width": w})
+
+		for letter_box in file["letter_boxes"]:
+			x, y = letter_box['x1'], letter_box['y1']
+			width, height = letter_box['x2'] - x, letter_box['y2'] - y
+			conf["annotations"].append(
+					{"id": letter_id, "image_id": filename, "category_id": letter_box["label"],
+					 "bbox": [x - x_start, y - y_start, width, height],
+					 "area": width * height, "iscrowd": 0})
+			letter_id += 1
+
 		os.makedirs(path, exist_ok=True)
 		cv2.imwrite(f'{path}/{filename}.jpg', img)
+
+	print_stats("Min Sides", min_sides)
+	print_stats("Max Sides", max_sides)
 
 	with open(f"{ANNOTATIONS}/train.json", "w", encoding="utf-8") as f:
 		json.dump(train_conf, f, indent=True)
 	with open(f"{ANNOTATIONS}/val.json", "w", encoding="utf-8") as f:
 		json.dump(val_conf, f, indent=True)
+
+
+class Trainer(DefaultTrainer):
+	@classmethod
+	def build_evaluator(cls, cfg, dataset_name, output_folder=None):
+		if output_folder is None:
+			output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
+
+		return COCOEvaluator(dataset_name, output_dir=output_folder)
+
+	def build_hooks(self):
+		hooks = super().build_hooks()
+
+		hooks.insert(
+				-1,
+				BestCheckpointer(
+						self.cfg.TEST.EVAL_PERIOD,
+						self.checkpointer,
+						"bbox/AP75",      # metric to maximize
+						mode="max"
+				)
+		)
+
+		return hooks
 
 
 def train(iters, preprocessor, samples=False, resume=False):
@@ -330,7 +398,7 @@ def train(iters, preprocessor, samples=False, resume=False):
 
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
-	trainer = DefaultTrainer(cfg)
+	trainer = Trainer(cfg)
 	trainer.resume_or_load(resume=resume)
 	trainer.train()
 
@@ -372,7 +440,7 @@ def predict(predictor, fragment, preprocessor=None):
 	from predict_letters import predict_letters
 	predict_letters(letter_boxes)
 	nms = []
-	for box in sorted(letter_boxes, key=lambda b: b["_score"], reverse=True):
+	for box in sorted(letter_boxes, key=lambda b:b["_score"], reverse=True):
 		keep = True
 		for kept in nms:
 			if intersection_over_union(box, kept) > 0.25:
@@ -512,7 +580,7 @@ def print_stats(title, values):
 	print(f'{title} min: {npa.min():.2f}, max: {npa.max():.2f}',
 				f'mean: {mean:.2f} median: {np.median(npa):.2f}',
 				'mode:', stats.mode(np.round(npa / 5) * 5).mode, f'std: {std:.2f}',
-				f'Z-Low: {mean - std * 1.96:.2f} Z-High: {mean + std * 1.96:.2f}')
+				f'90% ({mean - std * 1.645:.2f} - {mean + std * 1.645:.2f})')
 
 
 def verify(predictor, fragments, preprocessor=None, non_labeled_only=False, refresh=False):
@@ -622,10 +690,9 @@ if __name__ == '__main__':
 	print(cfg)
 	predictor = DefaultPredictor(cfg)
 
-	# evaluate(predictor, "war-column-4", True, preprocessor=pp, override=False)
+	# evaluate(predictor, "war-column-11", True, preprocessor=pp, override=True)
 	verify(predictor, WAR_SET, preprocessor=pp, non_labeled_only=False)
-			# preprocessor={"bf": 7, "blur": "median", "blur_size": 3, "threshold": 135, "threshold_type": 2})
-	# label_fragment(predictor, "war-column-10", preprocessor=pp)
+	# label_fragment(predictor, "war-column-5", preprocessor=pp)
 
 # No preprocessing
 # [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]

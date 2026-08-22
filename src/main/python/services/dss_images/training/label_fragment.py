@@ -4,7 +4,7 @@ import pytesseract
 from pytesseract import Output
 from urllib import request
 from verify import verify, to_isa_verify_request, to_verify_request, process_image
-from utility import image_to_boxes_data, post_process_boxes
+from tesseract_util import image_to_boxes_data, post_process_boxes
 
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0'

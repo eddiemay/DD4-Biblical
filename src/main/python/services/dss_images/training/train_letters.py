@@ -45,7 +45,7 @@ train_transform = transforms.Compose([
 # 20x40 256 99.36%, 97.37%, 96.79%, 97.99%
 
 if __name__ == '__main__':
-	train = True
+	train = False
 	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, transform=train_transform)
 	val_dataset = DSSLettersDataset(VAL_SET, SINGLE_LETTERS_ONLY, test_transform)
 	test_dataset = DSSLettersDataset(TEST_SET, SINGLE_LETTERS_ONLY, test_transform)

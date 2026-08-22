@@ -13,8 +13,8 @@ from matplotlib import pyplot as plt
 from multiprocessing import Pool
 from pytesseract import Output
 from scipy import stats
-from utility import image_to_boxes_data, post_process_boxes, unfinalize
-from utility import draw_letter_boxes_and_text
+from utility import unfinalize
+from tesseract_util import draw_letter_boxes_and_text, image_to_boxes_data, post_process_boxes
 
 BEST_MODEL = 'Hebrew_Font_Embedding_Label_19'
 DASK_SCHEDULER = 'localhost:8786'

@@ -18,9 +18,9 @@ from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, VAL_SET, \
-	parse_file_name, TRAINING_SET, TEST_SET, WAR_TRAIN_SET, WAR_VAL_SET, get_y_at_x, is_in_row, process_image
+	parse_file_name, TRAINING_SET, TEST_SET, WAR_TRAIN_SET, WAR_VAL_SET, \
+	get_y_at_x, is_in_row, process_image, calc_bbox_stats
 from urllib import request
-from utility import intersection_over_union
 
 DATASET_BASE = 'detect_lines/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
@@ -33,24 +33,6 @@ cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
 cfg.merge_from_file("detect_lines/config.yaml")
-
-
-def ensure_four(row_box):
-	coords = row_box["coords"]
-	if len(coords) == 3:
-		# Insert a new coord between the first and second
-		mid_x = (coords[0]["x"] + coords[1]["x"]) / 2
-		coords.insert(1, {"x": mid_x, "y": get_y_at_x(row_box, mid_x)})
-
-	if len(coords) == 2:
-		# Insert two coords between the beginning and end.
-		quarter = (coords[1]["x"] - coords[0]["x"]) / 4
-		x = coords[0]["x"] + quarter
-		coords.insert(1, {"x": x, "y": get_y_at_x(row_box, x)})
-		x = coords[1]["x"] + quarter
-		coords.insert(2, {"x": x, "y": get_y_at_x(row_box, x)})
-
-	return row_box
 
 
 def set_rows(row_boxes, letter_boxes):
@@ -280,35 +262,17 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 
 	set_rows(row_boxes, letter_boxes)
 
-	fn, fp, tp = 0, 0, 0
+	target_boxes = []
 	for row_box in row_boxes:
 		segmentation, bbox = get_segmentation(row_box)
 		if segmentation is None:
 			continue
-		bbox = {"x1": bbox[0], "y1": bbox[1], "x2": bbox[0] + bbox[2], "y2": bbox[1] + bbox[3]}
-		best_iou, best_pred = 0, None
-		for pred_box in pred_boxes:
-			if pred_box.get("_taken"):
-				continue
+		target_boxes.append(
+				{"x1": bbox[0], "y1": bbox[1], "x2": bbox[0] + bbox[2], "y2": bbox[1] + bbox[3]}
+		)
 
-			iou = intersection_over_union(bbox, pred_box)
-			if iou > best_iou:
-				best_iou = iou
-				best_pred = pred_box
-
-		# print(f'{row_box["value"]} best_iou: {best_iou} ({row_box["x1"]},{row_box["y1"]},{row_box["x2"]},{row_box["y2"]}) pred ({best_pred["x1"]},{best_pred["y1"]},{best_pred["x2"]},{best_pred["y2"]})')
-		if best_iou >= 0.6:
-			tp += 1
-			row_box["_taken"], best_pred["_taken"] = True, True
-		else:
-			fn += 1
-
-	for pred_box in pred_boxes:
-		if not pred_box.get("_taken"):
-			fp += 1
-
-	precision, recall = round(tp * 100 / (tp + fp), 2), round(tp * 100 / (tp + fn), 2)
-	f1_score = round(2 * precision * recall / (precision + recall + 0.00001), 2)
+	fp, fn, tp, precision, recall, f1_score = calc_bbox_stats(
+			target_boxes, pred_boxes, .6)
 
 	if display:
 		print(f'FP {fp}, FN {fn}, TP {tp}, Precision {precision}, Recall {recall}, F1 Score {f1_score}')

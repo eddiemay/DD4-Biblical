@@ -27,8 +27,8 @@ ISAIAH_TEST_SET = [
 ]
 TEMPLE_SET = list(map(lambda c: f'temple-column-{c + 1}', range(67)))
 WAR_SET = list(map(lambda c: f'war-column-{c + 1}', range(15)))
-WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 7, 10])) # 14
-WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [6])) # 5, 11
+WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 7, 9, 10])) # 14
+WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [6, 8, 11]))
 WAR_TEST_SET = [
 	scroll for scroll in WAR_SET
 	if scroll not in set(WAR_TRAIN_SET) | set(WAR_VAL_SET)
@@ -353,6 +353,59 @@ def get_row(filename, row):
 		print(f'Found none for {filename} Row: {row}')
 
 	return row_box
+
+
+def calc_area(box):
+	return max(0, box["x2"] - box["x1"]) * max(0, box["y2"] - box["y1"])
+
+
+def intersection_over_union(box1, box2):
+	if box1 is None:
+		return 0.0
+
+	ix1 = max(box1["x1"], box2["x1"])
+	iy1 = max(box1["y1"], box2["y1"])
+	ix2 = min(box1["x2"], box2["x2"])
+	iy2 = min(box1["y2"], box2["y2"])
+
+	intersection = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+
+	area1 = calc_area(box1)
+	area2 = calc_area(box2)
+
+	union = area1 + area2 - intersection
+
+	return intersection / union if union > 0 else 0.0
+
+
+def calc_bbox_stats(target_boxes, pred_boxes, iou_threshold=.5):
+	fn, fp, tp = 0, 0, 0
+	for bbox in target_boxes:
+		best_iou, best_pred = 0, None
+		for pred_box in pred_boxes:
+			if pred_box.get("_taken"):
+				continue
+
+			iou = intersection_over_union(bbox, pred_box)
+			if iou > best_iou:
+				best_iou = iou
+				best_pred = pred_box
+
+		value_match = bbox.get("value") is None or bbox["value"] == best_pred["value"]
+		if best_iou >= iou_threshold and value_match:
+			tp += 1
+			best_pred["_taken"] = True
+		else:
+			fn += 1
+
+	for pred_box in pred_boxes:
+		if not pred_box.get("_taken"):
+			fp += 1
+
+	precision, recall = round(tp * 100 / (tp + fp), 2), round(tp * 100 / (tp + fn), 2)
+	f1_score = round(2 * precision * recall / (precision + recall + 0.00001), 2)
+
+	return fp, fn, tp, precision, recall, f1_score
 
 
 if __name__ == '__main__':
