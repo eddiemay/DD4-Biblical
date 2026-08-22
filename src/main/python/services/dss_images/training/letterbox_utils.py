@@ -18,7 +18,7 @@ TEXT_MAP =  {'cal': '4QCalendrical.txt', 'community': '1Q_Community.txt',
 COMMUNITY_SET = list(map(lambda c: f'community-column-{c + 1}', range(11)))
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
 ISAIAH_TRAIN_SET = list(map(lambda c: f'isaiah-column-{c}',
-														[2, 4, 9, 11, 12, 13, 14, 16, 18, 20,24, 26,
+														[2, 4, 9, 11, 12, 13, 14, 16, 18, 20, 24, 26,
 														 28, 29, 31, 36, 38, 40, 44, 45, 48, 50, 52, 53]))
 ISAIAH_VAL_SET = list(map(lambda c: f'isaiah-column-{c}', [7, 17, 27, 37, 47]))
 ISAIAH_TEST_SET = [

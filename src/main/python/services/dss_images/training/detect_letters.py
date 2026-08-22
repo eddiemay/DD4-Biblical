@@ -687,12 +687,12 @@ if __name__ == '__main__':
 		train(args.iters, preprocessor=pp, resume=args.resume)
 
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
-	print(cfg)
+	# print(cfg)
 	predictor = DefaultPredictor(cfg)
 
-	# evaluate(predictor, "war-column-11", True, preprocessor=pp, override=True)
+	# evaluate(predictor, "war-column-5", True, preprocessor=pp, override=True)
 	verify(predictor, WAR_SET, preprocessor=pp, non_labeled_only=False)
-	# label_fragment(predictor, "war-column-5", preprocessor=pp)
+	# label_fragment(predictor, "war-column-14", preprocessor=pp)
 
 # No preprocessing
 # [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]
