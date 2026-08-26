@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from letterbox_utils import (
 	DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, TRAINING_SET, VAL_SET, TEST_SET, \
 	ISAIAH_SET, WAR_SET, PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image)
-from src.main.python.ml.dd4_ml import DD4PyTorchModel, visualize_augmentations, DD4Subset, conv_block
+from dd4_ml import DD4PyTorchModel, visualize_augmentations, conv_block
 from torch.utils.data import DataLoader
 
 pd.set_option("display.max_columns", None)
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
 	eval_start = time.time()
 	train_dataset = DSSLettersDataset(TRAINING_SET, SINGLE_LETTERS_ONLY, test_transform)
-	train_loader = DataLoader(train_dataset, batch_size=1000)
+	train_loader = DataLoader(train_dataset, batch_size=2048)
 	loss, accuracy = model.evaluate(train_loader)
 	print(f'Train Loss: {loss:.2f}, Train Accuracy: {accuracy:.2f}%, Items: {len(train_dataset)}')
 	print(f"Eval took: {time.time() - eval_start} seconds")
@@ -116,28 +116,28 @@ if __name__ == '__main__':
 	print(f"Eval took: {time.time() - start} seconds")
 
 	start = time.time()
-	test_loader = DataLoader(test_dataset, batch_size=1000)
+	test_loader = DataLoader(test_dataset, batch_size=2048)
 	loss, accuracy = model.evaluate(test_loader)
 	print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%, Items: {len(test_dataset)}')
 	print(f"Eval took: {time.time() - start} seconds")
 
 	start = time.time()
 	isa_dataset = DSSLettersDataset(ISAIAH_SET, SINGLE_LETTERS_ONLY, test_transform)
-	isa_loader = DataLoader(isa_dataset, batch_size=1000)
+	isa_loader = DataLoader(isa_dataset, batch_size=2048)
 	loss, accuracy = model.evaluate(isa_loader)
 	print(f'Isa Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, Items: {len(isa_dataset)}')
 	print(f"Eval took: {time.time() - start} seconds")
 
 	start = time.time()
 	war_dataset = DSSLettersDataset(WAR_SET, SINGLE_LETTERS_ONLY, test_transform)
-	war_loader = DataLoader(war_dataset, batch_size=1000)
+	war_loader = DataLoader(war_dataset, batch_size=2048)
 	loss, accuracy = model.evaluate(war_loader)
 	print(f'War Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, Items: {len(war_dataset)}')
 	print(f"Eval took: {time.time() - start} seconds")
 
 	start = time.time()
 	all_dataset = DSSLettersDataset(ALL, SINGLE_LETTERS_ONLY, test_transform)
-	all_loader = DataLoader(all_dataset, batch_size=1000)
+	all_loader = DataLoader(all_dataset, batch_size=2048)
 	loss, accuracy = model.evaluate(all_loader)
 	print(f'All Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(all_dataset)}')
 	print(f"Eval took: {time.time() - start} seconds")

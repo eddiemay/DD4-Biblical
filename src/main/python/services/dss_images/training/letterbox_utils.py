@@ -247,6 +247,11 @@ def read_database(fragments: list[str], overrides: list[str],
 				letterboxes = db[key]
 				# Dump each letterbox into the file.
 				for letterbox in letterboxes:
+					letterbox = {
+						key: value
+						for key, value in letterbox.items()
+						if not key.endswith(("Time", "Username"))
+					}
 					json.dump(letterbox, f)
 					f.write("\n")
 

@@ -523,7 +523,9 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 				break
 	print(f'NMS {added_letters} letters added')
 
-	target_text = get_frag_text(fragment)
+	target_text = ''.join(get_frag_text(fragment).split())
+	no_space = ''.join(target_text.split())
+	no_space_len = len(no_space)
 	pred_text = ''
 	repred_text = ''
 	remove_mismatch_text = ''
@@ -538,26 +540,22 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 		nms_text += row_box['_nms_text'] + '\n'
 		nms_rp_text += row_box['_nms_rp_text'] + '\n'
 
-	ld = Levenshtein.distance(target_text, pred_text)
-	percent = round((len(target_text) - ld) * 100 / len(target_text), 2)
-	rp_ld = Levenshtein.distance(target_text, repred_text)
-	rp_percent = round((len(target_text) - rp_ld) * 100 / len(target_text), 2)
-	rm_ld = Levenshtein.distance(target_text, remove_mismatch_text)
-	rm_percent = round((len(target_text) - rm_ld) * 100 / len(target_text), 2)
-	ru_ld = Levenshtein.distance(target_text, remove_union_text)
-	ru_percent = round((len(target_text) - ru_ld) * 100 / len(target_text), 2)
-	nms_ld = Levenshtein.distance(target_text, nms_text)
-	nms_percent = round((len(target_text) - nms_ld) * 100 / len(target_text), 2)
-	nms_rp_ld = Levenshtein.distance(target_text, nms_rp_text)
-	nms_rp_percent = round((len(target_text) - nms_rp_ld) * 100 / len(target_text), 2)
-	no_space_text = ''.join(target_text.split())
-	ld_no_space = Levenshtein.distance(no_space_text, ''.join(nms_rp_text.split()))
-	no_space_percent = round((len(no_space_text) - ld_no_space) * 100 / len(no_space_text), 2)
+	ld = Levenshtein.distance(no_space, ''.join(pred_text.split()))
+	percent = round((no_space_len - ld) * 100 / no_space_len, 2)
+	rp_ld = Levenshtein.distance(no_space, ''.join(repred_text.split()))
+	rp_percent = round((no_space_len - rp_ld) * 100 / no_space_len, 2)
+	rm_ld = Levenshtein.distance(no_space, ''.join(remove_mismatch_text.split()))
+	rm_percent = round((no_space_len - rm_ld) * 100 / no_space_len, 2)
+	ru_ld = Levenshtein.distance(no_space, ''.join(remove_union_text.split()))
+	ru_percent = round((no_space_len - ru_ld) * 100 / no_space_len, 2)
+	nms_ld = Levenshtein.distance(no_space, ''.join(nms_text.split()))
+	nms_percent = round((no_space_len - nms_ld) * 100 / no_space_len, 2)
+	nms_rp_ld = Levenshtein.distance(no_space, ''.join(nms_rp_text.split()))
+	nms_rp_percent = round((no_space_len - nms_rp_ld) * 100 / no_space_len, 2)
 	print(
 			f'{fragment} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
 			f'Remove Miss Diff: {rm_ld} {rm_percent}%, Remove Union Text: {ru_ld} {ru_percent}%,',
 			f'NMS Diff: {nms_ld} {nms_percent}%, NMS RP Diff: {nms_rp_ld} {nms_rp_percent}%,',
-			f'No Space Diff: {ld_no_space} {no_space_percent}%',
 			f'Prediction Diff: {len(letter_boxes) - matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
@@ -570,7 +568,7 @@ def evaluate(predictor, fragment, display=True, preprocessor=None, override=Fals
 		plt.imshow(out.get_image()[:, :, ::-1])
 		plt.show()
 
-	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent, no_space_percent
+	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent
 
 
 def print_stats(title, values):
@@ -591,7 +589,6 @@ def verify(predictor, fragments, preprocessor=None, non_labeled_only=False, refr
 	ru_percents = []
 	nms_percents = []
 	nms_rp_percents = []
-	no_space_percents = []
 
 	counts = {}
 	dataset = DSSLettersDataset(fragments=fragments)
@@ -614,18 +611,16 @@ def verify(predictor, fragments, preprocessor=None, non_labeled_only=False, refr
 			ru_percents.append(result[3])
 			nms_percents.append(result[4])
 			nms_rp_percents.append(result[5])
-			no_space_percents.append((result[6]))
+		scrolls.append({
+			"scroll": scroll,
+			"nms_percent": result[4],
+			"nms_rp_percent": result[5],
+			"labeled": counts[scroll] > 500
+		})
 
-			scrolls.append({
-				"scroll": scroll,
-				"nms_rp_percent": result[5],
-				"no_space_percent": result[6],
-				"labeled": counts[scroll] > 500
-			})
-
-	for scroll in sorted(scrolls, key=lambda s: s["no_space_percent"]):
+	for scroll in sorted(scrolls, key=lambda s: s["nms_rp_percent"]):
 		print(
-				f'{scroll["scroll"]} {scroll["no_space_percent"]}% labeled: {scroll["labeled"]}')
+				f'{scroll["scroll"]} {scroll["nms_percent"]}%, {scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
 
 	print_stats("Percents", percents)
 	print_stats("RP Percents", rp_percents)
@@ -633,7 +628,6 @@ def verify(predictor, fragments, preprocessor=None, non_labeled_only=False, refr
 	print_stats("RU Percents", ru_percents)
 	print_stats("NMS Percents", nms_percents)
 	print_stats("NMS RP Percents", nms_rp_percents)
-	print_stats("No Space Percents", no_space_percents)
 
 
 def label_fragment(predictor, fragment, preprocessor=None):
@@ -690,9 +684,9 @@ if __name__ == '__main__':
 	# print(cfg)
 	predictor = DefaultPredictor(cfg)
 
-	# evaluate(predictor, "war-column-5", True, preprocessor=pp, override=True)
+	# evaluate(predictor, "war-column-15", True, preprocessor=pp, override=True)
 	verify(predictor, WAR_SET, preprocessor=pp, non_labeled_only=False)
-	# label_fragment(predictor, "war-column-14", preprocessor=pp)
+	# label_fragment(predictor, "war-column-15", preprocessor=pp)
 
 # No preprocessing
 # [76.52, 80.76, 82.27, 83.61, 84.27, 83.63, 82.17, 80.79, 81.23, 78.92, 83.93, 84.94, 77.83]
