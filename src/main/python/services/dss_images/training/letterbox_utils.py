@@ -9,38 +9,39 @@ from torch.utils.data import Dataset
 from urllib import request
 from utility import romanize, unfinalize
 
+
+def compute_test_set(full, train, val):
+	return [scroll for scroll in full if scroll not in set(train) | set(val)]
+
 letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL =(
 		API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1')
-TEXT_MAP =  {'cal': '4QCalendrical.txt', 'community': '1Q_Community.txt',
+TEXT_MAP =  {'cal': '4QCalendrical.txt', 'community': '1Q_Community_Rule.txt',
 	'isaiah': '1Q_Isaiah_a.txt', 'temple': '1Q_Temple.txt', 'war': '1Q_War_Scroll.txt'}
 COMMUNITY_SET = list(map(lambda c: f'community-column-{c + 1}', range(11)))
+COMMUNITY_TRAIN_SET = list(map(lambda c: f'community-column-{c}', [1, 3, 4, 9])) # 6
+COMMUNITY_VAL_SET = list(map(lambda c: f'community-column-{c}', [2, 10])) # 5
+COMMUNITY_TEST_SET = compute_test_set(COMMUNITY_SET, COMMUNITY_TRAIN_SET, COMMUNITY_VAL_SET)
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
 ISAIAH_TRAIN_SET = list(map(lambda c: f'isaiah-column-{c}',
-														[2, 4, 9, 11, 12, 13, 14, 16, 18, 20, 24, 26,
-														 28, 29, 31, 36, 38, 40, 44, 45, 48, 50, 52, 53]))
-ISAIAH_VAL_SET = list(map(lambda c: f'isaiah-column-{c}', [7, 17, 27, 37, 47]))
-ISAIAH_TEST_SET = [
-	scroll for scroll in ISAIAH_SET
-	if scroll not in set(ISAIAH_TRAIN_SET) | set(ISAIAH_VAL_SET)
-]
+														[2, 4, 9, 11, 14, 16, 20, 24, 26,
+														 28, 31, 36, 38, 40, 44, 48, 50, 53]))
+ISAIAH_VAL_SET = list(map(lambda c: f'isaiah-column-{c}',
+													[7, 12, 13, 17, 18, 27, 29, 37, 45, 47, 52]))
+ISAIAH_TEST_SET = compute_test_set(ISAIAH_SET, ISAIAH_TRAIN_SET, ISAIAH_VAL_SET)
 TEMPLE_SET = list(map(lambda c: f'temple-column-{c + 1}', range(67)))
 WAR_SET = list(map(lambda c: f'war-column-{c + 1}', range(15)))
-WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 7, 9, 10])) # 14
-WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [6, 8, 11]))
-WAR_TEST_SET = [
-	scroll for scroll in WAR_SET
-	if scroll not in set(WAR_TRAIN_SET) | set(WAR_VAL_SET)
-]
+WAR_TRAIN_SET = list(map(lambda c: f'war-column-{c}', [2, 4, 6, 7, 9, 12, 14]))
+WAR_VAL_SET = list(map(lambda c: f'war-column-{c}', [1, 8, 11, 13]))
+WAR_TEST_SET = compute_test_set(WAR_SET, WAR_TRAIN_SET, WAR_VAL_SET)
 ALL = (
-		ISAIAH_SET + WAR_SET +
-		['temple-column-4',
-		 '4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3',
+		ISAIAH_SET + WAR_SET + COMMUNITY_SET +
+		['4QCalendrical-4Q320-Frag1', '4QCalendrical-4Q320-Frag2', '4QCalendrical-4Q320-Frag3',
 		  ])
-TRAINING_SET = ISAIAH_TRAIN_SET + WAR_TRAIN_SET
-VAL_SET = ISAIAH_VAL_SET + WAR_VAL_SET
-TEST_SET = ISAIAH_TEST_SET + WAR_TEST_SET
+TRAINING_SET = ISAIAH_TRAIN_SET + WAR_TRAIN_SET + COMMUNITY_TRAIN_SET
+VAL_SET = ISAIAH_VAL_SET + WAR_VAL_SET + COMMUNITY_VAL_SET
+TEST_SET = ISAIAH_TEST_SET + WAR_TEST_SET + COMMUNITY_TEST_SET
 SINGLE_LETTERS_ONLY = lambda lb:lb['type'] == 'Letter' and len(lb['value']) == 1
 mean, std = (0.5,), (0.5,)
 LABEL_LOOKUP = [chr(c) for c in range(ord('א'), ord('ת') + 1)] + ['?']
