@@ -1,12 +1,13 @@
+import argparse
 import os
 import pandas as pd
 import time
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from letterbox_utils import (
-	DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, TRAINING_SET, VAL_SET, TEST_SET, \
-	ISAIAH_SET, WAR_SET, PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image)
+from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, \
+	PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image, \
+	TRAINING_SET, VAL_SET, TEST_SET, ISAIAH_SET, WAR_SET, COMMUNITY_SET
 from dd4_ml import DD4PyTorchModel, visualize_augmentations, conv_block
 from torch.utils.data import DataLoader
 
@@ -44,8 +45,18 @@ train_transform = transforms.Compose([
 # 20x28 256 99.37%, 97.52%, 96.99%, 97.98%
 # 20x40 256 99.36%, 97.37%, 96.79%, 97.99%
 
+def verify(title, dataset, loader=None):
+	start = time.time()
+	loader = loader or DataLoader(dataset, batch_size=2048)
+	loss, accuracy = model.evaluate(loader)
+	print(f'{title} Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, '
+				f'Items: {len(dataset)} Time: {time.time() - start:.1f} seconds')
+
+
 if __name__ == '__main__':
-	train = False
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--train', action='store_true')
+	args = parser.parse_args()
 	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, transform=train_transform)
 	val_dataset = DSSLettersDataset(VAL_SET, SINGLE_LETTERS_ONLY, test_transform)
 	test_dataset = DSSLettersDataset(TEST_SET, SINGLE_LETTERS_ONLY, test_transform)
@@ -89,7 +100,7 @@ if __name__ == '__main__':
 	size_mb = (param_size + buffer_size) / 1024 ** 2
 	print(f"Model size: {size_mb:.2f} MB")
 
-	if train or not os.path.exists(checkpoint_path):
+	if args.train or not os.path.exists(checkpoint_path):
 		train_start_time = time.time()
 		num_epochs = 120
 		optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
@@ -104,42 +115,10 @@ if __name__ == '__main__':
 	model.reload(checkpoint_path)
 
 	eval_start = time.time()
-	train_dataset = DSSLettersDataset(TRAINING_SET, SINGLE_LETTERS_ONLY, test_transform)
-	train_loader = DataLoader(train_dataset, batch_size=2048)
-	loss, accuracy = model.evaluate(train_loader)
-	print(f'Train Loss: {loss:.2f}, Train Accuracy: {accuracy:.2f}%, Items: {len(train_dataset)}')
-	print(f"Eval took: {time.time() - eval_start} seconds")
-
-	start = time.time()
-	loss, accuracy = model.evaluate(val_loader)
-	print(f'Val Loss: {loss:.2f}, Val Accuracy: {accuracy:.2f}%, Items: {len(val_dataset)}')
-	print(f"Eval took: {time.time() - start} seconds")
-
-	start = time.time()
-	test_loader = DataLoader(test_dataset, batch_size=2048)
-	loss, accuracy = model.evaluate(test_loader)
-	print(f'Test Loss: {loss:.2f}, Test Accuracy: {accuracy:.2f}%, Items: {len(test_dataset)}')
-	print(f"Eval took: {time.time() - start} seconds")
-
-	start = time.time()
-	isa_dataset = DSSLettersDataset(ISAIAH_SET, SINGLE_LETTERS_ONLY, test_transform)
-	isa_loader = DataLoader(isa_dataset, batch_size=2048)
-	loss, accuracy = model.evaluate(isa_loader)
-	print(f'Isa Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, Items: {len(isa_dataset)}')
-	print(f"Eval took: {time.time() - start} seconds")
-
-	start = time.time()
-	war_dataset = DSSLettersDataset(WAR_SET, SINGLE_LETTERS_ONLY, test_transform)
-	war_loader = DataLoader(war_dataset, batch_size=2048)
-	loss, accuracy = model.evaluate(war_loader)
-	print(f'War Loss: {loss:.2f}, Accuracy: {accuracy:.2f}%, Items: {len(war_dataset)}')
-	print(f"Eval took: {time.time() - start} seconds")
-
-	start = time.time()
-	all_dataset = DSSLettersDataset(ALL, SINGLE_LETTERS_ONLY, test_transform)
-	all_loader = DataLoader(all_dataset, batch_size=2048)
-	loss, accuracy = model.evaluate(all_loader)
-	print(f'All Loss: {loss:.2f}, All Accuracy: {accuracy:.2f}%, Items: {len(all_dataset)}')
-	print(f"Eval took: {time.time() - start} seconds")
-
-	print(f"Total Eval took: {time.time() - eval_start} seconds")
+	verify('Train', DSSLettersDataset(TRAINING_SET, SINGLE_LETTERS_ONLY, test_transform))
+	verify('Val', val_dataset, val_loader)
+	verify('Test', test_dataset)
+	verify('War', DSSLettersDataset(WAR_SET, SINGLE_LETTERS_ONLY, test_transform))
+	verify('Community', DSSLettersDataset(COMMUNITY_SET, SINGLE_LETTERS_ONLY, test_transform))
+	verify('All', DSSLettersDataset(ALL, SINGLE_LETTERS_ONLY, test_transform))
+	print(f"Total Eval took: {time.time() - eval_start:.1f} seconds")

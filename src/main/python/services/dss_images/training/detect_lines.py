@@ -17,9 +17,9 @@ from detectron2.evaluation import COCOEvaluator
 from detectron2.utils.visualizer import Visualizer
 from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
-from letterbox_utils import DSSLettersDataset, get_img_file_path, VAL_SET, \
-	parse_file_name, TRAINING_SET, TEST_SET, WAR_TRAIN_SET, WAR_VAL_SET, \
-	get_y_at_x, is_in_row, process_image, calc_bbox_stats
+from letterbox_utils import DSSLettersDataset, get_img_file_path, is_in_row, \
+	parse_file_name, COMMUNITY_SET, TRAINING_SET, VAL_SET, TEST_SET, WAR_SET, \
+	process_image, calc_bbox_stats
 from urllib import request
 
 DATASET_BASE = 'detect_lines/dataset'
@@ -192,7 +192,7 @@ def train(iters, preprocessor, resume=False):
 
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
-	print('Training with conf:', cfg)
+	# print('Training with conf:', cfg)
 	trainer = Trainer(cfg)
 	trainer.resume_or_load(resume=resume)
 	trainer.train()
@@ -319,7 +319,7 @@ def verify(predictor, fragments, preprocessor=None, refresh=False):
 def label_fragment(predictor, fragment, preprocessor=None):
 	image, outputs, pred_boxes = predict(predictor, fragment, preprocessor=preprocessor)
 
-	print(outputs)
+	# print(outputs)
 
 	v = Visualizer(image[:, :, ::-1], scale=1.0)
 	out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
@@ -350,30 +350,51 @@ def label_fragment(predictor, fragment, preprocessor=None):
 
 
 if __name__ == '__main__':
-	force_train = False
 	parser = argparse.ArgumentParser()
+	subparsers = parser.add_subparsers(dest='command', required=True)
+
+	# train command
+	train_parser = subparsers.add_parser('train')
+	train_parser.add_argument('--iters', type=int, default=7500)
+	train_parser.add_argument('--samples', action='store_true')
+
+	# resume command
+	resume_parser = subparsers.add_parser('resume')
+	resume_parser.add_argument('--iters', type=int, default=7500)
+
+	# evaluate command
+	evaluate_parser = subparsers.add_parser('evaluate')
+	evaluate_parser.add_argument('fragment')
+
+	# verify command
+	verify_parser = subparsers.add_parser('verify')
+	verify_parser.add_argument("set")
+
+	# label command
+	label_parser = subparsers.add_parser('label')
+	label_parser.add_argument('fragment')
+
 	parser.add_argument('--preprocess', action='store_true')
-	parser.add_argument('--iters', type=int, default=7500)
-	parser.add_argument('--samples', action='store_true')
-	parser.add_argument('--resume', action='store_true')
-	parser.add_argument('--train', action='store_true')
 	parser.add_argument('--thresh_test', type=float, default=.5)
 
 	args = parser.parse_args()
 	pp = preprocessor if args.preprocess else preprocessor
 
-	if args.train or args.resume or force_train:
-		train(args.iters, preprocessor=pp, resume=args.resume)
+	if args.command == 'train' or args.command == 'resume':
+		train(args.iters, preprocessor=pp, resume=args.command == 'resume')
 
 	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_best.pth'
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.thresh_test
+	# print(cfg)
 	predictor = DefaultPredictor(cfg)
 
-	print("Verifying with:")
-	print(cfg)
+	if args.command == 'evaluate':
+		evaluate(predictor, args.fragment, preprocessor=pp)
 
-	# evaluate(predictor, 'war-column-2', preprocessor=pp)
-	verify(predictor, TRAINING_SET, preprocessor=pp)
-	verify(predictor, VAL_SET, preprocessor=pp)
-	# verify(predictor, TEST_SET, preprocessor=pp)
-	# label_fragment(predictor, 'war-column-2', preprocessor=pp)
+	if args.command == 'verify':
+		set = {'training': TRAINING_SET, 'val': VAL_SET, 'test': TEST_SET,
+			'community': COMMUNITY_SET, 'war': WAR_SET}[args.set]
+		verify(predictor, set, preprocessor=pp)
+
+	if args.command == 'label':
+		label_fragment(predictor, args.fragment, preprocessor=pp)
