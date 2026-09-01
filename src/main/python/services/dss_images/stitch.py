@@ -111,13 +111,13 @@ if __name__ == '__main__':
         # construct_column(Collection.ISAIAH, 29, res)
     # cv2.waitKey(0)
 
-    construct_column(Collection.WAR, 1)
-    cv2.waitKey(0)
     # for c in range(1, 16):
       # construct_column(Collection.WAR, c)
 
     # for c in range(1, 12):
         # construct_column(Collection.COMMUNITY_RULE, c)
+    construct_column(Collection.COMMUNITY_RULE, 11)
+    cv2.waitKey(0)
 
     # for c in range(2, 68):
         # construct_column(Collection.TEMPLE_SCROLL, c, res=9)

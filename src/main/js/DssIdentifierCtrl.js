@@ -9,7 +9,7 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
   const makeColumns = (n) => Array.from({length: n}, (_, i) => String(i + 1));
   this.scrolls = {
     ISAIAH: {name: 'Isaiah', filename: 'isaiah', columns: makeColumns(54), res: 9, textFile: '1Q_Isaiah_a.txt'},
-    COMMUNITY_RULE: {name: 'Community Rule', filename: 'community', columns: makeColumns(11), res: 7},
+    COMMUNITY_RULE: {name: 'Community Rule', filename: 'community', columns: makeColumns(11), res: 7, textFile: '1Q_Community_Rule.txt'},
     WAR_SCROLL: {name: 'War Scroll', filename: 'war', columns: makeColumns(15), res: 8, textFile: '1Q_War_Scroll.txt'},
     TEMPLE: {name: 'Temple Scroll', filename: 'temple', columns: makeColumns(67), res: 9},
     HABAKKUK: {name: 'Commentary on Habakkuk', filename: 'habakkuk', columns: makeColumns(14), res: 7},

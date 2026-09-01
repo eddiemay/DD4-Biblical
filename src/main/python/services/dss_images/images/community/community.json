@@ -17,7 +17,7 @@
 	"columns": [
 		{
 			"id": "11",
-			"width": 417,
+			"width": 400,
 			"x": 0,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community11.jpg"
 		}, {
@@ -32,17 +32,17 @@
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community9.jpg"
 		}, {
 			"id": "8",
-			"width": 361,
-			"x": 1212,
+			"width": 352,
+			"x": 1207,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community8.jpg"
 		}, {
 			"id": "7",
-			"width": 410,
-			"x": 1573,
+			"width": 400,
+			"x": 1580,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community7.jpg"
 		}, {
 			"id": "6",
-			"width": 430,
+			"width": 420,
 			"x": 1983,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community6.jpg"
 		}, {
@@ -52,23 +52,23 @@
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community5.jpg"
 		}, {
 			"id": "4",
-			"width": 465,
-			"x": 2858,
+			"width": 450,
+			"x": 2860,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community4.jpg"
 		}, {
 			"id": "3",
-			"width": 334,
+			"width": 331,
 			"x": 3323,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community3.jpg"
 		}, {
 			"id": "2",
-			"width": 291,
-			"x": 3657,
+			"width": 293,
+			"x": 3650,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community2.jpg"
 		}, {
 			"id": "1",
 			"width": 328,
-			"x": 3948,
+			"x": 3940,
 			"imageURL": "http://tiles.imj.org.il/columns/community/Community1.jpg"
 		}
 	]
