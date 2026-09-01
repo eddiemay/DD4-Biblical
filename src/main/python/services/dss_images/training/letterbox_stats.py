@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -57,8 +58,13 @@ def find_abnormals(letter, df, prop, filename):
 
 
 if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--abnormals', action='store_true')
+  parser.add_argument('--filename', type=str)
+  args = parser.parse_args()
+  filename = args.filename
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(fragments=ALL)
+  dataset = DSSLettersDataset(fragments=ALL if filename is None else filename)
   print(f'Dataset {len(dataset)} letters')
   letters = []
   rows = []
@@ -95,19 +101,19 @@ if __name__ == '__main__':
   letter_means = df.groupby("value")[['width', 'height']].mean()
   print(letter_means)
 
-  filename = None # 'war-column-1'
-  find_abnormals("all", df, 'width', filename)
-  find_abnormals("all", df, 'height', filename)
+  if args.abnormals:
+    find_abnormals("all", df, 'width', filename)
+    find_abnormals("all", df, 'height', filename)
 
-  lessthan_7 = df[df['width'] < 7]
-  if not lessthan_7.empty:
-    visualize_abnormals("Width < 7", lessthan_7)
+    lessthan_7 = df[df['width'] < 7]
+    if not lessthan_7.empty:
+      visualize_abnormals("Width < 7", lessthan_7)
 
-  lessthan_7 = df[df['height'] < 7]
-  if not lessthan_7.empty:
-    visualize_abnormals("Height < 7", lessthan_7)
+    lessthan_7 = df[df['height'] < 7]
+    if not lessthan_7.empty:
+      visualize_abnormals("Height < 7", lessthan_7)
 
-  groups = df.groupby("value")
-  for letter, group in groups:
-    find_abnormals(letter, group, 'width', filename)
-    find_abnormals(letter, group, 'height', filename)
+    groups = df.groupby("value")
+    for letter, group in groups:
+      find_abnormals(letter, group, 'width', filename)
+      find_abnormals(letter, group, 'height', filename)
