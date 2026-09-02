@@ -117,6 +117,7 @@ if __name__ == '__main__':
 	verify('Train', DSSLettersDataset(TRAINING_SET, SINGLE_LETTERS_ONLY, test_transform))
 	verify('Val', val_dataset, val_loader)
 	verify('Test', test_dataset)
+	verify('Isa', DSSLettersDataset(ISAIAH_SET, SINGLE_LETTERS_ONLY, test_transform))
 	verify('War', DSSLettersDataset(WAR_SET, SINGLE_LETTERS_ONLY, test_transform))
 	verify('Community', DSSLettersDataset(COMMUNITY_SET, SINGLE_LETTERS_ONLY, test_transform))
 	verify('All', DSSLettersDataset(ALL, SINGLE_LETTERS_ONLY, test_transform))
