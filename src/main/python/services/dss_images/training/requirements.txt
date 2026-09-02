@@ -5,6 +5,7 @@ diff-match-patch
 Levenshtein
 matplotlib
 onnxruntime
+onnxscript
 opencv-python
 pandas
 pytesseract
