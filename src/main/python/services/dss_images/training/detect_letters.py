@@ -508,12 +508,12 @@ if __name__ == '__main__':
 
 	# train command
 	train_parser = subparsers.add_parser('train')
-	train_parser.add_argument('--iters', type=int, default=7500)
+	train_parser.add_argument('--iters', type=int, default=5000)
 	train_parser.add_argument('--samples', action='store_true')
 
 	# resume command
 	resume_parser = subparsers.add_parser('resume')
-	resume_parser.add_argument('--iters', type=int, default=7500)
+	resume_parser.add_argument('--iters', type=int, default=10000)
 
 	# evaluate command
 	evaluate_parser = subparsers.add_parser('evaluate')

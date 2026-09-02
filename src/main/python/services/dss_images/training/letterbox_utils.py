@@ -24,9 +24,8 @@ COMMUNITY_TRAIN_SET = list(map(lambda c: f'community-column-{c}', [1, 3, 4, 9]))
 COMMUNITY_VAL_SET = list(map(lambda c: f'community-column-{c}', [2, 10])) # 5
 COMMUNITY_TEST_SET = compute_test_set(COMMUNITY_SET, COMMUNITY_TRAIN_SET, COMMUNITY_VAL_SET)
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
-ISAIAH_TRAIN_SET = list(map(lambda c: f'isaiah-column-{c}',
-														[2, 4, 9, 11, 14, 16, 20, 24, 26,
-														 28, 31, 36, 38, 40, 44, 48, 50, 53]))
+ISAIAH_TRAIN_SET = list(map(lambda c: f'isaiah-column-{c}', [
+	2, 4, 9, 11, 14, 16, 20, 24, 26, 28, 31, 36, 38, 40, 44, 48, 50, 53]))
 ISAIAH_VAL_SET = list(map(lambda c: f'isaiah-column-{c}',
 													[7, 12, 13, 17, 18, 27, 29, 37, 45, 47, 52]))
 ISAIAH_TEST_SET = compute_test_set(ISAIAH_SET, ISAIAH_TRAIN_SET, ISAIAH_VAL_SET)

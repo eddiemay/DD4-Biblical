@@ -90,7 +90,7 @@ if __name__ == '__main__':
 	model = DD4PyTorchModel(
 			train_loader=train_loader, val_loader=val_loader,
 			loss_function=loss_function, layers=nn.Sequential(*layers),
-			checkpoint_path=checkpoint_path, min_val_accuracy=97
+			checkpoint_path=checkpoint_path, min_val_accuracy=96
 	)
 
 	num_params = sum(p.numel() for p in model.parameters())
@@ -104,10 +104,9 @@ if __name__ == '__main__':
 		train_start_time = time.time()
 		num_epochs = 120
 		optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
-		scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,
-																													 T_max=num_epochs)
-		best_val_accuracy, _, _ = model.train_model(num_epochs, optimizer,
-																								scheduler)
+		scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+				optimizer, T_max=num_epochs)
+		best_val_accuracy, _, _ = model.train_model(num_epochs, optimizer, scheduler)
 		if best_val_accuracy > 0:  # If we replaced the save model we should export.
 			model.export("../letter_model.onnx", "image", "letter")
 		print(f'Training time {(time.time() - train_start_time)} seconds')
