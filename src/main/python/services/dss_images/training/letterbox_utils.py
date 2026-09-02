@@ -406,7 +406,8 @@ def calc_bbox_stats(target_boxes, pred_boxes, iou_threshold=.5):
 		if not pred_box.get("_taken"):
 			fp += 1
 
-	precision, recall = round(tp * 100 / (tp + fp), 2), round(tp * 100 / (tp + fn), 2)
+	precision = round(tp * 100 / (tp + fp + 0.00001), 2)
+	recall = round(tp * 100 / (tp + fn + 0.00001), 2)
 	f1_score = round(2 * precision * recall / (precision + recall + 0.00001), 2)
 
 	return fp, fn, tp, precision, recall, f1_score
