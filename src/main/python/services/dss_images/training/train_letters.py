@@ -90,7 +90,7 @@ if __name__ == '__main__':
 	model = DD4PyTorchModel(
 			train_loader=train_loader, val_loader=val_loader,
 			loss_function=loss_function, layers=nn.Sequential(*layers),
-			checkpoint_path=checkpoint_path, min_val_accuracy=96
+			checkpoint_path=checkpoint_path, min_val_accuracy=95
 	)
 
 	num_params = sum(p.numel() for p in model.parameters())
