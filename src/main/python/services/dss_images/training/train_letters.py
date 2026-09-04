@@ -16,16 +16,6 @@ pd.set_option("display.width", None)
 torch.manual_seed(42)
 checkpoint_path = 'letter_model.pth'
 
-
-# bf7-median3-THRESH_BINARY_135
-class Preprocess:
-	def __init__(self, params):
-		self.params = params
-
-	def __call__(self, img):
-		return process_image(img, self.params)[0]
-
-
 train_transform = transforms.Compose([
 	Resize(20, 40),
 	ToPilImage(),
@@ -38,12 +28,7 @@ train_transform = transforms.Compose([
 	transforms.ToTensor(),
 	transforms.Normalize(mean, std),
 ])
-# model     Train   Val      Test   All
-# 32x64 256 99.32%, 97.63%, 97.05%, 98.03%
-# 32x64 128 could not get passed 96.46% Val
-# 26x50 256 98.80%, 97.57%, 97.03%, 97.74%
-# 20x28 256 99.37%, 97.52%, 96.99%, 97.98%
-# 20x40 256 99.36%, 97.37%, 96.79%, 97.99%
+
 
 def verify(title, dataset, loader=None):
 	start = time.time()
@@ -104,12 +89,11 @@ if __name__ == '__main__':
 		train_start_time = time.time()
 		num_epochs = 120
 		optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
-		scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-				optimizer, T_max=num_epochs)
+		scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, num_epochs)
 		best_val_accuracy, _, _ = model.train_model(num_epochs, optimizer, scheduler)
 		if best_val_accuracy > 0:  # If we replaced the save model we should export.
 			model.export("../letter_model.onnx", "image", "letter")
-		print(f'Training time {(time.time() - train_start_time)} seconds')
+		print(f'Training time {(time.time() - train_start_time):.1f} seconds')
 
 	model.reload(checkpoint_path)
 

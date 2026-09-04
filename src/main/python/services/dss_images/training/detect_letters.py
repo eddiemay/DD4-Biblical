@@ -538,6 +538,7 @@ if __name__ == '__main__':
 	if args.command == 'train' or args.command == 'resume':
 		train(args.iters, preprocessor=pp, resume=args.command == 'resume')
 
+	cfg.MODEL.WEIGHTS = f'{cfg.OUTPUT_DIR}/model_final.pth'
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
 	# print(cfg)
 	predictor = DefaultPredictor(cfg)

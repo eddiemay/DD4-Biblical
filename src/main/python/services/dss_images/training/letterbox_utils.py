@@ -20,8 +20,8 @@ LETTERBOX_BY_FRAGMENT_URL =(
 TEXT_MAP =  {'cal': '4QCalendrical.txt', 'community': '1Q_Community_Rule.txt',
 	'isaiah': '1Q_Isaiah_a.txt', 'temple': '1Q_Temple.txt', 'war': '1Q_War_Scroll.txt'}
 COMMUNITY_SET = list(map(lambda c: f'community-column-{c + 1}', range(11)))
-COMMUNITY_TRAIN_SET = list(map(lambda c: f'community-column-{c}', [1, 3, 4, 9])) # 6
-COMMUNITY_VAL_SET = list(map(lambda c: f'community-column-{c}', [2, 10])) # 5
+COMMUNITY_TRAIN_SET = list(map(lambda c: f'community-column-{c}', [1, 3, 4, 6, 9]))
+COMMUNITY_VAL_SET = list(map(lambda c: f'community-column-{c}', [2, 5, 10]))
 COMMUNITY_TEST_SET = compute_test_set(COMMUNITY_SET, COMMUNITY_TRAIN_SET, COMMUNITY_VAL_SET)
 ISAIAH_SET = list(map(lambda c: f'isaiah-column-{c + 1}', range(54)))
 ISAIAH_TRAIN_SET = list(map(lambda c: f'isaiah-column-{c}',
