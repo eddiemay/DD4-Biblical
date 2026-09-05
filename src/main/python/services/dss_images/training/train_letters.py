@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--train', action='store_true')
 	args = parser.parse_args()
-	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, transform=train_transform)
+	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, transform=test_transform)
 	val_dataset = DSSLettersDataset(VAL_SET, SINGLE_LETTERS_ONLY, test_transform)
 	test_dataset = DSSLettersDataset(TEST_SET, SINGLE_LETTERS_ONLY, test_transform)
 
