@@ -8,22 +8,22 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
   this.rowNum = 1;
   const makeColumns = (n) => Array.from({length: n}, (_, i) => String(i + 1));
   this.scrolls = {
-    ISAIAH: {name: 'Isaiah', filename: 'isaiah', columns: makeColumns(54), res: 9, textFile: '1Q_Isaiah_a.txt'},
     COMMUNITY_RULE: {name: 'Community Rule', filename: 'community', columns: makeColumns(11), res: 7, textFile: '1Q_Community_Rule.txt'},
-    WAR_SCROLL: {name: 'War Scroll', filename: 'war', columns: makeColumns(15), res: 8, textFile: '1Q_War_Scroll.txt'},
-    TEMPLE: {name: 'Temple Scroll', filename: 'temple', columns: makeColumns(67), res: 9},
     HABAKKUK: {name: 'Commentary on Habakkuk', filename: 'habakkuk', columns: makeColumns(14), res: 7},
-    TORAH: {name: 'Torah Scroll', filename: 'torah', columns: makeColumns(4), res: 4},
+    ISAIAH: {name: 'Isaiah', filename: 'isaiah', columns: makeColumns(54), res: 9, textFile: '1Q_Isaiah_a.txt'},
     JUBILEES: {name: 'Jubilees', filename: 'Jubilees', columns: ['3Q5-Frag1', '3Q5-Frag6', '3Q5-Frag7', '3Q5-Frag8',
         '4Q176-Frag1', '4Q176-Frag2', '4Q176-Frag5', '4Q176-Frag6', '4Q176-Frag7',
         'Plate293-Frag1', 'Plate293-Frag2', 'Plate293-Frag3', 'Plate293-Frag4', 'Plate293-Frag5', 'Plate293-Frag6', 'Plate293-Frag7', 'Plate293-Frag8', 'Plate293-Frag9']},
-    Calendrical: {name: '4QCalendrical', filename: '4QCalendrical', textFile: '4QCalendrical.txt', columns: ['4Q318-Frag1', '4Q318-Frag2', '4Q318-Frag3', '4Q318-Frag4', '4Q318-Frag5',
-        '4Q319-Frag1', '4Q319-Frag2', '4Q319-Frag2-II', '4Q319-Frag3', '4Q319-Frag7',
-        '4Q320', '4Q320-Frag1', '4Q320-Frag2', '4Q320-Frag3',
-        '4Q321-Frag1', '4Q321-Frag2', '4Q321-Frag3', '4Q321-Frag4', '4Q321-Frag5', '4Q321-Frag6', '4Q321-Frag7', '4Q321-Frag8', '4Q321-Frag9', '4Q321-P372-Frag1', '4Q321-P372-Frag2', '4Q321-P372-Frag3',
-        '4Q321a-Frag1', '4Q321a-Frag2', '4Q321a-Frag3', '4Q321a-Frag4', '4Q321a-Frag5', '4Q321a-Frag6', '4Q321a-Frag7',
-        '4Q326', '4Q326-Frag1', '4Q326-Plates-693_710', '4Q326-Plates-693_710_694',
-        '4Q328']}
+    TEMPLE: {name: 'Temple Scroll', filename: 'temple', columns: makeColumns(67), res: 9},
+    TORAH: {name: 'Torah Scroll', filename: 'torah', columns: makeColumns(4), res: 4},
+    WAR_SCROLL: {name: 'War Scroll', filename: 'war', columns: makeColumns(15), res: 8, textFile: '1Q_War_Scroll.txt'},
+    Calendrical: {name: '4QCalendrical', filename: '4QCalendrical', textFile: '4QCalendrical.txt',
+        columns: ['4Q318-Frag1', '4Q318-Frag2', '4Q318-Frag3', '4Q318-Frag4', '4Q318-Frag5', '4Q319-Frag1', '4Q319-Frag2',
+            '4Q319-Frag2-II', '4Q319-Frag3', '4Q319-Frag7', '4Q320', '4Q320-Frag1', '4Q320-Frag2', '4Q320-Frag3',
+            '4Q321-Frag1', '4Q321-Frag2', '4Q321-Frag3', '4Q321-Frag4', '4Q321-Frag5', '4Q321-Frag6', '4Q321-Frag7',
+            '4Q321-Frag8', '4Q321-Frag9', '4Q321-P372-Frag1', '4Q321-P372-Frag2', '4Q321-P372-Frag3', '4Q321a-Frag1',
+            '4Q321a-Frag2', '4Q321a-Frag3', '4Q321a-Frag4', '4Q321a-Frag5', '4Q321a-Frag6', '4Q321a-Frag7', '4Q326',
+            '4Q326-Frag1', '4Q326-Plates-693_710', '4Q326-Plates-693_710_694', '4Q328']}
   };
   this.letters = {
     alef: {value: 'א', width: 26, height: 26}, bet: {value: 'ב', width: 26, height: 26},
@@ -675,14 +675,14 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.getRowText = function(row) {
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.computeDiff = function() {
-  var rowTextMap = {};
+  var rowTextList = [];
   this.resultText = '';
   this.rows
     .slice() // avoid mutating original array
     .sort((a, b) => Number(a.value) - Number(b.value))
     .forEach(row => {
       var rowText = row.value + ' ' + this.getRowText(row);
-      rowTextMap[row.value] = rowText;
+      rowTextList.push(rowText);
       this.resultText += rowText + '\n';
     });
 
@@ -693,8 +693,8 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.computeDiff = function() {
   var textFileArray = this.textFile.split('\n');
   this.textDiffs = [];
 
-  for (var x = 1; x < textFileArray.length; x++) {
-    var textDiff = {expected: unfinalize(textFileArray[x]), actual: rowTextMap[x] || ''};
+  for (var x = 0; x < textFileArray.length; x++) {
+    var textDiff = {expected: unfinalize(textFileArray[x + 1]), actual: rowTextList[x] || ''};
 
     var diffMatch = new diff_match_patch();
     textDiff.diff = diffMatch.diff_main(textDiff.expected, textDiff.actual);
@@ -736,6 +736,10 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.updateTranslation = function(
 
 function unfinalize(text) {
   var result = '';
+  if (text == undefined) {
+    return result;
+  }
+
   for (var x = 0; x < text.length; x++) {
     if (text[x] == 'ך') {
       result += 'כ';
@@ -747,9 +751,11 @@ function unfinalize(text) {
       result += 'פ';
     } else if (text[x] == 'ץ') {
       result += 'צ';
-    } else if (text[x] == '.') {
+    } else if (text[x] == '.' && x > 2) {
       result += ' ';
-    } else if (text[x] == ' ' || x < 2 || text[x] >= 'א' && text[x] <= 'ת') {
+    } else if (x < 4 && (text[x] == '.' || text[x] >= '0' && text[x] <= '9')) {
+      result += text[x];
+    } else if (text[x] == ' ' || text[x] >= 'א' && text[x] <= 'ת') {
       result += text[x];
     }
   }
