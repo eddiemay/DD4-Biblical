@@ -1,5 +1,6 @@
 import copy
 import matplotlib.pyplot as plt
+import time
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
@@ -124,9 +125,12 @@ def train_model(model, epochs, train_loader, val_loader, loss_function, optimize
   best_model_state = None
   # Training loop
   for epoch in range(1, epochs + 1):
+    start_time = time.time()
     epoch_loss = train_epoch(model, train_loader, loss_function, optimizer)
     val_loss, val_accuracy = evaluate(model, val_loader, loss_function)
-    print(f"Epoch [{epoch}/{epochs}], Train Loss: {epoch_loss:.4f}, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.2f}%")
+    print(f'Epoch [{epoch}/{epochs}], Train Loss: {epoch_loss:.4f}, '
+          f'Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.2f}% '
+          f'Elapse Time: {time.time() - start_time:.1f} seconds')
 
     if scheduler is not None:
       # Update the learning rate scheduler.
