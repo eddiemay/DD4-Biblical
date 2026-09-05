@@ -18,7 +18,7 @@ from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, LABEL_LOOKUP, \
 	SINGLE_LETTERS_ONLY, TRAINING_SET, VAL_SET, TEST_SET, get_frag_text, is_in_row, \
-	process_image, intersection_over_union, COMMUNITY_SET, WAR_SET
+	process_image, intersection_over_union, COMMUNITY_SET, ISAIAH_SET, WAR_SET
 from scipy import stats
 from train_by_labels import process
 from urllib import request
@@ -547,8 +547,8 @@ if __name__ == '__main__':
 		evaluate(predictor, args.fragment, args.display, pp, args.override)
 
 	if args.command == 'verify':
-		set = {'training': TRAINING_SET, 'val': VAL_SET, 'test': TEST_SET,
-					 'community': COMMUNITY_SET, 'war': WAR_SET}[args.set]
+		set = {'train': TRAINING_SET, 'val': VAL_SET, 'test': TEST_SET,
+					 'community': COMMUNITY_SET, 'isa': ISAIAH_SET, 'war': WAR_SET}[args.set]
 		verify(predictor, set, pp, args.non_labeled_only)
 
 	if args.command == 'label':

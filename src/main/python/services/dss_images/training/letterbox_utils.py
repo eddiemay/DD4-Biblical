@@ -134,11 +134,9 @@ class DSSLettersDataset(Dataset):
 		return len(self.metadata)
 
 	def __getitem__(self, idx: int) -> (any, int, dict):
-		img = self.images[idx]
-		if img is None:
-			img = get_image(self.metadata[idx], self.res)
-			self.images[idx] = img
-		return self.transform(img), self.labels[idx], self.metadata[idx]
+		if self.images[idx] is None:
+			self.images[idx] = get_image(self.metadata[idx], self.res)
+		return self.transform(self.images[idx]), self.labels[idx], self.metadata[idx]
 
 
 def parse_file_name(file_name):

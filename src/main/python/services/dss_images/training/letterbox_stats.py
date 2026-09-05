@@ -64,8 +64,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
   filename = args.filename
   # Filter to letters, exclude rows and words.
-  dataset = DSSLettersDataset(fragments=ALL if filename is None else filename)
-  print(f'Dataset {len(dataset)} letters')
+  dataset = DSSLettersDataset(fragments=ALL if filename is None else [filename])
+  print(f'Dataset {len(dataset)} letter boxes')
   letters = []
   rows = []
   for img, label, metadata in dataset:
