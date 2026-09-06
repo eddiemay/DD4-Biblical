@@ -54,8 +54,8 @@ if __name__ == '__main__':
 		for idx in range(0):
 			visualize_augmentations(name, ds, idx, mean, std)
 
-	train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
-	val_loader = DataLoader(val_dataset, batch_size=1000, shuffle=False)
+	train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True)
+	val_loader = DataLoader(val_dataset, batch_size=2048, shuffle=False)
 
 	layers = []
 	channels = [1, 32, 64, 128, 256]
