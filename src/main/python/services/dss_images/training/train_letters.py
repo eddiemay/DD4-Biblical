@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from letterbox_utils import DSSLettersDataset, SINGLE_LETTERS_ONLY, Resize, \
-	PadToSize, ToPilImage, mean, std, test_transform, ALL, process_image, \
+	PadToSize, ToPilImage, mean, std, base_transform, test_transform, ALL, \
 	TRAINING_SET, VAL_SET, TEST_SET, ISAIAH_SET, WAR_SET, COMMUNITY_SET
 from dd4_ml import DD4PyTorchModel, visualize_augmentations, conv_block
 from torch.utils.data import DataLoader
@@ -17,14 +17,8 @@ torch.manual_seed(42)
 checkpoint_path = 'letter_model.pth'
 
 train_transform = transforms.Compose([
-	Resize(20, 40),
-	ToPilImage(),
-	PadToSize(20, 40, 0),
 	transforms.RandomAffine(degrees=20, translate=(0.05, 0.05), scale=(0.7, 1.3)),
 	transforms.RandomPerspective(distortion_scale=0.2, p=0.3),
-	transforms.ColorJitter(brightness=0.3, contrast=0.3),
-	transforms.GaussianBlur(3, sigma=(0.1, 1.5)),
-	transforms.Grayscale(),
 	transforms.ToTensor(),
 	transforms.Normalize(mean, std),
 ])
@@ -42,7 +36,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--train', action='store_true')
 	args = parser.parse_args()
-	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, transform=test_transform)
+	train_dataset = DSSLettersDataset(filter=SINGLE_LETTERS_ONLY, base_transform=base_transform, transform=train_transform)
 	val_dataset = DSSLettersDataset(VAL_SET, SINGLE_LETTERS_ONLY, test_transform)
 	test_dataset = DSSLettersDataset(TEST_SET, SINGLE_LETTERS_ONLY, test_transform)
 

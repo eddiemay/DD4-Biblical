@@ -86,12 +86,17 @@ class PadToSize:
 		return transforms.functional.pad(img, padding, fill=self.fill)
 
 
-test_transform = transforms.Compose([
+base_transform = transforms.Compose([
 	Resize(20, 40),
 	ToPilImage(),
 	PadToSize(20, 40, 0),
 	transforms.GaussianBlur(3, sigma=(0.1, 1.5)),
 	transforms.Grayscale(),
+])
+
+
+test_transform = transforms.Compose([
+	base_transform,
 	transforms.ToTensor(),
 	transforms.Normalize(mean, std)
 ])
@@ -114,14 +119,16 @@ class LetterBox(TypedDict):
 
 class DSSLettersDataset(Dataset):
 	def __init__(self, fragments: list[str] = None,
-			filter: callable(LetterBox) = None, transform: callable(any) = None,
+			filter: callable(LetterBox) = None,
+			base_transform: callable(any) = None, transform: callable(any) = None,
 			overrides: list[str] = None, res: int = 9):
-		self.transform = transform or (lambda x: x)
+		fragments = fragments or TRAINING_SET
+		self.base_transform = base_transform or (lambda x:x)
+		self.transform = transform or (lambda x:x)
 		self.res = res
 		self.metadata: list[LetterBox] = []
 		self.labels: list[int] = []
-		for letter_box in read_database(fragments or TRAINING_SET, overrides or [],
-																		filter):
+		for letter_box in read_database(fragments, overrides or [], filter):
 			self.metadata.append(letter_box)
 			value = letter_box['value']
 			self.labels.append(ord(value) - ord('א') if len(
@@ -135,8 +142,8 @@ class DSSLettersDataset(Dataset):
 
 	def __getitem__(self, idx: int) -> (any, int, dict):
 		if self.images[idx] is None:
-			self.images[idx] = self.transform(get_image(self.metadata[idx], self.res))
-		return self.images[idx], self.labels[idx], self.metadata[idx]
+			self.images[idx] = self.base_transform(get_image(self.metadata[idx], self.res))
+		return self.transform(self.images[idx]), self.labels[idx], self.metadata[idx]
 
 
 def parse_file_name(file_name):
@@ -244,11 +251,12 @@ def read_database(fragments: list[str], overrides: list[str],
 				letterboxes = db[key]
 				# Dump each letterbox into the file.
 				for letterbox in letterboxes:
+					''' We will keep the Time and username fields for now, remove if file gets too large.
 					letterbox = {
 						key: value
 						for key, value in letterbox.items()
 						if not key.endswith(("Time", "Username"))
-					}
+					} '''
 					json.dump(letterbox, f)
 					f.write("\n")
 
