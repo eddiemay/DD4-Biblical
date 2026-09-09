@@ -98,6 +98,11 @@ if __name__ == '__main__':
         f"Mode: {counts.round(-2).mode().tolist()}, Std: {std:.2f},",
         f"90% interval: {mean - 1.645 * std:.2f} to {mean + 1.645 * std:.2f}")
 
+  counts = df["creationUsername"].value_counts()
+  print(counts)
+  counts = df["lastModifiedUsername"].value_counts()
+  print(counts)
+
   letter_means = df.groupby("value")[['width', 'height']].mean()
   print(letter_means)
 
