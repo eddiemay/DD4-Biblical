@@ -17,6 +17,9 @@ letter_box_file = 'letter_boxes.jsonl'
 API_BASE = 'https://dd4-biblical.appspot.com/_api/'
 LETTERBOX_BY_FRAGMENT_URL =(
 		API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0&orderBy=y1')
+LETTERBOX_BATCH_DELETE_URL = API_BASE + 'letterBoxs/v1/batchDelete?idToken='
+LETTERBOX_BATCH_CREATE_URL = API_BASE + 'letterBoxs/v1/batchCreate?idToken='
+session = {}
 TEXT_MAP =  {'cal': '4QCalendrical.txt', 'community': '1Q_Community_Rule.txt',
 	'isaiah': '1Q_Isaiah_a.txt', 'temple': '1Q_Temple.txt', 'war': '1Q_War_Scroll.txt'}
 COMMUNITY_SET = list(map(lambda c: f'community-column-{c + 1}', range(11)))
@@ -212,6 +215,22 @@ def get_image(letter_box: dict, res: int = 9) -> np.ndarray:
 	y1, y2 = int(letter_box['y1'] * scale), int(letter_box['y2'] * scale)
 	x1, x2 = int(letter_box['x1'] * scale), int(letter_box['x2'] * scale)
 	return file_img[y1:y2, x1:x2]
+
+
+def send_json_req(url, data):
+	if session.get('id') is None:
+		with open('token.id', 'r') as f:
+			session['id'] = f.readline()
+
+	json_data = json.dumps(data).encode('utf-8')
+	req = request.Request(url + session['id'])
+	req.add_header('Content-Type', 'application/json')
+	req.add_header('Content-Length', str(len(json_data)))
+	print(f'Sending request: {url} with data: {json_data}')
+	with request.urlopen(req, json_data) as resp:
+		response = json.load(resp)
+		print('Response: ', response)
+		return response
 
 
 def read_database(fragments: list[str], overrides: list[str],

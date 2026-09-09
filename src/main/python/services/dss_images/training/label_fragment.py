@@ -1,37 +1,17 @@
 import cv2
 import json
 import pytesseract
+from letterbox_utils import LETTERBOX_BY_FRAGMENT_URL, \
+    LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from pytesseract import Output
 from urllib import request
 from verify import verify, to_isa_verify_request, to_verify_request, process_image
 from tesseract_util import image_to_boxes_data, post_process_boxes
 
-API_BASE = 'https://dd4-biblical.appspot.com/_api/'
-LETTERBOX_BY_FRAGMENT_URL = API_BASE + 'letterBoxs/v1/list?filter=filename={}&pageSize=0'
-LETTERBOX_BATCH_DELETE_URL = API_BASE + 'letterBoxs/v1/batchDelete?idToken='
-LETTERBOX_BATCH_CREATE_URL = API_BASE + 'letterBoxs/v1/batchCreate?idToken='
-session = {}
-
 class Upload:
     ROWS = 1
     LETTERS = 2
     ROWS_AND_LETTERS = 3
-
-
-def send_json_req(url, data):
-    if session.get('id') is None:
-        with open('token.id', 'r') as f:
-            session['id'] = f.readline()
-
-    json_data = json.dumps(data).encode('utf-8')
-    req = request.Request(url + session['id'])
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Content-Length', str(len(json_data)))
-    print(f'Sending request: {url} with data: {json_data}')
-    with request.urlopen(req, json_data) as resp:
-        response = json.load(resp)
-        print('Response: ', response)
-        return response
 
 
 def label(scroll, fragment, display=True, upload=None):

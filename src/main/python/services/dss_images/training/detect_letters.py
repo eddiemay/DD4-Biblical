@@ -14,7 +14,7 @@ from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.engine.hooks import BestCheckpointer
 from detectron2.evaluation import COCOEvaluator
 from detectron2.utils.visualizer import Visualizer
-from label_fragment import LETTERBOX_BY_FRAGMENT_URL, \
+from letterbox_utils import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, LABEL_LOOKUP, \
 	SINGLE_LETTERS_ONLY, TRAINING_SET, VAL_SET, TEST_SET, get_frag_text, is_in_row, \
