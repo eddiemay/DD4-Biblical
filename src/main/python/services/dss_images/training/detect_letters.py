@@ -243,7 +243,8 @@ def train(iters, preprocessor, samples=False, resume=False):
 	cfg.SOLVER.MAX_ITER = iters  # 5000 or 20000 recommended
 
 	trainer = Trainer(cfg)
-	trainer.resume_or_load(resume=resume)
+	if resume:
+		trainer.resume_or_load(resume=resume)
 	trainer.train()
 
 

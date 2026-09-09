@@ -194,7 +194,8 @@ def train(iters, preprocessor, resume=False):
 
 	# print('Training with conf:', cfg)
 	trainer = Trainer(cfg)
-	trainer.resume_or_load(resume=resume)
+	if resume:
+		trainer.resume_or_load(resume=resume)
 	trainer.train()
 
 
