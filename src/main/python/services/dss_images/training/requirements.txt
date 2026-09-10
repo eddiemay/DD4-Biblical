@@ -16,6 +16,6 @@ setuptools==80.9.0
 # pytesseract
 
 # May want to comment out items below and install manually
-torch
-torchvision
+# torch
+# torchvision
 # git+https://github.com/facebookresearch/detectron2.git # or pip install --no-build-isolation git+https://github.com/facebookresearch/detectron2.git
