@@ -11,6 +11,7 @@ pip3 --version
 nvidia-smi
 uname -a
 pip install -r requirements.txt
+ln -s ../../../ml/dd4_ml.py .
 pip install torch==2.9.0+cu130 torchvision==0.24.0 \
   --index-url https://download.pytorch.org/whl/cu130 \
   --extra-index-url https://pypi.org/simple
