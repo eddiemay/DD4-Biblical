@@ -1,13 +1,15 @@
 package com.digitald4.biblical.util;
 
 import static com.digitald4.biblical.util.HebrewConverter.toGeezConstants;
+import static com.digitald4.biblical.util.HebrewConverter.transliterate;
 import static com.digitald4.biblical.util.HebrewConverter.unfinalize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.Arrays.stream;
 
 import com.digitald4.biblical.model.AncientLexicon;
+import com.digitald4.biblical.model.Interlinear.SubToken;
 import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.TokenWordStore;
+import com.digitald4.biblical.store.TokenWordStore.TokenOption;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.digitald4.common.util.JSONUtil;
 import com.google.common.collect.ImmutableList;
@@ -16,7 +18,7 @@ import javax.inject.Inject;
 import org.json.JSONObject;
 
 public class HebrewTokenizer {
-  public enum SearchState {PREFIX, WORD_MATCH_STRONGS, WORD, SUFFIX};
+  public enum SearchState {PREFIX, WORD_MATCH_STRONGS, WORD, SUFFIX, ANY_MATCH};
   private final TokenWordStore tokenWordStore;
 
   @Inject
@@ -24,34 +26,15 @@ public class HebrewTokenizer {
     this.tokenWordStore = tokenWordStore;
   }
 
-  public ImmutableList<ImmutableList<String>> tokenize(String sentence) {
-    return stream(sentence.split(" ")).map(this::tokenizeWord).collect(toImmutableList());
-  }
-
-  public ImmutableList<String> tokenizeWord(String word) {
-    ImmutableList<String> tokenized = tokenizeWord(word, null, SearchState.WORD);
-    return tokenized.isEmpty() ? ImmutableList.of(word) : tokenized;
-  }
-
-  public ImmutableList<String> tokenizeWord(String word, String strongsId) {
-    if (word.length() == 1 && strongsId == null) {
-      return ImmutableList.of();
-    }
-
-    ImmutableList<String> tokenized =
-        tokenizeWord(word, strongsId, strongsId != null ? SearchState.WORD_MATCH_STRONGS : SearchState.WORD);
-    return tokenized.isEmpty() ? tokenizeWord(word) : tokenized;
-  }
-
-  private ImmutableList<String> tokenizeWord(String word, String strongsId, SearchState state) {
+  private ImmutableList<TokenWord> tokenizeWord(String word, String strongsId, SearchState state) {
     int strLen = word.length();
     for (int len = strLen; len > 0; len--) {
       for (int start = 0; start + len <= strLen; start++) {
         for (boolean constantsOnly : new boolean[]{false, true}) {
           String subword = (constantsOnly ? toGeezConstants(word) : word).substring(start, start + len);
           ImmutableList<TokenWord> options = tokenWordStore.getOptions(subword);
-          if (!options.isEmpty() && hasGoodOption(state, options, strongsId)) {
-            ImmutableList<String> pretokens;
+          if (!options.isEmpty() && hasGoodOption(options, strongsId, state)) {
+            ImmutableList<TokenWord> pretokens;
             if (start > 0) {
               pretokens = tokenizeWord(word.substring(0, start), strongsId, SearchState.PREFIX);
               if (pretokens.isEmpty()) {
@@ -61,7 +44,7 @@ public class HebrewTokenizer {
               pretokens = ImmutableList.of();
             }
 
-            ImmutableList<String> postTokens;
+            ImmutableList<TokenWord> postTokens;
             if (start + len < strLen) {
               postTokens = tokenizeWord(word.substring(start + len), strongsId, SearchState.SUFFIX);
               if (postTokens.isEmpty()) {
@@ -71,7 +54,7 @@ public class HebrewTokenizer {
               postTokens = ImmutableList.of();
             }
 
-            return ImmutableList.<String>builder().addAll(pretokens).add(subword).addAll(postTokens).build();
+            return ImmutableList.<TokenWord>builder().addAll(pretokens).add(options.get(0)).addAll(postTokens).build();
           }
         }
       }
@@ -80,7 +63,50 @@ public class HebrewTokenizer {
     return ImmutableList.of();
   }
 
-  public static boolean hasGoodOption(SearchState state, ImmutableList<TokenWord> options, String strongsId) {
+  public ImmutableList<TokenOption> getTokenizeOptions(String word, String strongsId) {
+    ImmutableList<TokenOption> options = getTokenizeOptions(word, strongsId, SearchState.WORD_MATCH_STRONGS);
+    if (options.isEmpty()) {
+      options = getTokenizeOptions(word, strongsId, SearchState.WORD);
+    }
+
+    if (options.isEmpty()) {
+      options = getTokenizeOptions(word, strongsId, SearchState.ANY_MATCH);
+    }
+
+    return options;
+  }
+
+  private ImmutableList<TokenOption> getTokenizeOptions(String word, String strongsId, SearchState state) {
+    if (strongsId == null && state == SearchState.WORD_MATCH_STRONGS) {
+      return ImmutableList.of();
+    }
+
+    int strLen = word.length();
+    for (int len = strLen; len > 0; len--) {
+      for (boolean constantsOnly : new boolean[]{false, true}) {
+        ImmutableList<TokenOption> options = tokenWordStore.getOptions(constantsOnly ? toGeezConstants(word) : word, len)
+            .stream()
+            .filter(tokenOptions -> hasGoodOption(tokenOptions.getWords(), strongsId, state))
+            .peek(tokenOptions -> tokenOptions.setPreTokens(!tokenOptions.requiresPrefix() ? ImmutableList.of()
+                : tokenizeWord(word.substring(0, tokenOptions.getStart()), strongsId, SearchState.PREFIX)))
+            .filter(tokenOptions -> !tokenOptions.requiresPrefix() || !tokenOptions.getPreTokens().isEmpty())
+            .peek(tokenOptions -> tokenOptions.setPostTokens(!tokenOptions.requiresPostfix(strLen) ? ImmutableList.of()
+                : tokenizeWord(word.substring(tokenOptions.getStart() + tokenOptions.getLength()), strongsId, SearchState.SUFFIX)))
+            .filter(tokenOptions -> !tokenOptions.requiresPostfix(strLen) || !tokenOptions.getPostTokens().isEmpty())
+            .flatMap(tokenOptions -> tokenOptions.getWords().stream()
+                .map(tw -> new TokenOption(tw, tokenOptions.getPreTokens(), tokenOptions.getPostTokens())))
+            .collect(toImmutableList());
+
+        if (!options.isEmpty()) {
+          return options;
+        }
+      }
+    }
+
+    return ImmutableList.of();
+  }
+
+  public static boolean hasGoodOption(ImmutableList<TokenWord> options, String strongsId, SearchState state) {
     return switch (state) {
       case WORD_MATCH_STRONGS -> options.stream().anyMatch(o ->
           (o.tokenType() == TokenType.WORD || o.tokenType() == TokenType.WORD_STRONGS_MATCH_ONLY)
@@ -90,6 +116,7 @@ public class HebrewTokenizer {
           .anyMatch(tt -> tt == TokenType.PREFIX || tt == TokenType.PREFIX_ONLY);
       case SUFFIX -> options.stream().anyMatch(o -> o.tokenType() == TokenType.SUFFIX
           || o.tokenType() == TokenType.SUFFIX_ONLY || o.tokenType() == TokenType.PREFIX && o.asSuffix() != null);
+      case ANY_MATCH -> true;
     };
   }
 
@@ -101,6 +128,7 @@ public class HebrewTokenizer {
     private String transliteration;
     public enum TokenType {PREFIX, PREFIX_ONLY, SUFFIX, SUFFIX_ONLY, WORD, WORD_STRONGS_MATCH_ONLY, DISABLED}
     private TokenType tokenType;
+    private boolean derived;
 
     public String getId() {
       return word + (strongsId == null ? "" : "-" + strongsId);
@@ -189,6 +217,15 @@ public class HebrewTokenizer {
       return this;
     }
 
+    public boolean isDerived() {
+      return derived;
+    }
+
+    public TokenWord setDerived(boolean derived) {
+      this.derived = derived;
+      return this;
+    }
+
     public String getTransliteration() {
       return transliteration;
     }
@@ -201,6 +238,12 @@ public class HebrewTokenizer {
     @Override
     public String toString() {
       return String.format("%s,%s,%s%s", word, translation, strongsId, asSuffix == null ? "" : "," + asSuffix);
+    }
+
+    public SubToken toSubToken(boolean isSuffix) {
+      return new SubToken().setTokenType(tokenType).setWord(word).setStrongsId(strongsId)
+          .setTransliteration(transliteration != null ? transliteration : transliterate(word, isSuffix))
+          .setTranslation(isSuffix ? asSuffix() : translation);
     }
 
     @Override

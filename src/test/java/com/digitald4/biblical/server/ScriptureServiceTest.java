@@ -160,7 +160,7 @@ public class ScriptureServiceTest {
         new SubToken().setWord("יה").setTranslation("Yah").setStrongsId("H3050").setTransliteration("yah"),
         new SubToken().setWord("לכ").setTranslation("for yourself").setStrongsId("H0853").setTransliteration("lac"));
     assertThat(translation.get(1).getInterlinears().stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList()))
-        .containsExactly(new SubToken().setWord("").setTranslation("[UNK]").setStrongsId(null).setTransliteration(""));
+        .isEmpty();
     assertThat(translation.get(2).getInterlinears().stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList())).containsExactly(
         new SubToken().setWord("תורה").setTranslation("law").setStrongsId("H8451").setTransliteration("turah"),
         new SubToken().setWord("צוה").setTranslation("command").setStrongsId("H6680").setTransliteration("tzuh"),

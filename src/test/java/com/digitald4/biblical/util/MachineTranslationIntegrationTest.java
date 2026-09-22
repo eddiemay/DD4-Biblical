@@ -72,16 +72,16 @@ public class MachineTranslationIntegrationTest {
         "Genesis 1:18 and to rule in day and in night and to the separation between the light and between the darkness and he see Mighty Ones for good",
         "Genesis 1:19 and there came to be evening and there came to be morning day fourth",
         "Genesis 1:20 and he said Mighty Ones let abound the waters creeping soul live and bird he fly upon the land upon face firmament the heavens",
-        "Genesis 1:21 and he create Mighty Ones you the dragons the greats and you all soul the live the moves which abound the waters to kind of them and you all bird wing to kind of it and he see Mighty Ones for good",
-        "Genesis 1:22 and he bless them Mighty Ones to say increase and multiply and fill of him you the waters in seas and the bird let multiply in land",
+        "Genesis 1:21 and he create Mighty Ones you the dragons the greats and you all soul the live the moveers which abound the waters to kind of them and you all bird wing to kind of it and he see Mighty Ones for good",
+        "Genesis 1:22 and he bless them Mighty Ones to saided increase and multiply and fill of him you the waters in seas and the bird let multiply in land",
         "Genesis 1:23 and there came to be evening and there came to be morning day fifth",
         "Genesis 1:24 and he said Mighty Ones you bring out the land soul live to kind beast and move and his life land to kind and there came to be so",
         "Genesis 1:25 and he make Mighty Ones you lives the land to kind and you the beast to kind and you all move the land to kind of it and he see Mighty Ones for good",
-        "Genesis 1:26 and he said Mighty Ones we make man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the land and in all the move the move upon the land",
+        "Genesis 1:26 and he said Mighty Ones we make man in image of us like likeness of us and he rule in fish the sea and in bird the heavens and in beast and in all the land and in all the move the moveer upon the land",
         "Genesis 1:27 and he create Mighty Ones you the man in image of him in image Mighty Ones create him male and female create them",
-        "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the land and subdue of him and rule in fish the sea and in bird the heavens and in all live the moves upon the land",
+        "Genesis 1:28 and he bless them Mighty Ones and he said to them Mighty Ones increase and multiply and fill of him you the land and subdue of him and rule in fish the sea and in bird the heavens and in all live the moveers upon the land",
         "Genesis 1:29 and he said Mighty Ones behold gives of to them you all herb sow seed which upon face all the land and you all the tree which in it fruit tree sow seed to them let there be to food",
-        "Genesis 1:30 and to all lives the land and to all bird the heavens and to all move upon the land which in it soul live you all green herb to food and there came to be so",
+        "Genesis 1:30 and to all lives the land and to all bird the heavens and to all moveer upon the land which in it soul live you all green herb to food and there came to be so",
         "Genesis 1:31 and he see Mighty Ones you all which make and behold good very and there came to be evening and there came to be morning day the sixth",
         "Genesis 2:1 and he completed the heavens and the land and all hosts",
         "Genesis 2:2 and he complete Mighty Ones in day the seventh work of him which make and he cease in day the seventh from all work of him which make",
@@ -94,7 +94,7 @@ public class MachineTranslationIntegrationTest {
     assertThat(translate("Isa 9:6, Psa 83:18, Exo 12:11, Gen 10:1, Lev 25:4, Exo 20:2, Lev 23:14", "he")).containsExactly(
         "Isaiah 9:6 for child born to of us son given to of us and you will be the government upon shoulder of him and he call name of him wonderful counselor God mighty I in he forever prince peace",
         "Psalms 83:18 and know of him for you are name of you יהוה to alone of you high upon all the land",
-        "Exodus 12:11 and like this you and eat of him him waists of yous belts shoes of yous in foots of yous and rod of yous in hand of yous and eats him in haste passover he to יהוה",
+        "Exodus 12:11 and like this you and eat of him him waists of yous belteds shoes of yous in foots of yous and rod of yous in hand of yous and eats him in haste passover he to יהוה",
         "Genesis 10:1 and these generations sons of Noah Shem Kam and Japheth and born of him to them sons after the flood",
         "Leviticus 25:4 and in year the sevenths shabbat shabbat of it let there be to land shabbat to יהוה field of you not you sow and vineyard of you not you prune",
         "Exodus 20:2 I יהוה Mighty Ones of you which the bring outss of you from land Mizraim from house servants",
@@ -107,10 +107,10 @@ public class MachineTranslationIntegrationTest {
     assertThat(translate("Ecc 12", "he")).containsExactly(
         "Ecclesiastes 12:1 and remember you creators of you in days of youths of you until which not he come of him days of the evil and the reaching of him years which you said none for me beast desire",
         "Ecclesiastes 12:2 until which not you darken the sun and the light and the moon and the stars and dwell of him the clouds after the rain",
-        "Ecclesiastes 12:3 in day that which he moved of him that which and rebellious the house and the you pervert of him mans of the army and cease of him the daub of uss for little of him and darken of him the saws in windows",
+        "Ecclesiastes 12:3 in day that which he moved of him keepers of the house and the you pervert of him mans of the army and cease of him the grinders for little of him and darken of him the saws in windows",
         "Ecclesiastes 12:4 and shut of him doors in street in low sound the grinding and he up to sound the bird and he worship of him all daughters the song",
         "Ecclesiastes 12:5 also from high fear of him and fears in way and he despise the almond and he burden the grasshopper and you bullock the desire for walk the man unto house ever of him and about of him in street the mourners",
-        "Ecclesiastes 12:6 until which not he far [UNK] sorrow the silver and you run springs the gold and you break pitcher upon the fountain and we run the wheel unto the pit",
+        "Ecclesiastes 12:6 until which not he far he loose sorrow the silver and you run springs the gold and you break pitcher upon the fountain and we run the wheel unto the pit",
         "Ecclesiastes 12:7 and he return the dust upon the land like that which was and the spirit you return unto the Mighty Ones which given",
         "Ecclesiastes 12:8 vanity vanitys said the preacher the all vanity",
         "Ecclesiastes 12:9 and more that which was preacher wise again teach knowledge you the people and give ear and search make straight proverbs the multiply",
@@ -141,18 +141,18 @@ public class MachineTranslationIntegrationTest {
         "Luke 22:7 Come of she then the day of the unleavened by the necessary kill of him the Passover",
         "Luke 24:1 The then one of the sabbaton morning deeply on the memorial come of I bringing un prepared spices",
         "John 13:1 Before then the feast the Passover know which יהושע that come of she them the hour that [UNK] of the world this unto the [UNK] [UNK] their his own their by to [UNK] into end [UNK] them",
-        "John 20:1 The then one of the sabbaton Maria the Magdalene [UNK] in the morning darkness yet [UNK] into the memorial also [UNK] the stone [UNK] of the memorial");
+        "John 20:1 The then one of the sabbaton Maria the Magdalene [UNK] in the morning darkness yet ing into the memorial also [UNK] the stone [UNK] of the memorial");
 
   }
 
   @Test
   public void rawTranslation_Jub() {
     assertThat(translate("Jub 1:1-2,6:47,49:1-2", "he")).containsExactly(
-        "Jubilees 1:1 Mighty One words of [UNK] the days upon mouth the law and the testimony to generations the years to weeks of us and to jubilees of us all days of the heavens upon the land like which word unto Moses in mountain Sinai",
-        "Jubilees 1:2 and there came to be in year the first to go out sons of Yasharael from land Mizraim in month the third in six ten in it and he word [UNK] unto Moses to say",
+        "Jubilees 1:1 Mighty One words of portioneds the days upon mouth the law and the testimony to generations the years to weeks of us and to jubilees of us all days of the heavens upon the land like which word unto Moses in mountain Sinai",
+        "Jubilees 1:2 and there came to be in year the first to go out sons of Yasharael from land Mizraim in month the third in six ten in it and he word [UNK] unto Moses to saided",
         "Jubilees 6:47 and she command you sons of Yasharael and keep of him you the years upon mouth the number this four and sixty day and three hundred day",
         "Jubilees 49:1 remember you the commandment which given Yah for yourself upon word the passover to guard him in feast of him in four ten to month the first",
-        "Jubilees 49:2 for you kill him between the evenings and he eat of him him in night [UNK] the five ten from time come the sun"
+        "Jubilees 49:2 for you kill him between the evenings and he eat of him him in night in yesternight the five ten from time come the sun"
     );
   }
 
@@ -206,7 +206,7 @@ public class MachineTranslationIntegrationTest {
         "Exodus 20:22 יהוה and to Mosheh he said to son Yasharael as this he said of them I from the sky like the he spoke of you of you of them foods of them see of you of them",
         "Exodus 20:23 with me the Mighty Ones not you do the Mighty Ones silver of him the Mighty Ones gold of him for of yous of them not you do",
         "Exodus 20:24 alter from soil stretch out of him me at upon and burnt offerings altersss of you alters praise of you the sheep of you [UNK] man name me at that which remember of you of him all house exist of you come honor of you of you it is",
-        "Exodus 20:25 alter so of him you do of you of him me [UNK] you [UNK] [UNK] you so [UNK] so of him not you to son",
+        "Exodus 20:25 alter so of him you do of you of him me [UNK] you to to to not [UNK] you so [UNK] so of him not you to son",
         "Exodus 20:26 exist alter me me at upon nakeds of you not ascendhis in carve of him not you climb");
   }
 
@@ -221,18 +221,18 @@ public class MachineTranslationIntegrationTest {
   public void geezTranslation_randomFew() {
     assertThat(translate("Gen 35:23, Exo 15:2", "gez")).containsExactly(
         "Genesis 35:23 son Leah Ruban first born Jacob of him Simeon of him Levi of him Yuda of him Issachar of him Zebulun of him",
-        "Exodus 15:2 יהוה [UNK] [UNK] it is [UNK] [UNK] said came to be of him [UNK] this the Mighty One me it is so [UNK] it is [UNK] the Mighty One at me it is out of out of of him it is");
+        "Exodus 15:2 יהוה [UNK] [UNK] it is  [UNK] said came to be of him  this the Mighty One me it is so [UNK] it is  the Mighty One at me it is out of out of of him it is");
   }
 
   @Test
   public void geezTranslation_fullModernFirstPass() {
     assertThat(translate("Gen 2:11,3:22,5:22,32,10:1, Exo 3:1", "gez")).containsExactly(
-        "Genesis 2:11 name was one [UNK] it is he the gold existing all land Havilah [UNK]",
+        "Genesis 2:11 name was one [UNK] it is he the gold existing all land Havilah he to in in",
         "Genesis 3:22 יהוה the Mighty One and behold Adam like one from the of him good of him [UNK] separate to them [UNK] and [UNK] and mother [UNK] out of so lifes took and not he said of him to desire them said life [UNK] not dwell and",
         "Genesis 5:22 Enoch to Methuselah with generation and afterwards his three hundred years with the Mighty One complete of him of himhis the sons of him the generation of him said generation",
         "Genesis 5:32 Noah said son five hundred years came to be Noah and to Shem of him to Cam of him to Yepheth of him generation",
         "Genesis 10:1 generation son Noah this it is Shem Cam Yepheth forss of them and after water flood son to generation of him of them",
-        "Exodus 3:1 Mosheh and the sheep [UNK] [UNK] [UNK] Madai of him [UNK] dwell the of him the sheep I of youin  of youin  of him exist to of theand blessed exist [UNK] [UNK] the Mighty One come");
+        "Exodus 3:1 Mosheh and the sheep [UNK] [UNK] [UNK] Madai of him [UNK] dwell the of him the sheep the to to in out of of him exist to of theand blessed exist [UNK] [UNK] the Mighty One come");
   }
 
   @Test

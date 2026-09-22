@@ -5,6 +5,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
+import com.digitald4.biblical.model.Lexicon;
 import com.digitald4.biblical.store.TokenWordStore;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
@@ -16,7 +17,7 @@ public class MachineTranslatorTest {
   private static final ImmutableList<TokenWord> TOKEN_WORDS = ImmutableList.of(
       new TokenWord().setWord("ב").setTranslation("in ").setTokenType(TokenType.PREFIX_ONLY),
       new TokenWord().setWord("ה").setTranslation("the ").setAsSuffix("").setTokenType(TokenType.PREFIX),
-      new TokenWord().setWord("ו").setTranslation("and ").setTokenType(TokenType.PREFIX), // .setTransliteration("wa"),
+      new TokenWord().setWord("ו").setTranslation("and ").setTokenType(TokenType.PREFIX),
       new TokenWord().setWord("י").setTranslation("he ").setTokenType(TokenType.PREFIX).setAsSuffix("of me"),
       new TokenWord().setWord("ימ").setTranslation("s").setTokenType(TokenType.SUFFIX_ONLY),
       new TokenWord().setWord("כ").setTranslation("like ").setAsSuffix(" you").setTokenType(TokenType.PREFIX),
@@ -26,6 +27,7 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("את").setTranslation("you").setStrongsId("H0853"),
       new TokenWord().setWord("ראשית").setTranslation("beginning").setStrongsId("H7221"),
       new TokenWord().setWord("ברא").setTranslation("created").setStrongsId("H1254"),
+      new TokenWord().setWord("אל").setTranslation("unto").setStrongsId("H0413"),
       new TokenWord().setWord("אלוה").setTranslation("Mighty one").setStrongsId("H0433"),
       new TokenWord().setWord("אלה").setTranslation("Mighty one").setStrongsId("H0430"),
       new TokenWord().setWord("שמימ").setTranslation("heavens").setStrongsId("H8064"),
@@ -42,6 +44,7 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("οι").setTranslation("the").setStrongsId("G3588"),
       new TokenWord().setWord("πτωχοι").setTranslation("poor").setStrongsId("G4434"),
       new TokenWord().setWord("τω").setTranslation("to").setStrongsId("G3588"),
+      new TokenWord().setWord("η").setTranslation("the").setStrongsId("G3588"),
       new TokenWord().setWord("πνευματι").setTranslation("spirit").setStrongsId("G4151"),
       new TokenWord().setWord("οτι").setTranslation("that").setStrongsId("G3754"),
       new TokenWord().setWord("αυτων").setTranslation("them").setStrongsId("G0846"),
@@ -63,6 +66,12 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("שמ").setStrongsId("H8034").setTranslation("name"),
       new TokenWord().setWord("גד").setStrongsId("H1410").setTranslation("Gad"),
       new TokenWord().setWord("יהודה").setStrongsId("H3063").setTranslation("Judah"),
+      new TokenWord().setWord("חבר").setStrongsId("H2266").setTranslation("unite"),
+      new TokenWord().setWord("דרש").setStrongsId("H1875").setTranslation("seek"),
+      new TokenWord().setWord("שאל").setStrongsId("H7592").setTranslation("ask"),
+      new TokenWord().setWord("אוב").setStrongsId("H0178").setTranslation("bottle"),
+      new TokenWord().setWord("ידעוני").setStrongsId("H4181").setTranslation("wizard"),
+      new TokenWord().setWord("מת").setStrongsId("H4192").setTranslation("die"),
       new TokenWord().setWord("ከለአ").setTranslation("other"),
       new TokenWord().setWord("ተ").setTranslation("s").setTokenType(TokenType.SUFFIX_ONLY),
       new TokenWord().setWord("አ").setTranslation("the ").setTokenType(TokenType.PREFIX_ONLY),
@@ -79,8 +88,13 @@ public class MachineTranslatorTest {
       new TokenWord().setWord("ያፌት").setTranslation("Yepheth"),
       new TokenWord().setWord("ፈተ").setTranslation("decide"));
 
-  private final TokenWordStore tokenWordStore =
-      new TokenWordStore(() -> TOKEN_WORDS, ImmutableMap::of);
+  private final ImmutableMap<String, Lexicon> lexiconProvider = new ImmutableMap.Builder<String, Lexicon>()
+      .put("H2266", new Lexicon().setId("H2266").setPartOfSpeech("verb").setReferenceCount(28))
+      .put("H1875", new Lexicon().setId("H1875").setPartOfSpeech("verb").setReferenceCount(164))
+      .put("H7592", new Lexicon().setId("H7592").setPartOfSpeech("verb").setReferenceCount(173))
+      .build();
+
+  private final TokenWordStore tokenWordStore = new TokenWordStore(() -> TOKEN_WORDS, () -> lexiconProvider);
   private final MachineTranslator machineTranslator =
       new MachineTranslator(tokenWordStore, new HebrewTokenizer(tokenWordStore));
 
@@ -121,6 +135,38 @@ public class MachineTranslatorTest {
         new SubToken().setWord("את").setTranslation("you").setStrongsId("H0853").setTransliteration("at"),
         new SubToken().setWord("ה").setTranslation("the ").setTransliteration("ha"),
         new SubToken().setWord("ארצ").setTranslation("earth").setStrongsId("H0776").setTransliteration("aratz"));
+  }
+
+  @Test
+  public void verb_versions() {
+    ImmutableList<Interlinear> translation = machineTranslator.translate("דרש דורש דרוש דִֽריש ודורש׃");
+    assertThat(translation.stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList())).containsExactly(
+        new SubToken().setWord("דרש").setTranslation("seek").setStrongsId("H1875").setTransliteration("darash"),
+        new SubToken().setWord("דורש").setTranslation("seeker").setStrongsId("H1875").setTransliteration("durash"),
+        new SubToken().setWord("דרוש").setTranslation("seeked").setStrongsId("H1875").setTransliteration("darush"),
+        new SubToken().setWord("דריש").setTranslation("seeking").setStrongsId("H1875").setTransliteration("darysh"),
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("דורש").setTranslation("seeker").setStrongsId("H1875").setTransliteration("durash"));
+  }
+
+  @Test
+  public void translate_Deut_18_11() {
+    ImmutableList<Interlinear> translation = machineTranslator.translate("וְחֹבֵ֖ר חָ֑בֶר וְשֹׁאֵ֥ל אֹוב֙ וְיִדְּעֹנִ֔י וְדֹרֵ֖שׁ אֶל־הַמֵּתִֽים׃");
+    assertThat(translation.stream().flatMap(i -> i.getSubTokens().stream()).collect(toImmutableList())).containsExactly(
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("חובר").setTranslation("uniteer").setStrongsId("H2266").setTransliteration("chubar"),
+        new SubToken().setWord("חבר").setTranslation("unite").setStrongsId("H2266").setTransliteration("chabar"),
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("שואל").setTranslation("asker").setStrongsId("H7592").setTransliteration("shual"),
+        new SubToken().setWord("אוב").setTranslation("bottle").setStrongsId("H0178").setTransliteration("awab"),
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("ידעוני").setTranslation("wizard").setStrongsId("H4181").setTransliteration("yadiwany"),
+        new SubToken().setWord("ו").setTranslation("and ").setTransliteration("wa"),
+        new SubToken().setWord("דורש").setTranslation("seeker").setStrongsId("H1875").setTransliteration("durash"),
+        new SubToken().setWord("אל").setTranslation("unto").setStrongsId("H0413").setTransliteration("al"),
+        new SubToken().setWord("ה").setTranslation("the ").setTransliteration("ha"),
+        new SubToken().setWord("מת").setTranslation("die").setStrongsId("H4192").setTransliteration("mat"),
+        new SubToken().setWord("ימ").setTranslation("s").setTransliteration("ym"));
   }
 
   @Test
@@ -210,6 +256,7 @@ public class MachineTranslatorTest {
         new SubToken().setWord("οτι").setTranslation("that").setStrongsId("G3754").setTransliteration(""),
         new SubToken().setWord("αυτων").setTranslation("them").setStrongsId("G0846").setTransliteration(""),
         new SubToken().setWord("εστιν").setTranslation("to be").setStrongsId("G1510").setTransliteration(""),
+        new SubToken().setWord("η").setTranslation("the").setStrongsId("G3588").setTransliteration(""),
         new SubToken().setWord("βασιλεια").setTranslation("Kingdom").setStrongsId("G0932").setTransliteration(""),
         new SubToken().setWord("των").setTranslation("to the").setStrongsId("G3588").setTransliteration(""),
         new SubToken().setWord("ουρανων").setTranslation("heavens").setStrongsId("G3772").setTransliteration(""));

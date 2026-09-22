@@ -4,19 +4,24 @@ import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.biblical.util.HebrewConverter.toGeezConstants;
 import static com.digitald4.biblical.util.HebrewConverter.toRestored;
+import static com.digitald4.biblical.util.HebrewConverter.transliterate;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
+import static java.util.Comparator.reverseOrder;
 
 import com.digitald4.biblical.model.Interlinear;
 import com.digitald4.biblical.model.Interlinear.SubToken;
 import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.store.TokenWordStore;
+import com.digitald4.biblical.store.TokenWordStore.TokenOption;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
 import com.google.common.collect.ImmutableList;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
@@ -31,40 +36,33 @@ public class MachineTranslator {
     this.subwordTokenizer = subwordTokenizer;
   }
 
-  private SubToken getTranslation(String word, String strongsId, boolean isSuffix) {
-    if (word.startsWith("##")) {
-      word = word.substring(2);
-    }
-
-    SubToken subToken = new SubToken().setWord(word);
-    ImmutableList<TokenWord> options = tokenWordStore.getOptions(word);
+  private ImmutableList<SubToken> getTranslation(String word, ImmutableList<TokenOption> options, String strongsId) {
     if (options.isEmpty()) {
-      options = tokenWordStore.getOptions(toGeezConstants(word));
-    }
-    if (options.isEmpty()) {
-      return subToken.setTranslation("[UNK]").setTransliteration(HebrewConverter.transliterate(word, isSuffix));
+      if (word.length() < 2) {
+        return ImmutableList.of();
+      }
+
+      return ImmutableList.of(new SubToken().setWord(word).setTranslation("[UNK]")
+          .setTransliteration(transliterate(word, false)));
     }
 
-    TokenWord option = options.stream()
-        .filter(o -> Objects.equals(strongsId, o.getStrongsId())).findFirst()
-        .orElse(options.get(0));
+    var strongsMatch = options.stream().filter(o -> Objects.equals(strongsId, o.getStrongsId())).findFirst();
+    if (strongsMatch.isPresent()) {
+      return strongsMatch.get().toSubTokens();
+    }
 
-    return subToken.setTranslation(isSuffix ? option.asSuffix() : option.getTranslation())
-        .setStrongsId(option.getStrongsId())
-        .setTokenType(isSuffix ? TokenType.SUFFIX : option.tokenType())
-        .setTransliteration(option.getTransliteration() != null ?
-            option.getTransliteration() : HebrewConverter.transliterate(word, isSuffix));
+    var countsByStrongsId = tokenWordStore.getCountsByStrongsId();
+
+    return options.stream()
+        .max(Comparator.comparing(tw -> countsByStrongsId.getOrDefault(tw.getStrongsId(), 0)))
+        .get().toSubTokens();
   }
 
   public Interlinear translate(Interlinear interlinear) {
-    AtomicBoolean wordFound = new AtomicBoolean();
+    String strongsId = interlinear.getStrongsId();
+    String word = toRestored(interlinear.getWord());
     return interlinear.setSubTokens(
-        subwordTokenizer
-            .tokenizeWord(toRestored(interlinear.getWord()), interlinear.getStrongsId())
-            .stream()
-            .map(subWord -> getTranslation(subWord, interlinear.getStrongsId(), wordFound.get()))
-            .peek(subToken -> wordFound.set(wordFound.get() || subToken.isWord()))
-            .collect(toImmutableList()));
+        getTranslation(word, subwordTokenizer.getTokenizeOptions(word, strongsId), strongsId));
   }
 
   public ImmutableList<Interlinear> translate(Iterable<Interlinear> interlinears) {
