@@ -5,8 +5,8 @@ import time
 import torch
 import torch.nn as nn
 from PIL import Image
-from dd4_ml import (DD4PyTorchModel, evaluate, random_split, train_model,
-                    load_mobilenet_v3_small, visualize_augmentations)
+from dd4_ml import DD4PyTorchModel, evaluate, load_mobilenet_v3_small, \
+  random_split, train_model, visualize_augmentations
 from pathlib import Path
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms

@@ -9,7 +9,7 @@ from predict_letters import predict_letters
 # called `app` in `main.py`.
 app = Flask(__name__)
 
-HEADERS = {"Access-Control-Allow-Origin": "*", 'Content-Type': 'application/json'}
+HEADERS = {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"}
 
 
 def cors_enabled_function(request):
@@ -110,11 +110,10 @@ def letterboxes():
 
     datastore_client = get_datastore_client()
     id_token = request.args.get('idToken')
-    headers = {"Access-Control-Allow-Origin": "*", 'Content-Type': 'application/json'}
 
     session = resolve_login(datastore_client, id_token)
     if session is None:
-        return jsonify({'error': 'Not Authenticated'}), 401, headers
+        return jsonify({"error": "Not Authenticated"}), 401, HEADERS
 
     if request.method == 'DELETE':
         return delete_letterbox(request, datastore_client)
@@ -141,9 +140,9 @@ def resolve_login(datastore_client, id_token):
         return None
 
     now = datetime.now(timezone.utc)
-    if session['expTime'] < now:
+    if session["expTime"] < now:
         entity = datastore.Entity(key = key)
-        session['endTime'], session['state'] = now, 'CLOSED'
+        session["endTime"], session["state"] = now, 'CLOSED'
         entity.update(session)
         datastore_client.put(entity)
         return None
