@@ -731,7 +731,10 @@ com.digitald4.biblical.DssIdentifierCtrl.prototype.updateTranslation = function(
       }
     });
   }
+}
 
+com.digitald4.biblical.DssIdentifierCtrl.prototype.showStrongsDef = function(strongsId) {
+  this.lexiconRequest = {strongsId: strongsId};
 }
 
 function unfinalize(text) {
