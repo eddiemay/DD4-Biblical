@@ -64,6 +64,8 @@ if __name__ == '__main__':
 		nn.Linear(256, len(train_dataset.classes))
 	]
 
+	print(layers)
+
 	loss_function = nn.CrossEntropyLoss(label_smoothing=0.1)
 
 	model = DD4PyTorchModel(

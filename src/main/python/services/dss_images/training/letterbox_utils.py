@@ -125,17 +125,15 @@ class DSSLettersDataset(Dataset):
 			filter: callable(LetterBox) = None,
 			base_transform: callable(any) = None, transform: callable(any) = None,
 			overrides: list[str] = None, res: int = 9):
-		fragments = fragments or TRAINING_SET
 		self.base_transform = base_transform or (lambda x:x)
 		self.transform = transform or (lambda x:x)
 		self.res = res
 		self.metadata: list[LetterBox] = []
 		self.labels: list[int] = []
-		for letter_box in read_database(fragments, overrides or [], filter):
+		for letter_box in read_database(fragments or TRAINING_SET, overrides or [], filter):
 			self.metadata.append(letter_box)
 			value = letter_box['value']
-			self.labels.append(ord(value) - ord('א') if len(
-				value) == 1 and 'א' <= value <= 'ת' else 27)
+			self.labels.append(ord(value) - ord('א') if len(value) == 1 and 'א' <= value <= 'ת' else 27)
 
 		self.classes = LABEL_LOOKUP
 		self.images: list = [None] * len(self.metadata)

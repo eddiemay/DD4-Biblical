@@ -74,9 +74,9 @@ def get_agent(datastore_client:datastore.Client, session_id:str, ip_address):
     return LangAgent(ip_address=ip_address)
 
 
-def save_agent(datastore_client:datastore.Client, session_id:str, agent:LangAgent):
+def save_agent(ds_client:datastore.Client, session_id:str, agent:LangAgent):
   entity = datastore.Entity(
-      key=datastore_client.key("ChatSession", session_id),
+      key=ds_client.key("ChatSession", session_id),
       exclude_from_indexes=("messages",))
   entity.update(agent.to_dict())
-  datastore_client.put(entity)
+  ds_client.put(entity)

@@ -7,8 +7,6 @@ model = gpt_model
 
 if model.startswith("gpt"):
   from langchain_openai import ChatOpenAI
-  from dotenv import load_dotenv
-  load_dotenv()
   api_key = os.environ.get("OPENAI_API_KEY")
   if api_key is None:
     print("Need to create an .env file and put OPENAI_API_KEY=[OPENAI_API_KEY]")

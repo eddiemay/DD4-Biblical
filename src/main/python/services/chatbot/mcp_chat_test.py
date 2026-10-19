@@ -30,7 +30,7 @@ def test_sons_of_abraham():
   assert len(agent.messages) == 6
 
 
-def test_sons_of_jabob():
+def test_sons_of_jacob():
   assert "twelve" in query("How many sons did Jacob have?")
   assert len(agent.messages) == 8
   assert "one" in query("How many daughters?")
