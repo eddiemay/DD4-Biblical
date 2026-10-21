@@ -27,8 +27,10 @@ llm_with_tools = llm.bind_tools([
   }
 ])
 
+prompt = "You are a bible expert who answers questions about the bible."
+
 class MCPAgent(Agent):
-  def __init__(self, llm=None, system=None, ip_address=None, creation_time=None, last_modified_time=None, messages=None):
+  def __init__(self, llm=None, system=prompt, ip_address=None, creation_time=None, last_modified_time=None, messages=None):
     super().__init__(llm or llm_with_tools, system, ip_address, creation_time, last_modified_time, messages)
 
   def __call__(self, question):
