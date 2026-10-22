@@ -17,6 +17,9 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
   private final APIConnector apiConnector;
   private static final String URL_TEMPLATE =
       "https://www.sefaria.org/api/texts/%s.%d?commentary=0&context=1&pad=0&wrapLinks=1&wrapNamedEntities=1&multiple=0&stripItags=0&transLangPref=&firstAvailableRef=1&fallbackOnDefaultVersion=1";
+
+  private static final String URL_TEMPLATE_NO_CHAPTER =
+      "https://www.sefaria.org/api/texts/%s?commentary=0&context=1&pad=0&wrapLinks=1&wrapNamedEntities=1&multiple=0&stripItags=0&transLangPref=&firstAvailableRef=1&fallbackOnDefaultVersion=1";
   private static final String TESTAMENTS_TEMPLATE =
       "The_Testaments_of_the_Twelve_Patriarchs,_The_Testament_of_%s_the_%s_Son_of_Jacob_and_%s";
 
@@ -27,6 +30,12 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
 
   @Override
   public synchronized ImmutableList<Scripture> fetch(String version, String language, BibleBook book, int chapter) {
+    if (BibleBook.APOCRYPHAL_PSALMS.equals(book.name())) {
+      if (chapter == 151 || chapter == 154) {
+        return fetch(version, book, chapter, "Psalm_" + chapter);
+      }
+      return ImmutableList.of();
+    }
     return switch (book.name()) {
       case BibleBook.MACCABEES_1 -> fetch(version, book, chapter, "The_Book_of_Maccabees_I");
       case BibleBook.MACCABEES_2 -> fetch(version, book, chapter, "The_Book_of_Maccabees_II");
@@ -43,7 +52,9 @@ public class ScriptureFetcherSefariaOrg implements ScriptureFetcher {
 
   private synchronized ImmutableList<Scripture> fetch(String version, BibleBook book, int chapter, String sefariaName) {
     ImmutableList.Builder<Scripture> result = ImmutableList.builder();
-    String url = String.format(URL_TEMPLATE, sefariaName, chapter).replaceAll(",", "%2C");
+    String url = chapter < 151
+        ? String.format(URL_TEMPLATE, sefariaName, chapter).replaceAll(",", "%2C")
+        : String.format(URL_TEMPLATE_NO_CHAPTER, sefariaName).replaceAll(",", "%2C");
     JSONObject json = new JSONObject(apiConnector.sendGet(url));
 
     JSONArray english = json.getJSONArray("text");

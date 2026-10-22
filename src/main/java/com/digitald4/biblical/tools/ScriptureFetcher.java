@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.stream.IntStream;
 
 public class ScriptureFetcher {
-  private final static String URL = "%s/scriptures?reference=%s%%20%d:1&version=%s&lang=gez";
+  private final static String URL = "%s/scriptures?reference=%s%%20%d:1&version=%s&lang=en";
   private final APIConnector apiConnector;
   private final BibleBookStore bibleBookStore;
 

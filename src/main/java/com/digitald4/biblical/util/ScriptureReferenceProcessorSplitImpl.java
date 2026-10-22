@@ -44,8 +44,8 @@ public class ScriptureReferenceProcessorSplitImpl implements ScriptureReferenceP
 
     ImmutableList.Builder<VerseRange> verseRanges = ImmutableList.builder();
     do {
-      BibleBook book = bibleBookStore.get(matcher.group(1).trim());
       int chapter = parseInt(matcher.group(2));
+      BibleBook book = bibleBookStore.get(matcher.group(1).trim(), chapter);
       String[] parts = matcher.group(3).trim().split("[,;]");
 
       if (parts.length == 0) {

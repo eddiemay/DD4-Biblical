@@ -21,7 +21,6 @@ import com.digitald4.biblical.model.Scripture;
 import com.digitald4.biblical.model.Scripture.AuditScripture;
 import com.digitald4.biblical.model.Scripture.InterlinearScripture;
 import com.digitald4.biblical.model.ScriptureVersion;
-import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.MachineTranslator;
 import com.digitald4.biblical.util.ScriptureFetcher;
@@ -90,9 +89,7 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
     return getScriptures(version, language, reference, view);
   }
 
-  public GetOrSearchResponse getScriptures(
-      String version, String language, String reference, View view) {
-
+  public GetOrSearchResponse getScriptures(String version, String language, String reference, View view) {
     ImmutableList<VerseRange> verseRanges = scriptureRefProcessor.computeVerseRanges(reference);
     String prevChapter = null;
     String nextChapter = null;
@@ -113,6 +110,8 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
         nextChapter);
   }
 
+  public static final ImmutableSet<String> STANDARD_LANGUAGES = ImmutableSet.of(Language.EN, Language.HEBREW, Language.GK);
+
   private ImmutableList<Scripture> getScriptures(String version, String language, VerseRange verseRange, View view) {
     String book = verseRange.getBook().name();
     int chapter = verseRange.getChapter();
@@ -126,8 +125,8 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
               .getItems().stream()
               .collect(toImmutableMap(Scripture::getVerse, s -> s.getText().toString()));
 
-      boolean standardLang = ImmutableList.of(Language.EN, Language.HEBREW, Language.GK).contains(language);
-      ImmutableList<Interlinear> interlinears = verseRange.getBook().getNumber() < 67 && standardLang
+      boolean isStandardLang = STANDARD_LANGUAGES.contains(language);
+      ImmutableList<Interlinear> interlinears = verseRange.getBook().getNumber() < 67 && isStandardLang
           ? interlinearStore.getInterlinear(verseRange)
           : list(new LanguageRequest(version, Language.EN.equals(language) ? Language.HEBREW : language, false), book, chapter, startVerse, endVerse)
               .getItems().stream()
@@ -146,7 +145,7 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
             .collect(groupingBy(Interlinear::getVerse)).values().stream()
             .map(InterlinearScripture::new)
             .peek(s -> {
-              if (!standardLang) {
+              if (!isStandardLang) {
                 s.setLanguage(language);
               }
               InterlinearStore.fillDss(s, dssReferences.get(s.getVerse()));
@@ -338,9 +337,6 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
     String language = languageRequest.getLanguage();
 
     BibleBook bibleBook = bibleBookStore.get(book, chapter);
-    if (bibleBook.name().equals(BibleBook.APOCRYPHAL_PSALMS) && chapter > 150) {
-      chapter -= 150;
-    }
 
     if (version == null) {
       return list(languageRequest.getLanguage(), bibleBook, chapter, startVerse, endVerse);

@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.mapping;
 
 import com.digitald4.biblical.model.BibleBook;
 import com.digitald4.biblical.model.ScriptureVersion;
-import com.digitald4.biblical.util.ScriptureReferenceProcessor.LanguageRequest;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.exception.DD4StorageException.ErrorCode;
 import com.digitald4.common.storage.DAO;
@@ -42,6 +41,24 @@ public class BibleBookStore extends GenericStore<BibleBook, String> {
     return book;
   }
 
+  public BibleBook get(String name, int chapter) {
+    BibleBook book = get(name);
+
+    if (book.name().equals(BibleBook.ESTHER) && chapter > 10) {
+      return get(BibleBook.ADDITIONS_TO_ESTHER);
+    } else if (book.name().equals(BibleBook.ADDITIONS_TO_ESTHER) && chapter < 10) {
+      return get(BibleBook.ESTHER);
+    }
+
+    if (book.name().equals(BibleBook.Psalms) && chapter > 150) {
+      return get(BibleBook.APOCRYPHAL_PSALMS);
+    } else if (book.name().equals(BibleBook.APOCRYPHAL_PSALMS) && chapter < 151) {
+      return get(BibleBook.Psalms);
+    }
+
+    return book;
+  }
+
   public ImmutableList<BibleBook> getAllBooks() {
     if (allBooks == null) {
       synchronized (this) {
@@ -70,22 +87,6 @@ public class BibleBookStore extends GenericStore<BibleBook, String> {
 
   private static String collapseName(String name) {
     return name.toLowerCase().replace(" ", "");
-  }
-
-  public BibleBook get(String name, int chapter) {
-    BibleBook book = get(name);
-
-    if (book.name().equals(BibleBook.ESTHER) && chapter > 10) {
-      return get(BibleBook.ADDITIONS_TO_ESTHER);
-    } else if (book.name().equals(BibleBook.ADDITIONS_TO_ESTHER) && chapter < 10) {
-      return get(BibleBook.ESTHER);
-    }
-
-    if (book.name().equals(BibleBook.Psalms) && chapter > 150) {
-      return get(BibleBook.APOCRYPHAL_PSALMS);
-    }
-
-    return book;
   }
 
   public ImmutableSet<BibleBook> getBibleBooks(String version) {
