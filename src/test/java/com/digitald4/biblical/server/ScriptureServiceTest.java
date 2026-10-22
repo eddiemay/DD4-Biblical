@@ -54,7 +54,7 @@ public class ScriptureServiceTest {
 
   @Test
   public void getOrSearch_scriptureSingle() throws Exception {
-    when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:3")).thenReturn(
+    when(scriptureStore.getScriptures("ISR", EN, "Genesis 2:3", null)).thenReturn(
         ScriptureStore.GetOrSearchResponse.getResult(
             ImmutableList.of(new Scripture().setVersion("ISR").setBook("Genesis").setChapter(2)
                 .setVerse(3).setText("Elohim blessed the seventh day.")),

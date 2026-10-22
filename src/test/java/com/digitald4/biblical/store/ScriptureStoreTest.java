@@ -1,6 +1,5 @@
 package com.digitald4.biblical.store;
 
-import static com.digitald4.biblical.model.ScriptureVersion.INTERLINEAR;
 import static com.digitald4.biblical.util.Language.EN;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -213,34 +212,6 @@ public class ScriptureStoreTest {
   }
 
   @Test
-  public void getScriptures_interlaced_legacy() {
-    assertThat(
-        scriptureStore.getScriptures(VERSION, Language.INTERLACED, "2 Kings 23:5").getItems()).containsExactly(
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"));
-    assertThat(
-        scriptureStore.getScriptures(VERSION, Language.INTERLACED, "2 Kings 23:3-5").getItems()).containsExactly(
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(3).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(4).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion(VERSION).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]"),
-        new Scripture().setVersion("WLC").setLanguage(Language.HEBREW).setBook("2 Kings").setChapter(23).setVerse(5).setText("[Scripture Placeholder]")).inOrder();
-  }
-
-  @Test
-  public void getScriptures_interlacedNotSupported_legacy() {
-    assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Jasher 1:1").getItems())
-        .containsExactly(
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
-    assertThat(scriptureStore.getScriptures("OXFORD", Language.INTERLACED, "Jasher 5:17-19").getItems())
-        .containsExactly(
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(19).setText("[Fetched OXFORD From Web]"));
-  }
-
-  @Test
   public void getScriptures_interlinear() {
     ImmutableList<Interlinear> interlinears = ImmutableList.of(
         new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H7225").setWord("בְּרֵאשִׁ֖ית"),
@@ -322,59 +293,8 @@ public class ScriptureStoreTest {
   }
 
   @Test
-  public void getScriptures_interlinear_legacy() {
-    ImmutableList<Interlinear> interlinears = ImmutableList.of(
-        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H7225").setWord("בְּרֵאשִׁ֖ית"),
-        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H1254").setWord("בָּרָ֣א"),
-        new Interlinear().setBook("Gen").setChapter(1).setVerse(1).setStrongsId("H0430").setWord("אֱלֹהִ֑ים"));
-    when(interlinearStore.getInterlinear(any(VerseRange.class))).thenReturn(interlinears);
-    assertThat(scriptureStore.getScriptures(VERSION, INTERLINEAR, "Gen 1:1").getItems())
-        .containsExactly(new InterlinearScripture(interlinears));
-  }
-
-  @Test
-  public void getScriptures_interlinearNotSupported_legacy() {
-    assertThat(scriptureStore.getScriptures(VERSION, INTERLINEAR, "Jasher 1:1").getItems())
-        .containsExactly(
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(1).setVerse(1).setText("[Fetched OXFORD From Web]"));
-    assertThat(scriptureStore.getScriptures(INTERLINEAR, "en", "Jasher 5:17-19").getItems())
-        .containsExactly(
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(17).setText("[Fetched OXFORD From Web]"),
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(18).setText("[Fetched OXFORD From Web]"),
-            new Scripture().setVersion("OXFORD").setBook("Jasher").setChapter(5).setVerse(19).setText("[Fetched OXFORD From Web]"));
-  }
-
-  @Test
-  public void getScriptures_interlinear_derived_legacy() {
-    ImmutableList<Interlinear> interlinears = ImmutableList.of(
-        createInterlinear("Jub", 6, 45, 1, "וכל", null),
-        createInterlinear("Jub", 6, 45, 2, "הימים", null),
-        createInterlinear("Jub", 6, 45, 3, "אשר", null),
-        createInterlinear("Jub", 6, 45, 4, "נועדו", null),
-        createInterlinear("Jub", 6, 45, 5, "הם", null),
-        createInterlinear("Jub", 6, 45, 6, "שתים", null),
-        createInterlinear("Jub", 6, 45, 7, "וחמישים", null),
-        createInterlinear("Jub", 6, 45, 8, "שבתות", null),
-        createInterlinear("Jub", 6, 45, 9, "ימים", null),
-        createInterlinear("Jub", 6, 45, 10, "עד", null),
-        createInterlinear("Jub", 6, 45, 11, "מלאת", null),
-        createInterlinear("Jub", 6, 45, 12, "שנה", null),
-        createInterlinear("Jub", 6, 45, 13, "תמימה", null));
-
-    when(dao.list(eq(Scripture.class), any(Query.List.class))).thenReturn(
-        QueryResult.of(Scripture.class,
-            ImmutableList.of(
-                new Scripture().setBook("Jub").setChapter(6).setVerse(45)
-                    .setText("וכל הימים אשר נועדו הם שתים וחמישים שבתות ימים עד מלאת שנה תמימה:")),
-            1, null));
-
-    assertThat(scriptureStore.getScriptures(VERSION, INTERLINEAR, "Jub 6:45").getItems())
-        .containsExactly(new InterlinearScripture(interlinears));
-  }
-
-  @Test
   public void getScriptures_comparison() {
-    assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Isa 56:6").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, "en", "Isa 56:6", View.Interlaced).getItems())
         .containsExactly(
             new Scripture().setVersion(VERSION).setBook("Isaiah").setChapter(56).setVerse(6)
                 .setText("[Fetched " + VERSION + " From Web]"),
@@ -386,7 +306,7 @@ public class ScriptureStoreTest {
                 "Fetched <span class=\"diff-delete\">DSS</span><span class=\"diff-insert\">WLC</span> From Web", 3, 0.85),
             new Scripture().setVersion("DSS").setBook("Isaiah").setChapter(56).setVerse(6).setLanguage(Language.EN)
                 .setText("[Fetched DSS From Web]")).inOrder();
-    assertThat(scriptureStore.getScriptures(VERSION, Language.INTERLACED, "Isa 24:3-5").getItems())
+    assertThat(scriptureStore.getScriptures(VERSION, "en", "Isa 24:3-5", View.Interlaced).getItems())
         .containsExactlyElementsIn(
             IntStream.range(3, 6)
                 .boxed()

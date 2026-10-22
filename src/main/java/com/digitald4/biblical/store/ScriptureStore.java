@@ -1,6 +1,5 @@
 package com.digitald4.biblical.store;
 
-import static com.digitald4.biblical.model.ScriptureVersion.INTERLINEAR;
 import static com.digitald4.biblical.util.HebrewConverter.removePunctuation;
 import static com.digitald4.biblical.util.HebrewConverter.toConstantsOnly;
 import static com.digitald4.biblical.util.HebrewConverter.toRestored;
@@ -77,19 +76,11 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
   }
 
   public GetOrSearchResponse getScriptures(String version, String language, String reference) {
-    View view = View.Text;
-    if (Language.INTERLACED.equals(language)) {
-      language = Language.EN;
-      view = View.Interlaced;
-    } else if (INTERLINEAR.equalsIgnoreCase(language)) {
-      language = Language.EN;
-      view = View.Interlinear;
-    }
-
-    return getScriptures(version, language, reference, view);
+    return getScriptures(version, language, reference, View.Text);
   }
 
   public GetOrSearchResponse getScriptures(String version, String language, String reference, View view) {
+    View _view = view != null ? view : View.Text;
     ImmutableList<VerseRange> verseRanges = scriptureRefProcessor.computeVerseRanges(reference);
     String prevChapter = null;
     String nextChapter = null;
@@ -104,7 +95,7 @@ public class ScriptureStore extends GenericStore<Scripture, String> {
 
     return GetOrSearchResponse.getResult(
         verseRanges.stream()
-            .flatMap(verseRange -> getScriptures(version, language, verseRange, view).stream())
+            .flatMap(verseRange -> getScriptures(version, language, verseRange, _view).stream())
             .collect(toImmutableSet()),
         prevChapter,
         nextChapter);

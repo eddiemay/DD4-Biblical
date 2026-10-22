@@ -43,6 +43,7 @@ import com.digitald4.biblical.util.ScriptureFetcherRouter;
 import com.digitald4.biblical.util.ScriptureFetcherSefariaOrg;
 import com.digitald4.biblical.util.ScriptureFetcherStepBibleOrg;
 import com.digitald4.biblical.util.ScriptureReferenceProcessor;
+import com.digitald4.biblical.util.ScriptureReferenceProcessor.View;
 import com.digitald4.biblical.util.ScriptureReferenceProcessorSplitImpl;
 import com.digitald4.common.exception.DD4StorageException;
 import com.digitald4.common.server.APIConnector;
@@ -88,13 +89,13 @@ public class DiffStats {
           System.out.println("Chapter: " + chapter);
           boolean ignorePunc = diffConfig.hebrewProcessings.contains(HebrewProcessing.IGNORE_PUN);
           ImmutableMap<Integer, String> base = scriptureStore
-              .getScriptures(diffConfig.baseVersion, diffConfig.baseLanguage, "Isa " + chapter)
+              .getScriptures(diffConfig.baseVersion, diffConfig.baseLanguage, "Isa " + chapter, diffConfig.view)
               .getItems().stream()
-              .collect(toImmutableMap(Scripture::getVerse, s -> getHebrewText(s, ignorePunc)));
+              .collect(toImmutableMap(Scripture::getVerse, s -> getHebrewText(s, diffConfig.view, ignorePunc)));
           ImmutableMap<Integer, String> compare = scriptureStore
-              .getScriptures(diffConfig.compareVersion, diffConfig.compareLanguage, "Isa " + chapter)
+              .getScriptures(diffConfig.compareVersion, diffConfig.compareLanguage, "Isa " + chapter, diffConfig.view)
               .getItems().stream()
-              .collect(toImmutableMap(Scripture::getVerse, s -> getHebrewText(s, ignorePunc)));
+              .collect(toImmutableMap(Scripture::getVerse, s -> getHebrewText(s, diffConfig.view, ignorePunc)));
 
           return IntStream.range(1, Math.max(base.size(), compare.size()) + 1).mapToObj(
               v -> ScriptureDiffStats.of("Isaiah", chapter, v, base.getOrDefault(v, ""),
@@ -104,8 +105,8 @@ public class DiffStats {
         .collect(toImmutableList());
   }
 
-  public static String getHebrewText(Scripture scripture, boolean ignorePunc) {
-    return !scripture.getVersion().equals(ScriptureVersion.INTERLINEAR) ? scripture.getText().toString()
+  public static String getHebrewText(Scripture scripture, View view, boolean ignorePunc) {
+    return view != View.Interlinear ? scripture.getText().toString()
         : ((InterlinearScripture) scripture).getInterlinears().stream()
             .filter(i -> !(ignorePunc && "Punc".equals(i.getMorphology())))
             .map(Interlinear::getWord)
@@ -429,7 +430,7 @@ public class DiffStats {
   public void fillDssWords() {
     IntStream.range(1, 67).boxed()
         .flatMap(c ->
-            scriptureStore.getScriptures(ScriptureVersion.INTERLINEAR, Language.EN, "Isa " + c).getItems().stream())
+            scriptureStore.getScriptures("ISR", Language.EN, "Isa " + c, View.Interlinear).getItems().stream())
         .forEach(scripture -> interlinearStore.create(((InterlinearScripture) scripture).getInterlinears()));
   }
 
@@ -463,7 +464,7 @@ public class DiffStats {
     DiffStats statsProcessor = new DiffStats(scriptureStore, interlinearStore);
 
     statsProcessor.processAndPrint(
-        new DiffConfig("DSS", Language.HEBREW, ScriptureVersion.INTERLINEAR, Language.HEBREW,
+        new DiffConfig("DSS", Language.HEBREW, "ISR", Language.HEBREW, View.Interlinear,
             HebrewProcessing.IGNORE_PUN, HebrewProcessing.TO_FULL_HEBREW, HebrewProcessing.UNFINALIZE));
 
     // statsProcessor.printWordStats("WLCO");
@@ -508,15 +509,17 @@ public class DiffStats {
     private final String baseLanguage;
     private final String compareVersion;
     private final String compareLanguage;
+    private final View view;
     public enum HebrewProcessing {IGNORE_PUN, UNFINALIZE, TO_CONSTANTS_ONLY, TO_FULL_HEBREW};
     private final ImmutableList<HebrewProcessing> hebrewProcessings;
 
     public DiffConfig(String baseVersion, String baseLanguage, String compareVersion,
-        String compareLanguage, HebrewProcessing... hebrewProcessings) {
+        String compareLanguage, View view, HebrewProcessing... hebrewProcessings) {
       this.baseVersion = baseVersion;
       this.baseLanguage = baseLanguage;
       this.compareVersion = compareVersion;
       this.compareLanguage = compareLanguage;
+      this.view = view;
       this.hebrewProcessings = ImmutableList.copyOf(hebrewProcessings);
     }
   }

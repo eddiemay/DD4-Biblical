@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class ScriptureVersion {
-  @Deprecated public static final String INTERLINEAR = "Interlinear";
   private final String name;
   private final String version;
   private final int versionNum;
@@ -39,8 +38,7 @@ public class ScriptureVersion {
           ImmutableSet.of("Community Rule", "War Scroll", "Book of Giants", BibleBook.ISAIAH),
           Language.EN, Language.HEBREW),
       new ScriptureVersion("Open Siddur", "SID", 85, ImmutableSet.of("Jubilees"), Language.GEEZ),
-      new ScriptureVersion("Geez Experience", "GzExp", 86, ImmutableSet.of("Canon"), Language.GEEZ),
-      new ScriptureVersion(INTERLINEAR, INTERLINEAR, 90, "Canon"));
+      new ScriptureVersion("Geez Experience", "GzExp", 86, ImmutableSet.of("Canon"), Language.GEEZ));
 
   public static final ImmutableMap<String, ScriptureVersion> BY_VERSION =
       ALL_VERSIONS.stream().collect(toImmutableMap(ScriptureVersion::getVersion, identity()));

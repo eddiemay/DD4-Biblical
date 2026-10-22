@@ -10,5 +10,4 @@ public class Language {
   public static final String GREEK = "greek";
   public static final String GEEZ = "gez";
   public static final String GEEZ_RESTORED = "gez-re";
-  @Deprecated public static final String INTERLACED = "interlaced";
 }

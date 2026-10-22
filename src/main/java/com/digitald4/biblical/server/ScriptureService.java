@@ -46,8 +46,7 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
       @Named("lang") @Nullable String lang, @Named("view") @Nullable View view)
       throws ServiceException {
     try {
-      return view == null ? scriptureStore.getScriptures(version, lang, reference)
-          : scriptureStore.getScriptures(version, lang, reference, view);
+      return scriptureStore.getScriptures(version, lang, reference, view);
     } catch (DD4StorageException e) {
       throw new ServiceException(e.getErrorCode(), e);
     }
@@ -62,8 +61,7 @@ public class ScriptureService extends EntityServiceBulkImpl<String, Scripture> {
       throws ServiceException {
     try {
       if (scriptureReferenceProcessor.matchesPattern(searchText)) {
-        return view == null ? scriptureStore.getScriptures(version, lang, searchText)
-            : scriptureStore.getScriptures(version, lang, searchText, view);
+        return scriptureStore.getScriptures(version, lang, searchText, view);
       }
 
       return GetOrSearchResponse.searchResult(
