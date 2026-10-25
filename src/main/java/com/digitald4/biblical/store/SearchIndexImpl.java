@@ -90,7 +90,8 @@ public class SearchIndexImpl extends SearchIndexerAppEngineImpl {
     return super.toDocumentBuilder(lexicon)
         .addField(Field.newBuilder().setName("unfinalized").setAtom(unfinalize(constantsOnly)))
         .addField(Field.newBuilder().setName("constantsOnly").setAtom(constantsOnly))
-        .addField(Field.newBuilder().setName("restored").setAtom(lexicon.restored()));
+        .addField(Field.newBuilder().setName("restored").setAtom(lexicon.restored()))
+        .addField(Field.newBuilder().setName("lang").setAtom(lexicon.lang()));
   }
 
   public Document.Builder toDocumentBuilder(Commandment commandment) {

@@ -97,10 +97,71 @@ def fetch_strongs_translations(strongs_id: str) -> list:
        A json list of the different ways it is translated based on the Hebrew
        forms.
     Examples:
-      fetch_strongs_translation_forms('H1254')
+      fetch_strongs_translations('H1254')
       returns {"items":[{"word":"בורא","strongsId":"H1254","translation":"creator","id":"בורא-H1254"},{"word":"ברא","strongsId":"H1254","translation":"create","id":"ברא-H1254"},{"word":"ברוא","strongsId":"H1254","translation":"created","id":"ברוא-H1254"},{"word":"בריא","strongsId":"H1254","translation":"creating","id":"בריא-H1254"}]}
   """
   fetch_url = f"https://dabar.cloud/_api/tokenWords/v1/getTranslations?strongsId={strongs_id}"
+  print("Sending request: ", fetch_url)
+  with request.urlopen(fetch_url) as url:
+    return json.load(url)['items']
+
+
+@mcp.tool
+def fetch_strongs_references(strongs_id: str) -> list:
+  """Fetches references to a Strong's ID from the Bible. This can be used to see
+    how the word is translated in different verses.
+    Args:
+      strongs_id The ID of the strong's reference to fetch. i.e. H6963 or G1234
+    Returns:
+       A json list of the different references in the bible with word,
+       forms.
+    Examples:
+      fetch_strongs_references('H1254')
+      returns {
+        "type": "Interlinear",
+        "items": [
+          {"book": "Genesis","chapter": 14,"verse": 2,"index": 2,"strongsId": "H4421","word": "מִלְחָמָ֗ה","constantsOnly": "מלחמה","transliteration": "mil·ḥā·māh,","morphology": "N‑fs","bookNumber": 1,"translation": "war","restored": "מלחמה","id": "Genesis-14-2-2","reference": "Genesis 14:2"},
+          {"book": "Genesis","chapter": 14,"verse": 8,"index": 17,"strongsId": "H4421","word": "מִלְחָמָ֔ה","constantsOnly": "מלחמה","transliteration": "mil·ḥā·māh,","morphology": "N‑fs","bookNumber": 1,"translation": "in battle","restored": "מלחמה","id": "Genesis-14-8-17","reference": "Genesis 14:8"}
+        ],
+        "totalSize": 319,
+        "orderBy": "",
+        "pageSize": 2,
+        "pageToken": 1,
+        "filter": ""
+      }
+  """
+  fetch_url = f"https://www.dabar.cloud/_api/interlinears/v1/getReferences?pageSize=256&strongsId={strongs_id}"
+  print("Sending request: ", fetch_url)
+  with request.urlopen(fetch_url) as url:
+    return json.load(url)['items']
+
+
+@mcp.tool
+def search_strongs(search_text: str, language: str) -> list:
+  """Searches Strong's for words that may be translated to the search text in a
+    given langauge.
+    Args:
+      search_text The text of a word or words we are looking for.
+      language The language is which we are looking to find translation for. Normally Hebrew or Greek.
+    Returns:
+       A json list of strong's Lexicon entries that match the search.
+    Examples:
+      search_strongs('H1254', 'Hebrew')
+      returns {
+       "type": "Lexicon",
+       "items": [
+        {"id": "H0529","word": "אֵמוּן","transliteration": "'ēmûn","pronunciation": "ay-moon'","partOfSpeech": "masculine noun","rootWord": "From אָמַן (<a href=\"\" data-ng-click=\"$ctrl.showStrongsDef('H539')\">H539</a>)","dictionaryAid": "TWOT Reference: 116d",
+         "translationCounts": [
+          {"word": "faithful","count": 3},
+          {"word": "truth","count": 1},
+          {"word": "faith","count": 1}
+         ],
+         "outline": [{"value": "faithfulness, trusting faithful, trusty (as adj.)","children": [{"value": "faithful, trusty (as adj.)"}]}],
+         "strongsDefinition": "אֵמוּן ʼêmûwn, ay-moon'; from <a href=\"\" data-ng-click=\"$ctrl.showStrongsDef('H539')\">H539</a>; established, i.e. (figuratively) trusty; also (abstractly) trustworthiness:—faith(-ful), truth.",
+         "translation": "faithful","referenceCount": 5,"constantsOnly": "אמון","restored": "אמונ","language": "Hebrew"
+        }]
+  """
+  fetch_url = f"https://www.dabar.cloud/_api/lexicons/v1/search?orderBy=strongsId&searchText=language%3D{language}+{search_text}"
   print("Sending request: ", fetch_url)
   with request.urlopen(fetch_url) as url:
     return json.load(url)['items']

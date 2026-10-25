@@ -154,9 +154,7 @@ public class Scripture extends ModelObject<String> implements Searchable {
 
     public InterlinearScripture(Iterable<Interlinear> interlinears) {
       this.interlinears = ImmutableList.copyOf(interlinears);
-      String strongsId =
-          stream(interlinears).map(Interlinear::getStrongsId).filter(Objects::nonNull).findAny().orElse("");
-      setLanguage(strongsId.startsWith("G") ? Language.GK : Language.HEBREW);
+      setLanguage(stream(interlinears).map(Interlinear::language).filter(Objects::nonNull).findAny().orElse(""));
       Interlinear interlinear = interlinears.iterator().next();
       setVersion("Interlinear");
       setBook(interlinear.getBook());

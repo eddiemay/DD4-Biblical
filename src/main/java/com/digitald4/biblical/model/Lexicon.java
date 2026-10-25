@@ -1,6 +1,7 @@
 package com.digitald4.biblical.model;
 
 import com.digitald4.biblical.util.HebrewConverter;
+import com.digitald4.biblical.util.Language;
 import com.digitald4.biblical.util.LexiconFetcherBlueLetterImpl;
 import com.digitald4.common.model.ModelObject;
 import com.digitald4.common.model.Searchable;
@@ -39,6 +40,18 @@ public class Lexicon extends ModelObject<String> implements Searchable {
 
   public Lexicon setWord(String word) {
     this.word = word;
+    return this;
+  }
+
+  public String lang() {
+    return getId().startsWith("G") ? Language.GK : Language.HEBREW;
+  }
+
+  public String getLanguage() {
+    return getId().startsWith("G") ? "Greek" : "Hebrew";
+  }
+
+  public Lexicon setLanguage(String language) {
     return this;
   }
 

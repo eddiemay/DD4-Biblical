@@ -126,7 +126,7 @@
       <div data-ng-if="$ctrl.view=='SEARCH'">
         <h2>Lexicon Search</h2>
         <div class="columns">
-          <input type="text" data-ng-model="$ctrl.searchText"/>
+          <input type="text" data-ng-model="$ctrl.searchText" data-on-enter="$ctrl.search()"/>
           <button data-ng-click="$ctrl.search()">Search</button>
         </div>
         <div data-ng-repeat="lexicon in $ctrl.searchResults.items">

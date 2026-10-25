@@ -2,12 +2,14 @@ package com.digitald4.biblical.model;
 
 import com.digitald4.biblical.util.HebrewConverter;
 import com.digitald4.biblical.util.HebrewTokenizer.TokenWord.TokenType;
+import com.digitald4.biblical.util.Language;
 import com.digitald4.common.storage.Annotations.NonIndexed;
 import com.digitald4.common.util.FormatText;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.common.collect.ImmutableList;
 // This has to be List or the compiler throws an error for some reason during JSON parsing.
 import java.util.List;
+import java.util.Objects;
 
 public class Interlinear {
   // Id values
@@ -199,6 +201,18 @@ public class Interlinear {
   public Interlinear setDssDiff(String dssDiff) {
     this.dssDiff = dssDiff;
     return this;
+  }
+
+  public String language() {
+    String sId = strongsId;
+    if (sId == null && subTokens != null) {
+      sId = subTokens.stream().map(SubToken::getStrongsId).filter(Objects::nonNull).findAny().orElse(null);
+    }
+    if (sId == null) {
+      return null;
+    }
+
+    return sId.startsWith("G") ? Language.GK : Language.HEBREW;
   }
 
   @ApiResourceProperty

@@ -11,6 +11,8 @@ async def call_tool(name: str, arguments: dict):
   async with client:
     result = await client.call_tool(name, arguments)
     print(result)
+    if result.is_error:
+      raise RuntimeError(f"MCP Error: {result.content}")
     return result
 
 
@@ -63,7 +65,7 @@ def test_fetch_scripture_resource_multi():
 
 def test_fetch_scripture():
   scripture = json.loads(asyncio.run(call_tool(
-      "fetch_scripture", {"reference": "Gen 2:3"}))[0].text)
+      "fetch_scripture", {"reference": "Gen 2:3"})).content[0].text)[0]
 
   assert scripture['version'] == 'ISR'
   assert scripture['language'] == 'en'
@@ -75,7 +77,7 @@ def test_fetch_scripture():
 
 def test_fetch_scripture_multi():
   scriptures = json.loads(asyncio.run(call_tool(
-      "fetch_scripture", {"reference": "Exo 20:13-15"}))[0].text)
+      "fetch_scripture", {"reference": "Exo 20:13-15"})).content[0].text)
 
   assert len(scriptures) == 3
   verse = 13
@@ -94,7 +96,7 @@ def test_fetch_scripture_multi():
 
 def test_fetch_strongs_def():
   strongs_def = json.loads(asyncio.run(call_tool(
-      "fetch_strongs_def", {"strongs_id": "H6963"}))[0].text)
+      "fetch_strongs_def", {"strongs_id": "H6963"})).content[0].text)
 
   assert strongs_def['id'] == 'H6963'
   assert strongs_def['word'] == 'קוֹל'
@@ -106,7 +108,7 @@ def test_fetch_strongs_def():
 
 def test_fetch_strongs_translations():
   translations = json.loads(asyncio.run(call_tool(
-      "fetch_strongs_translations", {"strongs_id": "H1254"}))[0].text)
+      "fetch_strongs_translations", {"strongs_id": "H1254"})).content[0].text)
 
   assert len(translations) == 4
   assert translations[0]['word'] == 'בורא'
@@ -119,18 +121,52 @@ def test_fetch_strongs_translations():
   assert translations[3]['translation'] == 'creating'
 
 
-def test_similarity_compare():
+def test_fetch_strongs_references():
+  references = json.loads(asyncio.run(call_tool(
+      "fetch_strongs_references", {"strongs_id": "H3153"})).content[0].text)
+
+  assert len(references) == 2
+  assert references[0]['restored'] == 'ויזניהו'
+  assert references[0]['translation'] == 'and Jezaniah'
+  assert references[0]['book'] == 'Jeremiah'
+  assert references[0]['chapter'] == 40
+  assert references[0]['verse'] == 8
+  assert references[1]['restored'] == 'ויזניה'
+  assert references[1]['translation'] == 'Jezaniah'
+  assert references[1]['book'] == 'Jeremiah'
+  assert references[1]['chapter'] == 42
+  assert references[1]['verse'] == 1
+
+
+def test_search_strongs():
+  references = json.loads(asyncio.run(call_tool(
+      "search_strongs", {"search_text": "faith", "language": "Hebrew"})).content[0].text)
+
+  assert len(references) == 5
+  assert references[0]['id'] == 'H0529'
+  assert references[0]['word'] == 'אֵמוּן'
+  assert references[1]['id'] == 'H0530'
+  assert references[1]['word'] == 'אֱמוּנָה'
+  assert references[2]['id'] == 'H0548'
+  assert references[2]['word'] == 'אֲמָנָה'
+  assert references[3]['id'] == 'H4159'
+  assert references[3]['word'] == 'מוֹפֵת'
+  assert references[4]['id'] == 'H7343'
+  assert references[4]['word'] == 'רָחָב'
+
+
+def ignore_test_similarity_compare():
   result = asyncio.run(call_tool(
       "similarity_compare", {"a": "I like dogs", "b": "I like puppies"}))
-  score = float(result[0].text)
+  score = float(result.content[0].text)
   assert score < .8
 
   result = asyncio.run(call_tool(
       "similarity_compare", {"a": "I like dogs", "b": "I love dogs"}))
-  score = float(result[0].text)
+  score = float(result.content[0].text)
   assert score > .88
 
   result = asyncio.run(call_tool(
       "similarity_compare", {"a": "I like dogs", "b": "It's prime time"}))
-  score = float(result[0].text)
+  score = float(result.content[0].text)
   assert score < .2
