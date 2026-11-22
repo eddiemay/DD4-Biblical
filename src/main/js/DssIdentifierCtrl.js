@@ -1,7 +1,8 @@
-com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, letterBoxService, scriptureService) {
+com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, globalData, letterBoxService, scriptureService) {
   this.$http = $http;
   this.$scope = $scope;
   this.$window = $window;
+  this.globalData = globalData;
   this.letterBoxService = letterBoxService;
   this.scriptureService = scriptureService;
   this.showLetterBoxes = this.showLetters = this.showMissmatch = this.showRowBoxes = true;
@@ -55,7 +56,9 @@ com.digitald4.biblical.DssIdentifierCtrl = function($http, $scope, $window, lett
     return;
   }
   this.letterBoxes = [];
-  this.addEventListeners();
+  if (globalData.activeSession) {
+    this.addEventListeners();
+  }
 }
 
 com.digitald4.biblical.DssIdentifierCtrl.prototype.addEventListeners = function() {
