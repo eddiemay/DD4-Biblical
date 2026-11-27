@@ -258,9 +258,9 @@ def predict(model, fragment, preprocessor=None):
 			"_score": float(box.conf[0])
 		})
 
+	# from predict_letters import predict_letters
+	# predict_letters(letter_boxes)
 	nms = []
-	from predict_letters import predict_letters
-	predict_letters(letter_boxes)
 	for box in sorted(letter_boxes, key=lambda b:b["_score"], reverse=True):
 		keep = True
 		for kept in nms:
