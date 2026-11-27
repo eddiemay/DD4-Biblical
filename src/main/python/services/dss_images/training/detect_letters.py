@@ -14,6 +14,7 @@ from detectron2.engine import DefaultPredictor, DefaultTrainer
 from detectron2.engine.hooks import BestCheckpointer
 from detectron2.evaluation import COCOEvaluator
 from detectron2.utils.visualizer import Visualizer
+from enum import Enum, auto
 from letterbox_utils import LETTERBOX_BY_FRAGMENT_URL, \
 	LETTERBOX_BATCH_CREATE_URL, LETTERBOX_BATCH_DELETE_URL, send_json_req
 from letterbox_utils import DSSLettersDataset, get_img_file_path, LABEL_LOOKUP, \
@@ -28,6 +29,10 @@ DATASET_BASE = 'detect_letters/dataset'
 ANNOTATIONS = f'{DATASET_BASE}/annotations'
 IMAGES_BASE = f'{DATASET_BASE}/images'
 preprocessor = {"gray": True, "blur": "gaussian", "blur_size": 3}
+class Process(Enum):
+	FULL = auto()
+	SAMPLES = auto()
+	TILED = auto()
 
 # config = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 # 👉 Much higher accuracy, but slower
@@ -39,6 +44,7 @@ cfg.merge_from_file(model_zoo.get_config_file(config))
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(config)
 cfg.merge_from_file("detect_letters/config.yaml")
 # cfg.MODEL.ROI_HEADS.POSITIVE_FRACTION = 0.5
+
 
 def append_data(conf, sample):
 	sample = process(sample)
@@ -69,12 +75,6 @@ def append_data(conf, sample):
 
 
 def setup_samples(preprocessor=None):
-	if os.path.exists(IMAGES_BASE):
-		shutil.rmtree(IMAGES_BASE)
-	os.makedirs(f'{DATASET_BASE}/annotations', exist_ok=True)
-	os.makedirs(f'{IMAGES_BASE}/train', exist_ok=True)
-	os.makedirs(f'{IMAGES_BASE}/val', exist_ok=True)
-
 	train_conf = {"type": 'train', "images": [], "annotations": [],
 								"categories": []}
 	val_conf = {"type": 'val', "images": [], "annotations": [], "categories": []}
@@ -86,19 +86,91 @@ def setup_samples(preprocessor=None):
 	for frag in TRAINING_SET:
 		for r in range(1, 33):
 			if r % 7 == 1:
-				append_data(train_conf, {'fragment': frag, 'srow': r, 'erow': r + 6,
-													 'preprocessor': preprocessor})
+				append_data(train_conf, {
+					'fragment': frag, 'srow': r, 'erow': r + 6, 'preprocessor': preprocessor})
 
 	for frag in VAL_SET:
 		for r in range(1, 33):
 			if r % 7 == 1:
-				append_data(val_conf, {'fragment': frag, 'srow': r, 'erow': r + 6,
-																 'preprocessor': preprocessor})
+				append_data(val_conf, {
+					'fragment': frag, 'srow': r, 'erow': r + 6, 'preprocessor': preprocessor})
 
 	print(f'Files creation time: {time.time() - image_start} seconds')
 
 	train_conf.pop('type')
 	val_conf.pop('type')
+	with open(f"{ANNOTATIONS}/train.json", "w", encoding="utf-8") as f:
+		json.dump(train_conf, f, indent=True)
+	with open(f"{ANNOTATIONS}/val.json", "w", encoding="utf-8") as f:
+		json.dump(val_conf, f, indent=True)
+
+
+def setup_tiled(preprocessor=None, tile_size=1024, overlap=.9):
+	train_conf = {"images": [], "annotations": [], "categories": []}
+	val_conf = {"images": [], "annotations": [], "categories": []}
+	for c in range(len(LABEL_LOOKUP)):
+		train_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
+		val_conf["categories"].append({"id": c, "name": LABEL_LOOKUP[c]})
+
+	files = {}
+	fragments = []
+	fragments.extend(TRAINING_SET)
+	fragments.extend(VAL_SET)
+	dataset = DSSLettersDataset(fragments, SINGLE_LETTERS_ONLY)
+	for _, label, letter_box in dataset:
+		filename = letter_box['filename']
+		if filename not in files:
+			files[filename] = {"id": filename, "letter_boxes": []}
+		file = files[filename]
+		letter_box["label"] = label
+		letter_box['mid_x'] = (letter_box['x1'] + letter_box['x2']) / 2
+		letter_box['mid_y'] = (letter_box['y1'] + letter_box['y2']) / 2
+		file["letter_boxes"].append(letter_box)
+
+	letter_id = 0
+	for filename, file in files.items():
+		conf, path = (train_conf, f'{IMAGES_BASE}/train') \
+			if filename not in VAL_SET else (val_conf, f'{IMAGES_BASE}/val')
+		file_path = get_img_file_path(filename, 9)
+		img = process_image(cv2.imread(file_path), preprocessor)[0]
+		h, w = img.shape[:2]
+		step_size = int(round(tile_size * overlap, 0))
+		for y_start in range(0, h, step_size):
+			y_end = y_start + tile_size if y_start + tile_size <= h else h
+			for x_start in range(0, w, step_size):
+				x_end = x_start + tile_size if x_start + tile_size <= w else w
+				tile_name = f'{filename}-{y_start}-{x_start}'
+
+				tile_letters = []
+				for letter_box in file["letter_boxes"]:
+					if x_start <= letter_box['mid_x'] <= x_end and y_start <= letter_box['mid_y'] <= y_end:
+						lb = {"label": letter_box["label"],
+									"x1": max(letter_box['x1'] - x_start, 0),
+									"y1": max(letter_box['y1'] - y_start, 0),
+									"x2": min(letter_box['x2'] - x_start, tile_size),
+									"y2": min(letter_box['y2'] - y_start, tile_size)}
+						width, height = letter_box['x2'] - letter_box['x1'], letter_box['y2'] - letter_box['y1']
+						tile_letters.append(lb)
+						conf["annotations"].append(
+								{"id": letter_id, "image_id": tile_name, "category_id": letter_box["label"],
+								 "bbox": [lb['x1'], lb['y1'], width, height],
+								 "area": width * height, "iscrowd": 0})
+						letter_id += 1
+
+				if len(tile_letters) < 14 or x_end - x_start < tile_size / 2 or y_end - y_start < tile_size / 2:
+					# If we did not add any letters, then no need to add to conf.
+					continue
+
+				conf["images"].append(
+						{"id": tile_name, "file_name": f'{tile_name}.jpg',
+						 "height": y_end - y_start, "width": x_end - x_start})
+				tile = img[y_start:y_end, x_start:x_end]
+				# annotated = draw_letter_boxes(tile, tile_letters)
+				# cv2.imshow('Tile Preview', annotated)
+				# cv2.waitKey(0)
+				os.makedirs(path, exist_ok=True)
+				cv2.imwrite(f'{path}/{tile_name}.jpg', tile)
+
 	with open(f"{ANNOTATIONS}/train.json", "w", encoding="utf-8") as f:
 		json.dump(train_conf, f, indent=True)
 	with open(f"{ANNOTATIONS}/val.json", "w", encoding="utf-8") as f:
@@ -116,12 +188,6 @@ def resize(filename, img, start_x, end_x, target_x, max_x, start_y, end_y, targe
 
 
 def setup_data(preprocessor):
-	if os.path.exists(IMAGES_BASE):
-		shutil.rmtree(IMAGES_BASE)
-	os.makedirs(f'{DATASET_BASE}/annotations', exist_ok=True)
-	os.makedirs(f'{IMAGES_BASE}/train', exist_ok=True)
-	os.makedirs(f'{IMAGES_BASE}/val', exist_ok=True)
-
 	train_conf = {"images": [], "annotations": [], "categories": []}
 	val_conf = {"images": [], "annotations": [], "categories": []}
 	for c in range(len(LABEL_LOOKUP)):
@@ -223,8 +289,19 @@ class Trainer(DefaultTrainer):
 		return hooks
 
 
-def train(iters, preprocessor, samples=False, resume=False):
-	setup_samples(preprocessor) if samples else setup_data(preprocessor)
+def train(iters, preprocessor, process:Process=Process.TILED, resume=False):
+	if os.path.exists(IMAGES_BASE):
+		shutil.rmtree(IMAGES_BASE)
+	os.makedirs(f'{DATASET_BASE}/annotations', exist_ok=True)
+	os.makedirs(f'{IMAGES_BASE}/train', exist_ok=True)
+	os.makedirs(f'{IMAGES_BASE}/val', exist_ok=True)
+
+	if process == Process.FULL:
+		setup_data(preprocessor)
+	elif process == Process.SAMPLES:
+		setup_samples(preprocessor)
+	elif process == Process.TILED:
+		setup_tiled(preprocessor)
 
 	register_coco_instances(
 			"dss_train",
@@ -457,8 +534,8 @@ def verify(predictor, fragments, preprocessor=None, non_labeled_only=False, refr
 		})
 
 	for scroll in sorted(scrolls, key=lambda s: s["nms_rp_percent"]):
-		print(
-				f'{scroll["scroll"]} {scroll["nms_percent"]}%, {scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
+		print(f'{scroll["scroll"]} {scroll["nms_percent"]}%, '
+					f'{scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
 
 	print_stats("Percents", percents)
 	print_stats("RP Percents", rp_percents)

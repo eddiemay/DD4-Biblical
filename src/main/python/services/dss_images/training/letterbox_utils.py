@@ -341,6 +341,20 @@ def is_in_row(row_box, letter_box):
 	return get_y_at_x(row_box, letter_box['x1']) >= letter_box['y2']
 
 
+def draw_letter_boxes(img, boxes, box_colors=None):
+	if box_colors is None:
+		box_colors = [[0, 255, 0], [255, 0, 0], [0, 0, 255]]
+
+	box_img = img.copy()
+	ci = 0
+	for b in boxes:
+		cv2.rectangle(
+				box_img, [b['x1'], b['y1']], [b['x2'], b['y2']], box_colors[ci], 2)
+		ci = (ci + 1) % len(box_colors)
+
+	return box_img
+
+
 row_map = {}
 def get_row(filename, row):
 	if not row_map:

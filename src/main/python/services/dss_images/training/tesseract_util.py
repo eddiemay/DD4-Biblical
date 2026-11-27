@@ -51,15 +51,14 @@ def draw_letter_boxes(img, boxes, box_colors=None):
 	if box_colors is None:
 		box_colors = [[0, 255, 0], [255, 0, 0], [0, 0, 255]]
 
-	letter_img = img.copy()
+	img = img.copy()
 	ci = 0
 	for b in boxes:
-		cv2.rectangle(letter_img,
-									[b['left'], b['top']], [b['right'], b['bottom']],
-									box_colors[ci], 2)
+		cv2.rectangle(
+				img, [b['left'], b['top']], [b['right'], b['bottom']], box_colors[ci], 2)
 		ci = (ci + 1) % len(box_colors)
 
-	return letter_img
+	return img
 
 
 def draw_letter_text(img, boxes, box_colors=None):

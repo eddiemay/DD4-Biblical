@@ -1,0 +1,8 @@
+path: ./dataset_ultralytics
+train: images/train
+val: images/val
+
+nc: 27  # 22 base + 5 final forms (ך, ם, ן, ף, ץ)
+names: ['aleph','bet','gimel','dalet','he','vav','zayin','chet','tet','yod','kaf_final','kaf',
+        'lamed','mem_final','mem','nun_final','nun','samech','ayin','pe_final','pe','tsadi_final','tsadi',
+        'qof','resh','shin','tav']

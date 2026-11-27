@@ -12,6 +12,7 @@ pandas
 requests
 scipy
 setuptools==80.9.0
+ultralytics
 # Tesseract only needed for legacy stuff
 # pytesseract
 
