@@ -303,7 +303,7 @@ def evaluate(model, fragment:str, display=True, preprocessor=None, override=Fals
 					row_box['_text'] += ' '
 					row_box['_predict_text'] += ' '
 				row_box['_text'] += letter_box['value']
-				row_box['_predict_text'] += letter_box['_predicted']
+				row_box['_predict_text'] += letter_box.get('_predicted', '')
 				if letter_box['value'] == letter_box['_predicted']:
 					if row_box.get('_last_non_removed') != None and \
 							row_box['_last_non_removed']['x1'] - letter_box['x2'] >= 5:
