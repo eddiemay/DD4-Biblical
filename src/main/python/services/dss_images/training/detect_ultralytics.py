@@ -260,21 +260,12 @@ def predict(model, fragment, preprocessor=None):
 
 	# from predict_letters import predict_letters
 	# predict_letters(letter_boxes)
-	nms = []
-	for box in sorted(letter_boxes, key=lambda b:b["_score"], reverse=True):
-		keep = True
-		for kept in nms:
-			if intersection_over_union(box, kept) > 0.25:
-				keep = False
-				break
-		if keep:
-			nms.append(box)
 
-	return image, results, letter_boxes, nms
+	return image, results, letter_boxes
 
 
 def evaluate(model, fragment:str, display=True, preprocessor=None, override=False):
-	image, results, letter_boxes, nms = predict(model, fragment, preprocessor)
+	image, results, letter_boxes = predict(model, fragment, preprocessor)
 
 	dataset = DSSLettersDataset(
 			fragments=[fragment], overrides=[fragment] if override else [],
@@ -282,13 +273,8 @@ def evaluate(model, fragment:str, display=True, preprocessor=None, override=Fals
 	row_boxes = []
 	for _, _, row_box in dataset:
 		row_box['_letterBoxes'] = []
-		row_box['_nmsBoxes'] = []
 		row_box['_text'] = ''
 		row_box['_predict_text'] = ''
-		row_box['_remove_mismatch_text'] = ''
-		row_box['_remove_union_text'] = ''
-		row_box['_nms_text'] = ''
-		row_box['_nms_rp_text'] = ''
 		row_boxes.append(row_box)
 
 	added_letters = 0
@@ -303,80 +289,27 @@ def evaluate(model, fragment:str, display=True, preprocessor=None, override=Fals
 					row_box['_text'] += ' '
 					row_box['_predict_text'] += ' '
 				row_box['_text'] += letter_box['value']
-				row_box['_predict_text'] += letter_box.get('_predicted', '')
-				if letter_box['value'] == letter_box.get('_predicted'):
-					if row_box.get('_last_non_removed') != None and \
-							row_box['_last_non_removed']['x1'] - letter_box['x2'] >= 5:
-						row_box['_remove_mismatch_text'] += ' '
-					row_box['_remove_mismatch_text'] += letter_box['value']
-					row_box['_last_non_removed'] = letter_box
-
-				iou = intersection_over_union(row_box.get('_prev_letter'), letter_box)
-				if iou < .25:
-					if row_box.get('_prev_letter') != None and row_box['_prev_letter']['x1'] - letter_box['x2'] >= 5:
-						row_box['_remove_union_text'] += ' '
-					row_box['_remove_union_text'] += letter_box['value']
-					row_box['_prev_letter'] = letter_box
 				row_lbs.append(letter_box)
 				added_letters += 1
 				break
 	print(f'{added_letters} letters added')
 
-	added_letters = 0
-	for letter_box in sorted(nms, key=lambda x: x['x2'], reverse=True):
-		for row_box in row_boxes:
-			if is_in_row(row_box, letter_box):
-				row_lbs = row_box['_nmsBoxes']
-				if len(row_lbs) > 0 and (row_lbs[-1]['x1'] - letter_box['x2'] >= 5):
-					row_box['_nms_text'] += ' '
-					row_box['_nms_rp_text'] += ' '
-				row_box['_nms_text'] += letter_box['value']
-				row_box['_nms_rp_text'] += letter_box.get("_predicted", '')
-				row_lbs.append(letter_box)
-				added_letters += 1
-				break
-	print(f'NMS {added_letters} letters added')
-
 	target_text = get_frag_text(fragment)
 	no_space = ''.join(target_text.split())
 	no_space_len = len(no_space)
 	pred_text = ''
-	repred_text = ''
-	remove_mismatch_text = ''
-	remove_union_text = ''
-	nms_text = ''
-	nms_rp_text = ''
 	for row_box in row_boxes:
 		pred_text += row_box['_text'] + '\n'
-		repred_text += row_box['_predict_text'] + '\n'
-		remove_mismatch_text += row_box['_remove_mismatch_text'] + '\n'
-		remove_union_text += row_box['_remove_union_text'] + '\n'
-		nms_text += row_box['_nms_text'] + '\n'
-		nms_rp_text += row_box['_nms_rp_text'] + '\n'
 
 	ld = Levenshtein.distance(no_space, ''.join(pred_text.split()))
 	percent = round((no_space_len - ld) * 100 / no_space_len, 2)
-	rp_ld = Levenshtein.distance(no_space, ''.join(repred_text.split()))
-	rp_percent = round((no_space_len - rp_ld) * 100 / no_space_len, 2)
-	rm_ld = Levenshtein.distance(no_space, ''.join(remove_mismatch_text.split()))
-	rm_percent = round((no_space_len - rm_ld) * 100 / no_space_len, 2)
-	ru_ld = Levenshtein.distance(no_space, ''.join(remove_union_text.split()))
-	ru_percent = round((no_space_len - ru_ld) * 100 / no_space_len, 2)
-	nms_ld = Levenshtein.distance(no_space, ''.join(nms_text.split()))
-	nms_percent = round((no_space_len - nms_ld) * 100 / no_space_len, 2)
-	nms_rp_ld = Levenshtein.distance(no_space, ''.join(nms_rp_text.split()))
-	nms_rp_percent = round((no_space_len - nms_rp_ld) * 100 / no_space_len, 2)
 	print(
-			f'{fragment} Diff: {ld} {percent}%, Repredict Diff: {rp_ld} {rp_percent}%,',
-			f'Remove Miss Diff: {rm_ld} {rm_percent}%, Remove Union Text: {ru_ld} {ru_percent}%,',
-			f'NMS Diff: {nms_ld} {nms_percent}%, NMS RP Diff: {nms_rp_ld} {nms_rp_percent}%,',
+			f'{fragment} Diff: {ld} {percent}%',
 			f'Prediction Diff: {len(letter_boxes) - matching_predictions} {matching_predictions * 100 / len(letter_boxes):.2f}%')
 
 	if display:
 		print('\nTarget Text:\n', target_text)
 		print('Pred Text:\n', pred_text)
-		print('Remove Missmatch Text:\n', remove_mismatch_text)
-		print('Remove Union Text:\n', remove_union_text)
 
 		# Extract detections
 		detections = []
@@ -396,17 +329,12 @@ def evaluate(model, fragment:str, display=True, preprocessor=None, override=Fals
 			# print(det)
 		print(f"✅ Detected {len(detections)} letters")
 
-	return percent, rp_percent, rm_percent, ru_percent, nms_percent, nms_rp_percent
+	return percent
 
 
 def verify(model, fragments, preprocessor=None, non_labeled_only=False, refresh=False):
 	scrolls = []
 	percents = []
-	rp_percents = []
-	rm_percents = []
-	ru_percents = []
-	nms_percents = []
-	nms_rp_percents = []
 
 	counts = {}
 	dataset = DSSLettersDataset(fragments=fragments)
@@ -422,30 +350,18 @@ def verify(model, fragments, preprocessor=None, non_labeled_only=False, refresh=
 				dataset = DSSLettersDataset(fragments=[scroll], overrides=[scroll])
 				if len(dataset) > 500:
 					continue
-			result = evaluate(model, scroll, False, preprocessor=preprocessor)
-			percents.append(result[0])
-			rp_percents.append(result[1])
-			rm_percents.append(result[2])
-			ru_percents.append(result[3])
-			nms_percents.append(result[4])
-			nms_rp_percents.append(result[5])
+			percent = evaluate(model, scroll, False, preprocessor=preprocessor)
+			percents.append(percent)
 		scrolls.append({
 			"scroll": scroll,
-			"nms_percent": result[4],
-			"nms_rp_percent": result[5],
+			"percent": percent,
 			"labeled": counts[scroll] > 500
 		})
 
-	for scroll in sorted(scrolls, key=lambda s: s["nms_rp_percent"]):
-		print(f'{scroll["scroll"]} {scroll["nms_percent"]}%, '
-					f'{scroll["nms_rp_percent"]}% labeled: {scroll["labeled"]}')
+	for scroll in sorted(scrolls, key=lambda s: s["percent"]):
+		print(f'{scroll["scroll"]} {scroll["percent"]}%, labeled: {scroll["labeled"]}')
 
 	print_stats("Percents", percents)
-	print_stats("RP Percents", rp_percents)
-	print_stats("RM Percents", rm_percents)
-	print_stats("RU Percents", ru_percents)
-	print_stats("NMS Percents", nms_percents)
-	print_stats("NMS RP Percents", nms_rp_percents)
 
 
 if __name__ == '__main__':
