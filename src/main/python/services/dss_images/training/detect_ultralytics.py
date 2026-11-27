@@ -331,7 +331,7 @@ def evaluate(model, fragment:str, display=True, preprocessor=None, override=Fals
 					row_box['_nms_text'] += ' '
 					row_box['_nms_rp_text'] += ' '
 				row_box['_nms_text'] += letter_box['value']
-				row_box['_nms_rp_text'] += letter_box["_predicted"]
+				row_box['_nms_rp_text'] += letter_box.get("_predicted", '')
 				row_lbs.append(letter_box)
 				added_letters += 1
 				break
