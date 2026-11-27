@@ -294,7 +294,7 @@ def evaluate(model, fragment:str, display=True, preprocessor=None, override=Fals
 	added_letters = 0
 	matching_predictions = 0
 	for letter_box in sorted(letter_boxes, key=lambda x: x['x2'], reverse=True):
-		if letter_box['value'] == letter_box['_predicted']:
+		if letter_box['value'] == letter_box.get('_predicted'):
 			matching_predictions += 1
 		for row_box in row_boxes:
 			if is_in_row(row_box, letter_box):
