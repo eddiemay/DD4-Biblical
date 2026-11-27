@@ -48,10 +48,11 @@ def setup_data_yolo(preprocessor):
 
 	# Create YOLO directory structure
 	for split in ['train', 'val']:
-		shutil.rmtree(os.path.join(IMG_DIR, split))
-		shutil.rmtree(os.path.join(LAB_DIR, split))
-		os.makedirs(os.path.join(IMG_DIR, split), exist_ok=True)
-		os.makedirs(os.path.join(LAB_DIR, split), exist_ok=True)
+		img_dir, label_dir = os.path.join(IMG_DIR, split), os.path.join(LAB_DIR, split)
+		if os.path.exists(img_dir): shutil.rmtree(img_dir)
+		if os.path.exists(label_dir): shutil.rmtree(label_dir)
+		os.makedirs(img_dir, exist_ok=True)
+		os.makedirs(label_dir, exist_ok=True)
 
 	# Group annotations by filename (same logic as your original)
 	files = {}
